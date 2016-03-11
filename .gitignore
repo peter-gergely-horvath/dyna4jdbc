@@ -1,4 +1,6 @@
 target/
+.idea/
+dyna4jdbc.iml
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
