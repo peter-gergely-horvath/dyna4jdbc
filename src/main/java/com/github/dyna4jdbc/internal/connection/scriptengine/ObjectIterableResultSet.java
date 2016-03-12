@@ -10,19 +10,16 @@ import java.sql.*;
 import java.util.Calendar;
 import java.util.Map;
 
-class SingleStringResultSet extends ClosableSQLObject implements ResultSet{
+class ObjectIterableResultSet extends ClosableSQLObject implements ResultSet{
 
     private final String theResult;
     private final ScriptEngineStatement scriptEngineStatement;
-	private final ResultSetObjectIterable resultSetObjectIterable;
 
     private int currentRow = -1;
 
-
-    SingleStringResultSet(String theResult, ScriptEngineStatement scriptEngineStatement, ResultSetObjectIterable resultSetObjectIterable) {
+    ObjectIterableResultSet(String theResult, ScriptEngineStatement scriptEngineStatement) {
         this.theResult = theResult;
         this.scriptEngineStatement = scriptEngineStatement;
-        this.resultSetObjectIterable = resultSetObjectIterable;
     }
 
     public boolean next() throws SQLException {
@@ -798,8 +795,7 @@ class SingleStringResultSet extends ClosableSQLObject implements ResultSet{
         return (T) theResult;
     }
 
-    @SuppressWarnings("unchecked")
-	public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
+    public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
         if("result".equalsIgnoreCase(columnLabel)) {
             throw new SQLException("Illegal columnLabel:" + columnLabel);
         }
@@ -811,17 +807,11 @@ class SingleStringResultSet extends ClosableSQLObject implements ResultSet{
         return (T) theResult;
     }
 
-    @SuppressWarnings("unchecked")
-	public <T> T unwrap(Class<T> iface) throws SQLException {
-    	if(ResultSetObjectIterable.class.isAssignableFrom(iface)) return (T) resultSetObjectIterable;
-    	
-    	throw new SQLException();
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        throw new SQLException();
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-    	if(iface == ResultSetObjectIterable.class) return true;
-    	
-    	
         return false;
     }
 

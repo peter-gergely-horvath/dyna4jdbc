@@ -1,6 +1,9 @@
 package com.github.dyna4jdbc;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import com.github.dyna4jdbc.internal.connection.scriptengine.ResultSetObjectIterable;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -22,13 +25,26 @@ public class TestScriptEngine {
 
         statement.executeUpdate("var myNumber = 0.5 ");
         statement.executeUpdate("var msg = 'Hello World'");
+        statement.executeUpdate("print (msg)");
 
-        boolean execute = statement.execute("print ('Hello')");
+        statement.execute("print ('Hello');print (msg)");
 
         ResultSet resultSet = statement.getResultSet();
-        while (resultSet.next()) {
-            System.out.println(resultSet.getObject(1));
+        
+        Assert.assertTrue(resultSet.isWrapperFor(ResultSetObjectIterable.class));
+        
+        System.out.println("--- BEGIN: Iterator ---");
+        for(Object obj : resultSet.unwrap(ResultSetObjectIterable.class)) {
+        	System.out.println(obj);
         }
+        System.out.println("--- END: Iterator ---");
+        
+        System.out.println("--- BEGIN: ResultSet ---");
+        while (resultSet.next()) {
+            String str = resultSet.getString(1);
+			System.out.println(str);
+        }
+        System.out.println("--- END: ResultSet ---");
 
     }
 

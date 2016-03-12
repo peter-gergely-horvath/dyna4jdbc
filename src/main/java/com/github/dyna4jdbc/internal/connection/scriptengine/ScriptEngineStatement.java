@@ -12,6 +12,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 class ScriptEngineStatement extends ClosableSQLObject implements java.sql.Statement {
 
@@ -26,18 +29,17 @@ class ScriptEngineStatement extends ClosableSQLObject implements java.sql.Statem
         return null;
     }
 
-    public boolean execute(final String sql) throws SQLException {
+    public boolean execute(final String script) throws SQLException {
 
-        final Writer writer = new StringWriter();
-        final PrintWriter printWriter = new PrintWriter(writer);
+        final ObjectCapturingPrintWriter objectCapturingPrintWriter = new ObjectCapturingPrintWriter();
 
         try {
             scriptEngineConnection.executeUsingScriptEngine(new ScriptEngineConnection.ScriptEngineCallback<Void>() {
                 public Void execute(ScriptEngine engine) throws ScriptException {
 
-                    engine.getContext().setWriter(printWriter);
+                    engine.getContext().setWriter(objectCapturingPrintWriter);
 
-                    engine.eval(sql);
+                    engine.eval(script);
 
                     return null;
                 }
@@ -46,19 +48,51 @@ class ScriptEngineStatement extends ClosableSQLObject implements java.sql.Statem
         } catch (Exception e) {
             throw new SQLException(e.getMessage(), e);
         }
-
-        String string = writer.toString();
-
-        if(string.isEmpty()) {
+        
+        StringBuilder sb = new StringBuilder();
+        
+        for(Object objectWritten : objectCapturingPrintWriter.getUnmodifyAbleCapturedObjectList()) {
+        	
+        	String stringToWrite;
+        	
+        	if(objectWritten == null) {
+        		stringToWrite = null;
+        	} else {
+				Class<?> objectClass = objectWritten.getClass();
+				if(! objectClass.isArray()) {
+					stringToWrite = objectWritten.toString();
+				} else {
+					Class<?> componentType = objectClass.getComponentType();
+					if(! componentType.isPrimitive()) {
+						stringToWrite = Arrays.deepToString((Object[]) objectWritten);
+					} else
+						stringToWrite = Arrays.toString((char[]) objectWritten);
+				}
+			}
+        		
+        	sb.append(stringToWrite);
+        }
+        	
+        String string = sb.toString();
+        
+        if(sb.toString().isEmpty()) {
             return false;
 
         } else {
 
-            resultSet = new SingleStringResultSet(string, this);
+            resultSet = new SingleStringResultSet(string, this, new ResultSetObjectIterable() {
+				
+				@Override
+				public Iterator<Object> iterator() {
+					return objectCapturingPrintWriter.getUnmodifyAbleCapturedObjectList().iterator();
+				}
+			});
             return true;
         }
 
     }
+    
+    
 
     public int executeUpdate(final String sql) throws SQLException {
 
