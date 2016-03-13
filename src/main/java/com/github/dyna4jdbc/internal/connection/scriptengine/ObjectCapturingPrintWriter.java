@@ -34,6 +34,10 @@ class ObjectCapturingPrintWriter extends java.io.PrintWriter {
 		}
 	}
 	
+	boolean getCapturedAnyOutput() {
+		return ! capturedObjects.isEmpty();
+	}
+	
 	
 
 	@Override
@@ -126,10 +130,16 @@ class ObjectCapturingPrintWriter extends java.io.PrintWriter {
     }
 
     public void write(String str, int off, int len) {
-        char arrayToWrite[] = new char[len];
-        str.getChars(off, (off + len), arrayToWrite, 0);
-        
-        printInternal(arrayToWrite);
+    	
+    	if(str.length() == len) {
+    		write(str);
+    		
+    	} else {
+    		char arrayToWrite[] = new char[len];
+            str.getChars(off, (off + len), arrayToWrite, 0);
+            
+            printInternal(arrayToWrite);
+    	}
     }
 
     public void write(char[] x) {

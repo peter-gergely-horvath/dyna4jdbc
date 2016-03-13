@@ -25,9 +25,10 @@ public class TestScriptEngine {
 
         statement.executeUpdate("var myNumber = 0.5 ");
         statement.executeUpdate("var msg = 'Hello World'");
-        statement.executeUpdate("print (msg)");
 
-        statement.execute("print ('Hello');print (msg)");
+        //statement.execute("('Hello');print (myNumber)");
+        
+        statement.execute("print(new java.util.Date())");
 
         ResultSet resultSet = statement.getResultSet();
         

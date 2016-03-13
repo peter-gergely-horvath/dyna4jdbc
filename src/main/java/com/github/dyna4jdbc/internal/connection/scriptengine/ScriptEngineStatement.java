@@ -1,279 +1,354 @@
 package com.github.dyna4jdbc.internal.connection.scriptengine;
 
-import com.github.dyna4jdbc.internal.ClosableSQLObject;
-import com.github.dyna4jdbc.internal.SQLError;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
-import java.util.Arrays;
+import java.sql.Statement;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+
+import com.github.dyna4jdbc.internal.ClosableSQLObject;
+import com.github.dyna4jdbc.internal.SQLError;
+
 class ScriptEngineStatement extends ClosableSQLObject implements java.sql.Statement {
 
-    private final ScriptEngineConnection scriptEngineConnection;
-    private SingleStringResultSet resultSet;
+	private final ScriptEngineConnection scriptEngineConnection;
+	private final ResultSetFactory resultSetFactory;
 
-    public ScriptEngineStatement(ScriptEngineConnection scriptEngineConnection) {
-        this.scriptEngineConnection = scriptEngineConnection;
-    }
+	private Iterator<ResultSet> resultSetIterator;
 
-    public ResultSet executeQuery(String sql) throws SQLException {
-        return null;
-    }
+	public ScriptEngineStatement(ScriptEngineConnection scriptEngineConnection, ResultSetFactory resultSetFactory) {
+		this.scriptEngineConnection = scriptEngineConnection;
+		this.resultSetFactory = resultSetFactory;
+	}
 
-    public boolean execute(final String script) throws SQLException {
+	public ResultSet executeQuery(String script) throws SQLException {
+		try {
+			
+			ResultSet resultSetToReturn;
+			
+			final ObjectCapturingPrintWriter objectCapturingPrintWriter = new ObjectCapturingPrintWriter();
+			
+			executScriptUsingCustomWriters(script, objectCapturingPrintWriter, null);
 
-        final ObjectCapturingPrintWriter objectCapturingPrintWriter = new ObjectCapturingPrintWriter();
+			final boolean resultsCaptured = objectCapturingPrintWriter.getCapturedAnyOutput();
+			if (resultsCaptured) {
 
-        try {
-            scriptEngineConnection.executeUsingScriptEngine(new ScriptEngineConnection.ScriptEngineCallback<Void>() {
-                public Void execute(ScriptEngine engine) throws ScriptException {
-
-                    engine.getContext().setWriter(objectCapturingPrintWriter);
-
-                    engine.eval(script);
-
-                    return null;
-                }
-            });
-
-        } catch (Exception e) {
-            throw new SQLException(e.getMessage(), e);
-        }
-        
-        StringBuilder sb = new StringBuilder();
-        
-        for(Object objectWritten : objectCapturingPrintWriter.getUnmodifyAbleCapturedObjectList()) {
-        	
-        	String stringToWrite;
-        	
-        	if(objectWritten == null) {
-        		stringToWrite = null;
-        	} else {
-				Class<?> objectClass = objectWritten.getClass();
-				if(! objectClass.isArray()) {
-					stringToWrite = objectWritten.toString();
-				} else {
-					Class<?> componentType = objectClass.getComponentType();
-					if(! componentType.isPrimitive()) {
-						stringToWrite = Arrays.deepToString((Object[]) objectWritten);
-					} else
-						stringToWrite = Arrays.toString((char[]) objectWritten);
-				}
-			}
-        		
-        	sb.append(stringToWrite);
-        }
-        	
-        String string = sb.toString();
-        
-        if(sb.toString().isEmpty()) {
-            return false;
-
-        } else {
-
-            resultSet = new SingleStringResultSet(string, this, new ResultSetObjectIterable() {
+				List<Object> resultObjectList = objectCapturingPrintWriter.getUnmodifyAbleCapturedObjectList();
 				
-				@Override
-				public Iterator<Object> iterator() {
-					return objectCapturingPrintWriter.getUnmodifyAbleCapturedObjectList().iterator();
+				List<ResultSet> resultSetList = resultSetFactory.newResultSets(this, resultObjectList);
+				switch (resultSetList.size()) {
+				case 0:
+					resultSetToReturn = new EmptyResultSet();
+					break;
+				
+				case 1:
+					resultSetToReturn = resultSetList.get(0);
+					break;
+					
+				default:
+					throw SQLError.RESULT_SET_MULTIPLE_EXPECTED_ONE.raiseException(resultSetList.size());
 				}
-			});
-            return true;
-        }
+				
+			} else {
+				resultSetToReturn = new EmptyResultSet();
+			}
 
-    }
-    
-    
+			return resultSetToReturn;
+		} 
+		catch (ScriptException se) {
+			throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se);
+		}
+		catch (Throwable t) {
+			throw SQLError.UNEXPECTED_THROWABLE.raiseException(t);
+		}
+	}
 
-    public int executeUpdate(final String sql) throws SQLException {
+	public boolean execute(final String script) throws SQLException {
 
-        try {
-            scriptEngineConnection.executeUsingScriptEngine(new ScriptEngineConnection.ScriptEngineCallback<Void>() {
-                public Void execute(ScriptEngine engine) throws ScriptException {
+		try {
+			final ObjectCapturingPrintWriter objectCapturingPrintWriter = new ObjectCapturingPrintWriter();
+			
+			executScriptUsingCustomWriters(script, objectCapturingPrintWriter, null);
 
-                        engine.getContext().setWriter(
-                                DisallowAllWritesPrintWriter.forMessage(
-                                        SQLError.USING_STDOUT_FROM_UPDATE.toString()));
+			boolean resultsCaptured = objectCapturingPrintWriter.getCapturedAnyOutput();
+			if (resultsCaptured) {
 
-                        engine.eval(sql);
+				List<Object> resultObjectList = objectCapturingPrintWriter.getUnmodifyAbleCapturedObjectList();
+				resultSetIterator = resultSetFactory.newResultSets(this, resultObjectList).iterator();
+			}
 
-                    return null;
-                }
-            });
+			return resultsCaptured;
+		}
+		catch (ScriptException se) {
+			throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se);
+		}
+		catch (Throwable t) {
+			throw SQLError.UNEXPECTED_THROWABLE.raiseException(t);
+		}
+	}
 
-        } catch (Exception e) {
-            throw new SQLException(e.getMessage(), e);
-        }
+	public int executeUpdate(final String script) throws SQLException {
 
-        return 0;
-    }
+		try {
+			final DisallowAllWritesPrintWriter printWriter = DisallowAllWritesPrintWriter
+					.forMessage(SQLError.USING_STDOUT_FROM_UPDATE.toString());
 
-    public int executeUpdate(String sql, int autoGeneratedKeys) throws SQLException {
-        return 0;
-    }
+			executScriptUsingCustomWriters(script, printWriter, null);
 
-    public int executeUpdate(String sql, int[] columnIndexes) throws SQLException {
-        return 0;
-    }
+			return 0;
 
-    public int executeUpdate(String sql, String[] columnNames) throws SQLException {
-        return 0;
-    }
+		}
+		catch (ScriptException se) {
+			throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se);
+		}
+		catch (Throwable t) {
+			throw SQLError.UNEXPECTED_THROWABLE.raiseException(t);
+		}
+	}
 
-    public boolean execute(String sql, int autoGeneratedKeys) throws SQLException {
-        return false;
-    }
+	private void executScriptUsingCustomWriters(final String script, Writer outWriter, Writer errorWriter)
+			throws ScriptException {
 
-    public boolean execute(String sql, int[] columnIndexes) throws SQLException {
-        return false;
-    }
+		ExecuteScriptUsingCustomPrintWriter customWritersCallback = new ExecuteScriptUsingCustomPrintWriter(script,
+				outWriter, errorWriter);
 
-    public boolean execute(String sql, String[] columnNames) throws SQLException {
-        return false;
-    }
+		scriptEngineConnection.executeUsingScriptEngine(customWritersCallback);
+	}
 
-    public int getMaxFieldSize() throws SQLException {
-        return 0;
-    }
+	private static final class ExecuteScriptUsingCustomPrintWriter
+			implements ScriptEngineConnection.ScriptEngineCallback<Void> {
 
-    public void setMaxFieldSize(int max) throws SQLException {
+		private final String script;
+		private final Writer outWriter;
+		private final Writer errorWriter;
 
-    }
+		private ExecuteScriptUsingCustomPrintWriter(String script, Writer outWriter, Writer errorWriter) {
+			this.script = script;
+			this.outWriter = outWriter;
+			this.errorWriter = errorWriter;
+		}
 
-    public int getMaxRows() throws SQLException {
-        return 0;
-    }
+		public Void execute(ScriptEngine engine) throws ScriptException {
 
-    public void setMaxRows(int max) throws SQLException {
+			if (outWriter != null) {
+				engine.getContext().setWriter(outWriter);
+			}
 
-    }
+			if (errorWriter != null) {
+				engine.getContext().setErrorWriter(errorWriter);
+			}
 
-    public void setEscapeProcessing(boolean enable) throws SQLException {
+			engine.eval(script);
 
-    }
+			return null;
+		}
+	}
 
-    public int getQueryTimeout() throws SQLException {
-        return 0;
-    }
+	public int executeUpdate(String sql, int autoGeneratedKeys) throws SQLException {
+		throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+				"java.sql.Statement.executeUpdate(String, int)");
+	}
 
-    public void setQueryTimeout(int seconds) throws SQLException {
+	public int executeUpdate(String sql, int[] columnIndexes) throws SQLException {
+		throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+				"java.sql.Statement.executeUpdate(String, int[])");
+	}
 
-    }
+	public int executeUpdate(String sql, String[] columnNames) throws SQLException {
+		throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+				"java.sql.Statement.executeUpdate(String, String[])");
+	}
 
-    public void cancel() throws SQLException {
+	public boolean execute(String sql, int autoGeneratedKeys) throws SQLException {
+		throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+				"java.sql.Statement.execute(String, int)");
+	}
 
-    }
+	public boolean execute(String sql, int[] columnIndexes) throws SQLException {
+		throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+				"java.sql.Statement.execute(String, int[])");
+	}
 
-    public SQLWarning getWarnings() throws SQLException {
-        return null;
-    }
+	public boolean execute(String sql, String[] columnNames) throws SQLException {
+		throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+				"java.sql.Statement.execute(String, String[])");
+	}
 
-    public void clearWarnings() throws SQLException {
+	public int getMaxFieldSize() throws SQLException {
+		return 0;
+	}
 
-    }
+	public void setMaxFieldSize(int max) throws SQLException {
+		// TODO: implement
+	}
 
-    public void setCursorName(String name) throws SQLException {
+	public int getMaxRows() throws SQLException {
+		return 0; // no limit
+	}
 
-    }
+	public void setMaxRows(int max) throws SQLException {
+		// TODO: implement
+	}
 
+	public void setEscapeProcessing(boolean enable) throws SQLException {
 
-    public ResultSet getResultSet() throws SQLException {
-        SingleStringResultSet resultSetToReturn = this.resultSet;
-        this.resultSet = null;
-        return resultSetToReturn;
-    }
+	}
 
-    public int getUpdateCount() throws SQLException {
-        return 0;
-    }
+	public int getQueryTimeout() throws SQLException {
+		return 0;
+	}
 
-    public boolean getMoreResults() throws SQLException {
-        return this.resultSet != null;
-    }
+	public void setQueryTimeout(int seconds) throws SQLException {
 
-    public void setFetchDirection(int direction) throws SQLException {
+	}
 
-    }
+	public void cancel() throws SQLException {
+		SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+				"java.sql.Statement.cancel()");
+	}
 
-    public int getFetchDirection() throws SQLException {
-        return 0;
-    }
+	public SQLWarning getWarnings() throws SQLException {
+		return null;
+	}
 
-    public void setFetchSize(int rows) throws SQLException {
+	public void clearWarnings() throws SQLException {
 
-    }
+	}
 
-    public int getFetchSize() throws SQLException {
-        return 0;
-    }
+	public void setCursorName(String name) throws SQLException {
+		// No-op: "If the database does not support positioned update/delete, this method is a noop"
+	}
 
-    public int getResultSetConcurrency() throws SQLException {
-        return 0;
-    }
+	public ResultSet getResultSet() throws SQLException {
+		
+		ResultSet resultSetToReturn;
+		if(resultSetIterator != null && resultSetIterator.hasNext()) { 
+			resultSetToReturn = resultSetIterator.next();
+		} else {
+			resultSetToReturn = null;
+		}
+		
+		return resultSetToReturn;
+	}
 
-    public int getResultSetType() throws SQLException {
-        return 0;
-    }
+	public int getUpdateCount() throws SQLException {
+		return 0;
+	}
 
-    public void addBatch(String sql) throws SQLException {
+	public boolean getMoreResults() throws SQLException {
+		return resultSetIterator.hasNext();
+	}
+	
+	public boolean getMoreResults(int current) throws SQLException {
+		if(current != Statement.CLOSE_CURRENT_RESULT && 
+				current != Statement.KEEP_CURRENT_RESULT && 
+				current != Statement.CLOSE_ALL_RESULTS) {
+			throw new SQLException("Invalid value for current: " + current);
+		}
+		
+		if(current != Statement.CLOSE_CURRENT_RESULT) {
+			throw new SQLException(
+					"Only Statement.CLOSE_CURRENT_RESULT is supported: " + 
+							current);
+		}
+		return getMoreResults();
+	}
 
-    }
+	public void setFetchDirection(int direction) throws SQLException {
+		if(direction ==  ResultSet.FETCH_FORWARD ||
+				direction == ResultSet.FETCH_REVERSE ||
+						direction == ResultSet.FETCH_UNKNOWN) {
+			// no-op: setFetchDirection is just a hint, a driver might ignore it
+		}
+		else {
+			// signal illegal argument
+			throw new SQLException("Invalid direction: " + direction);
+		}
+	}
 
-    public void clearBatch() throws SQLException {
+	public int getFetchDirection() throws SQLException {
+		return ResultSet.FETCH_FORWARD;
+	}
 
-    }
+	public void setFetchSize(int rows) throws SQLException {
+		if(rows < 0) { 
+			throw new SQLException("Invalid fetchSize: " + rows);
+		}
+		
+		if(rows > 0) {
+			throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+					"Setting a non-zero fetchSize: " + rows);
+		}
+		
+		// zero -- no-op
+	}
 
-    public int[] executeBatch() throws SQLException {
-        return new int[0];
-    }
+	public int getFetchSize() throws SQLException {
+		return 0;
+	}
 
-    public Connection getConnection() throws SQLException {
-        return scriptEngineConnection;
-    }
+	public int getResultSetConcurrency() throws SQLException {
+		return ResultSet.CONCUR_READ_ONLY;
+	}
 
-    public boolean getMoreResults(int current) throws SQLException {
-        return false;
-    }
+	public int getResultSetType() throws SQLException {
+		return ResultSet.TYPE_FORWARD_ONLY;
+	}
 
-    public ResultSet getGeneratedKeys() throws SQLException {
-        return new EmptyResultSet();
-    }
+	public void addBatch(String sql) throws SQLException {
+		throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+				"java.sql.Statement.addBatch(String)");
+	}
 
+	public void clearBatch() throws SQLException {
+		throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+				"java.sql.Statement.clearBatch()");
+	}
 
-    public int getResultSetHoldability() throws SQLException {
-        return 0;
-    }
+	public int[] executeBatch() throws SQLException {
+		throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+				"java.sql.Statement.executeBatch()");
+	}
 
-    public void setPoolable(boolean poolable) throws SQLException {
+	public Connection getConnection() throws SQLException {
+		return scriptEngineConnection;
+	}
 
-    }
+	public ResultSet getGeneratedKeys() throws SQLException {
+		return new EmptyResultSet();
+	}
 
-    public boolean isPoolable() throws SQLException {
-        return false;
-    }
+	public int getResultSetHoldability() throws SQLException {
+		return ResultSet.HOLD_CURSORS_OVER_COMMIT;
+	}
 
-    public void closeOnCompletion() throws SQLException {
+	public void setPoolable(boolean poolable) throws SQLException {
 
-    }
+	}
 
-    public boolean isCloseOnCompletion() throws SQLException {
-        return false;
-    }
+	public boolean isPoolable() throws SQLException {
+		return false; 
+	}
 
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        return null;
-    }
+	public void closeOnCompletion() throws SQLException {
+		// TODO: implement
+	}
 
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
-    }
+	public boolean isCloseOnCompletion() throws SQLException {
+		return false; // TODO: implement
+	}
+
+	public <T> T unwrap(Class<T> iface) throws SQLException {
+		return null;
+	}
+
+	public boolean isWrapperFor(Class<?> iface) throws SQLException {
+		return false;
+	}
 }

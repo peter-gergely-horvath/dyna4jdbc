@@ -53,7 +53,7 @@ public class ScriptEngineConnection extends ClosableSQLObject implements java.sq
 
     public Statement createStatement() throws SQLException {
         checkNotClosed();
-        return new ScriptEngineStatement(this);
+        return new ScriptEngineStatement(this, new DummySingleStringResultSetFactoryImpl(this));
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
@@ -324,7 +324,7 @@ public class ScriptEngineConnection extends ClosableSQLObject implements java.sq
     }
 
 
-    void executeUsingScriptEngine(ScriptEngineCallback scriptEngineCallback) throws ScriptException {
+    void executeUsingScriptEngine(ScriptEngineCallback<Void> scriptEngineCallback) throws ScriptException {
 
         synchronized (engine) {
             Writer originalWriter = engine.getContext().getWriter();
