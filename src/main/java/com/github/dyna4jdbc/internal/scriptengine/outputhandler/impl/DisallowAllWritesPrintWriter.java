@@ -1,13 +1,13 @@
-package com.github.dyna4jdbc.internal.connection.scriptengine;
+package com.github.dyna4jdbc.internal.scriptengine.outputhandler.impl;
 
 import java.io.IOException;
 import java.io.Writer;
 
-class DisallowAllWritesPrintWriter extends java.io.PrintWriter {
+public class DisallowAllWritesPrintWriter extends java.io.PrintWriter {
 
     private final String message;
 
-    static DisallowAllWritesPrintWriter forMessage(String message) {
+    public static DisallowAllWritesPrintWriter forMessage(String message) {
         return new DisallowAllWritesPrintWriter(message);
     }
 

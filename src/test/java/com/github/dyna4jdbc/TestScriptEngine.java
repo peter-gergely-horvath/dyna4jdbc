@@ -3,7 +3,7 @@ package com.github.dyna4jdbc;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.github.dyna4jdbc.internal.connection.scriptengine.ResultSetObjectIterable;
+import com.github.dyna4jdbc.internal.scriptengine.ResultSetObjectIterable;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

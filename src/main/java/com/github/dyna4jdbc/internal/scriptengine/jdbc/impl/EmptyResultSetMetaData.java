@@ -1,4 +1,4 @@
-package com.github.dyna4jdbc.internal.connection.scriptengine;
+package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSetMetaData;

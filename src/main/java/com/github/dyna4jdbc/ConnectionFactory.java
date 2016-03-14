@@ -1,6 +1,6 @@
 package com.github.dyna4jdbc;
 
-import com.github.dyna4jdbc.internal.connection.scriptengine.ScriptEngineConnection;
+import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScriptEngineConnection;
 
 import java.lang.reflect.Constructor;
 import java.util.Properties;

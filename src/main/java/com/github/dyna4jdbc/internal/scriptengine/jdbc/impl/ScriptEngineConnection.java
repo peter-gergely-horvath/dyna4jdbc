@@ -1,6 +1,7 @@
-package com.github.dyna4jdbc.internal.connection.scriptengine;
+package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
 import com.github.dyna4jdbc.internal.ClosableSQLObject;
+import com.github.dyna4jdbc.internal.scriptengine.outputhandler.impl.DummyScriptOutputHandlerFactory;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -53,7 +54,7 @@ public class ScriptEngineConnection extends ClosableSQLObject implements java.sq
 
     public Statement createStatement() throws SQLException {
         checkNotClosed();
-        return new ScriptEngineStatement(this, new DummySingleStringResultSetFactoryImpl(this));
+        return new ScriptEngineStatement(this, new DummyScriptOutputHandlerFactory(this));
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {

@@ -1,4 +1,4 @@
-package com.github.dyna4jdbc.internal.connection.scriptengine;
+package com.github.dyna4jdbc.internal.scriptengine.outputhandler.impl;
 
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -7,10 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-class ObjectCapturingPrintWriter extends java.io.PrintWriter {
+public class ObjectCapturingPrintWriter extends java.io.PrintWriter {
 
 
-	ObjectCapturingPrintWriter() {
+	public ObjectCapturingPrintWriter() {
 		super(DisallowAllWritesWriter.INSTANCE);
 	}
 
@@ -34,12 +34,6 @@ class ObjectCapturingPrintWriter extends java.io.PrintWriter {
 		}
 	}
 	
-	boolean getCapturedAnyOutput() {
-		return ! capturedObjects.isEmpty();
-	}
-	
-	
-
 	@Override
     public void println(double x) {
     	printLineInternal(x);
@@ -209,7 +203,7 @@ class ObjectCapturingPrintWriter extends java.io.PrintWriter {
         return formatter.ioException() != null;
     }
     
-    List<Object> getUnmodifyAbleCapturedObjectList() {
+    public List<Object> getUnmodifyAbleCapturedObjectList() {
     	return Collections.unmodifiableList(capturedObjects);
     }
 }

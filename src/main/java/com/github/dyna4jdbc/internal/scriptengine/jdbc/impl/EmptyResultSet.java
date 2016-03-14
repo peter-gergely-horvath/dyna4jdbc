@@ -1,4 +1,4 @@
-package com.github.dyna4jdbc.internal.connection.scriptengine;
+package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
 import com.github.dyna4jdbc.internal.ClosableSQLObject;
 
@@ -10,32 +10,19 @@ import java.sql.*;
 import java.util.Calendar;
 import java.util.Map;
 
-class ObjectIterableResultSet extends ClosableSQLObject implements ResultSet{
+class EmptyResultSet extends ClosableSQLObject implements ResultSet{
 
-    private final String theResult;
-    private final ScriptEngineStatement scriptEngineStatement;
-
-    private int currentRow = -1;
-
-    ObjectIterableResultSet(String theResult, ScriptEngineStatement scriptEngineStatement) {
-        this.theResult = theResult;
-        this.scriptEngineStatement = scriptEngineStatement;
-    }
 
     public boolean next() throws SQLException {
-        return ++currentRow == 0;
-    }
-
-    public boolean wasNull() throws SQLException {
         return false;
     }
 
+    public boolean wasNull() throws SQLException {
+        return true;
+    }
+
     public String getString(int columnIndex) throws SQLException {
-        if(columnIndex == 1) {
-            return theResult;
-        } else {
-            throw new SQLException("Illegal columnIndex:" + columnIndex);
-        }
+        throw new SQLException("EmptyResultSet#getString"); // TODO: implement method
     }
 
     public boolean getBoolean(int columnIndex) throws SQLException {
@@ -99,10 +86,7 @@ class ObjectIterableResultSet extends ClosableSQLObject implements ResultSet{
     }
 
     public String getString(String columnLabel) throws SQLException {
-        if("result".equalsIgnoreCase(columnLabel)) {
-            throw new SQLException("Illegal columnLabel:" + columnLabel);
-        }
-        return theResult;
+        throw new SQLException("EmptyResultSet#getString"); // TODO: implement method
     }
 
     public boolean getBoolean(String columnLabel) throws SQLException {
@@ -166,11 +150,11 @@ class ObjectIterableResultSet extends ClosableSQLObject implements ResultSet{
     }
 
     public SQLWarning getWarnings() throws SQLException {
-        return null;
+        throw new SQLException("EmptyResultSet#getWarnings"); // TODO: implement method
     }
 
     public void clearWarnings() throws SQLException {
-        // no-op
+        throw new SQLException("EmptyResultSet#clearWarnings"); // TODO: implement method
     }
 
     public String getCursorName() throws SQLException {
@@ -178,22 +162,15 @@ class ObjectIterableResultSet extends ClosableSQLObject implements ResultSet{
     }
 
     public ResultSetMetaData getMetaData() throws SQLException {
-        return new ScriptEngineResultSetMetaData();
+        return new EmptyResultSetMetaData();
     }
 
     public Object getObject(int columnIndex) throws SQLException {
-        if(columnIndex != 1) {
-            throw new SQLException("Illegal columnIndex:" + columnIndex);
-        }
-        return theResult;
+        throw new SQLException("EmptyResultSet#getObject"); // TODO: implement method
     }
 
     public Object getObject(String columnLabel) throws SQLException {
-        if("result".equalsIgnoreCase(columnLabel)) {
-            throw new SQLException("Illegal columnLabel:" + columnLabel);
-        }
-
-        return theResult;
+        throw new SQLException("EmptyResultSet#getObject"); // TODO: implement method
     }
 
     public int findColumn(String columnLabel) throws SQLException {
@@ -217,41 +194,39 @@ class ObjectIterableResultSet extends ClosableSQLObject implements ResultSet{
     }
 
     public boolean isBeforeFirst() throws SQLException {
-        return currentRow < 0;
+        throw new SQLException("EmptyResultSet#isBeforeFirst"); // TODO: implement method
     }
 
     public boolean isAfterLast() throws SQLException {
-        return currentRow > 0;
+        throw new SQLException("EmptyResultSet#isAfterLast"); // TODO: implement method
     }
 
     public boolean isFirst() throws SQLException {
-        return currentRow == 0;
+        throw new SQLException("EmptyResultSet#isFirst"); // TODO: implement method
     }
 
     public boolean isLast() throws SQLException {
-        return currentRow == 0;
+        throw new SQLException("EmptyResultSet#isLast"); // TODO: implement method
     }
 
     public void beforeFirst() throws SQLException {
-        currentRow = -1;
+        throw new SQLException("EmptyResultSet#beforeFirst"); // TODO: implement method
     }
 
     public void afterLast() throws SQLException {
-        currentRow = 1;
+        throw new SQLException("EmptyResultSet#afterLast"); // TODO: implement method
     }
 
     public boolean first() throws SQLException {
-        currentRow = 0;
-        return true;
+        throw new SQLException("EmptyResultSet#first"); // TODO: implement method
     }
 
     public boolean last() throws SQLException {
-        currentRow = 0;
-        return true;
+        throw new SQLException("EmptyResultSet#last"); // TODO: implement method
     }
 
     public int getRow() throws SQLException {
-        return currentRow;
+        throw new SQLException("EmptyResultSet#getRow"); // TODO: implement method
     }
 
     public boolean absolute(int row) throws SQLException {
@@ -283,11 +258,11 @@ class ObjectIterableResultSet extends ClosableSQLObject implements ResultSet{
     }
 
     public int getType() throws SQLException {
-        return ResultSet.TYPE_FORWARD_ONLY;
+        throw new SQLException("EmptyResultSet#getType"); // TODO: implement method
     }
 
     public int getConcurrency() throws SQLException {
-        return ResultSet.CONCUR_READ_ONLY;
+        throw new SQLException("EmptyResultSet#getConcurrency"); // TODO: implement method
     }
 
     public boolean rowUpdated() throws SQLException {
@@ -591,12 +566,7 @@ class ObjectIterableResultSet extends ClosableSQLObject implements ResultSet{
     }
 
     public RowId getRowId(int columnIndex) throws SQLException {
-        if(columnIndex == 1) {
-            return new ScriptEngineRowId("result", this.scriptEngineStatement);
-        } else {
-            throw new SQLException("Invalid columnIndex:" + columnIndex);
-        }
-
+        throw new SQLException("EmptyResultSet#getRowId"); // TODO: implement method
     }
 
     public RowId getRowId(String columnLabel) throws SQLException {
@@ -784,35 +754,19 @@ class ObjectIterableResultSet extends ClosableSQLObject implements ResultSet{
     }
 
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-        if(columnIndex != 1) {
-            throw new SQLException("Illegal columnIndex:" + columnIndex);
-        }
-
-        if(type != java.lang.String.class) {
-            throw new SQLException("Illegal type:" + type);
-        }
-
-        return (T) theResult;
+        throw new SQLException("EmptyResultSet#getObject"); // TODO: implement method
     }
 
     public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
-        if("result".equalsIgnoreCase(columnLabel)) {
-            throw new SQLException("Illegal columnLabel:" + columnLabel);
-        }
-
-        if(type != java.lang.String.class) {
-            throw new SQLException("Illegal type:" + type);
-        }
-
-        return (T) theResult;
+        throw new SQLException("EmptyResultSet#getObject"); // TODO: implement method
     }
 
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw new SQLException();
+        throw new SQLException("EmptyResultSet#unwrap"); // TODO: implement method
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
+        throw new SQLException("EmptyResultSet#isWrapperFor"); // TODO: implement method
     }
 
 
