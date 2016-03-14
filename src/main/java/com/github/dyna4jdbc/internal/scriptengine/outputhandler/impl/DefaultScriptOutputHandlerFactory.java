@@ -1,7 +1,7 @@
 package com.github.dyna4jdbc.internal.scriptengine.outputhandler.impl;
 
-import com.github.dyna4jdbc.internal.scriptengine.ResultSetObjectIterable;
-import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.SingleStringResultSet;
+import com.github.dyna4jdbc.internal.scriptengine.DataTable;
+import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DataTableHolderResultSet;
 import com.github.dyna4jdbc.internal.scriptengine.outputhandler.MultiTypeScriptOutputHandler;
 import com.github.dyna4jdbc.internal.scriptengine.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.scriptengine.outputhandler.SingleResultSetScriptOutputHandler;
@@ -10,55 +10,25 @@ import com.github.dyna4jdbc.internal.scriptengine.outputhandler.UpdateScriptOutp
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
-public class DummyScriptOutputHandlerFactory implements ScriptOutputHandlerFactory {
+public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFactory {
 	
-	public DummyScriptOutputHandlerFactory() {
+	public DefaultScriptOutputHandlerFactory() {
 	}
 
-    private static class DummyResultSetScriptOutputHandler implements SingleResultSetScriptOutputHandler, MultiTypeScriptOutputHandler {
+    private static class DefaultResultSetScriptOutputHandler
+            implements SingleResultSetScriptOutputHandler, MultiTypeScriptOutputHandler {
 
-        private final ObjectCapturingPrintWriter stdOut = new ObjectCapturingPrintWriter();
+        private final DataTableWriter stdOut = new DataTableWriter();
+        private final PrintWriter printWriter = new PrintWriter(stdOut);
 
 
         private ResultSet processObjectListToResultSet() {
-            StringBuilder sb = new StringBuilder();
 
-            List<Object> objectList = stdOut.getUnmodifyAbleCapturedObjectList();
+            DataTable dataTable = stdOut.getDataTable();
 
-            for (Object objectWritten : objectList) {
-
-                String stringToWrite;
-
-                if (objectWritten == null) {
-                    stringToWrite = null;
-                } else {
-                    Class<?> objectClass = objectWritten.getClass();
-                    if (!objectClass.isArray()) {
-                        stringToWrite = objectWritten.toString();
-                    } else {
-                        Class<?> componentType = objectClass.getComponentType();
-                        if (!componentType.isPrimitive()) {
-                            stringToWrite = Arrays.deepToString((Object[]) objectWritten);
-                        } else
-                            stringToWrite = Arrays.toString((char[]) objectWritten);
-                    }
-                }
-
-                sb.append(stringToWrite);
-            }
-
-            String string = sb.toString();
-
-            return new SingleStringResultSet(string, new ResultSetObjectIterable() {
-
-                        @Override
-                        public Iterator<Object> iterator() {
-                            return objectList.iterator();
-                        }
-                    });
+            return new DataTableHolderResultSet(dataTable);
         }
 
         @Override
@@ -83,7 +53,7 @@ public class DummyScriptOutputHandlerFactory implements ScriptOutputHandlerFacto
 
         @Override
         public PrintWriter getOutPrintWriter() {
-            return stdOut;
+            return printWriter;
         }
 
         @Override
@@ -94,12 +64,12 @@ public class DummyScriptOutputHandlerFactory implements ScriptOutputHandlerFacto
 
     @Override
     public SingleResultSetScriptOutputHandler newSingleResultSetScriptOutputHandler(String script) {
-        return new DummyResultSetScriptOutputHandler();
+        return new DefaultResultSetScriptOutputHandler();
     }
 
     @Override
     public MultiTypeScriptOutputHandler newMultiTypeScriptOutputHandler(String script) {
-        return new DummyResultSetScriptOutputHandler();
+        return new DefaultResultSetScriptOutputHandler();
     }
 
     @Override

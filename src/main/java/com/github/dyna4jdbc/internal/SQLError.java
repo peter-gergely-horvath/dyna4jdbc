@@ -8,11 +8,14 @@ public enum SQLError {
 
     CONNECT_FAILED_INVALID_URL("Invalid URL: %s"),
     CONNECT_FAILED_GENERIC("Failed to connect: %s"),
+    OBJECT_CLOSED("Object has already been closed: %s"),
     SCRIPT_EXECUTION_EXCEPTION("Execution of script raised exception: examine stack trace for root cause."),
     UNEXPECTED_THROWABLE("Processing failed: caught unexpected exception."),
     RESULT_SET_MULTIPLE_EXPECTED_ONE("Expected one result set, but script produced %s result sets."),
     JDBC_FUNCTION_NOT_SUPPORTED("This JDBC API function is not supported: %s"),
-    USING_STDOUT_FROM_UPDATE("Using standard output from an update call is not permitted");
+    USING_STDOUT_FROM_UPDATE("Using standard output from an update call is not permitted"),
+    JDBC_API_USAGE_CALLER_ERROR("Illegal JDBC API call: %s"),
+    DRIVER_BUG_UNEXPECTED_STATE("An unexpected state has been reached: %s");
 
 
     private final String message;
@@ -36,5 +39,9 @@ public enum SQLError {
 
     public SQLException raiseException(Object... params) throws SQLException {
         throw new SQLException(String.format(getMessageTemplate(), params));
+    }
+
+    public SQLException raiseThrowable(Throwable t) throws SQLException {
+        throw new SQLException(getMessageTemplate(), t);
     }
 }

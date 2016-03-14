@@ -155,14 +155,14 @@ public class DisallowAllWritesPrintWriter extends java.io.PrintWriter {
     }
 
     public void close() {
-        throw new IllegalStateException(message);
+
     }
 
     public void flush() {
-        throw new IllegalStateException(message);
+
     }
 
     public boolean checkError() {
-        throw new IllegalStateException(message);
+        return false;
     }
 }

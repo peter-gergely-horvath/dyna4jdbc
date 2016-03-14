@@ -19,34 +19,28 @@ public class TestScriptEngine {
 
         Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:JavaScript");
 
-        System.out.println(connection);
+        String databaseProductName = connection.getMetaData().getDatabaseProductName();
+        String databaseProductVer = connection.getMetaData().getDatabaseProductVersion();
 
         Statement statement = connection.createStatement();
 
         statement.executeUpdate("var myNumber = 0.5 ");
-        statement.executeUpdate("var msg = 'Hello World'");
+        statement.executeUpdate("var msg = 'Hello World\tI am here!'");
 
-        //statement.execute("('Hello');print (myNumber)");
-        
-        statement.execute("print(new java.util.Date())");
+        statement.execute("print('Foo\tBar') ; print(msg)");
 
         ResultSet resultSet = statement.getResultSet();
         
-        Assert.assertTrue(resultSet.isWrapperFor(ResultSetObjectIterable.class));
-        
-        System.out.println("--- BEGIN: Iterator ---");
-        for(Object obj : resultSet.unwrap(ResultSetObjectIterable.class)) {
-        	System.out.println(obj);
-        }
-        System.out.println("--- END: Iterator ---");
-        
         System.out.println("--- BEGIN: ResultSet ---");
         while (resultSet.next()) {
-            String str = resultSet.getString(1);
-			System.out.println(str);
+            String str1 = resultSet.getString(1);
+            String str2 = resultSet.getString(2);
+
+			System.out.format("%s %s %n", str1, str2);
         }
         System.out.println("--- END: ResultSet ---");
 
+        resultSet.close();
     }
 
 }

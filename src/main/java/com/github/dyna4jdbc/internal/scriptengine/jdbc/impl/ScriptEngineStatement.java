@@ -64,5 +64,10 @@ class ScriptEngineStatement extends AbstractScriptEngineStatement {
         PrintWriter errorPrintWriter = scriptOutputHandler.getErrorPrintWriter();
 
         executeScriptUsingCustomWriters(script, outPrintWriter, errorPrintWriter);
+
+        if(outPrintWriter != null) {
+            outPrintWriter.flush();
+            outPrintWriter.close();;
+        }
     }
 }

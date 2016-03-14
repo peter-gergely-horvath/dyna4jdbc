@@ -50,11 +50,11 @@ class ScriptEngineDatabaseMetaData implements DatabaseMetaData {
     }
 
     public String getDatabaseProductName() throws SQLException {
-        return String.format("%s ScriptEngine", scriptEngineConnection.engineName);
+        return scriptEngineConnection.getEngineDescription();
     }
 
     public String getDatabaseProductVersion() throws SQLException {
-        return DynaDriver.DRIVER_VERSION;
+        return scriptEngineConnection.getEngineVersion();
     }
 
     public String getDriverName() throws SQLException {

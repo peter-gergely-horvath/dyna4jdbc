@@ -29,7 +29,7 @@ abstract class AbstractScriptEngineStatement extends ClosableSQLObject implement
         } catch (ScriptException se) {
             throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se);
         } catch (Throwable t) {
-            throw SQLError.UNEXPECTED_THROWABLE.raiseException(t);
+            throw SQLError.UNEXPECTED_THROWABLE.raiseThrowable(t);
         }
     }
 
@@ -43,7 +43,7 @@ abstract class AbstractScriptEngineStatement extends ClosableSQLObject implement
         } catch (ScriptException se) {
             throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se);
         } catch (Throwable t) {
-            throw SQLError.UNEXPECTED_THROWABLE.raiseException(t);
+            throw SQLError.UNEXPECTED_THROWABLE.raiseThrowable(t);
         }
     }
 
@@ -56,7 +56,7 @@ abstract class AbstractScriptEngineStatement extends ClosableSQLObject implement
         } catch (ScriptException se) {
             throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se);
         } catch (Throwable t) {
-            throw SQLError.UNEXPECTED_THROWABLE.raiseException(t);
+            throw SQLError.UNEXPECTED_THROWABLE.raiseThrowable(t);
         }
     }
 

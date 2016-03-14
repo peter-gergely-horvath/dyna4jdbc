@@ -1,11 +1,9 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
 import com.github.dyna4jdbc.internal.ClosableSQLObject;
-import com.github.dyna4jdbc.internal.scriptengine.outputhandler.impl.DummyScriptOutputHandlerFactory;
+import com.github.dyna4jdbc.internal.scriptengine.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 import java.io.Writer;
 import java.sql.*;
 import java.util.*;
@@ -54,7 +52,7 @@ public class ScriptEngineConnection extends ClosableSQLObject implements java.sq
 
     public Statement createStatement() throws SQLException {
         checkNotClosed();
-        return new ScriptEngineStatement(this, new DummyScriptOutputHandlerFactory(this));
+        return new ScriptEngineStatement(this, new DefaultScriptOutputHandlerFactory());
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
@@ -325,7 +323,7 @@ public class ScriptEngineConnection extends ClosableSQLObject implements java.sq
     }
 
 
-    void executeUsingScriptEngine(ScriptEngineCallback<Void> scriptEngineCallback) throws ScriptException {
+    <T> T executeUsingScriptEngine(ScriptEngineCallback<T> scriptEngineCallback) throws ScriptException {
 
         synchronized (engine) {
             Writer originalWriter = engine.getContext().getWriter();
@@ -333,16 +331,35 @@ public class ScriptEngineConnection extends ClosableSQLObject implements java.sq
 
             try {
 
-                scriptEngineCallback.execute(engine);
+                return scriptEngineCallback.execute(engine);
             }
             finally {
                 engine.getContext().setWriter(originalWriter);
                 engine.getContext().setErrorWriter(originalErrorWriter);
             }
         }
+    }
 
 
+    public String getEngineDescription() {
+        ScriptEngineFactory factory = engine.getFactory();
+        if(factory != null) {
+            String engineName = factory.getEngineName();
+            String languageVersion = factory.getLanguageVersion();
 
+            return String.format("%s (%s)", engineName, languageVersion);
+        }
 
+        return null;
+    }
+
+    public String getEngineVersion() {
+
+        ScriptEngineFactory factory = engine.getFactory();
+        if(factory != null) {
+            return factory.getEngineVersion();
+        }
+
+        return null;
     }
 }

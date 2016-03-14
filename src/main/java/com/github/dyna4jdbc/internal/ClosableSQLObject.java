@@ -7,8 +7,12 @@ public class ClosableSQLObject {
     private boolean closed = false;
 
     protected void checkNotClosed() throws SQLException {
+        checkNotClosed(this.toString());
+    }
+
+    protected final void checkNotClosed(String message) throws SQLException {
         if(closed) {
-            throw new SQLException(this + " is closed already");
+            throw SQLError.OBJECT_CLOSED.raiseException(message);
         }
     }
 
@@ -17,7 +21,7 @@ public class ClosableSQLObject {
         closed = true;
     }
 
-    public boolean isClosed() throws SQLException {
+    public final boolean isClosed() throws SQLException {
         return closed;
     }
 }
