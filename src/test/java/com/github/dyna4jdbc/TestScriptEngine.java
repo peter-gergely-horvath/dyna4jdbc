@@ -19,28 +19,32 @@ public class TestScriptEngine {
 
         Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:JavaScript");
 
-        String databaseProductName = connection.getMetaData().getDatabaseProductName();
-        String databaseProductVer = connection.getMetaData().getDatabaseProductVersion();
-
         Statement statement = connection.createStatement();
 
-        statement.executeUpdate("var myNumber = 0.5 ");
         statement.executeUpdate("var msg = 'Hello World\tI am here!'");
 
-        statement.execute("print('Foo\tBar') ; print(msg)");
+        String script = "print('Foo\tBar') ; print(msg)";
 
-        ResultSet resultSet = statement.getResultSet();
-        
-        System.out.println("--- BEGIN: ResultSet ---");
-        while (resultSet.next()) {
-            String str1 = resultSet.getString(1);
-            String str2 = resultSet.getString(2);
+        boolean results = statement.execute(script);
+        int rsCount = 0;
 
-			System.out.format("%s %s %n", str1, str2);
-        }
-        System.out.println("--- END: ResultSet ---");
+        //Loop through the available result sets.
+        do {
+            if (results) {
+                ResultSet rs = statement.getResultSet();
+                rsCount++;
 
-        resultSet.close();
+                //Show data from the result set.
+                System.out.println("RESULT SET #" + rsCount);
+                while (rs.next()) {
+                    System.out.format("%s %s %n",
+                            rs.getString(1), rs.getString(2));
+                }
+                rs.close();
+            }
+
+            results = statement.getMoreResults();
+        } while (results);
+        statement.close();
     }
-
 }

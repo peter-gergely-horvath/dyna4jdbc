@@ -67,7 +67,7 @@ class ScriptEngineStatement extends AbstractScriptEngineStatement {
 
         if(outPrintWriter != null) {
             outPrintWriter.flush();
-            outPrintWriter.close();;
+            outPrintWriter.close();
         }
     }
 }

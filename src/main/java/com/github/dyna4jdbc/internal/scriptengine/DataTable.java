@@ -1,13 +1,15 @@
 package com.github.dyna4jdbc.internal.scriptengine;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 public class DataTable implements Iterable<DataTable.Row> {
 
     private LinkedList<Row> rows = new LinkedList<>();
+
+    public Row appendRow(Row row) {
+        rows.addLast(row);
+        return row;
+    }
 
     public Row appendRow() {
         Row row = new Row();
@@ -16,7 +18,7 @@ public class DataTable implements Iterable<DataTable.Row> {
     }
 
     public Row getLastRow() {
-        if(rows.isEmpty()) {
+        if (rows.isEmpty()) {
             appendRow();
         }
         return rows.getLast();
@@ -31,13 +33,12 @@ public class DataTable implements Iterable<DataTable.Row> {
 
         @Override
         public Iterator<Cell> iterator() {
-            if(cells == null) {
+            if (cells == null) {
                 return Collections.emptyIterator();
             } else {
                 return cells.iterator();
             }
         }
-
 
 
         public class Cell {
@@ -71,9 +72,10 @@ public class DataTable implements Iterable<DataTable.Row> {
         }
 
         public Cell getCell(int column) {
-            if(cells == null) {
+            if (cells == null) {
                 return null;
-            } if (column < cells.size()) {
+            }
+            if (column < cells.size()) {
                 return cells.get(column);
             } else {
                 return null;
@@ -85,18 +87,18 @@ public class DataTable implements Iterable<DataTable.Row> {
         }
 
         public void appendCell(String value) {
-            if(cells == null) {
+            if (cells == null) {
                 cells = new ArrayList<>();
             }
             cells.add(new Cell(value));
         }
 
         public boolean isValidIndex(int column) {
-            if(column < 0) {
+            if (column < 0) {
                 return false;
             }
 
-            if(cells == null || cells.isEmpty()) {
+            if (cells == null || cells.isEmpty()) {
                 return false;
             }
 
@@ -108,7 +110,7 @@ public class DataTable implements Iterable<DataTable.Row> {
         }
 
         public void clear() {
-            if(cells != null) {
+            if (cells != null) {
                 cells.clear();
             }
         }
@@ -142,8 +144,53 @@ public class DataTable implements Iterable<DataTable.Row> {
     }
 
     public void clear() {
-        rows.forEach(row -> row.clear() );
+        rows.forEach(row -> row.clear());
         rows.clear();
+    }
+
+    public boolean getAllRowsAreOfSameLength() {
+
+        int numberOfCells = -1;
+        for(Row row : this.rows) {
+            if (numberOfCells == -1) {
+                numberOfCells = row.getNumberOfCells();
+            } else {
+                if (numberOfCells != row.getNumberOfCells()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public List<DataTable> partitionByRowLengthDifferences() {
+
+        LinkedList<DataTable> result = new LinkedList<>();
+
+        DataTable outputDataTable = new DataTable();
+        result.addLast(outputDataTable);
+
+
+        Row previousRow = null;
+
+        Iterator<Row> iterator = this.rows.iterator();
+        while (iterator.hasNext()) {
+
+            Row thisRow = iterator.next();
+
+            if (previousRow != null &&
+                    previousRow.getNumberOfCells() != thisRow.getNumberOfCells()) {
+
+                outputDataTable = new DataTable();
+                result.addLast(outputDataTable);
+            }
+
+            outputDataTable.appendRow(thisRow);
+            previousRow = thisRow;
+        }
+
+        return Collections.unmodifiableList(result);
     }
 
 

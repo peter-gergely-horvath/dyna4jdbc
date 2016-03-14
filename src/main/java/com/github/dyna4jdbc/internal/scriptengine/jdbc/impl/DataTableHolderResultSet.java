@@ -1,6 +1,5 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
-import com.github.dyna4jdbc.internal.ClosableSQLObject;
 import com.github.dyna4jdbc.internal.SQLError;
 import com.github.dyna4jdbc.internal.scriptengine.DataTable;
 
@@ -35,25 +34,25 @@ public class DataTableHolderResultSet extends AbstractResultSet implements Resul
         switch (currentState) {
             case BEFORE_FIRST: {
                 if(rowIterator.hasNext()) {
-                    resultSetState.transitionTo(State.ITERATING);
+                    resultSetState.transitionTo(State.ITERATING_OVER_RESULTS);
                     currentRow = rowIterator.next();
                 } else {
                     resultSetState.transitionTo(State.AFTER_LAST);
                 }
 
-                return resultSetState.isInState(State.ITERATING);
+                return resultSetState.isInState(State.ITERATING_OVER_RESULTS);
             }
 
 
 
-            case ITERATING: {
+            case ITERATING_OVER_RESULTS: {
                 if(rowIterator.hasNext()) {
                     currentRow = rowIterator.next();
                 } else {
                     resultSetState.transitionTo(State.AFTER_LAST);
                 }
 
-                return resultSetState.isInState(State.ITERATING);
+                return resultSetState.isInState(State.ITERATING_OVER_RESULTS);
             }
 
             case AFTER_LAST: {

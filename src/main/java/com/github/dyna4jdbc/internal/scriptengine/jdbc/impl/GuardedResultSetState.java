@@ -13,8 +13,8 @@ class GuardedResultSetState {
 
     enum State {
         AFTER_LAST,
-        ITERATING(AFTER_LAST),
-        BEFORE_FIRST(ITERATING, AFTER_LAST);
+        ITERATING_OVER_RESULTS(AFTER_LAST),
+        BEFORE_FIRST(ITERATING_OVER_RESULTS, AFTER_LAST);
 
         private final Set<State> validTransitions;
 
@@ -47,7 +47,7 @@ class GuardedResultSetState {
     }
 
     void checkValidStateForRowAccess() throws SQLException {
-        if(currentState != State.ITERATING) {
+        if(currentState != State.ITERATING_OVER_RESULTS) {
             throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException(
                     "Performing this operation in state " + currentState + " is illegal");
         }

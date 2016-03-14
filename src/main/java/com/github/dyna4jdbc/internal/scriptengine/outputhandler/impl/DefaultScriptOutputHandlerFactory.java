@@ -1,5 +1,6 @@
 package com.github.dyna4jdbc.internal.scriptengine.outputhandler.impl;
 
+import com.github.dyna4jdbc.internal.SQLError;
 import com.github.dyna4jdbc.internal.scriptengine.DataTable;
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DataTableHolderResultSet;
 import com.github.dyna4jdbc.internal.scriptengine.outputhandler.MultiTypeScriptOutputHandler;
@@ -9,13 +10,17 @@ import com.github.dyna4jdbc.internal.scriptengine.outputhandler.UpdateScriptOutp
 
 import java.io.PrintWriter;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFactory {
-	
-	public DefaultScriptOutputHandlerFactory() {
-	}
+
+    // TODO: cleanup
+
+    public DefaultScriptOutputHandlerFactory() {
+    }
 
     private static class DefaultResultSetScriptOutputHandler
             implements SingleResultSetScriptOutputHandler, MultiTypeScriptOutputHandler {
@@ -24,11 +29,20 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
         private final PrintWriter printWriter = new PrintWriter(stdOut);
 
 
-        private ResultSet processObjectListToResultSet() {
+        private List<ResultSet> processObjectListToResultSet() {
 
-            DataTable dataTable = stdOut.getDataTable();
+            DataTable collectedDataTable = stdOut.getDataTable();
 
-            return new DataTableHolderResultSet(dataTable);
+            if (collectedDataTable.getAllRowsAreOfSameLength()) {
+                return Arrays.asList(new DataTableHolderResultSet(collectedDataTable));
+            } else {
+
+                return collectedDataTable.partitionByRowLengthDifferences().stream()
+                        .map(dataTable -> new DataTableHolderResultSet(dataTable))
+                        .collect(Collectors.toList());
+            }
+
+
         }
 
         @Override
@@ -38,7 +52,7 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 
         @Override
         public List<ResultSet> getResultSets() {
-            return Arrays.asList(getResultSet());
+            return processObjectListToResultSet();
         }
 
         @Override
@@ -48,7 +62,19 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 
         @Override
         public ResultSet getResultSet() {
-            return processObjectListToResultSet();
+            try {
+                List<ResultSet> resultSets = getResultSets();
+
+                if (resultSets.size() > 1) {
+
+                    throw SQLError.RESULT_SET_MULTIPLE_EXPECTED_ONE.raiseException(resultSets.size());
+
+                } else {
+                    return resultSets.get(0);
+                }
+            } catch (SQLException e) {
+                throw new IllegalStateException(e);
+            }
         }
 
         @Override
