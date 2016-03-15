@@ -3,6 +3,8 @@ package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 import com.github.dyna4jdbc.internal.ClosableSQLObject;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
+import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
+import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultTypeHandlerFactory;
 
 import javax.script.*;
 import java.io.Writer;
@@ -18,6 +20,7 @@ public class ScriptEngineConnection extends AbstractConnection {
     private final Properties properties;
 
     private final ScriptEngine engine;
+    private final TypeHandlerFactory typeHandlerFactory;
 
     public ScriptEngineConnection(String parameters, Properties properties)
     {
@@ -42,6 +45,8 @@ public class ScriptEngineConnection extends AbstractConnection {
             throw new IllegalArgumentException("ScriptEngine not found: " + engineName);
         }
 
+        typeHandlerFactory = new DefaultTypeHandlerFactory();
+
     }
 
     public DatabaseMetaData getMetaData() throws SQLException {
@@ -51,7 +56,7 @@ public class ScriptEngineConnection extends AbstractConnection {
 
     public Statement createStatement() throws SQLException {
         checkNotClosed();
-        return new ScriptEngineStatement(this, new DefaultScriptOutputHandlerFactory());
+        return new ScriptEngineStatement(this, new DefaultScriptOutputHandlerFactory(typeHandlerFactory));
     }
 
 

@@ -7,6 +7,7 @@ import com.github.dyna4jdbc.internal.common.outputhandler.MultiTypeScriptOutputH
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 
 import java.io.PrintWriter;
 import java.sql.ResultSet;
@@ -19,7 +20,11 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 
     // TODO: cleanup
 
-    public DefaultScriptOutputHandlerFactory() {
+    private final TypeHandlerFactory typeHandlerFactory;
+
+    public DefaultScriptOutputHandlerFactory(TypeHandlerFactory typeHandlerFactory) {
+        this.typeHandlerFactory = typeHandlerFactory;
+
     }
 
     private static class DefaultResultSetScriptOutputHandler
@@ -27,22 +32,18 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 
         private final DataTableWriter stdOut = new DataTableWriter();
         private final PrintWriter printWriter = new PrintWriter(stdOut);
+        private final TypeHandlerFactory typeHandlerFactory;
+
+        public DefaultResultSetScriptOutputHandler(TypeHandlerFactory typeHandlerFactory) {
+            this.typeHandlerFactory = typeHandlerFactory;
+        }
 
 
         private List<ResultSet> processObjectListToResultSet() {
 
-            DataTable collectedDataTable = stdOut.getDataTable();
-
-            if (collectedDataTable.getAllRowsAreOfSameLength()) {
-                return Arrays.asList(new DataTableHolderResultSet(collectedDataTable));
-            } else {
-
-                return collectedDataTable.partitionByRowLengthDifferences().stream()
-                        .map(dataTable -> new DataTableHolderResultSet(dataTable))
-                        .collect(Collectors.toList());
-            }
-
-
+            return stdOut.getDataTableList().stream()
+                    .map(dataTable -> new DataTableHolderResultSet(dataTable, typeHandlerFactory))
+                    .collect(Collectors.toList());
         }
 
         @Override
@@ -90,12 +91,12 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 
     @Override
     public SingleResultSetScriptOutputHandler newSingleResultSetScriptOutputHandler(String script) {
-        return new DefaultResultSetScriptOutputHandler();
+        return new DefaultResultSetScriptOutputHandler(typeHandlerFactory);
     }
 
     @Override
     public MultiTypeScriptOutputHandler newMultiTypeScriptOutputHandler(String script) {
-        return new DefaultResultSetScriptOutputHandler();
+        return new DefaultResultSetScriptOutputHandler(typeHandlerFactory);
     }
 
     @Override

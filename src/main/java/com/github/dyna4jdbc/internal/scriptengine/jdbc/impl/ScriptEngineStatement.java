@@ -1,6 +1,7 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
 import com.github.dyna4jdbc.internal.common.outputhandler.*;
+import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 
 import java.io.PrintWriter;
 import java.sql.ResultSet;
@@ -12,7 +13,9 @@ class ScriptEngineStatement extends AbstractScriptEngineStatement {
 
     private final ScriptOutputHandlerFactory scriptOutputHandlerFactory;
 
-    public ScriptEngineStatement(ScriptEngineConnection scriptEngineConnection, ScriptOutputHandlerFactory scriptOutputHandlerFactory) {
+    public ScriptEngineStatement(ScriptEngineConnection scriptEngineConnection,
+                                 ScriptOutputHandlerFactory scriptOutputHandlerFactory) {
+
         super(scriptEngineConnection);
         this.scriptOutputHandlerFactory = scriptOutputHandlerFactory;
     }
@@ -58,7 +61,8 @@ class ScriptEngineStatement extends AbstractScriptEngineStatement {
         return resultSets;
     }
 
-    private void executeScriptUsingOutputHandler(String script, ScriptOutputHandler scriptOutputHandler) throws ScriptException {
+    private void executeScriptUsingOutputHandler(
+            String script, ScriptOutputHandler scriptOutputHandler) throws ScriptException {
 
         PrintWriter outPrintWriter = scriptOutputHandler.getOutPrintWriter();
         PrintWriter errorPrintWriter = scriptOutputHandler.getErrorPrintWriter();

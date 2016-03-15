@@ -3,7 +3,6 @@ package com.github.dyna4jdbc;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.github.dyna4jdbc.internal.scriptengine.ResultSetObjectIterable;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -36,9 +35,14 @@ public class TestScriptEngine {
 
                 //Show data from the result set.
                 System.out.println("RESULT SET #" + rsCount);
+                int columnCount = rs.getMetaData().getColumnCount();
+
                 while (rs.next()) {
-                    System.out.format("%s %s %n",
-                            rs.getString(1), rs.getString(2));
+
+                    for(int i=1; i<=columnCount; i++ ) {
+                        System.out.format("%s ", rs.getString(i));
+                    }
+                    System.out.println();
                 }
                 rs.close();
             }

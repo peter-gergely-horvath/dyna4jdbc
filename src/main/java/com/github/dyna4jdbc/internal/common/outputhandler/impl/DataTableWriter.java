@@ -1,14 +1,26 @@
 package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
+import com.github.dyna4jdbc.internal.common.datamodel.DataRow;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class DataTableWriter extends CursorCellWriterOutputStream{
 
-    private DataTable dataTable = new DataTable();
-    private boolean shouldStartNewRow = false;
+    private LinkedList<DataTable> dataTableList = new LinkedList<>();
+    private DataRow currentRow = new DataRow();
 
-    public DataTable getDataTable() {
-        return dataTable;
+    public DataTableWriter() {
+        dataTableList.addLast(new DataTable());
+
+    }
+
+
+    public List<DataTable> getDataTableList() {
+        return Collections.unmodifiableList(dataTableList);
     }
 
     @Override
@@ -18,22 +30,37 @@ public class DataTableWriter extends CursorCellWriterOutputStream{
 
     @Override
     protected void nextRow() {
-        shouldStartNewRow = true;
+        appendRow();
+        currentRow = new DataRow();
     }
 
 
     @Override
     protected void writeCellValue(String value) {
-        DataTable.Row currentRow;
+        currentRow.appendDataCell(value);
+    }
 
-        if(shouldStartNewRow) {
-            currentRow = dataTable.appendRow();
-            shouldStartNewRow = false;
+    @Override
+    public void close() throws IOException {
+        super.close(); // ensure all pending content is written to currentRow
 
-        } else {
-            currentRow = dataTable.getLastRow();
-
+        if(! currentRow.isEmpty()) {
+            appendRow();
         }
-        currentRow.appendCell(value);
+    }
+
+    private void appendRow() {
+        DataTable currentTable = dataTableList.getLast();
+
+        if (!currentTable.isEmpty()) {
+
+            DataRow lastRow = currentTable.getLastRow();
+            if (lastRow.cellNumber() != currentRow.cellNumber()) {
+                currentTable = new DataTable();
+                dataTableList.addLast(currentTable);
+            }
+        }
+
+        currentTable.appendRow(currentRow);
     }
 }

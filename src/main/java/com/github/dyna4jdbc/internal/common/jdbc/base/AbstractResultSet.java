@@ -10,8 +10,63 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Iterator;
 
-public abstract class AbstractResultSet extends ClosableSQLObject implements java.sql.ResultSet {
+public abstract class AbstractResultSet<T> extends ClosableSQLObject implements java.sql.ResultSet {
+
+    protected final GuardedResultSetState resultSetState = new GuardedResultSetState();
+
+    private final Iterator<T> rowIterator;
+
+    protected T currentRow = null;
+
+    public AbstractResultSet(Iterator<T> dataRowIterator) {
+        this.rowIterator = dataRowIterator;
+    }
+
+    public boolean next() throws SQLException {
+        checkNotClosed();
+
+        GuardedResultSetState.State currentState = resultSetState.getCurrentState();
+        switch (currentState) {
+            case BEFORE_FIRST: {
+                if(rowIterator.hasNext()) {
+                    resultSetState.transitionTo(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
+                    currentRow = rowIterator.next();
+                } else {
+                    resultSetState.transitionTo(GuardedResultSetState.State.AFTER_LAST);
+                }
+
+                return resultSetState.isInState(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
+            }
+
+
+
+            case ITERATING_OVER_RESULTS: {
+                if(rowIterator.hasNext()) {
+                    currentRow = rowIterator.next();
+                } else {
+                    resultSetState.transitionTo(GuardedResultSetState.State.AFTER_LAST);
+                }
+
+                return resultSetState.isInState(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
+            }
+
+            case AFTER_LAST: {
+                throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Calling next() in state " + currentState);
+            }
+
+
+
+            default:
+                throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException("Unexpected currentState: " + currentState);
+        }
+    }
+
+    protected void checkValidStateForRowAccess() throws SQLException {
+        checkNotClosed();
+        resultSetState.checkValidStateForRowAccess();
+    }
 
     @Override
     protected void checkNotClosed() throws java.sql.SQLException {

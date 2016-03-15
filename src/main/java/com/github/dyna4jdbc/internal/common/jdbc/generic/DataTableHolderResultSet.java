@@ -1,6 +1,9 @@
 package com.github.dyna4jdbc.internal.common.jdbc.generic;
 
 import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.common.datamodel.DataCell;
+import com.github.dyna4jdbc.internal.common.datamodel.DataColumn;
+import com.github.dyna4jdbc.internal.common.datamodel.DataRow;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
 
 import java.io.*;
@@ -9,67 +12,54 @@ import java.net.URL;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractResultSet;
+import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
+import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 
-public class DataTableHolderResultSet extends AbstractResultSet implements ResultSet {
+public class DataTableHolderResultSet extends AbstractResultSet<DataRow> implements ResultSet {
 
     private final DataTable dataTable;
-    private final Iterator<DataTable.Row> rowIterator;
-    private DataTable.Row currentRow = null;
+    private final TypeHandlerFactory typeHandlerFactory;
+    private final LinkedHashMap<DataColumn, TypeHandler> typeHandlers;
+
     private boolean wasNull = false;
 
-    private GuardedResultSetState resultSetState = new GuardedResultSetState();
 
-    public DataTableHolderResultSet(DataTable dataTable) {
+    public DataTableHolderResultSet(DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
+        super(dataTable.rowIterator());
         this.dataTable = dataTable;
-        this.rowIterator = dataTable.iterator();
+        this.typeHandlerFactory = typeHandlerFactory;
+        this.typeHandlers = initTypeHandlers(dataTable);
+
     }
 
+    private LinkedHashMap<DataColumn, TypeHandler> initTypeHandlers(DataTable dataTable) {
 
-    public boolean next() throws SQLException {
-        checkNotClosed();
+        try {
+            LinkedHashMap<DataColumn, TypeHandler> resultMap = new LinkedHashMap<>();
 
-        GuardedResultSetState.State currentState = resultSetState.getCurrentState();
-        switch (currentState) {
-            case BEFORE_FIRST: {
-                if(rowIterator.hasNext()) {
-                    resultSetState.transitionTo(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
-                    currentRow = rowIterator.next();
-                } else {
-                    resultSetState.transitionTo(GuardedResultSetState.State.AFTER_LAST);
+            for (int i=0; i< dataTable.getColumnCount(); i++) {
+
+                DataColumn column = dataTable.getColumn(i);
+
+                TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(column.valueIterator());
+                if (typeHandler == null) {
+                    throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException("typeHandler is null");
                 }
 
-                return resultSetState.isInState(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
+
+                resultMap.put(column, typeHandler);
             }
 
+            return resultMap;
 
 
-            case ITERATING_OVER_RESULTS: {
-                if(rowIterator.hasNext()) {
-                    currentRow = rowIterator.next();
-                } else {
-                    resultSetState.transitionTo(GuardedResultSetState.State.AFTER_LAST);
-                }
-
-                return resultSetState.isInState(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
-            }
-
-            case AFTER_LAST: {
-                throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Calling next() in state " + currentState);
-            }
-
-
-
-            default:
-                throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException("Unexpected currentState: " + currentState);
+        } catch (SQLException e) {
+            // TODO: clean up!
+            throw new IllegalStateException(e);
         }
-    }
-
-
-    private void checkResultSetState() throws SQLException {
-        checkNotClosed();
-        resultSetState.checkValidStateForRowAccess();
     }
 
     @Override
@@ -82,28 +72,28 @@ public class DataTableHolderResultSet extends AbstractResultSet implements Resul
     }
 
     private String getCellValueBySqlIndex(int sqlIndex) throws SQLException {
-        checkResultSetState();
+        checkValidStateForRowAccess();
 
         final int javaIndex = sqlIndex - 1;
 
 
-        if(currentRow == null) {
+        if (currentRow == null) {
             throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException(
                     "currentRow is null in state: " + resultSetState);
         }
 
-        if(! currentRow.isValidIndex(javaIndex)) {
+        if (!currentRow.isValidIndex(javaIndex)) {
             throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException(
                     "Invalid index: " + sqlIndex);
         }
 
-        DataTable.Row.Cell cell = currentRow.getCell(javaIndex);
-        if(cell == null) {
+        DataCell dataCell = currentRow.getCell(javaIndex);
+        if (dataCell == null) {
             throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException(
-                    "Indexed cell not found: " + javaIndex);
+                    "Indexed dataCell not found: " + javaIndex);
         }
 
-        String cellValue = cell.getValue();
+        String cellValue = dataCell.getValue();
         wasNull = cellValue == null;
 
         return cellValue;
@@ -291,7 +281,7 @@ public class DataTableHolderResultSet extends AbstractResultSet implements Resul
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getMetaData"); // TODO: implement method
+        return new DataTableHolderResultSetMetaData(typeHandlers.values().stream().collect(Collectors.toList()));
     }
 
     @Override
@@ -433,7 +423,6 @@ public class DataTableHolderResultSet extends AbstractResultSet implements Resul
     public boolean rowDeleted() throws SQLException {
         throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#rowDeleted"); // TODO: implement method
     }
-
 
 
     @Override
@@ -700,7 +689,6 @@ public class DataTableHolderResultSet extends AbstractResultSet implements Resul
     public Reader getNCharacterStream(String columnLabel) throws SQLException {
         throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getNCharacterStream"); // TODO: implement method
     }
-
 
 
     @Override
