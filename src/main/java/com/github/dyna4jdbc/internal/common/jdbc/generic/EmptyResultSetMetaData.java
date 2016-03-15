@@ -1,11 +1,11 @@
-package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
+package com.github.dyna4jdbc.internal.common.jdbc.generic;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-class EmptyResultSetMetaData implements ResultSetMetaData {
+public class EmptyResultSetMetaData implements ResultSetMetaData {
     public int getColumnCount() throws SQLException {
         return 0;
     }

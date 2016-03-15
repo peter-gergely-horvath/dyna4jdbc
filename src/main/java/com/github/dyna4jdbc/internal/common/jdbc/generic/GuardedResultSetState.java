@@ -1,4 +1,4 @@
-package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
+package com.github.dyna4jdbc.internal.common.jdbc.generic;
 
 import com.github.dyna4jdbc.internal.SQLError;
 
@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-class GuardedResultSetState {
+public class GuardedResultSetState {
 
     enum State {
         AFTER_LAST,

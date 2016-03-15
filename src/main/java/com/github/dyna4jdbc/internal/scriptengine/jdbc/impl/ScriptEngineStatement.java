@@ -1,6 +1,6 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
-import com.github.dyna4jdbc.internal.scriptengine.outputhandler.*;
+import com.github.dyna4jdbc.internal.common.outputhandler.*;
 
 import java.io.PrintWriter;
 import java.sql.ResultSet;

@@ -1,4 +1,4 @@
-package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
+package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import com.github.dyna4jdbc.internal.ClosableSQLObject;
 import com.github.dyna4jdbc.internal.SQLError;

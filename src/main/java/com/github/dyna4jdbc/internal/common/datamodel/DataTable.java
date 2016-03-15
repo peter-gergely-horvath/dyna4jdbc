@@ -1,4 +1,4 @@
-package com.github.dyna4jdbc.internal.scriptengine;
+package com.github.dyna4jdbc.internal.common.datamodel;
 
 import java.util.*;
 

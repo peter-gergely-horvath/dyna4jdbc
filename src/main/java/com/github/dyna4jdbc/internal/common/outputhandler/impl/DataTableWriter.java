@@ -1,6 +1,6 @@
-package com.github.dyna4jdbc.internal.scriptengine.outputhandler.impl;
+package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
-import com.github.dyna4jdbc.internal.scriptengine.DataTable;
+import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
 
 public class DataTableWriter extends CursorCellWriterOutputStream{
 

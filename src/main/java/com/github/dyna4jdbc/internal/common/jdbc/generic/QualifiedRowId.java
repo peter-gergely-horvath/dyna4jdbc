@@ -1,13 +1,13 @@
-package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
+package com.github.dyna4jdbc.internal.common.jdbc.generic;
 
 import java.sql.RowId;
 
-public class ScriptEngineRowId<T> implements RowId {
+public class QualifiedRowId<T> implements RowId {
 
     private final String name;
     private final T qualifier;
 
-    ScriptEngineRowId(String name, T qualifier) {
+    public QualifiedRowId(String name, T qualifier) {
         if(name == null || "".equals(name)) {
             throw new RuntimeException("name cannot be null");
         }
@@ -21,7 +21,7 @@ public class ScriptEngineRowId<T> implements RowId {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ScriptEngineRowId that = (ScriptEngineRowId) o;
+        QualifiedRowId that = (QualifiedRowId) o;
 
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         return !(qualifier != null ? !qualifier.equals(that.qualifier) : that.qualifier != null);

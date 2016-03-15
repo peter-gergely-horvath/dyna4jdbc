@@ -1,12 +1,12 @@
-package com.github.dyna4jdbc.internal.scriptengine.outputhandler.impl;
+package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
 import com.github.dyna4jdbc.internal.SQLError;
-import com.github.dyna4jdbc.internal.scriptengine.DataTable;
-import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DataTableHolderResultSet;
-import com.github.dyna4jdbc.internal.scriptengine.outputhandler.MultiTypeScriptOutputHandler;
-import com.github.dyna4jdbc.internal.scriptengine.outputhandler.ScriptOutputHandlerFactory;
-import com.github.dyna4jdbc.internal.scriptengine.outputhandler.SingleResultSetScriptOutputHandler;
-import com.github.dyna4jdbc.internal.scriptengine.outputhandler.UpdateScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
+import com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet;
+import com.github.dyna4jdbc.internal.common.outputhandler.MultiTypeScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
 
 import java.io.PrintWriter;
 import java.sql.ResultSet;
