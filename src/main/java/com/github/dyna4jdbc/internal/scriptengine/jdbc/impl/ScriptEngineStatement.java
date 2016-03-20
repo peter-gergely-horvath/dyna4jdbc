@@ -5,6 +5,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 
 import java.io.PrintWriter;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.script.ScriptException;
@@ -20,7 +21,7 @@ class ScriptEngineStatement extends AbstractScriptEngineStatement {
         this.scriptOutputHandlerFactory = scriptOutputHandlerFactory;
     }
 
-    protected ResultSet executeScriptForSingleResultSet(String script) throws ScriptException {
+    protected ResultSet executeScriptForSingleResultSet(String script) throws ScriptException, SQLException {
 
         SingleResultSetScriptOutputHandler outputHandler =
                 scriptOutputHandlerFactory.newSingleResultSetScriptOutputHandler(script);

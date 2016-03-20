@@ -1,5 +1,6 @@
 package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
+import com.github.dyna4jdbc.internal.OutputDisabledError;
 import com.github.dyna4jdbc.internal.SQLError;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet;
@@ -62,8 +63,7 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
         }
 
         @Override
-        public ResultSet getResultSet() {
-            try {
+        public ResultSet getResultSet() throws SQLException {
                 List<ResultSet> resultSets = getResultSets();
 
                 if (resultSets.size() > 1) {
@@ -73,9 +73,7 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
                 } else {
                     return resultSets.get(0);
                 }
-            } catch (SQLException e) {
-                throw new IllegalStateException(e);
-            }
+
         }
 
         @Override
@@ -109,7 +107,7 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 
             @Override
             public PrintWriter getOutPrintWriter() {
-                return DisallowAllWritesPrintWriter.forMessage("Cannot write to stdout from update!");
+                return new DisallowAllWritesPrintWriter("Cannot write to stdout from update!");
             }
 
             @Override

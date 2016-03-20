@@ -1,5 +1,6 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
+import com.github.dyna4jdbc.internal.OutputDisabledError;
 import com.github.dyna4jdbc.internal.SQLError;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
 
@@ -20,12 +21,14 @@ abstract class AbstractScriptEngineStatement extends AbstractStatement<ScriptEng
             return executeScriptForSingleResultSet(script);
         } catch (ScriptException se) {
             throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se);
+        } catch (SQLException sqle) {
+            throw sqle;
         } catch (Throwable t) {
             throw SQLError.UNEXPECTED_THROWABLE.raiseThrowable(t);
         }
     }
 
-    protected abstract ResultSet executeScriptForSingleResultSet(String script) throws ScriptException;
+    protected abstract ResultSet executeScriptForSingleResultSet(String script) throws ScriptException, SQLException;
 
     public final int executeUpdate(final String script) throws SQLException {
 
@@ -34,7 +37,11 @@ abstract class AbstractScriptEngineStatement extends AbstractStatement<ScriptEng
 
         } catch (ScriptException se) {
             throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se);
-        } catch (Throwable t) {
+        }
+        catch (OutputDisabledError t) {
+            throw SQLError.USING_STDOUT_FROM_UPDATE.raiseThrowable(t);
+        }
+        catch (Throwable t) {
             throw SQLError.UNEXPECTED_THROWABLE.raiseThrowable(t);
         }
     }
