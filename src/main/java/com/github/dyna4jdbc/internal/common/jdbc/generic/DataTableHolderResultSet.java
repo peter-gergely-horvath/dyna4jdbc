@@ -15,42 +15,37 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractResultSet;
+import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 
 public class DataTableHolderResultSet extends AbstractResultSet<DataRow> implements ResultSet {
 
     private final DataTable dataTable;
-    private final TypeHandlerFactory typeHandlerFactory;
-    private final LinkedHashMap<DataColumn, TypeHandler> typeHandlers;
 
     private boolean wasNull = false;
-
+	private List<TypeHandler> typeHandlers;
 
     public DataTableHolderResultSet(DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
         super(dataTable.rowIterator());
         this.dataTable = dataTable;
-        this.typeHandlerFactory = typeHandlerFactory;
-        this.typeHandlers = initTypeHandlers(dataTable);
-
+        this.typeHandlers = initTypeHandlers(dataTable, typeHandlerFactory);
     }
 
-    private LinkedHashMap<DataColumn, TypeHandler> initTypeHandlers(DataTable dataTable) {
+    private static List<TypeHandler> initTypeHandlers(DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
 
-    	// using a LinkedHashMap here ensures that we retain the
-    	// order of the columns during iteration over the keys
-    	LinkedHashMap<DataColumn, TypeHandler> resultMap = new LinkedHashMap<>();
-
+    	LinkedList<TypeHandler> typeHandlerList = new LinkedList<>();
+    	
     	for(DataColumn column : dataTable.columnIterable() ) {
-    		TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(column.valueIterator());
+    		TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(column.valueIterable());
     		if (typeHandler == null) {
     			throw SQLError.raiseInternalIllegalStateRuntimeException("typeHandler is null");
     		}
-
-    		resultMap.put(column, typeHandler);
+    		
+    		typeHandlerList.add(typeHandler);
     	}
-
-    	return resultMap;
+    	
+    	return Collections.unmodifiableList(typeHandlerList);
     }
 
     @Override
@@ -62,17 +57,13 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
         super.close();
     }
 
-    private String getCellValueBySqlIndex(int sqlIndex) throws SQLException {
-        checkValidStateForRowAccess();
+    private String getRawCellValueBySqlIndex(int sqlIndex) throws SQLException {
 
         final int javaIndex = sqlIndex - 1;
 
 
-        if (currentRow == null) {
-            throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException(
-                    "currentRow is null in state: " + resultSetState);
-        }
-
+        DataRow currentRow = getCurrentRow();
+        
         if (!currentRow.isValidIndex(javaIndex)) {
             throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException(
                     "Invalid index: " + sqlIndex);
@@ -89,6 +80,20 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
         return cellValue;
     }
+    
+    private TypeHandler getTypeHandlerByBySqlIndex(int sqlIndex) throws SQLException {
+        final int javaIndex = sqlIndex - 1;
+
+        TypeHandler typeHandler = typeHandlers.get(javaIndex);
+        
+		return typeHandler;
+    }
+    
+    @SuppressWarnings("unchecked")
+	private <T> T checkIfNull(Object formattedValue) {
+    	wasNull = (formattedValue == null);
+    	return (T) formattedValue;
+    }
 
     @Override
     public boolean wasNull() throws SQLException {
@@ -97,67 +102,200 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     @Override
     public String getString(int columnIndex) throws SQLException {
-        return getCellValueBySqlIndex(columnIndex);
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		String formattedValue = typeHandler.covertToString(rawCellValue);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, java.lang.String.class);
+    	}
     }
 
     @Override
     public boolean getBoolean(int columnIndex) throws SQLException {
-        return Boolean.valueOf(getCellValueBySqlIndex(columnIndex));
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Boolean formattedValue = typeHandler.covertToBoolean(rawCellValue);
+    		Boolean returnValue = checkIfNull(formattedValue);
+
+    		return returnValue != null ? returnValue.booleanValue() : false; 
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, "boolean");
+    	}
     }
 
     @Override
     public byte getByte(int columnIndex) throws SQLException {
-        return Byte.valueOf(getCellValueBySqlIndex(columnIndex));
+
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Byte formattedValue = typeHandler.covertToByte(rawCellValue);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, "byte");
+    	}
     }
 
     @Override
     public short getShort(int columnIndex) throws SQLException {
-        return Short.valueOf(getCellValueBySqlIndex(columnIndex));
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Short formattedValue = typeHandler.covertToShort(rawCellValue);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, "short");
+    	}
     }
 
     @Override
     public int getInt(int columnIndex) throws SQLException {
-        return Integer.valueOf(getCellValueBySqlIndex(columnIndex));
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Integer formattedValue = typeHandler.covertToInteger(rawCellValue);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, "int");
+    	}
     }
 
     @Override
     public long getLong(int columnIndex) throws SQLException {
-        return Long.valueOf(getCellValueBySqlIndex(columnIndex));
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Long formattedValue = typeHandler.covertToLong(rawCellValue);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, "long");
+    	}
     }
 
     @Override
     public float getFloat(int columnIndex) throws SQLException {
-        return Long.valueOf(getCellValueBySqlIndex(columnIndex));
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Float formattedValue = typeHandler.covertToFloat(rawCellValue);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, "float");
+    	}
     }
 
     @Override
     public double getDouble(int columnIndex) throws SQLException {
-        return Double.valueOf(getCellValueBySqlIndex(columnIndex));
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Double formattedValue = typeHandler.covertToDouble(rawCellValue);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, "double");
+    	}
     }
 
     @Override
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
-        return BigDecimal.valueOf(getLong(columnIndex), scale);
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		BigDecimal formattedValue = typeHandler.covertToBigDecimal(rawCellValue, scale);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, java.math.BigDecimal.class);
+    	}
     }
 
     @Override
     public byte[] getBytes(int columnIndex) throws SQLException {
-        return getCellValueBySqlIndex(columnIndex).getBytes();
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		byte[] formattedValue = typeHandler.covertToByteArray(rawCellValue);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, "byte[]");
+    	}
     }
 
     @Override
     public Date getDate(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getDate"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Date formattedValue = typeHandler.covertToDate(rawCellValue);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, java.sql.Date.class);
+    	}
     }
 
     @Override
     public Time getTime(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getTime"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Time formattedValue = typeHandler.covertToTime(rawCellValue);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, java.sql.Time.class);
+    	}
     }
 
     @Override
     public Timestamp getTimestamp(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getTimestamp"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Timestamp formattedValue = typeHandler.covertToTimestamp(rawCellValue);
+    		return checkIfNull(formattedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, rawCellValue, java.sql.Timestamp.class);
+    	}
     }
 
     @Override
@@ -272,7 +410,7 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return new DataTableHolderResultSetMetaData(typeHandlers.values().stream().collect(Collectors.<TypeHandler>toList()));
+		return new DataTableHolderResultSetMetaData(typeHandlers);
     }
 
     @Override

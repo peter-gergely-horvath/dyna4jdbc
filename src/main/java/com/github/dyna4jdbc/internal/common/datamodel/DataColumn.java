@@ -35,20 +35,28 @@ public class DataColumn implements Iterable<DataCell>  {
         };
     }
 
-    public Iterator<String> valueIterator() {
-        Iterator<DataCell> delegate = iterator();
+    public Iterable<String> valueIterable() {
+    	
+    	return new Iterable<String>() {
 
-        return new Iterator<String>() {
-            @Override
-            public boolean hasNext() {
-                return delegate.hasNext();
-            }
+			@Override
+			public Iterator<String> iterator() {
+		        Iterator<DataCell> delegate = DataColumn.this.iterator();
 
-            @Override
-            public String next() {
-                DataCell cell = delegate.next();
-                return cell.getValue();
-            }
-        };
+		        return new Iterator<String>() {
+		            @Override
+		            public boolean hasNext() {
+		                return delegate.hasNext();
+		            }
+
+		            @Override
+		            public String next() {
+		                DataCell cell = delegate.next();
+		                return cell.getValue();
+		            }
+		        };
+			}
+    		
+    	};
     }
 }

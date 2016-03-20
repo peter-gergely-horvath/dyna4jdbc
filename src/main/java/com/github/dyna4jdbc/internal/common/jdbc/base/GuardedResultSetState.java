@@ -40,7 +40,7 @@ class GuardedResultSetState {
     void transitionTo(State newState) throws SQLException {
         if(!currentState.validTransitions.contains(newState)) {
             throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException(
-                    "Transitioning from " + this + " to " + newState + " is illegal");
+                    "Transitioning from " + currentState + " to " + newState + " is illegal");
         }
 
         this.currentState = newState;

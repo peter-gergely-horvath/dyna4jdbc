@@ -14,11 +14,11 @@ import java.util.Iterator;
 
 public abstract class AbstractResultSet<T> extends ClosableSQLObject implements java.sql.ResultSet {
 
-    protected final GuardedResultSetState resultSetState = new GuardedResultSetState();
+    private final GuardedResultSetState resultSetState = new GuardedResultSetState();
 
     private final Iterator<T> rowIterator;
 
-    protected T currentRow = null;
+    private T currentRow = null;
 
     public AbstractResultSet(Iterator<T> dataRowIterator) {
         this.rowIterator = dataRowIterator;
@@ -66,6 +66,15 @@ public abstract class AbstractResultSet<T> extends ClosableSQLObject implements 
     protected void checkValidStateForRowAccess() throws SQLException {
         checkNotClosed();
         resultSetState.checkValidStateForRowAccess();
+    }
+    
+    protected T getCurrentRow() throws SQLException {
+        if (currentRow == null) {
+            throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException(
+                    "currentRow is null in state: " + resultSetState);
+        }
+        
+        return currentRow;
     }
 
     @Override

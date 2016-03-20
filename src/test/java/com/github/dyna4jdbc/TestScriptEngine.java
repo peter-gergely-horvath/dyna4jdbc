@@ -20,9 +20,9 @@ public class TestScriptEngine {
 
         Statement statement = connection.createStatement();
 
-        statement.executeUpdate("var msg = 'Hello World\tI am here!'");
+        statement.executeUpdate("var msg = '2\tHello World\tI am here!'");
 
-        String script = "print('Foo\tBar') ; print(msg)";
+        String script = "print('1\tFoo\tBar') ; print(msg)";
 
         boolean results = statement.execute(script);
         int rsCount = 0;
@@ -40,7 +40,7 @@ public class TestScriptEngine {
                 while (rs.next()) {
 
                     for(int i=1; i<=columnCount; i++ ) {
-                        System.out.format("%s ", rs.getString(i));
+                        System.out.format("%s ", i == 1 ? rs.getLong(i) : rs.getString(i));
                     }
                     System.out.println();
                 }
