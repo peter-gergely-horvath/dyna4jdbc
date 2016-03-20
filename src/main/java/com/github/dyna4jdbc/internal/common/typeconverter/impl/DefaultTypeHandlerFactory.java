@@ -1,6 +1,7 @@
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
 
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 
@@ -29,60 +30,70 @@ public class DefaultTypeHandlerFactory implements TypeHandlerFactory {
         private DummyStringTypeHandler(String header) {
             this.header = header;
         }
+        
+		@Override
+		public ColumnMetadata getColumnMetadata() {
+			// TODO Auto-generated method stub
+			return new ColumnMetadata() {
+				  @Override
+			        public boolean isCurrency() {
+			            return false;
+			        }
 
-        @Override
-        public boolean isCurrency() {
-            return false;
-        }
+			        @Override
+			        public int isNullable() {
+			            return ResultSetMetaData.columnNullable; // TODO: decouple this!!
+			        }
 
-        @Override
-        public int isNullable() {
-            return ResultSetMetaData.columnNullable; // TODO: decouple this!!
-        }
+			        @Override
+			        public boolean isSigned() {
+			            return false;
+			        }
 
-        @Override
-        public boolean isSigned() {
-            return false;
-        }
+			        @Override
+			        public int getColumnDisplaySize() {
+			            return header.length();
+			        }
 
-        @Override
-        public int getColumnDisplaySize() {
-            return header.length();
-        }
+			        @Override
+			        public String getColumnLabel() {
+			            return header;
+			        }
 
-        @Override
-        public String getColumnLabel() {
-            return header;
-        }
+			        @Override
+			        public String getColumnName() {
+			            return header;
+			        }
 
-        @Override
-        public String getColumnName() {
-            return header;
-        }
+			        @Override
+			        public int getPrecision() {
+			            return 0;
+			        }
 
-        @Override
-        public int getPrecision() {
-            return 0;
-        }
+			        @Override
+			        public int getScale() {
+			            return 0;
+			        }
 
-        @Override
-        public int getScale() {
-            return 0;
-        }
+			        @Override
+			        public int getColumnType() {
+			            return Types.VARCHAR;
+			        }
 
-        @Override
-        public int getColumnType() {
-            return Types.VARCHAR;
-        }
+			        @Override
+			        public String getColumnTypeName() {
+			            return "VARCHAR";
+			        }
 
-        @Override
-        public String getColumnTypeName() {
-            return "VARCHAR";
-        }
+			        @Override
+			        public Class<?> getColumnClass() {
+			            return java.lang.String.class;
+			        }
+			};
+		}
 
-        @Override
-        public Class<?> getColumnClass() {
-            return java.lang.String.class;
-        }
+      
+
+
     }
 }

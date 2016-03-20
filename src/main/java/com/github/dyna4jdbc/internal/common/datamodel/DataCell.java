@@ -5,7 +5,7 @@ public class DataCell {
     private final DataRow dataRow;
 
     private final String value;
-    private int columnIndex;
+    private final int columnIndex;
 
     DataCell(DataRow dataRow, String value, int columnIndex) {
         this.dataRow = dataRow;
@@ -18,7 +18,7 @@ public class DataCell {
     }
 
 
-    public DataColumn getColumn() {
-        return dataRow.owner.getColumn(columnIndex);
+    public int getColumnIndex() {
+        return columnIndex;
     }
 }

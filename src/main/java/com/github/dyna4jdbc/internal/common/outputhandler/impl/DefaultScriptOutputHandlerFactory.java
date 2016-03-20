@@ -43,7 +43,7 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 
             return stdOut.getDataTableList().stream()
                     .map(dataTable -> new DataTableHolderResultSet(dataTable, typeHandlerFactory))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.<ResultSet>toList());
         }
 
         @Override

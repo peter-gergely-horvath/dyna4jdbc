@@ -37,29 +37,20 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     private LinkedHashMap<DataColumn, TypeHandler> initTypeHandlers(DataTable dataTable) {
 
-        try {
-            LinkedHashMap<DataColumn, TypeHandler> resultMap = new LinkedHashMap<>();
+    	// using a LinkedHashMap here ensures that we retain the
+    	// order of the columns during iteration over the keys
+    	LinkedHashMap<DataColumn, TypeHandler> resultMap = new LinkedHashMap<>();
 
-            for (int i=0; i< dataTable.getColumnCount(); i++) {
+    	for(DataColumn column : dataTable.columnIterable() ) {
+    		TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(column.valueIterator());
+    		if (typeHandler == null) {
+    			throw SQLError.raiseInternalIllegalStateRuntimeException("typeHandler is null");
+    		}
 
-                DataColumn column = dataTable.getColumn(i);
+    		resultMap.put(column, typeHandler);
+    	}
 
-                TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(column.valueIterator());
-                if (typeHandler == null) {
-                    throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException("typeHandler is null");
-                }
-
-
-                resultMap.put(column, typeHandler);
-            }
-
-            return resultMap;
-
-
-        } catch (SQLException e) {
-            // TODO: clean up!
-            throw new IllegalStateException(e);
-        }
+    	return resultMap;
     }
 
     @Override
@@ -281,7 +272,7 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return new DataTableHolderResultSetMetaData(typeHandlers.values().stream().collect(Collectors.toList()));
+        return new DataTableHolderResultSetMetaData(typeHandlers.values().stream().collect(Collectors.<TypeHandler>toList()));
     }
 
     @Override

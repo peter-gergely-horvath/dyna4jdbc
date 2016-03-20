@@ -19,11 +19,29 @@ public class DataTable {
     public DataRow getLastRow() {
         return rows.getLast();
     }
-
-    public DataColumn getColumn(int index) {
-
-        return new DataColumn(this, index);
-    }
+    
+	public Iterable<DataColumn> columnIterable() {
+		return new Iterable<DataColumn>() {
+			
+			@Override
+			public Iterator<DataColumn> iterator() {
+				return new Iterator<DataColumn>() {
+					
+					private int index = 0;
+					
+					@Override
+					public DataColumn next() {
+						return new DataColumn(DataTable.this, index++);
+					}
+					
+					@Override
+					public boolean hasNext() {
+						return index < columnCount;
+					}
+				};
+			}
+		};
+	}
 
     public int getColumnCount() {
         return columnCount;
@@ -31,17 +49,6 @@ public class DataTable {
 
     public Iterator<DataRow> rowIterator() {
         return rows.iterator();
-    }
-
-    public Iterator<DataColumn> columnIterator() {
-        return columns.iterator();
-    }
-
-    public List<DataColumn> getColumns() {
-        for(int i=0; i<columnCount; i++) {
-            getColumn(i);
-        }
-        return Collections.unmodifiableList(columns);
     }
 
     LinkedList<DataRow> getRows() {
@@ -57,4 +64,6 @@ public class DataTable {
     public boolean isEmpty() {
         return rows.isEmpty();
     }
+
+
 }

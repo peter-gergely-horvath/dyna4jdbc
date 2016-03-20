@@ -19,7 +19,7 @@ public class DataColumn implements Iterable<DataCell>  {
 
     @Override
     public Iterator<DataCell> iterator() {
-        Iterator<DataRow> delegate = dataTable.getRows().iterator();
+        final Iterator<DataRow> delegate = dataTable.getRows().iterator();
 
         return new Iterator<DataCell>() {
             @Override
