@@ -1,20 +1,30 @@
 package com.github.dyna4jdbc.internal.common.jdbc.generic;
 
+import java.io.InputStream;
+import java.io.Reader;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import com.github.dyna4jdbc.internal.SQLError;
 import com.github.dyna4jdbc.internal.common.datamodel.DataCell;
 import com.github.dyna4jdbc.internal.common.datamodel.DataColumn;
 import com.github.dyna4jdbc.internal.common.datamodel.DataRow;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
-
-import java.io.*;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.sql.*;
-import java.sql.Date;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractResultSet;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
@@ -25,11 +35,13 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     private boolean wasNull = false;
 	private List<TypeHandler> typeHandlers;
+	private Map<String, Integer> columnNameToColumnIndexMap;
 
     public DataTableHolderResultSet(Statement statement, DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
         super(dataTable.rowIterator(), statement);
         this.dataTable = dataTable;
         this.typeHandlers = initTypeHandlers(dataTable, typeHandlerFactory);
+        this.columnNameToColumnIndexMap = initColumnNameToColumnIndexMap(this.typeHandlers);
     }
 
     private static List<TypeHandler> initTypeHandlers(DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
@@ -46,6 +58,32 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
     	}
     	
     	return Collections.unmodifiableList(typeHandlerList);
+    }
+    
+    private static Map<String, Integer> initColumnNameToColumnIndexMap(List<TypeHandler> columnTypeHandlers) {
+
+    	HashMap<String, Integer> columnNameToColumnIndexMap = new HashMap<>();
+    	
+    	int sqlIndex = 1;
+    	
+    	for(TypeHandler typeHandler : columnTypeHandlers ) {
+    		
+    		ColumnMetadata columnMetadata = typeHandler.getColumnMetadata();
+    		if (columnMetadata == null) {
+    			throw SQLError.raiseInternalIllegalStateRuntimeException("columnMetadata is null");
+    		}
+    		
+    		String columnLabel = columnMetadata.getColumnLabel();
+    		if(columnNameToColumnIndexMap.containsKey(columnLabel)) {
+    			throw new IllegalStateException("Duplicate column label: " + columnLabel);
+    		}
+    		
+    		columnNameToColumnIndexMap.put(columnLabel, sqlIndex);
+    		
+    		sqlIndex++;
+    	}
+    	
+    	return Collections.unmodifiableMap(columnNameToColumnIndexMap);
     }
 
     @Override
@@ -78,6 +116,8 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
         String cellValue = dataCell.getValue();
         wasNull = cellValue == null;
 
+        
+        
         return cellValue;
     }
     
@@ -90,9 +130,9 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
     }
     
     @SuppressWarnings("unchecked")
-	private <T> T checkIfNull(Object formattedValue) {
-    	wasNull = (formattedValue == null);
-    	return (T) formattedValue;
+	private <T> T checkIfNull(Object convertedValue) {
+    	wasNull = (convertedValue == null);
+    	return (T) convertedValue;
     }
 
     @Override
@@ -106,12 +146,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		String formattedValue = typeHandler.covertToString(rawCellValue);
-    		return checkIfNull(formattedValue);
+    		String convertedValue = typeHandler.covertToString(rawCellValue);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, java.lang.String.class);
+    				tce, getRow(), columnIndex, rawCellValue, java.lang.String.class);
     	}
     }
 
@@ -121,14 +161,14 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Boolean formattedValue = typeHandler.covertToBoolean(rawCellValue);
-    		Boolean returnValue = checkIfNull(formattedValue);
+    		Boolean convertedValue = typeHandler.covertToBoolean(rawCellValue);
+    		Boolean returnValue = checkIfNull(convertedValue);
 
     		return returnValue != null ? returnValue.booleanValue() : false; 
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, "boolean");
+    				tce, getRow(), columnIndex, rawCellValue, "boolean");
     	}
     }
 
@@ -139,12 +179,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Byte formattedValue = typeHandler.covertToByte(rawCellValue);
-    		return checkIfNull(formattedValue);
+    		Byte convertedValue = typeHandler.covertToByte(rawCellValue);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, "byte");
+    				tce, getRow(), columnIndex, rawCellValue, "byte");
     	}
     }
 
@@ -154,12 +194,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Short formattedValue = typeHandler.covertToShort(rawCellValue);
-    		return checkIfNull(formattedValue);
+    		Short convertedValue = typeHandler.covertToShort(rawCellValue);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, "short");
+    				tce, getRow(), columnIndex, rawCellValue, "short");
     	}
     }
 
@@ -169,12 +209,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Integer formattedValue = typeHandler.covertToInteger(rawCellValue);
-    		return checkIfNull(formattedValue);
+    		Integer convertedValue = typeHandler.covertToInteger(rawCellValue);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, "int");
+    				tce, getRow(), columnIndex, rawCellValue, "int");
     	}
     }
 
@@ -184,12 +224,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Long formattedValue = typeHandler.covertToLong(rawCellValue);
-    		return checkIfNull(formattedValue);
+    		Long convertedValue = typeHandler.covertToLong(rawCellValue);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, "long");
+    				tce, getRow(), columnIndex, rawCellValue, "long");
     	}
     }
 
@@ -199,12 +239,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Float formattedValue = typeHandler.covertToFloat(rawCellValue);
-    		return checkIfNull(formattedValue);
+    		Float convertedValue = typeHandler.covertToFloat(rawCellValue);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, "float");
+    				tce, getRow(), columnIndex, rawCellValue, "float");
     	}
     }
 
@@ -214,12 +254,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Double formattedValue = typeHandler.covertToDouble(rawCellValue);
-    		return checkIfNull(formattedValue);
+    		Double convertedValue = typeHandler.covertToDouble(rawCellValue);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, "double");
+    				tce, getRow(), columnIndex, rawCellValue, "double");
     	}
     }
 
@@ -229,12 +269,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		BigDecimal formattedValue = typeHandler.covertToBigDecimal(rawCellValue, scale);
-    		return checkIfNull(formattedValue);
+    		BigDecimal convertedValue = typeHandler.covertToBigDecimal(rawCellValue, scale);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, java.math.BigDecimal.class);
+    				tce, getRow(), columnIndex, rawCellValue, java.math.BigDecimal.class);
     	}
     }
 
@@ -244,12 +284,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		byte[] formattedValue = typeHandler.covertToByteArray(rawCellValue);
-    		return checkIfNull(formattedValue);
+    		byte[] convertedValue = typeHandler.covertToByteArray(rawCellValue);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, "byte[]");
+    				tce, getRow(), columnIndex, rawCellValue, "byte[]");
     	}
     }
 
@@ -259,12 +299,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Date formattedValue = typeHandler.covertToDate(rawCellValue);
-    		return checkIfNull(formattedValue);
+    		Date convertedValue = typeHandler.covertToDate(rawCellValue);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, java.sql.Date.class);
+    				tce, getRow(), columnIndex, rawCellValue, java.sql.Date.class);
     	}
     }
 
@@ -274,12 +314,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Time formattedValue = typeHandler.covertToTime(rawCellValue);
-    		return checkIfNull(formattedValue);
+    		Time convertedValue = typeHandler.covertToTime(rawCellValue);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, java.sql.Time.class);
+    				tce, getRow(), columnIndex, rawCellValue, java.sql.Time.class);
     	}
     }
 
@@ -289,123 +329,145 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Timestamp formattedValue = typeHandler.covertToTimestamp(rawCellValue);
-    		return checkIfNull(formattedValue);
+    		Timestamp convertedValue = typeHandler.covertToTimestamp(rawCellValue);
+    		return checkIfNull(convertedValue);
 
     	} catch(TypeConversionException tce) {
     		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
-    				tce, rawCellValue, java.sql.Timestamp.class);
+    				tce, getRow(), columnIndex, rawCellValue, java.sql.Timestamp.class);
     	}
     }
 
     @Override
     public InputStream getAsciiStream(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getAsciiStream"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		InputStream convertedValue = typeHandler.covertToAsciiInputStream(rawCellValue);
+    		return checkIfNull(convertedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, getRow(), columnIndex, rawCellValue, "(ASCII) InputStream");
+    	}
     }
 
     @Override
     public InputStream getUnicodeStream(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getUnicodeStream"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		InputStream convertedValue = typeHandler.covertToUnicodeInputStream(rawCellValue);
+    		return checkIfNull(convertedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, getRow(), columnIndex, rawCellValue, "(Unicode) InputStream");
+    	}
     }
 
     @Override
     public InputStream getBinaryStream(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getBinaryStream"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		InputStream convertedValue = typeHandler.covertToBinaryInputStream(rawCellValue);
+    		return checkIfNull(convertedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, getRow(), columnIndex, rawCellValue, "(Binary) InputStream");
+    	}
     }
 
     @Override
     public String getString(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getString"); // TODO: implement method
+        return getString(findColumn(columnLabel));
     }
 
     @Override
     public boolean getBoolean(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getBoolean"); // TODO: implement method
+    	return getBoolean(findColumn(columnLabel));
     }
 
     @Override
     public byte getByte(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getByte"); // TODO: implement method
+    	return getByte(findColumn(columnLabel));
     }
 
     @Override
     public short getShort(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getShort"); // TODO: implement method
+    	return getShort(findColumn(columnLabel));
     }
 
     @Override
     public int getInt(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getInt"); // TODO: implement method
+    	return getInt(findColumn(columnLabel));
     }
 
     @Override
     public long getLong(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getLong"); // TODO: implement method
+    	return getLong(findColumn(columnLabel));
     }
 
     @Override
     public float getFloat(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getFloat"); // TODO: implement method
+    	return getFloat(findColumn(columnLabel));
     }
 
     @Override
     public double getDouble(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getDouble"); // TODO: implement method
+    	return getDouble(findColumn(columnLabel));
     }
 
     @Override
     public BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getBigDecimal"); // TODO: implement method
+    	return getBigDecimal(findColumn(columnLabel), scale);
     }
 
     @Override
     public byte[] getBytes(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getBytes"); // TODO: implement method
+    	return getBytes(findColumn(columnLabel));
     }
 
     @Override
     public Date getDate(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getDate"); // TODO: implement method
+    	return getDate(findColumn(columnLabel));
     }
 
     @Override
     public Time getTime(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getTime"); // TODO: implement method
+    	return getTime(findColumn(columnLabel));
     }
 
     @Override
     public Timestamp getTimestamp(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getTimestamp"); // TODO: implement method
+    	return getTimestamp(findColumn(columnLabel));
     }
 
     @Override
     public InputStream getAsciiStream(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getAsciiStream"); // TODO: implement method
+    	return getAsciiStream(findColumn(columnLabel));
     }
 
     @Override
     public InputStream getUnicodeStream(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getUnicodeStream"); // TODO: implement method
+    	return getUnicodeStream(findColumn(columnLabel));
     }
 
     @Override
     public InputStream getBinaryStream(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getBinaryStream"); // TODO: implement method
+    	return getBinaryStream(findColumn(columnLabel));
     }
 
-    @Override
-    public SQLWarning getWarnings() throws SQLException {
-        return null;
-    }
 
-    @Override
-    public void clearWarnings() throws SQLException {
-
-    }
 
     @Override
     public String getCursorName() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getCursorName"); // TODO: implement method
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Retrieval of cursor name");
     }
 
     @Override
@@ -415,27 +477,50 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     @Override
     public Object getObject(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getObject"); // TODO: implement method
+    	return getObject(columnIndex, (Map<String, Class<?>>)null);
+
     }
 
     @Override
     public Object getObject(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getObject"); // TODO: implement method
+        return getObject(findColumn(columnLabel));
     }
 
     @Override
     public int findColumn(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#findColumn"); // TODO: implement method
+        if (!columnNameToColumnIndexMap.containsKey(columnLabel)) {
+            throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException(
+                    "Invalid column label: " + columnLabel);
+        }
+    	
+    	
+    	Integer sqlIndex = columnNameToColumnIndexMap.get(columnLabel);
+        if (sqlIndex == null) {
+            throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException(
+                    "sqlIndex is null");
+        }
+    	
+    	return sqlIndex;
     }
 
     @Override
     public Reader getCharacterStream(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getCharacterStream"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Reader convertedValue = typeHandler.covertToCharacterStream(rawCellValue);
+    		return checkIfNull(convertedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, getRow(), columnIndex, rawCellValue, java.io.Reader.class);
+    	}
     }
 
     @Override
     public Reader getCharacterStream(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getCharacterStream"); // TODO: implement method
+    	return getCharacterStream(findColumn(columnLabel));
     }
 
     @Override
@@ -445,306 +530,134 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 
     @Override
     public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getBigDecimal"); // TODO: implement method
+    	return getBigDecimal(findColumn(columnLabel));
     }
 
-
-
-
-
-    @Override
-    public boolean absolute(int row) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#absolute"); // TODO: implement method
-    }
-
-    @Override
-    public boolean relative(int rows) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#relative"); // TODO: implement method
-    }
-
-    @Override
-    public boolean previous() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#previous"); // TODO: implement method
-    }
-
-    @Override
-    public void setFetchDirection(int direction) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#setFetchDirection"); // TODO: implement method
-    }
-
-    @Override
-    public int getFetchDirection() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getFetchDirection"); // TODO: implement method
-    }
-
-    @Override
-    public void setFetchSize(int rows) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#setFetchSize"); // TODO: implement method
-    }
-
-    @Override
-    public int getFetchSize() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getFetchSize"); // TODO: implement method
-    }
-
-    @Override
-    public int getType() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getType"); // TODO: implement method
-    }
-
-    @Override
-    public int getConcurrency() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getConcurrency"); // TODO: implement method
-    }
-
-    @Override
-    public boolean rowUpdated() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#rowUpdated"); // TODO: implement method
-    }
-
-    @Override
-    public boolean rowInserted() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#rowInserted"); // TODO: implement method
-    }
-
-    @Override
-    public boolean rowDeleted() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#rowDeleted"); // TODO: implement method
-    }
-
-
-    @Override
-    public void insertRow() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#insertRow"); // TODO: implement method
-    }
-
-    @Override
-    public void updateRow() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateRow"); // TODO: implement method
-    }
-
-    @Override
-    public void deleteRow() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#deleteRow"); // TODO: implement method
-    }
-
-    @Override
-    public void refreshRow() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#refreshRow"); // TODO: implement method
-    }
-
-    @Override
-    public void cancelRowUpdates() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#cancelRowUpdates"); // TODO: implement method
-    }
-
-    @Override
-    public void moveToInsertRow() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#moveToInsertRow"); // TODO: implement method
-    }
-
-    @Override
-    public void moveToCurrentRow() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#moveToCurrentRow"); // TODO: implement method
-    }
 
 
     @Override
     public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getObject"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Object convertedValue = typeHandler.covertToObject(rawCellValue, map);
+    		return checkIfNull(convertedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, getRow(), columnIndex, rawCellValue, java.lang.Object.class);
+    	}
     }
 
-    @Override
-    public Ref getRef(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getRef"); // TODO: implement method
-    }
 
-    @Override
-    public Blob getBlob(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getBlob"); // TODO: implement method
-    }
 
-    @Override
-    public Clob getClob(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getClob"); // TODO: implement method
-    }
-
-    @Override
-    public Array getArray(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getArray"); // TODO: implement method
-    }
-
+   
     @Override
     public Object getObject(String columnLabel, Map<String, Class<?>> map) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getObject"); // TODO: implement method
+    	return getObject(findColumn(columnLabel), map);
     }
 
-    @Override
-    public Ref getRef(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getRef"); // TODO: implement method
-    }
-
-    @Override
-    public Blob getBlob(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getBlob"); // TODO: implement method
-    }
-
-    @Override
-    public Clob getClob(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getClob"); // TODO: implement method
-    }
-
-    @Override
-    public Array getArray(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getArray"); // TODO: implement method
-    }
-
+    
     @Override
     public Date getDate(int columnIndex, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getDate"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Object convertedValue = typeHandler.covertToDate(rawCellValue, cal);
+    		return checkIfNull(convertedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, getRow(), columnIndex, rawCellValue, java.sql.Date.class);
+    	}
     }
 
     @Override
     public Date getDate(String columnLabel, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getDate"); // TODO: implement method
+    	return getDate(findColumn(columnLabel), cal);
     }
 
     @Override
     public Time getTime(int columnIndex, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getTime"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Object convertedValue = typeHandler.covertToTime(rawCellValue, cal);
+    		return checkIfNull(convertedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, getRow(), columnIndex, rawCellValue, java.sql.Time.class);
+    	}
     }
 
     @Override
     public Time getTime(String columnLabel, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getTime"); // TODO: implement method
+    	return getTime(findColumn(columnLabel), cal);
     }
 
     @Override
     public Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getTimestamp"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Object convertedValue = typeHandler.covertToTimestamp(rawCellValue, cal);
+    		return checkIfNull(convertedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, getRow(), columnIndex, rawCellValue, java.sql.Timestamp.class);
+    	}
     }
 
     @Override
     public Timestamp getTimestamp(String columnLabel, Calendar cal) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getTimestamp"); // TODO: implement method
+    	return getTimestamp(findColumn(columnLabel), cal);
     }
 
     @Override
     public URL getURL(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getURL"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Object convertedValue = typeHandler.covertToURL(rawCellValue);
+    		return checkIfNull(convertedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, getRow(), columnIndex, rawCellValue, java.net.URL.class);
+    	}
     }
 
     @Override
     public URL getURL(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getURL"); // TODO: implement method
-    }
-
-   
-
-    @Override
-    public RowId getRowId(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getRowId"); // TODO: implement method
-    }
-
-    @Override
-    public RowId getRowId(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getRowId"); // TODO: implement method
-    }
-
-    @Override
-    public void updateRowId(int columnIndex, RowId x) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateRowId"); // TODO: implement method
-    }
-
-    @Override
-    public void updateRowId(String columnLabel, RowId x) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateRowId"); // TODO: implement method
-    }
-
-    @Override
-    public int getHoldability() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getHoldability"); // TODO: implement method
-    }
-
-    @Override
-    public void updateNString(int columnIndex, String nString) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateNString"); // TODO: implement method
-    }
-
-    @Override
-    public void updateNString(String columnLabel, String nString) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateNString"); // TODO: implement method
-    }
-
-    @Override
-    public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateNClob"); // TODO: implement method
-    }
-
-    @Override
-    public void updateNClob(String columnLabel, NClob nClob) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateNClob"); // TODO: implement method
-    }
-
-    @Override
-    public NClob getNClob(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getNClob"); // TODO: implement method
-    }
-
-    @Override
-    public NClob getNClob(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getNClob"); // TODO: implement method
-    }
-
-    @Override
-    public SQLXML getSQLXML(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getSQLXML"); // TODO: implement method
-    }
-
-    @Override
-    public SQLXML getSQLXML(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getSQLXML"); // TODO: implement method
-    }
-
-    @Override
-    public void updateSQLXML(int columnIndex, SQLXML xmlObject) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateSQLXML"); // TODO: implement method
-    }
-
-    @Override
-    public void updateSQLXML(String columnLabel, SQLXML xmlObject) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateSQLXML"); // TODO: implement method
-    }
-
-    @Override
-    public String getNString(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getNString"); // TODO: implement method
-    }
-
-    @Override
-    public String getNString(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getNString"); // TODO: implement method
-    }
-
-    @Override
-    public Reader getNCharacterStream(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getNCharacterStream"); // TODO: implement method
-    }
-
-    @Override
-    public Reader getNCharacterStream(String columnLabel) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getNCharacterStream"); // TODO: implement method
+    	return getURL(findColumn(columnLabel));
     }
 
 
     @Override
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getObject"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		Object convertedValue = typeHandler.covertToObject(rawCellValue, type);
+    		return checkIfNull(convertedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, getRow(), columnIndex, rawCellValue, java.net.URL.class);
+    	}
     }
 
     @Override
     public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getObject"); // TODO: implement method
+    	return getObject(findColumn(columnLabel), type);
     }
 
     @SuppressWarnings("unchecked")
@@ -754,11 +667,11 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
         	return (T) dataTable;
         }
         
-        throw SQLError.CANNOT_UNWARP_OBJECT.raiseException(iface, this.getClass());
+        return super.unwrap(iface);
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return iface.isAssignableFrom(DataTable.class);
+        return iface.isAssignableFrom(DataTable.class) || super.isWrapperFor(iface);
     }
 }

@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
 public class TestScriptEngine {
@@ -35,12 +36,14 @@ public class TestScriptEngine {
 
                 //Show data from the result set.
                 System.out.println("RESULT SET #" + rsCount);
-                int columnCount = rs.getMetaData().getColumnCount();
+                ResultSetMetaData metaData = rs.getMetaData();
+				int columnCount = metaData.getColumnCount();
 
                 while (rs.next()) {
 
                     for(int i=1; i<=columnCount; i++ ) {
-                        System.out.format("%s ", i == 1 ? rs.getLong(i) : rs.getString(i));
+                    	String columnLabel = metaData.getColumnLabel(i);
+                    	System.out.format("%s ", rs.getString(columnLabel));
                     }
                     System.out.println();
                 }

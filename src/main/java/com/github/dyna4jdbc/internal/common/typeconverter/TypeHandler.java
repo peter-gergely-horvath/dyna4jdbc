@@ -1,9 +1,14 @@
 package com.github.dyna4jdbc.internal.common.typeconverter;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Map;
 
 public interface TypeHandler {
 
@@ -29,10 +34,30 @@ public interface TypeHandler {
 
 	byte[] covertToByteArray(String rawCellValue) throws TypeConversionException;
 
-	Date covertToDate(String rawCellValue) throws TypeConversionException;
+	java.sql.Date covertToDate(String rawCellValue) throws TypeConversionException;
 
 	Time covertToTime(String rawCellValue) throws TypeConversionException;
 
 	Timestamp covertToTimestamp(String rawCellValue) throws TypeConversionException;
+
+	Object covertToObject(String rawCellValue, Map<String, Class<?>> map) throws TypeConversionException;
+
+	InputStream covertToAsciiInputStream(String rawCellValue) throws TypeConversionException;
+
+	InputStream covertToUnicodeInputStream(String rawCellValue) throws TypeConversionException;
+
+	InputStream covertToBinaryInputStream(String rawCellValue) throws TypeConversionException;
+
+	<T> T covertToObject(String rawCellValue, Class<T> type) throws TypeConversionException;
+
+	URL covertToURL(String rawCellValue) throws TypeConversionException;
+
+	Timestamp covertToTimestamp(String rawCellValue, Calendar cal) throws TypeConversionException;
+
+	Time covertToTime(String rawCellValue, Calendar cal) throws TypeConversionException;
+
+	java.sql.Date covertToDate(String rawCellValue, Calendar cal) throws TypeConversionException;
+
+	Reader covertToCharacterStream(String rawCellValue) throws TypeConversionException;
 	
 }

@@ -7,9 +7,12 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Date;
+import java.sql.NClob;
 import java.sql.Ref;
 import java.sql.ResultSet;
+import java.sql.RowId;
 import java.sql.SQLException;
+import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 
@@ -386,5 +389,98 @@ public abstract class AbstractReadOnlyResultSet extends BasicSQLObject implement
     public void updateArray(String columnLabel, Array x) throws SQLException {
     	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
     }
+    
+    @Override
+    public boolean rowUpdated() throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public boolean rowInserted() throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public boolean rowDeleted() throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+
+    @Override
+    public void insertRow() throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public void updateRow() throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public void deleteRow() throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public void refreshRow() throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public void cancelRowUpdates() throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public void moveToInsertRow() throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public void moveToCurrentRow() throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+    
+    @Override
+    public void updateRowId(int columnIndex, RowId x) throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public void updateRowId(String columnLabel, RowId x) throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+    
+    @Override
+    public void updateNString(int columnIndex, String nString) throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public void updateNString(String columnLabel, String nString) throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public void updateNClob(String columnLabel, NClob nClob) throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+    
+    @Override
+    public void updateSQLXML(int columnIndex, SQLXML xmlObject) throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+    @Override
+    public void updateSQLXML(String columnLabel, SQLXML xmlObject) throws SQLException {
+    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Updating ResultSet data");
+    }
+
+
 	
 }

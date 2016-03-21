@@ -25,7 +25,7 @@ public class DataTableHolderResultSetMetaData extends AbstractResultSetMetaData 
     private ColumnMetadata getColumnMetadataBySqlIndex(int sqlColumnIndex) throws SQLException {
         final int javaIndex = sqlColumnIndex - 1;
 
-        if(javaIndex < 0 && javaIndex >= getColumnCount()) {
+        if(javaIndex < 0 || javaIndex >= getColumnCount()) {
             throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Invalid column index: " + sqlColumnIndex);
         }
 
