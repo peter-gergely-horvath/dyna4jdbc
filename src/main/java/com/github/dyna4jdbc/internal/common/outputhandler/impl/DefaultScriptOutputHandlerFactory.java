@@ -1,8 +1,13 @@
 package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
-import com.github.dyna4jdbc.internal.OutputDisabledError;
+import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.github.dyna4jdbc.internal.SQLError;
-import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet;
 import com.github.dyna4jdbc.internal.common.outputhandler.MultiTypeScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
@@ -10,110 +15,112 @@ import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptO
 import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 
-import java.io.PrintWriter;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFactory {
 
-    // TODO: cleanup
+	// TODO: cleanup
 
-    private final TypeHandlerFactory typeHandlerFactory;
+	private final TypeHandlerFactory typeHandlerFactory;
 
-    public DefaultScriptOutputHandlerFactory(TypeHandlerFactory typeHandlerFactory) {
-        this.typeHandlerFactory = typeHandlerFactory;
+	public DefaultScriptOutputHandlerFactory(TypeHandlerFactory typeHandlerFactory) {
+		this.typeHandlerFactory = typeHandlerFactory;
 
-    }
+	}
 
-    private static class DefaultResultSetScriptOutputHandler
-            implements SingleResultSetScriptOutputHandler, MultiTypeScriptOutputHandler {
+	@Override
+	public SingleResultSetScriptOutputHandler newSingleResultSetScriptOutputHandler(
+			Statement statement, String script) {
+		
+		return new DefaultResultSetScriptOutputHandler(statement, typeHandlerFactory);
+	}
 
-        private final DataTableWriter stdOut = new DataTableWriter();
-        private final PrintWriter printWriter = new PrintWriter(stdOut);
-        private final TypeHandlerFactory typeHandlerFactory;
+	@Override
+	public MultiTypeScriptOutputHandler newMultiTypeScriptOutputHandler(
+			Statement statement, String script) {
+		
+		return new DefaultResultSetScriptOutputHandler(statement, typeHandlerFactory);
+	}
 
-        public DefaultResultSetScriptOutputHandler(TypeHandlerFactory typeHandlerFactory) {
-            this.typeHandlerFactory = typeHandlerFactory;
-        }
+	@Override
+	public UpdateScriptOutputHandler newUpdateScriptOutputHandler(
+			Statement statement, String script) {
+		
+		return new DefaultUpdateScriptOutputHandler();
+	}
 
+	private static final class DefaultUpdateScriptOutputHandler implements UpdateScriptOutputHandler {
+		@Override
+		public int getUpdateCount() {
+			return 0;
+		}
 
-        private List<ResultSet> processObjectListToResultSet() {
+		@Override
+		public PrintWriter getOutPrintWriter() {
+			return new DisallowAllWritesPrintWriter("Writing to to stdout from update is not allowed");
+		}
 
-            return stdOut.getDataTableList().stream()
-                    .map(dataTable -> new DataTableHolderResultSet(dataTable, typeHandlerFactory))
-                    .collect(Collectors.<ResultSet>toList());
-        }
+		@Override
+		public PrintWriter getErrorPrintWriter() {
+			return null;
+		}
+	}
 
-        @Override
-        public boolean isResultSets() {
-            return true;
-        }
+	private static class DefaultResultSetScriptOutputHandler
+			implements SingleResultSetScriptOutputHandler, MultiTypeScriptOutputHandler {
 
-        @Override
-        public List<ResultSet> getResultSets() {
-            return processObjectListToResultSet();
-        }
+		private final Statement statement;
+		private final DataTableWriter stdOut = new DataTableWriter();
+		private final PrintWriter printWriter = new PrintWriter(stdOut);
+		private final TypeHandlerFactory typeHandlerFactory;
 
-        @Override
-        public int getUpdateCount() {
-            return 0;
-        }
+		public DefaultResultSetScriptOutputHandler(Statement statement, TypeHandlerFactory typeHandlerFactory) {
+			this.statement = statement;
+			this.typeHandlerFactory = typeHandlerFactory;
+		}
 
-        @Override
-        public ResultSet getResultSet() throws SQLException {
-                List<ResultSet> resultSets = getResultSets();
+		private List<ResultSet> processObjectListToResultSet() {
 
-                if (resultSets.size() > 1) {
+			return stdOut.getDataTableList().stream()
+					.map(dataTable -> new DataTableHolderResultSet(statement, dataTable, typeHandlerFactory))
+					.collect(Collectors.<ResultSet> toList());
+		}
 
-                    throw SQLError.RESULT_SET_MULTIPLE_EXPECTED_ONE.raiseException(resultSets.size());
+		@Override
+		public boolean isResultSets() {
+			return true;
+		}
 
-                } else {
-                    return resultSets.get(0);
-                }
+		@Override
+		public List<ResultSet> getResultSets() {
+			return processObjectListToResultSet();
+		}
 
-        }
+		@Override
+		public int getUpdateCount() {
+			return 0;
+		}
 
-        @Override
-        public PrintWriter getOutPrintWriter() {
-            return printWriter;
-        }
+		@Override
+		public ResultSet getResultSet() throws SQLException {
+			List<ResultSet> resultSets = getResultSets();
 
-        @Override
-        public PrintWriter getErrorPrintWriter() {
-            return null;
-        }
-    }
+			if (resultSets.size() > 1) {
 
-    @Override
-    public SingleResultSetScriptOutputHandler newSingleResultSetScriptOutputHandler(String script) {
-        return new DefaultResultSetScriptOutputHandler(typeHandlerFactory);
-    }
+				throw SQLError.RESULT_SET_MULTIPLE_EXPECTED_ONE.raiseException(resultSets.size());
 
-    @Override
-    public MultiTypeScriptOutputHandler newMultiTypeScriptOutputHandler(String script) {
-        return new DefaultResultSetScriptOutputHandler(typeHandlerFactory);
-    }
+			} else {
+				return resultSets.get(0);
+			}
 
-    @Override
-    public UpdateScriptOutputHandler newUpdateScriptOutputHandler(String script) {
-        return new UpdateScriptOutputHandler() {
-            @Override
-            public int getUpdateCount() {
-                return 0;
-            }
+		}
 
-            @Override
-            public PrintWriter getOutPrintWriter() {
-                return new DisallowAllWritesPrintWriter("Cannot write to stdout from update!");
-            }
+		@Override
+		public PrintWriter getOutPrintWriter() {
+			return printWriter;
+		}
 
-            @Override
-            public PrintWriter getErrorPrintWriter() {
-                return null;
-            }
-        };
-    }
+		@Override
+		public PrintWriter getErrorPrintWriter() {
+			return null;
+		}
+	}
 }

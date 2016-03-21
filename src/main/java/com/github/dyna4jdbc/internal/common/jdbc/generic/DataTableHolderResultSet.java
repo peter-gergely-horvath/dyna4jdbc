@@ -26,8 +26,8 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
     private boolean wasNull = false;
 	private List<TypeHandler> typeHandlers;
 
-    public DataTableHolderResultSet(DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
-        super(dataTable.rowIterator());
+    public DataTableHolderResultSet(Statement statement, DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
+        super(dataTable.rowIterator(), statement);
         this.dataTable = dataTable;
         this.typeHandlers = initTypeHandlers(dataTable, typeHandlerFactory);
     }
@@ -448,50 +448,9 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
         throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getBigDecimal"); // TODO: implement method
     }
 
-    @Override
-    public boolean isBeforeFirst() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#isBeforeFirst"); // TODO: implement method
-    }
 
-    @Override
-    public boolean isAfterLast() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#isAfterLast"); // TODO: implement method
-    }
 
-    @Override
-    public boolean isFirst() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#isFirst"); // TODO: implement method
-    }
 
-    @Override
-    public boolean isLast() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#isLast"); // TODO: implement method
-    }
-
-    @Override
-    public void beforeFirst() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#beforeFirst"); // TODO: implement method
-    }
-
-    @Override
-    public void afterLast() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#afterLast"); // TODO: implement method
-    }
-
-    @Override
-    public boolean first() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#first"); // TODO: implement method
-    }
-
-    @Override
-    public boolean last() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#last"); // TODO: implement method
-    }
-
-    @Override
-    public int getRow() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getRow"); // TODO: implement method
-    }
 
     @Override
     public boolean absolute(int row) throws SQLException {
@@ -589,10 +548,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
         throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#moveToCurrentRow"); // TODO: implement method
     }
 
-    @Override
-    public Statement getStatement() throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getStatement"); // TODO: implement method
-    }
 
     @Override
     public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {
@@ -684,45 +639,7 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
         throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getURL"); // TODO: implement method
     }
 
-    @Override
-    public void updateRef(int columnIndex, Ref x) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateRef"); // TODO: implement method
-    }
-
-    @Override
-    public void updateRef(String columnLabel, Ref x) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateRef"); // TODO: implement method
-    }
-
-    @Override
-    public void updateBlob(int columnIndex, Blob x) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateBlob"); // TODO: implement method
-    }
-
-    @Override
-    public void updateBlob(String columnLabel, Blob x) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateBlob"); // TODO: implement method
-    }
-
-    @Override
-    public void updateClob(int columnIndex, Clob x) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateClob"); // TODO: implement method
-    }
-
-    @Override
-    public void updateClob(String columnLabel, Clob x) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateClob"); // TODO: implement method
-    }
-
-    @Override
-    public void updateArray(int columnIndex, Array x) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateArray"); // TODO: implement method
-    }
-
-    @Override
-    public void updateArray(String columnLabel, Array x) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#updateArray"); // TODO: implement method
-    }
+   
 
     @Override
     public RowId getRowId(int columnIndex) throws SQLException {
@@ -830,13 +747,18 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
         throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getObject"); // TODO: implement method
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        return null;
+        if(iface.isAssignableFrom(DataTable.class)) {
+        	return (T) dataTable;
+        }
+        
+        throw SQLError.CANNOT_UNWARP_OBJECT.raiseException(iface, this.getClass());
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
+        return iface.isAssignableFrom(DataTable.class);
     }
 }

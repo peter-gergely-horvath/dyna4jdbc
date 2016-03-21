@@ -10,6 +10,7 @@ public enum SQLError {
     CONNECT_FAILED_GENERIC("Failed to connect: %s"),
     OBJECT_CLOSED("Object has already been closed: %s"),
     SCRIPT_EXECUTION_EXCEPTION("Execution of script raised exception: examine stack trace for root cause."),
+    CANNOT_UNWARP_OBJECT("The requested type (%s) cannot be unwrapped from this object (%s)."),
     UNEXPECTED_THROWABLE("Processing failed: caught unexpected exception."),
     RESULT_SET_MULTIPLE_EXPECTED_ONE("Expected one result set, but script produced %s result sets."),
     JDBC_FUNCTION_NOT_SUPPORTED("This JDBC API function is not supported: %s"),

@@ -24,7 +24,7 @@ class ScriptEngineStatement extends AbstractScriptEngineStatement {
     protected ResultSet executeScriptForSingleResultSet(String script) throws ScriptException, SQLException {
 
         SingleResultSetScriptOutputHandler outputHandler =
-                scriptOutputHandlerFactory.newSingleResultSetScriptOutputHandler(script);
+                scriptOutputHandlerFactory.newSingleResultSetScriptOutputHandler(this, script);
 
         executeScriptUsingOutputHandler(script, outputHandler);
 
@@ -34,7 +34,7 @@ class ScriptEngineStatement extends AbstractScriptEngineStatement {
     protected int executeScriptForUpdateCount(String script) throws ScriptException {
 
         UpdateScriptOutputHandler outputHandler =
-                scriptOutputHandlerFactory.newUpdateScriptOutputHandler(script);
+                scriptOutputHandlerFactory.newUpdateScriptOutputHandler(this, script);
 
         executeScriptUsingOutputHandler(script, outputHandler);
 
@@ -45,7 +45,7 @@ class ScriptEngineStatement extends AbstractScriptEngineStatement {
     protected boolean executeScript(String script, ScriptResultHandler scriptResultHandler) throws ScriptException {
 
         MultiTypeScriptOutputHandler outputHandler =
-                scriptOutputHandlerFactory.newMultiTypeScriptOutputHandler(script);
+                scriptOutputHandlerFactory.newMultiTypeScriptOutputHandler(this, script);
 
         executeScriptUsingOutputHandler(script, outputHandler);
 
