@@ -3,7 +3,7 @@ package com.github.dyna4jdbc.internal.common.datamodel;
 
 import java.util.Iterator;
 
-public class DataColumn implements Iterable<DataCell>  {
+public class DataColumn implements Iterable<String>  {
 
     private final DataTable dataTable;
     final int columnNumber;
@@ -18,45 +18,20 @@ public class DataColumn implements Iterable<DataCell>  {
     }
 
     @Override
-    public Iterator<DataCell> iterator() {
+    public Iterator<String> iterator() {
         final Iterator<DataRow> delegate = dataTable.getRows().iterator();
 
-        return new Iterator<DataCell>() {
+        return new Iterator<String>() {
             @Override
             public boolean hasNext() {
                 return delegate.hasNext();
             }
 
             @Override
-            public DataCell next() {
+            public String next() {
                 DataRow dataRow = delegate.next();
                 return dataRow.getCell(columnNumber);
             }
         };
-    }
-
-    public Iterable<String> valueIterable() {
-    	
-    	return new Iterable<String>() {
-
-			@Override
-			public Iterator<String> iterator() {
-		        Iterator<DataCell> delegate = DataColumn.this.iterator();
-
-		        return new Iterator<String>() {
-		            @Override
-		            public boolean hasNext() {
-		                return delegate.hasNext();
-		            }
-
-		            @Override
-		            public String next() {
-		                DataCell cell = delegate.next();
-		                return cell.getValue();
-		            }
-		        };
-			}
-    		
-    	};
     }
 }

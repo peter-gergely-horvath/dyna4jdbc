@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.Iterator;
 
 
-public class DataRow implements Iterable<DataCell> {
+public class DataRow implements Iterable<String> {
 
-    private ArrayList<DataCell> dataCells;
+    private ArrayList<String> dataCells;
     DataTable owner;
 
 
@@ -16,7 +16,7 @@ public class DataRow implements Iterable<DataCell> {
     }
 
     @Override
-    public Iterator<DataCell> iterator() {
+    public Iterator<String> iterator() {
         if (dataCells == null) {
             return Collections.emptyIterator();
         } else {
@@ -32,7 +32,7 @@ public class DataRow implements Iterable<DataCell> {
         }
     }
 
-    public DataCell getCell(int column) {
+    public String getCell(int column) {
         if (dataCells == null) {
             return null;
         }
@@ -43,7 +43,7 @@ public class DataRow implements Iterable<DataCell> {
         }
     }
 
-    public DataCell getCell(DataColumn column) {
+    public String getCell(DataColumn column) {
         return getCell(column.columnNumber);
     }
 
@@ -51,9 +51,7 @@ public class DataRow implements Iterable<DataCell> {
         if (dataCells == null) {
             dataCells = new ArrayList<>();
         }
-        final int newColumnIndex = dataCells.size();
-
-        dataCells.add(new DataCell(this, value, newColumnIndex));
+        dataCells.add(value);
     }
 
     public boolean isValidIndex(int column) {

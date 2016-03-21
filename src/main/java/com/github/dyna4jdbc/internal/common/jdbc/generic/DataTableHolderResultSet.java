@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.dyna4jdbc.internal.SQLError;
-import com.github.dyna4jdbc.internal.common.datamodel.DataCell;
 import com.github.dyna4jdbc.internal.common.datamodel.DataColumn;
 import com.github.dyna4jdbc.internal.common.datamodel.DataRow;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
@@ -49,7 +48,7 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
     	LinkedList<TypeHandler> typeHandlerList = new LinkedList<>();
     	
     	for(DataColumn column : dataTable.columnIterable() ) {
-    		TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(column.valueIterable());
+    		TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(column);
     		if (typeHandler == null) {
     			throw SQLError.raiseInternalIllegalStateRuntimeException("typeHandler is null");
     		}
@@ -107,17 +106,9 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
                     "Invalid index: " + sqlIndex);
         }
 
-        DataCell dataCell = currentRow.getCell(javaIndex);
-        if (dataCell == null) {
-            throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException(
-                    "Indexed dataCell not found: " + javaIndex);
-        }
-
-        String cellValue = dataCell.getValue();
+        String cellValue = currentRow.getCell(javaIndex);
         wasNull = cellValue == null;
 
-        
-        
         return cellValue;
     }
     

@@ -16,7 +16,7 @@ import java.util.Map;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
 
-public class DefaultTypeHandler extends AbstractTypeHandler {
+class DefaultTypeHandler extends AbstractTypeHandler {
 	
 	DefaultTypeHandler(ColumnMetadata columnMetadata) {
 		super(columnMetadata);
