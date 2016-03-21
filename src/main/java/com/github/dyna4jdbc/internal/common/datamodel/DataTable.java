@@ -2,21 +2,19 @@ package com.github.dyna4jdbc.internal.common.datamodel;
 
 import java.util.*;
 
-public class DataTable {
+public class DataTable implements Iterable<List<String>> {
 
-    private LinkedList<DataRow> rows = new LinkedList<>();
-    private ArrayList<DataColumn> columns = new ArrayList<>();
+    private LinkedList<List<String>> rows = new LinkedList<>();
     private int columnCount = 0;
 
-    public DataRow appendRow(DataRow row) {
+    public List<String> appendRow(List<String> row) {
         rows.addLast(row);
-        row.owner = this;
-        columnCount = Math.max(columnCount, row.cellNumber());
+        columnCount = Math.max(columnCount, row.size());
 
         return row;
     }
 
-    public DataRow getLastRow() {
+    public List<String> getLastRow() {
         return rows.getLast();
     }
     
@@ -47,16 +45,11 @@ public class DataTable {
         return columnCount;
     }
 
-    public Iterator<DataRow> rowIterator() {
-        return rows.iterator();
-    }
-
-    LinkedList<DataRow> getRows() {
+    LinkedList<List<String>> getRows() {
         return rows;
     }
 
     public void clear() {
-        columns.clear();
         rows.forEach(theRow -> theRow.clear());
         rows.clear();
     }
@@ -64,6 +57,11 @@ public class DataTable {
     public boolean isEmpty() {
         return rows.isEmpty();
     }
+
+	@Override
+	public Iterator<List<String>> iterator() {
+		return rows.iterator();
+	}
 
 
 }

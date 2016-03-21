@@ -29,8 +29,8 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
 
     private T currentRow = null;
 
-    public AbstractResultSet(Iterator<T> dataRowIterator, Statement statement) {
-        this.rowIterator = dataRowIterator;
+    public AbstractResultSet(Iterable<T> dataRowIterator, Statement statement) {
+        this.rowIterator = dataRowIterator.iterator();
         this.statement = statement;
     }
 

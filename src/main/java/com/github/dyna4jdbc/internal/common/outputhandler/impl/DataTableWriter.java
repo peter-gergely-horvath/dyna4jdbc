@@ -1,17 +1,17 @@
 package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
-import com.github.dyna4jdbc.internal.common.datamodel.DataRow;
-import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
-
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
+
 public class DataTableWriter extends CursorCellWriterOutputStream{
 
     private LinkedList<DataTable> dataTableList = new LinkedList<>();
-    private DataRow currentRow = new DataRow();
+    private List<String> currentRow = new ArrayList<String>();
 
     public DataTableWriter() {
         dataTableList.addLast(new DataTable());
@@ -31,13 +31,13 @@ public class DataTableWriter extends CursorCellWriterOutputStream{
     @Override
     protected void nextRow() {
         appendRow();
-        currentRow = new DataRow();
+        currentRow = new ArrayList<String>();
     }
 
 
     @Override
     protected void writeCellValue(String value) {
-        currentRow.appendDataCell(value);
+        currentRow.add(value);
     }
 
     @Override
@@ -54,8 +54,8 @@ public class DataTableWriter extends CursorCellWriterOutputStream{
 
         if (!currentTable.isEmpty()) {
 
-            DataRow lastRow = currentTable.getLastRow();
-            if (lastRow.cellNumber() != currentRow.cellNumber()) {
+            List<String> lastRow = currentTable.getLastRow();
+            if (lastRow.size() != currentRow.size()) {
                 currentTable = new DataTable();
                 dataTableList.addLast(currentTable);
             }

@@ -20,7 +20,6 @@ import java.util.Map;
 
 import com.github.dyna4jdbc.internal.SQLError;
 import com.github.dyna4jdbc.internal.common.datamodel.DataColumn;
-import com.github.dyna4jdbc.internal.common.datamodel.DataRow;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractResultSet;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
@@ -28,7 +27,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionExceptio
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 
-public class DataTableHolderResultSet extends AbstractResultSet<DataRow> implements ResultSet {
+public class DataTableHolderResultSet extends AbstractResultSet<List<String>> implements ResultSet {
 
     private final DataTable dataTable;
 
@@ -37,7 +36,7 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
 	private Map<String, Integer> columnNameToColumnIndexMap;
 
     public DataTableHolderResultSet(Statement statement, DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
-        super(dataTable.rowIterator(), statement);
+        super(dataTable, statement);
         this.dataTable = dataTable;
         this.typeHandlers = initTypeHandlers(dataTable, typeHandlerFactory);
         this.columnNameToColumnIndexMap = initColumnNameToColumnIndexMap(this.typeHandlers);
@@ -99,14 +98,14 @@ public class DataTableHolderResultSet extends AbstractResultSet<DataRow> impleme
         final int javaIndex = sqlIndex - 1;
 
 
-        DataRow currentRow = getCurrentRow();
+        List<String> currentRow = getCurrentRow();
         
-        if (!currentRow.isValidIndex(javaIndex)) {
+        if (!(javaIndex >= 0 && javaIndex < currentRow.size())) {
             throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException(
                     "Invalid index: " + sqlIndex);
         }
 
-        String cellValue = currentRow.getCell(javaIndex);
+        String cellValue = currentRow.get(javaIndex);
         wasNull = cellValue == null;
 
         return cellValue;
