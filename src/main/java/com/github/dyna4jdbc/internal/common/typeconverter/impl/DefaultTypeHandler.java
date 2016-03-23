@@ -21,7 +21,7 @@ class DefaultTypeHandler extends AbstractTypeHandler {
 	DefaultTypeHandler(ColumnMetadata columnMetadata) {
 		super(columnMetadata);
 	}
-
+	
 	@Override
 	public String covertToString(String rawCellValue) throws TypeConversionException {
 		return rawCellValue;

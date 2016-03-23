@@ -1,11 +1,10 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 
-import com.github.dyna4jdbc.internal.SQLError;
-import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
-
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+
+import com.github.dyna4jdbc.internal.SQLError;
 
 public abstract class AbstractResultSetMetaData implements ResultSetMetaData {
 

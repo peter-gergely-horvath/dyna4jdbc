@@ -215,7 +215,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection> extends C
     }
 
     @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
+    public <C> C unwrap(Class<C> iface) throws SQLException {
         return null;
     }
 

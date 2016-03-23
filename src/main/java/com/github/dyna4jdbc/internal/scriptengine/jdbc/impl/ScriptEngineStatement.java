@@ -1,14 +1,17 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
-import com.github.dyna4jdbc.internal.common.outputhandler.*;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
-
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 import javax.script.ScriptException;
+
+import com.github.dyna4jdbc.internal.common.outputhandler.MultiTypeScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
 
 class ScriptEngineStatement extends AbstractScriptEngineStatement {
 

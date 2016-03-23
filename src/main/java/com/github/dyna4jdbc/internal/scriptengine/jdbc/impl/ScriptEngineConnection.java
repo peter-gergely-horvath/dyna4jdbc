@@ -1,16 +1,20 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
-import com.github.dyna4jdbc.internal.ClosableSQLObject;
+import java.io.Writer;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultTypeHandlerFactory;
-
-import javax.script.*;
-import java.io.Writer;
-import java.sql.*;
-import java.util.*;
-import java.util.concurrent.Executor;
 
 public class ScriptEngineConnection extends AbstractConnection {
 

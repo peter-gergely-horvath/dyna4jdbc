@@ -1,9 +1,16 @@
 package com.github.dyna4jdbc.internal.common.typeconverter;
 
-public interface ColumnMetadata {
-    boolean isCurrency();
+import com.github.dyna4jdbc.internal.common.typeconverter.impl.SQLDataType;
 
-    int isNullable();
+public interface ColumnMetadata {
+    
+	public enum Nullability { NOT_NULLABLE, NULLABLE, UNKNOWN }
+	
+	boolean isTakesFirstRowValue();
+	
+	boolean isCurrency();
+
+	Nullability getNullability();
 
     boolean isSigned();
 
@@ -17,7 +24,7 @@ public interface ColumnMetadata {
 
     int getScale();
 
-    int getColumnType();
+    SQLDataType getColumnType();
 
     String getColumnTypeName();
 

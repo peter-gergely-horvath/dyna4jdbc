@@ -21,9 +21,9 @@ public class TestScriptEngine {
 
         Statement statement = connection.createStatement();
 
-        statement.executeUpdate("var msg = '2\tHello World\tI am here!'");
+        statement.executeUpdate("var msg = '123\tHello World\tI am here!'");
 
-        String script = "print('1\tFoo\tBar') ; print(msg)";
+        String script = "print('42\tFoo\tBar') ; print(msg)";
 
         boolean results = statement.execute(script);
         int rsCount = 0;
