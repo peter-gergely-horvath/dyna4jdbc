@@ -46,8 +46,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
     	LinkedList<TypeHandler> typeHandlerList = new LinkedList<>();
     	
+    	int columnIndex = 0;
+    	
     	for(DataColumn column : dataTable.columnIterable() ) {
-    		TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(column);
+    		TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(columnIndex++, column);
     		if (typeHandler == null) {
     			throw SQLError.raiseInternalIllegalStateRuntimeException("typeHandler is null");
     		}
