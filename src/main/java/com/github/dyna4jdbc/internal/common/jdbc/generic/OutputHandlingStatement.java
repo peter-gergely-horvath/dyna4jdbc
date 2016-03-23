@@ -17,19 +17,16 @@ import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFac
 import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtil;
-import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScriptEngineConnection;
 
-public class OutputHandlingStatement extends AbstractStatement<ScriptEngineConnection> {
+public class OutputHandlingStatement<T extends java.sql.Connection> extends AbstractStatement<T> {
 
     private final ScriptOutputHandlerFactory scriptOutputHandlerFactory;
 	private final OutputCapturingScriptExecutor outputCapturingScriptExecutor;
 
-	public OutputHandlingStatement(
-			ScriptEngineConnection scriptEngineConnection, 
-			ScriptOutputHandlerFactory scriptOutputHandlerFactory, 
+	public OutputHandlingStatement(T connection, ScriptOutputHandlerFactory scriptOutputHandlerFactory, 
 			OutputCapturingScriptExecutor outputCapturingScriptExecutor) {
 		
-        super(scriptEngineConnection);
+        super(connection);
         this.scriptOutputHandlerFactory = scriptOutputHandlerFactory;
         this.outputCapturingScriptExecutor = outputCapturingScriptExecutor;
     }

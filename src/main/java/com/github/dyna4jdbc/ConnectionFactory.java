@@ -1,5 +1,6 @@
 package com.github.dyna4jdbc;
 
+import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScriptEngineConnection;
 
 import java.lang.reflect.Constructor;
@@ -27,8 +28,9 @@ class ConnectionFactory {
 
 
     private enum BuiltInConnectionBridge {
-        SCRIPTENGINE("scriptengine", ScriptEngineConnection.class);
-
+        SCRIPTENGINE("scriptengine", ScriptEngineConnection.class),
+    	PROCESS_RUNNER("process-runner", ProcessRunnerConnection.class);
+    	
         private final String name;
         private final Class<? extends java.sql.Connection> clazz;
 

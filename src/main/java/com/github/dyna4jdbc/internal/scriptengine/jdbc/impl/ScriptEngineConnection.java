@@ -66,7 +66,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
         checkNotClosed();
         ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory);
         
-		return new OutputHandlingStatement(this, outputHandlerFactory, this);
+		return new OutputHandlingStatement<ScriptEngineConnection>(this, outputHandlerFactory, this);
     }
 
 
