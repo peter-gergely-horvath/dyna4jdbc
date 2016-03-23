@@ -102,6 +102,8 @@ public class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
 			}
 		}
 		
+		maxSize = maxSize >= 15 ? maxSize : 15;
+		
 		return metaData
 			.setTakesFirstRowValue(false)
 			.setCurrency(false)

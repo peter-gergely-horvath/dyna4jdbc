@@ -3,6 +3,7 @@ package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 import com.github.dyna4jdbc.internal.OutputDisabledError;
 import com.github.dyna4jdbc.internal.SQLError;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
+import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtil;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -20,11 +21,13 @@ abstract class AbstractScriptEngineStatement extends AbstractStatement<ScriptEng
         try {
             return executeScriptForSingleResultSet(script);
         } catch (ScriptException se) {
-            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se);
+        	String message = ExceptionUtil.getRootCauseMessage(se);
+            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se, message);
         } catch (SQLException sqle) {
             throw sqle;
         } catch (Throwable t) {
-            throw SQLError.UNEXPECTED_THROWABLE.raiseThrowable(t);
+        	String message = ExceptionUtil.getRootCauseMessage(t);
+            throw SQLError.UNEXPECTED_THROWABLE.raiseException(t, message);
         }
     }
 
@@ -36,13 +39,16 @@ abstract class AbstractScriptEngineStatement extends AbstractStatement<ScriptEng
             return executeScriptForUpdateCount(script);
 
         } catch (ScriptException se) {
-            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se);
+        	String message = ExceptionUtil.getRootCauseMessage(se);
+            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se, message);
         }
         catch (OutputDisabledError t) {
-            throw SQLError.USING_STDOUT_FROM_UPDATE.raiseThrowable(t);
+        	String message = ExceptionUtil.getRootCauseMessage(t);
+        	throw SQLError.USING_STDOUT_FROM_UPDATE.raiseException(t, message);
         }
         catch (Throwable t) {
-            throw SQLError.UNEXPECTED_THROWABLE.raiseThrowable(t);
+        	String message = ExceptionUtil.getRootCauseMessage(t);
+            throw SQLError.UNEXPECTED_THROWABLE.raiseException(t, message);
         }
     }
 
@@ -53,9 +59,11 @@ abstract class AbstractScriptEngineStatement extends AbstractStatement<ScriptEng
         try {
             return executeScript(script, new ScriptResultHandler());
         } catch (ScriptException se) {
-            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se);
+        	String message = ExceptionUtil.getRootCauseMessage(se);
+            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se, message);
         } catch (Throwable t) {
-            throw SQLError.UNEXPECTED_THROWABLE.raiseThrowable(t);
+        	String message = ExceptionUtil.getRootCauseMessage(t);
+            throw SQLError.UNEXPECTED_THROWABLE.raiseException(t, message);
         }
     }
 
