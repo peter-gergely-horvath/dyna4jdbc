@@ -1,14 +1,45 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.RowIdLifetime;
+import java.sql.SQLException;
+
 import com.github.dyna4jdbc.DynaDriver;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
 
-import java.sql.*;
+public abstract class AbstractDatabaseMetaData<T extends Connection> implements DatabaseMetaData {
 
-public abstract class AbstractDatabaseMetaData implements DatabaseMetaData {
+	private final T connection;
 
+	public AbstractDatabaseMetaData(T connection) {
+		this.connection = connection;
+	}
+	
+	public T getConnection() throws SQLException {
+	    return connection;
+	}
 
-    public boolean allProceduresAreCallable() throws SQLException {
+	public String getDriverName() throws SQLException {
+	    return DynaDriver.DRIVER_NAME;
+	}
+
+	public String getDriverVersion() throws SQLException {
+	    return DynaDriver.DRIVER_VERSION;
+	}
+
+	public int getDriverMajorVersion() {
+	    return DynaDriver.DRIVER_VERSION_MAJOR;
+	}
+
+	public int getDriverMinorVersion() {
+	    return DynaDriver.DRIVER_VERSION_MINOR;
+	}
+	
+	
+	// --- reasonable implementation of DatabaseMetaData
+	public boolean allProceduresAreCallable() throws SQLException {
         return false;
     }
 
@@ -678,12 +709,14 @@ public abstract class AbstractDatabaseMetaData implements DatabaseMetaData {
         return false;
     }
 
-    public <T> T unwrap(Class<T> iface) throws SQLException {
+    public <C> C unwrap(Class<C> iface) throws SQLException {
         throw new SQLException();
     }
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
     }
+
+
 
 }

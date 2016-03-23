@@ -11,12 +11,16 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
+import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
+import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
+import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultTypeHandlerFactory;
 
-public class ScriptEngineConnection extends AbstractConnection {
+public class ScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
     final String engineName;
 
@@ -60,29 +64,9 @@ public class ScriptEngineConnection extends AbstractConnection {
 
     public Statement createStatement() throws SQLException {
         checkNotClosed();
-        return new ScriptEngineStatement(this, new DefaultScriptOutputHandlerFactory(typeHandlerFactory));
-    }
-
-
-    interface ScriptEngineCallback<T> {
-        T execute(ScriptEngine engine) throws ScriptException;
-    }
-
-    <T> T executeUsingScriptEngine(ScriptEngineCallback<T> scriptEngineCallback) throws ScriptException {
-
-        synchronized (engine) {
-            Writer originalWriter = engine.getContext().getWriter();
-            Writer originalErrorWriter = engine.getContext().getErrorWriter();
-
-            try {
-
-                return scriptEngineCallback.execute(engine);
-            }
-            finally {
-                engine.getContext().setWriter(originalWriter);
-                engine.getContext().setErrorWriter(originalErrorWriter);
-            }
-        }
+        ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory);
+        
+		return new OutputHandlingStatement(this, outputHandlerFactory, this);
     }
 
 
@@ -107,4 +91,33 @@ public class ScriptEngineConnection extends AbstractConnection {
 
         return null;
     }
+
+	@Override
+	public void executeScriptUsingCustomWriters(String script, Writer outWriter, Writer errorWriter)
+			throws ScriptExecutionException {
+        
+        synchronized (engine) {
+            Writer originalWriter = engine.getContext().getWriter();
+            Writer originalErrorWriter = engine.getContext().getErrorWriter();
+
+            try {
+
+        		if (outWriter != null) {
+                    engine.getContext().setWriter(outWriter);
+                }
+        		
+                if (errorWriter != null) {
+                    engine.getContext().setErrorWriter(errorWriter);
+                }
+            	
+                engine.eval(script);
+            } catch (ScriptException e) {
+            	throw new ScriptExecutionException(e);
+			}
+            finally {
+                engine.getContext().setWriter(originalWriter);
+                engine.getContext().setErrorWriter(originalErrorWriter);
+            }
+        }
+	}
 }
