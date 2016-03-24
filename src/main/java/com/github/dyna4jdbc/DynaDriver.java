@@ -1,7 +1,9 @@
 
 package com.github.dyna4jdbc;
 
+import com.github.dyna4jdbc.internal.MisconfigurationSQLException;
 import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtil;
 
 import java.sql.*;
 import java.util.Properties;
@@ -54,9 +56,15 @@ public class DynaDriver implements java.sql.Driver {
 
             return doConnect(bridgeName, config, info);
         }
+        catch (MisconfigurationSQLException ex)
+        {
+        	String causeMessage = ExceptionUtil.getRootCauseMessage(ex);
+            throw SQLError.INVALID_CONFIGURATION.raiseException(ex, causeMessage);
+        }
         catch (Exception ex)
         {
-            throw SQLError.CONNECT_FAILED_GENERIC.raiseException(ex, "examine stack trace for root cause");
+        	String causeMessage = ExceptionUtil.getRootCauseMessage(ex);
+            throw SQLError.CONNECT_FAILED_GENERIC.raiseException(ex, causeMessage);
         }
     }
 

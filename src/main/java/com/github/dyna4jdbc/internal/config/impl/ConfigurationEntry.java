@@ -1,15 +1,17 @@
 package com.github.dyna4jdbc.internal.config.impl;
 
-import com.github.dyna4jdbc.internal.SQLError;
+import java.sql.SQLException;
+
+import com.github.dyna4jdbc.internal.MisconfigurationSQLException;
 
 enum ConfigurationEntry {
 	
 	CELL_SEPARATOR("cellSeparator", "\t") {
 		@Override
-		void setConfiguration(ConfigurationImpl config, String value) throws Exception {
+		void setConfiguration(ConfigurationImpl config, String value) throws SQLException {
 			if(value != null && value.length() > 1) {
-				throw SQLError.raiseInternalIllegalStateRuntimeException(
-						"%s should contain a singe character, but was: [%s]", this.key, value);
+				throw MisconfigurationSQLException.forMessage(
+						"A singe character is expected for %s, but was: '%s'", this.key, value);
 			}
 			
 			char charAtZero = value.charAt(0);
@@ -26,6 +28,6 @@ enum ConfigurationEntry {
 		this.defaultValue = defaultValue;
 	}
 	
-	abstract void setConfiguration(ConfigurationImpl config, String value) throws Exception;
+	abstract void setConfiguration(ConfigurationImpl config, String value) throws SQLException;
 
 }

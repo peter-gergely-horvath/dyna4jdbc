@@ -4,6 +4,7 @@ import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnec
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScriptEngineConnection;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
 class ConnectionFactory {
@@ -16,17 +17,27 @@ class ConnectionFactory {
     }
 
     java.sql.Connection newConnection(String bridgeName, String config, Properties info) throws Exception {
-        BuiltInConnectionBridge connectionBridge = BuiltInConnectionBridge.getByName(bridgeName);
+    	try {
+    		BuiltInConnectionBridge connectionBridge = BuiltInConnectionBridge.getByName(bridgeName);
 
-        final Class<?> classToInstantiate = (connectionBridge != null) ? connectionBridge.clazz :
-                Class.forName(bridgeName);
+            final Class<?> classToInstantiate = (connectionBridge != null) ? connectionBridge.clazz :
+                    Class.forName(bridgeName);
 
-        Constructor<?> constructor = classToInstantiate.getConstructor(String.class, Properties.class);
+            Constructor<?> constructor = classToInstantiate.getConstructor(String.class, Properties.class);
 
-        return (java.sql.Connection) constructor.newInstance(config, info);
-    }
-
-
+            return (java.sql.Connection) constructor.newInstance(config, info);
+    	}
+    	catch(InvocationTargetException ite) {
+    		Throwable cause = ite.getCause();
+			if (cause instanceof RuntimeException)
+				  throw (RuntimeException) cause;
+			  else if (cause instanceof Error)
+			      throw (Error) cause;
+			  else
+			      throw (Exception)cause;
+    	}
+   }
+    
     private enum BuiltInConnectionBridge {
         SCRIPTENGINE("scriptengine", ScriptEngineConnection.class),
     	PROCESS_RUNNER("process-runner", ProcessRunnerConnection.class);

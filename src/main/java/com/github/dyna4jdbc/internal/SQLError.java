@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public enum SQLError {
 
     CONNECT_FAILED_INVALID_URL("Invalid URL: %s"),
-    CONNECT_FAILED_GENERIC("Failed to connect: %s"),
+    CONNECT_FAILED_GENERIC("Failed to connect: %s (examine stack trace for details)"),
     OBJECT_CLOSED("Object has already been closed: %s"),
     SCRIPT_EXECUTION_EXCEPTION("Execution of script raised exception: %s"),
     CANNOT_UNWARP_OBJECT("The requested type (%s) cannot be unwrapped from this object (%s)."),
