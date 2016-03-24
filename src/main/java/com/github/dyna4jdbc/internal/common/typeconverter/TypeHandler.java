@@ -1,6 +1,5 @@
 package com.github.dyna4jdbc.internal.common.typeconverter;
 
-
 public interface TypeHandler {
 
 	ColumnMetadata getColumnMetadata();
@@ -21,6 +20,8 @@ public interface TypeHandler {
 
 	Double covertToDouble(String rawCellValue) throws TypeConversionException;
 
+	java.math.BigDecimal covertToBigDecimal(String rawCellValue) throws TypeConversionException;
+	
 	java.math.BigDecimal covertToBigDecimal(String rawCellValue, int scale) throws TypeConversionException;
 
 	byte[] covertToByteArray(String rawCellValue) throws TypeConversionException;
@@ -50,5 +51,4 @@ public interface TypeHandler {
 	java.sql.Date covertToDate(String rawCellValue, java.util.Calendar cal) throws TypeConversionException;
 
 	java.io.Reader covertToCharacterStream(String rawCellValue) throws TypeConversionException;
-	
 }

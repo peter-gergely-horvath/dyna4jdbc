@@ -517,7 +517,17 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
     @Override
     public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getBigDecimal"); // TODO: implement method
+    	String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
+
+    	try {
+    		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
+    		BigDecimal convertedValue = typeHandler.covertToBigDecimal(rawCellValue);
+    		return checkIfNull(convertedValue);
+
+    	} catch(TypeConversionException tce) {
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    				tce, getRow(), columnIndex, rawCellValue, java.io.Reader.class);
+    	}
     }
 
     @Override

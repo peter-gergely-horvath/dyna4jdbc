@@ -124,13 +124,29 @@ class DefaultTypeHandler extends AbstractTypeHandler {
 	}
 
 	@Override
+	public BigDecimal covertToBigDecimal(String rawCellValue) throws TypeConversionException {
+		try {
+			if (rawCellValue == null) {
+				return null;
+			}
+
+			return new BigDecimal(rawCellValue);
+		} catch (NumberFormatException nfe) {
+			throw new TypeConversionException(nfe);
+		}
+	}
+	
+	@Override
 	public BigDecimal covertToBigDecimal(String rawCellValue, int scale) throws TypeConversionException {
 		try {
 			if (rawCellValue == null) {
 				return null;
 			}
 
-			return BigDecimal.valueOf(covertToLong(rawCellValue), scale);
+			BigDecimal bigDecimal = new BigDecimal(rawCellValue);
+			bigDecimal.setScale(scale);
+			
+			return bigDecimal;
 		} catch (NumberFormatException nfe) {
 			throw new TypeConversionException(nfe);
 		}
