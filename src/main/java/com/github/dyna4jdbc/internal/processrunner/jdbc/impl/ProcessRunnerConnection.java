@@ -23,7 +23,7 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
-public class ProcessRunnerConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
+public class ProcessRunnerConnection extends AbstractConnection  {
 
     private final TypeHandlerFactory typeHandlerFactory;
 	private final Configuration configuration;
@@ -44,7 +44,7 @@ public class ProcessRunnerConnection extends AbstractConnection implements Outpu
         checkNotClosed();
         ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
         
-		return new OutputHandlingStatement<ProcessRunnerConnection>(this, outputHandlerFactory, this);
+		return new OutputHandlingStatement<ProcessRunnerConnection>(this, outputHandlerFactory, new ProcessRunnerScriptExecutor());
     }
 
 
@@ -56,29 +56,4 @@ public class ProcessRunnerConnection extends AbstractConnection implements Outpu
     	return System.getProperty("os.version");
     	
     }
-
-	@Override
-	public void executeScriptUsingCustomWriters(String script, Writer outWriter, Writer errorWriter)
-			throws ScriptExecutionException {
-        
-		try {
-		    
-			PrintWriter outputPrintWriter = new PrintWriter(new BufferedWriter(outWriter));
-			
-			Process process = Runtime.getRuntime().exec(script);
-		 
-		    BufferedReader reader = new BufferedReader(
-		            new InputStreamReader(process.getInputStream()));
-		    String line;
-		    while ((line = reader.readLine()) != null) {
-		    	outputPrintWriter.println(line);
-		    }
-		 
-		    reader.close();
-		    outputPrintWriter.close();
-		 
-		} catch (IOException e) {
-		    throw new ScriptExecutionException(e);
-		}
-	}
 }
