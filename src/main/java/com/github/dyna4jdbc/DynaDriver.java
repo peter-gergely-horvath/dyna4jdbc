@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.config.impl.DriverPropertyInfoFactory;
 
 
 public class DynaDriver implements java.sql.Driver {
@@ -63,7 +64,7 @@ public class DynaDriver implements java.sql.Driver {
 	}
 
 	public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
-		return new DriverPropertyInfo[0];
+		return DriverPropertyInfoFactory.getDriverPropertyInfo();
 	}
 
 	public int getMajorVersion() {
