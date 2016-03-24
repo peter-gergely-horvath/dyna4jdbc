@@ -5,7 +5,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
 
 public abstract class AbstractTypeHandler implements TypeHandler {
 
-	private final ColumnMetadata columnMetadata;
+	protected final ColumnMetadata columnMetadata;
 
 	protected AbstractTypeHandler(ColumnMetadata columnMetadata) {
 		this.columnMetadata = columnMetadata;
