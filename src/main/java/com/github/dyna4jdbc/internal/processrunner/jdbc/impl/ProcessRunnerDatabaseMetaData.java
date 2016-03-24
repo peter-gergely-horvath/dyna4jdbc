@@ -11,10 +11,10 @@ public class ProcessRunnerDatabaseMetaData extends AbstractDatabaseMetaData<Proc
     }
 
     public String getDatabaseProductName() throws SQLException {
-        return getConnection().getEngineDescription();
+        return getConnection().getProductName();
     }
 
     public String getDatabaseProductVersion() throws SQLException {
-        return getConnection().getEngineVersion();
+        return getConnection().getProductVersion();
     }
 }

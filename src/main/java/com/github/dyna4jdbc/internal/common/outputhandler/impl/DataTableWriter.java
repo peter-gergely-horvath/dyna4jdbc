@@ -7,14 +7,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
+import com.github.dyna4jdbc.internal.config.Configuration;
 
 public class DataTableWriter extends CursorCellWriterOutputStream{
 
     private LinkedList<DataTable> dataTableList = new LinkedList<>();
     private List<String> currentRow = new ArrayList<String>();
+	private Configuration configuration;
 
-    public DataTableWriter() {
-        dataTableList.addLast(new DataTable());
+    public DataTableWriter(Configuration configuration) {
+    	super(configuration.getCellSeparator());
+    	
+    	dataTableList.addLast(new DataTable());
+        this.configuration = configuration;
 
     }
 

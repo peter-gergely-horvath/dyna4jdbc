@@ -23,7 +23,9 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
     private final ScriptOutputHandlerFactory scriptOutputHandlerFactory;
 	private final OutputCapturingScriptExecutor outputCapturingScriptExecutor;
 
-	public OutputHandlingStatement(T connection, ScriptOutputHandlerFactory scriptOutputHandlerFactory, 
+	public OutputHandlingStatement(
+			T connection, 
+			ScriptOutputHandlerFactory scriptOutputHandlerFactory, 
 			OutputCapturingScriptExecutor outputCapturingScriptExecutor) {
 		
         super(connection);

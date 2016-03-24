@@ -7,8 +7,6 @@ import java.io.OutputStream;
 
 public abstract class CursorCellWriterOutputStream extends OutputStream {
 
-    private static final int TAB = 0x9;
-
     private static final int LF = 0xD;
     private static final int CR = 0xA;
 
@@ -17,8 +15,14 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
 
     private ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
+	private char cellSeparator;
 
-    @Override
+
+    public CursorCellWriterOutputStream(char cellSeparator) {
+		this.cellSeparator = cellSeparator;
+	}
+
+	@Override
     public void write(int thisByte) throws IOException {
 
         checkNotClosed();
@@ -26,27 +30,20 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
         if (!((lastByte == LF || lastByte == CR) &&
                 (thisByte == LF || thisByte == CR))) {
 
-            switch (thisByte) {
-                case LF:
-                case CR:
 
-                    flushBufferToCell();
+        	if(thisByte == LF || thisByte == CR  ) {
+                flushBufferToCell();
 
-                    nextRow();
+                nextRow();
+                
+        	} else if(thisByte == cellSeparator) {
+                flushBufferToCell();
 
-                    break;
-
-                case TAB:
-
-                    flushBufferToCell();
-
-                    nextCell();
-
-                    break;
-
-                default:
-                    byteArrayOutputStream.write(thisByte);
-            }
+                nextCell();
+                
+        	} else {
+        		byteArrayOutputStream.write(thisByte);
+        	}
         }
 
         lastByte = thisByte;

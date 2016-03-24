@@ -14,15 +14,18 @@ import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFac
 import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
+import com.github.dyna4jdbc.internal.config.Configuration;
 
 public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFactory {
 
 	// TODO: cleanup
 
 	private final TypeHandlerFactory typeHandlerFactory;
+	private final Configuration configuration;
 
-	public DefaultScriptOutputHandlerFactory(TypeHandlerFactory typeHandlerFactory) {
+	public DefaultScriptOutputHandlerFactory(TypeHandlerFactory typeHandlerFactory, Configuration configuration) {
 		this.typeHandlerFactory = typeHandlerFactory;
+		this.configuration = configuration;
 
 	}
 
@@ -30,14 +33,14 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 	public SingleResultSetScriptOutputHandler newSingleResultSetScriptOutputHandler(
 			Statement statement, String script) {
 		
-		return new DefaultResultSetScriptOutputHandler(statement, typeHandlerFactory);
+		return new DefaultResultSetScriptOutputHandler(statement, typeHandlerFactory, configuration);
 	}
 
 	@Override
 	public MultiTypeScriptOutputHandler newMultiTypeScriptOutputHandler(
 			Statement statement, String script) {
 		
-		return new DefaultResultSetScriptOutputHandler(statement, typeHandlerFactory);
+		return new DefaultResultSetScriptOutputHandler(statement, typeHandlerFactory, configuration);
 	}
 
 	@Override
@@ -68,13 +71,17 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 			implements SingleResultSetScriptOutputHandler, MultiTypeScriptOutputHandler {
 
 		private final Statement statement;
-		private final DataTableWriter stdOut = new DataTableWriter();
-		private final PrintWriter printWriter = new PrintWriter(stdOut);
+		private final DataTableWriter stdOut;
+		private final PrintWriter printWriter;
 		private final TypeHandlerFactory typeHandlerFactory;
 
-		public DefaultResultSetScriptOutputHandler(Statement statement, TypeHandlerFactory typeHandlerFactory) {
+		public DefaultResultSetScriptOutputHandler(Statement statement, TypeHandlerFactory typeHandlerFactory, Configuration configuration) {
 			this.statement = statement;
 			this.typeHandlerFactory = typeHandlerFactory;
+			
+			this.stdOut = new DataTableWriter(configuration);
+			this.printWriter = new PrintWriter(stdOut);
+			
 		}
 
 		private List<ResultSet> processObjectListToResultSet() {

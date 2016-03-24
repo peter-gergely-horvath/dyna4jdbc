@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.sql.DatabaseMetaData;
@@ -20,13 +19,19 @@ import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFac
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultTypeHandlerFactory;
+import com.github.dyna4jdbc.internal.config.Configuration;
+import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
+import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
 public class ProcessRunnerConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
     private final TypeHandlerFactory typeHandlerFactory;
+	private final Configuration configuration;
 
-    public ProcessRunnerConnection(String parameters, Properties properties)
+    public ProcessRunnerConnection(String parameters, Properties properties) throws SQLException
     {
+        ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
+		configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
         typeHandlerFactory = new DefaultTypeHandlerFactory();
     }
 
@@ -37,17 +42,17 @@ public class ProcessRunnerConnection extends AbstractConnection implements Outpu
 
     public Statement createStatement() throws SQLException {
         checkNotClosed();
-        ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory);
+        ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
         
 		return new OutputHandlingStatement<ProcessRunnerConnection>(this, outputHandlerFactory, this);
     }
 
 
-    public String getEngineDescription() {
+    public String getProductName() {
     	return System.getProperty("os.name");
     }
 
-    public String getEngineVersion() {
+    public String getProductVersion() {
     	return System.getProperty("os.version");
     	
     }

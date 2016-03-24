@@ -8,6 +8,12 @@ import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 public class DefaultTypeHandlerFactory implements TypeHandlerFactory {
 
 	
+	private static final DefaultTypeHandlerFactory INSTANCE = new DefaultTypeHandlerFactory();
+	
+	public static DefaultTypeHandlerFactory getInstance() {
+		return INSTANCE;
+	}
+	
 	private ColumnMetadataFactory columnMetadataFactory = new DefaultColumnMetadataFactory();
 	
 	

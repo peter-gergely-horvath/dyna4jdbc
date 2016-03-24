@@ -12,6 +12,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
+import com.github.dyna4jdbc.internal.SQLError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
@@ -19,43 +20,52 @@ import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFac
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultTypeHandlerFactory;
+import com.github.dyna4jdbc.internal.config.Configuration;
+import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
+import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
 public class ScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
-    final String engineName;
-
-    private final String configuration;
-    private final Properties properties;
-
     private final ScriptEngine engine;
     private final TypeHandlerFactory typeHandlerFactory;
+	private final Configuration configuration;
 
-    public ScriptEngineConnection(String parameters, Properties properties)
+    public ScriptEngineConnection(String parameters, Properties properties) throws SQLException
     {
-        this.properties = properties;
-
         if(parameters == null || "".equals(parameters.trim())) {
-            throw new IllegalArgumentException("Scrip Engine Name not specified");
+        	throw SQLError.INVALID_CONFIGURATION.raiseException(
+        			"Scrip Engine Name not specified");
         }
 
         String[] engineNameAndParameters = parameters.split(":", 2);
 
-        engineName = engineNameAndParameters[0];
-        configuration = engineNameAndParameters.length == 2 ? engineNameAndParameters[1] : null;
+        String engineName = engineNameAndParameters[0];
+        String configurationString = engineNameAndParameters.length == 2 ? engineNameAndParameters[1] : null;
 
         if(engineName == null || "".equals(engineName.trim())) {
-            throw new IllegalArgumentException("Scrip Engine Name not specified");
+        	throw SQLError.INVALID_CONFIGURATION.raiseException(
+        			"Scrip Engine Name is not specified");
         }
 
-        ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-        this.engine = scriptEngineManager.getEngineByName(engineName);
-        if(this.engine == null) {
-            throw new IllegalArgumentException("ScriptEngine not found: " + engineName);
-        }
+        this.engine = loadEngineByName(engineName);
 
-        typeHandlerFactory = new DefaultTypeHandlerFactory();
+        ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
+		configuration = configurationFactory.newConfigurationFromParameters(configurationString, properties);
+        
+        typeHandlerFactory = DefaultTypeHandlerFactory.getInstance();
 
     }
+
+	private static ScriptEngine loadEngineByName(String engineName) throws SQLException {
+		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+		ScriptEngine se = scriptEngineManager.getEngineByName(engineName);
+        if(se == null) {
+        	throw SQLError.INVALID_CONFIGURATION.raiseException(
+        			"ScriptEngine not found: " + engineName);
+        }
+        
+        return se;
+	}
 
     public DatabaseMetaData getMetaData() throws SQLException {
         checkNotClosed();
@@ -64,7 +74,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
 
     public Statement createStatement() throws SQLException {
         checkNotClosed();
-        ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory);
+        ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
         
 		return new OutputHandlingStatement<ScriptEngineConnection>(this, outputHandlerFactory, this);
     }
