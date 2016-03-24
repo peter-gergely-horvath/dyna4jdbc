@@ -1,18 +1,10 @@
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
-import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
@@ -27,12 +19,14 @@ public class ProcessRunnerConnection extends AbstractConnection  {
 
     private final TypeHandlerFactory typeHandlerFactory;
 	private final Configuration configuration;
+	private final ProcessRunnerScriptExecutor scriptExecutor;
 
     public ProcessRunnerConnection(String parameters, Properties properties) throws SQLException
     {
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
 		configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
         typeHandlerFactory = new DefaultTypeHandlerFactory();
+        scriptExecutor = new ProcessRunnerScriptExecutor();
     }
 
     public DatabaseMetaData getMetaData() throws SQLException {
@@ -44,7 +38,13 @@ public class ProcessRunnerConnection extends AbstractConnection  {
         checkNotClosed();
         ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
         
-		return new OutputHandlingStatement<ProcessRunnerConnection>(this, outputHandlerFactory, new ProcessRunnerScriptExecutor());
+		
+		return new OutputHandlingStatement<ProcessRunnerConnection>(this, outputHandlerFactory, scriptExecutor) {
+			@Override
+			public void cancel() throws SQLException {
+				ProcessRunnerConnection.this.scriptExecutor.cancelExecution();
+			}
+		};
     }
 
 
