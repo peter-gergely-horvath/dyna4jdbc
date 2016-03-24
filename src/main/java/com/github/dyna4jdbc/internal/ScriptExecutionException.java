@@ -12,5 +12,9 @@ public class ScriptExecutionException extends Exception {
 	public ScriptExecutionException(Throwable cause) {
 		super(cause);
 	}
+
+	public ScriptExecutionException(String message, Throwable cause) {
+		super(message, cause);
+	}
 	
 }

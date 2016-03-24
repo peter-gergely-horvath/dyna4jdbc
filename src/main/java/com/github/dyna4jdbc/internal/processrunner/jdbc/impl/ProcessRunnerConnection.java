@@ -6,7 +6,6 @@ import java.sql.Statement;
 import java.util.Properties;
 
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
@@ -17,16 +16,17 @@ import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
 public class ProcessRunnerConnection extends AbstractConnection  {
 
-    private final TypeHandlerFactory typeHandlerFactory;
+
+
+	private final TypeHandlerFactory typeHandlerFactory;
 	private final Configuration configuration;
-	private final ProcessRunnerScriptExecutor scriptExecutor;
+
 
     public ProcessRunnerConnection(String parameters, Properties properties) throws SQLException
     {
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
 		configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
         typeHandlerFactory = new DefaultTypeHandlerFactory();
-        scriptExecutor = new ProcessRunnerScriptExecutor();
     }
 
     public DatabaseMetaData getMetaData() throws SQLException {
@@ -39,12 +39,7 @@ public class ProcessRunnerConnection extends AbstractConnection  {
         ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
         
 		
-		return new OutputHandlingStatement<ProcessRunnerConnection>(this, outputHandlerFactory, scriptExecutor) {
-			@Override
-			public void cancel() throws SQLException {
-				ProcessRunnerConnection.this.scriptExecutor.cancelExecution();
-			}
-		};
+		return new ProcessRunnerStatement(this, outputHandlerFactory, new ProcessRunnerScriptExecutor());
     }
 
 
