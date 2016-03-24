@@ -20,6 +20,7 @@ public class ProcessRunnerConnection extends AbstractConnection  {
 
 	private final TypeHandlerFactory typeHandlerFactory;
 	private final Configuration configuration;
+	private final ProcessRunnerScriptExecutor scriptExecutor;
 
 
     public ProcessRunnerConnection(String parameters, Properties properties) throws SQLException
@@ -27,6 +28,8 @@ public class ProcessRunnerConnection extends AbstractConnection  {
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
 		configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
         typeHandlerFactory = new DefaultTypeHandlerFactory();
+        
+        this.scriptExecutor = new ProcessRunnerScriptExecutor();
     }
 
     public DatabaseMetaData getMetaData() throws SQLException {
@@ -39,7 +42,13 @@ public class ProcessRunnerConnection extends AbstractConnection  {
         ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
         
 		
-		return new ProcessRunnerStatement(this, outputHandlerFactory, new ProcessRunnerScriptExecutor());
+		return new ProcessRunnerStatement(this, outputHandlerFactory, scriptExecutor);
+    }
+    
+    @Override
+    public void close() throws SQLException {
+    	scriptExecutor.close();
+    	super.close();
     }
 
 
