@@ -39,7 +39,8 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 
 				if (skipFirstLine) {
 					// skip and discard first result line
-					processRunner.pollStandardOutput(5, TimeUnit.SECONDS);
+					String discardedOutput = processRunner.pollStandardOutput(5, TimeUnit.SECONDS);
+					System.out.println(discardedOutput);
 				}
 
 				do {

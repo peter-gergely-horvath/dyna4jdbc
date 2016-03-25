@@ -87,6 +87,10 @@ public enum SQLDataType {
 			return false;
 		}
 		
+		if(value == null) {
+			return true;
+		}
+		
 		return this.acceptedPattern.matcher(value).matches();
 	}
 

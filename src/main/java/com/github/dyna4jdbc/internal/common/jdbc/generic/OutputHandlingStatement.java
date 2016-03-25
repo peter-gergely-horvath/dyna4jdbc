@@ -90,7 +90,8 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 			if(resultSets) {
 			    List<ResultSet> resultSetList = outputHandler.getResultSets();
 			    setCurrentResultSetList(resultSetList);
-			
+			    setUpdateCount(-1);
+			    
 			} else {
 			    int updateCount = outputHandler.getUpdateCount();
 			    setUpdateCount(updateCount);

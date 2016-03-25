@@ -2,7 +2,6 @@ package com.github.dyna4jdbc.internal.config.impl;
 
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 import com.github.dyna4jdbc.internal.MisconfigurationSQLException;
 
@@ -40,6 +39,40 @@ enum ConfigurationEntry {
 
 			case "false":
 				config.setSkipFirstLine(false);
+				break;
+
+			default:
+				throw MisconfigurationSQLException
+						.forMessage("Value for %s must either be 'true' or 'false', but was '%s'", 
+								this.key, value);
+			}
+		}
+		
+		@Override
+		public DriverPropertyInfo getDriverPropertyInfo() {
+			DriverPropertyInfo propertyInfo = super.getDriverPropertyInfo();
+			propertyInfo.choices = new String[] {"true", "false"};
+			return propertyInfo;
+		}
+	},
+	PREFER_MULTIPLE_RESULT_SETS("preferMultipleResultSets", "false",
+			"If set to true, output with different column count will be considered as a new result set. Default is false.") {
+		@Override
+		void setConfiguration(ConfigurationImpl config, String value) throws SQLException {
+
+			if (value == null || "".equals(value) || "".equals(value.trim())) {
+				throw MisconfigurationSQLException
+						.forMessage("Value for %s cannot be null/whitespace only, but was '%s'", 
+								this.key, value);
+			}
+
+			switch (value) {
+			case "true":
+				config.setPreferMultipleResultSets(true);
+				break;
+
+			case "false":
+				config.setPreferMultipleResultSets(false);
 				break;
 
 			default:

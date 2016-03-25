@@ -158,7 +158,7 @@ public class ProcessRunner {
 			try {
 				cyclicBarrier.await(DEFAULT_TIMEOUT_MILLI_SECONDS, TimeUnit.MILLISECONDS);
 
-				while (true) {
+				while (! Thread.currentThread().isInterrupted()) {
 					String line = bufferedReader.readLine();
 					if (line == null) {
 						break;

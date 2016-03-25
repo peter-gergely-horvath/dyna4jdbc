@@ -29,9 +29,10 @@ public class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
 			return EMPTY_COLUMN_METADATA;
 		}
 
-		String headerValue = iterator.next();
+		final String headerValue = iterator.next();
 
-		final boolean headerSeemsToContainParseInstructions = HEADER_PATTERN.matcher(headerValue).matches();
+		final boolean headerSeemsToContainParseInstructions = 
+				headerValue != null && HEADER_PATTERN.matcher(headerValue).matches();
 
 		if (headerSeemsToContainParseInstructions) {
 			return configureForHeader(DefaultColumnMetaData.builder(), columnIndex,  headerValue).build();

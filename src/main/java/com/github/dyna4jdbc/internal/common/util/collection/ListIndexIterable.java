@@ -31,7 +31,13 @@ public class ListIndexIterable<E> implements Iterable<E> {
 			@Override
 			public E next() {
 				List<E> nextList = iterator.next();
-				return nextList.get(index);
+				E resultObject = null;
+				
+				if(index < nextList.size()) {
+					resultObject = nextList.get(index);
+				}
+				
+				return resultObject;
 			}
 		};
 	}

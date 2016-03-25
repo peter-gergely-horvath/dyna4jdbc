@@ -101,14 +101,18 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
 
         List<String> currentRow = getCurrentRow();
-        
-        if (!(javaIndex >= 0 && javaIndex < currentRow.size())) {
+
+        if (!(javaIndex >= 0 && javaIndex < dataTable.getColumnCount())) {
             throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException(
                     "Invalid index: " + sqlIndex);
         }
-
-        String cellValue = currentRow.get(javaIndex);
-        wasNull = cellValue == null;
+        
+        String cellValue;
+        if(javaIndex < currentRow.size()) {
+        	cellValue = currentRow.get(javaIndex);
+        } else {
+        	cellValue = null;
+        }
 
         return cellValue;
     }

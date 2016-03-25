@@ -16,12 +16,14 @@ public class DataTableWriter extends CursorCellWriterOutputStream{
 	
     private boolean currentRowIsTheFirstLine = true;
 	private final boolean skipFirstLine;
+	private boolean preferMultipleResultSets;
 
     public DataTableWriter(Configuration configuration) {
     	super(configuration.getCellSeparator());
     	
     	dataTableList.addLast(new DataTable());
         this.skipFirstLine = configuration.getSkipFirstLine();
+        this.preferMultipleResultSets = configuration.getPreferMultipleResultSets();
     }
 
 
@@ -68,15 +70,17 @@ public class DataTableWriter extends CursorCellWriterOutputStream{
     private void appendRow() {
         DataTable currentTable = dataTableList.getLast();
 
-        if (!currentTable.isEmpty()) {
+        if(preferMultipleResultSets) {
+            if (!currentTable.isEmpty()) {
 
-            List<String> lastRow = currentTable.getLastRow();
-            if (lastRow.size() != currentRow.size()) {
-                currentTable = new DataTable();
-                dataTableList.addLast(currentTable);
+                List<String> lastRow = currentTable.getLastRow();
+                if (lastRow.size() != currentRow.size()) {
+                    currentTable = new DataTable();
+                    dataTableList.addLast(currentTable);
+                }
             }
         }
-
+        
         currentTable.appendRow(currentRow);
     }
 }

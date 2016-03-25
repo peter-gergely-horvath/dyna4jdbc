@@ -6,6 +6,7 @@ class ConfigurationImpl implements Configuration {
 
 	private char cellSeparator;
 	private boolean skipFirstLine;
+	private boolean preferMultipleResultSets;
 
 	@Override
 	public char getCellSeparator() {
@@ -23,6 +24,15 @@ class ConfigurationImpl implements Configuration {
 	
 	public void setSkipFirstLine(boolean skipFirstLine) {
 		this.skipFirstLine = skipFirstLine;
+	}
+
+	@Override
+	public boolean getPreferMultipleResultSets() {
+		return preferMultipleResultSets;
+	}
+
+	public void setPreferMultipleResultSets(boolean preferMultipleResultSets) {
+		this.preferMultipleResultSets = preferMultipleResultSets;
 	}
 	
 }
