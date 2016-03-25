@@ -37,9 +37,12 @@ public class ProcessRunner {
 
 	private ProcessRunner(String command) throws ProcessExecutionException {
 
+		LOGGER.entering("ProcessRunner", "<init>", command);
+		
 		try {
 			synchronized (lock) {
 				Runtime runtime = Runtime.getRuntime();
+
 				process = runtime.exec(command);
 
 				executorService = Executors.newCachedThreadPool();
@@ -54,9 +57,11 @@ public class ProcessRunner {
 				standardOutputStreamContentQueue = new LinkedBlockingQueue<>();
 				errorStreamContentQueue = new LinkedBlockingQueue<>();
 
-				executorService.submit(new BufferedReaderToBlockingQueueRunnable("stdandard Out reader", stdOut,
+				executorService.submit(new BufferedReaderToBlockingQueueRunnable(
+						String.format("Stdandard Out reader of '%s'", command) , stdOut,
 						standardOutputStreamContentQueue, cyclicBarrier));
-				executorService.submit(new BufferedReaderToBlockingQueueRunnable("stdandard Error reader", stdErr,
+				executorService.submit(new BufferedReaderToBlockingQueueRunnable(
+						String.format("Stdandard Error reader of '%s'", command), stdErr,
 						errorStreamContentQueue, cyclicBarrier));
 
 				cyclicBarrier.await(DEFAULT_TIMEOUT_MILLI_SECONDS, TimeUnit.MILLISECONDS);
@@ -66,6 +71,8 @@ public class ProcessRunner {
 			Thread.currentThread().interrupt();
 		} catch (BrokenBarrierException | TimeoutException | IOException e) {
 			throw new ProcessExecutionException(e);
+		} finally {
+			LOGGER.exiting("ProcessRunner", "<init>");
 		}
 	}
 
@@ -183,6 +190,21 @@ public class ProcessRunner {
 			}
 
 		}
+
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder();
+			builder.append("BufferedReaderToBlockingQueueRunnable [identifier=");
+			builder.append(identifier);
+			builder.append(",\nblockingQueue=");
+			builder.append(blockingQueue);
+			builder.append("]");
+			return builder.toString();
+		}
+		
+		
+		
+	
 	}
 
 	void close() {

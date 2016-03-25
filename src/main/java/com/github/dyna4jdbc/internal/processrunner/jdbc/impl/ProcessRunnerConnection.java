@@ -29,7 +29,7 @@ public class ProcessRunnerConnection extends AbstractConnection  {
 		configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
         typeHandlerFactory = new DefaultTypeHandlerFactory();
         
-        this.scriptExecutor = new ProcessRunnerScriptExecutor();
+        this.scriptExecutor = new ProcessRunnerScriptExecutor(configuration);
     }
 
     public DatabaseMetaData getMetaData() throws SQLException {

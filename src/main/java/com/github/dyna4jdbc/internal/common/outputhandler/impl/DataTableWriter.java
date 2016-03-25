@@ -13,14 +13,15 @@ public class DataTableWriter extends CursorCellWriterOutputStream{
 
     private LinkedList<DataTable> dataTableList = new LinkedList<>();
     private List<String> currentRow = new ArrayList<String>();
-	private Configuration configuration;
+	
+    private boolean currentRowIsTheFirstLine = true;
+	private final boolean skipFirstLine;
 
     public DataTableWriter(Configuration configuration) {
     	super(configuration.getCellSeparator());
     	
     	dataTableList.addLast(new DataTable());
-        this.configuration = configuration;
-
+        this.skipFirstLine = configuration.getSkipFirstLine();
     }
 
 
@@ -35,7 +36,17 @@ public class DataTableWriter extends CursorCellWriterOutputStream{
 
     @Override
     protected void nextRow() {
-        appendRow();
+        boolean addCurrentRowToOutput = true;
+    	if(currentRowIsTheFirstLine) {
+    		currentRowIsTheFirstLine = false;
+    		if(skipFirstLine) {
+    			addCurrentRowToOutput = false;
+    		}
+        }
+    	
+    	if(addCurrentRowToOutput) {
+    		appendRow();
+    	}
         currentRow = new ArrayList<String>();
     }
 
