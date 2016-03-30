@@ -1,16 +1,30 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
-import com.github.dyna4jdbc.internal.ClosableSQLObject;
-
-import java.sql.*;
+import java.sql.Array;
+import java.sql.Blob;
+import java.sql.CallableStatement;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.NClob;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLClientInfoException;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.SQLXML;
+import java.sql.Savepoint;
+import java.sql.Statement;
+import java.sql.Struct;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+import com.github.dyna4jdbc.internal.SQLError;
 
-public abstract class AbstractConnection extends ClosableSQLObject implements java.sql.Connection{
+
+public abstract class AbstractConnection extends BasicSQLObject implements java.sql.Connection{
 
     // TODO unify unsupported method handling in this class
     // --- properties used only to provide a sensible default JDBC interface implementation ---
@@ -22,12 +36,14 @@ public abstract class AbstractConnection extends ClosableSQLObject implements ja
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public CallableStatement prepareCall(String sql) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public String nativeSQL(String sql) throws SQLException {
@@ -38,7 +54,8 @@ public abstract class AbstractConnection extends ClosableSQLObject implements ja
     public void setAutoCommit(boolean autoCommit) throws SQLException {
         checkNotClosed();
         if(! autoCommit) {
-            throw new SQLException("This driver can only handle autocommit mode");
+            throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+            		"This driver can only handle autocommit mode");
         }
     }
 
@@ -49,15 +66,15 @@ public abstract class AbstractConnection extends ClosableSQLObject implements ja
 
     public void commit() throws SQLException {
         checkNotClosed();
-        throw new SQLException("This driver can only handle autocommit mode");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This driver can only handle autocommit mode");
     }
 
     public void rollback() throws SQLException {
         checkNotClosed();
-        throw new SQLException("This driver can only handle autocommit mode");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This driver can only handle autocommit mode");
     }
-
-
 
     public void setReadOnly(boolean readOnly) throws SQLException {
         checkNotClosed();
@@ -82,7 +99,8 @@ public abstract class AbstractConnection extends ClosableSQLObject implements ja
     public void setTransactionIsolation(int level) throws SQLException {
         checkNotClosed();
         if(level != Connection.TRANSACTION_NONE) {
-            throw new SQLException("This driver does not support transaction isolation");
+            throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+            		"This driver does not support transaction isolation");
         }
     }
 
@@ -102,17 +120,20 @@ public abstract class AbstractConnection extends ClosableSQLObject implements ja
 
     public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public Map<String, Class<?>> getTypeMap() throws SQLException {
@@ -144,72 +165,86 @@ public abstract class AbstractConnection extends ClosableSQLObject implements ja
 
     public Savepoint setSavepoint() throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public Savepoint setSavepoint(String name) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public void rollback(Savepoint savepoint) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public void releaseSavepoint(Savepoint savepoint) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public Clob createClob() throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public Blob createBlob() throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public NClob createNClob() throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public SQLXML createSQLXML() throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public boolean isValid(int timeout) throws SQLException {
@@ -237,12 +272,14 @@ public abstract class AbstractConnection extends ClosableSQLObject implements ja
 
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
         checkNotClosed();
-        throw new SQLException("This method is not supported");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException(
+        		"This method is not supported");
     }
 
     public void setSchema(String schema) throws SQLException {
@@ -265,18 +302,5 @@ public abstract class AbstractConnection extends ClosableSQLObject implements ja
     public int getNetworkTimeout() throws SQLException {
         checkNotClosed();
         return 0;
-    }
-
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw new SQLException();
-    }
-
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
-    }
-
-    @Override
-    public void close() throws SQLException {
-        super.close();
     }
 }

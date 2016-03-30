@@ -1,15 +1,17 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 
-import com.github.dyna4jdbc.internal.ClosableSQLObject;
-import com.github.dyna4jdbc.internal.SQLError;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
-
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Statement;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class AbstractStatement<T extends java.sql.Connection> extends ClosableSQLObject implements java.sql.Statement {
+import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
+
+public abstract class AbstractStatement<T extends java.sql.Connection> extends BasicSQLObject implements java.sql.Statement {
 
     protected final T connection;
 

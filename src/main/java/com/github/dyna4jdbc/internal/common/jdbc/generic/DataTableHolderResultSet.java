@@ -39,6 +39,9 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
         super(dataTable, statement);
         this.dataTable = dataTable;
         this.typeHandlers = initTypeHandlers(dataTable, typeHandlerFactory);
+        if(checkFirstRowIsSkipped(this.typeHandlers)) {
+        	super.skipNextRowIfPresent();
+        }
         this.columnNameToColumnIndexMap = initColumnNameToColumnIndexMap(this.typeHandlers);
     }
 
@@ -48,16 +51,39 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	
     	int columnIndex = 0;
     	
+
+    	
     	for(DataColumn column : dataTable.columnIterable() ) {
     		TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(columnIndex++, column);
     		if (typeHandler == null) {
     			throw SQLError.raiseInternalIllegalStateRuntimeException("typeHandler is null");
     		}
-    		
+
     		typeHandlerList.add(typeHandler);
     	}
     	
     	return Collections.unmodifiableList(typeHandlerList);
+    }
+    
+    private static boolean checkFirstRowIsSkipped(List<TypeHandler> typeHandlers) {
+    
+    	Boolean shouldTakeFirstRowValue = null; 
+    	
+		for(TypeHandler typeHandler : typeHandlers) {
+			final boolean thisTypeHandlerTakesFirstRowValue = 
+					typeHandler.getColumnMetadata().isTakesFirstRowValue();
+			
+			if(shouldTakeFirstRowValue == null) {
+				shouldTakeFirstRowValue = thisTypeHandlerTakesFirstRowValue;
+			} else {
+				if(shouldTakeFirstRowValue != thisTypeHandlerTakesFirstRowValue) {
+					// inconsistent header definition
+					throw new IllegalStateException("Column header type mismatch");
+				}
+			}
+		}
+		
+		return shouldTakeFirstRowValue;
     }
     
     private static Map<String, Integer> initColumnNameToColumnIndexMap(List<TypeHandler> columnTypeHandlers) {

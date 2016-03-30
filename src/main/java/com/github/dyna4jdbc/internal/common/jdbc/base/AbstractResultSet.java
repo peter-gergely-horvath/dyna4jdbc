@@ -75,6 +75,13 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
         }
     }
 
+    
+    protected void skipNextRowIfPresent() {
+    	if(this.rowIterator.hasNext()) {
+    		rowIterator.next();
+    	}
+    }
+    
     protected void checkValidStateForRowAccess() throws SQLException {
         checkNotClosed();
         resultSetState.checkValidStateForRowAccess();

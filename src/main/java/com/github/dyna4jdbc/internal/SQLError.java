@@ -16,6 +16,7 @@ public enum SQLError {
     JDBC_FUNCTION_NOT_SUPPORTED("This JDBC API function is not supported: %s"),
     USING_STDOUT_FROM_UPDATE("Using standard output from an update call is not permitted"),
     DATA_CONVERSION_FAILED("Data conversion failed in row %1$s, column %2$s. Value '%3$s' could not be converted to %4$s."),
+    INVALID_CONFIGURATION_HEADER("Encountered invalid configuration header: %s"),
     JDBC_API_USAGE_CALLER_ERROR("Illegal JDBC API call: %s"),
     INVALID_CONFIGURATION("Configuration error: %s"),
     DRIVER_BUG_UNEXPECTED_STATE("An unexpected state has been reached: %s"); 

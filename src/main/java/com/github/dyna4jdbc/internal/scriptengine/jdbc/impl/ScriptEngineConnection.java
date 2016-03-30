@@ -52,7 +52,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
 		configuration = configurationFactory.newConfigurationFromParameters(configurationString, properties);
         
-        typeHandlerFactory = DefaultTypeHandlerFactory.getInstance();
+        typeHandlerFactory = DefaultTypeHandlerFactory.getInstance(configuration);
 
     }
 

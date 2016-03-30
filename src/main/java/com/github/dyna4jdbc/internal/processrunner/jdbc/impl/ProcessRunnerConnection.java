@@ -27,7 +27,7 @@ public class ProcessRunnerConnection extends AbstractConnection  {
     {
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
 		configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
-        typeHandlerFactory = new DefaultTypeHandlerFactory();
+        typeHandlerFactory = DefaultTypeHandlerFactory.getInstance(configuration);
         
         this.scriptExecutor = new ProcessRunnerScriptExecutor(configuration);
     }
