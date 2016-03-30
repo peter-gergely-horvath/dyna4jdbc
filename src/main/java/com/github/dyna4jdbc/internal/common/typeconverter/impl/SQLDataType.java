@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 public enum SQLDataType {
 
+	// TODO: extract methods
 	BIT(java.sql.Types.BIT, "BIT", java.lang.Boolean.class, false, "^[-]?\\d+$"),
 	TINYINT(java.sql.Types.TINYINT, "TINYINT", java.lang.Short.class, false, "^[-]?\\d+$"),
 	SMALLINT(java.sql.Types.SMALLINT, "SMALLINT", java.lang.Short.class, false, "^[-]?\\d+$"),
@@ -11,9 +12,63 @@ public enum SQLDataType {
 	BIGINT(java.sql.Types.BIGINT, "BIGINT", java.lang.Long.class, false, "^[-]?\\d+$"),
 	FLOAT(java.sql.Types.FLOAT, "FLOAT", java.lang.Float.class, false, "^[-]?\\d+\\.\\d+$"),
 	REAL(java.sql.Types.REAL, "REAL", java.lang.Float.class, false, "^[-]?\\d+\\.\\d+$"),
-	DOUBLE(java.sql.Types.DOUBLE, "DOUBLE", java.lang.Double.class, false, "^[-]?\\d+\\.\\d+$"),
-	NUMERIC(java.sql.Types.NUMERIC, "NUMERIC", java.lang.Double.class, false, "^[-]?\\d+\\.\\d+$"),
-	DECIMAL(java.sql.Types.DECIMAL, "DECIMAL", java.math.BigDecimal.class, false, "^[-]?\\d+\\.\\d+$"),
+	DOUBLE(java.sql.Types.DOUBLE, "DOUBLE", java.lang.Double.class, false, "^[-]?\\d+\\.\\d+$") {
+		@Override
+		int getPrecision(String value) {
+			
+			if(value != null && value.matches("\\d+\\.\\d+")) {
+				return value.split("\\.")[1].length();
+			}
+			
+			return 0;
+		}
+
+		int getScale(String value) {
+			if(value != null && value.matches("\\d+\\.\\d+")) {
+				return value.length() - 1;
+			}
+			
+			return 0;
+		}
+	},
+	NUMERIC(java.sql.Types.NUMERIC, "NUMERIC", java.lang.Double.class, false, "^[-]?\\d+\\.\\d+$") {
+		@Override
+		int getPrecision(String value) {
+			
+			if(value != null && value.matches("\\d+\\.\\d+")) {
+				return value.split("\\.")[1].length();
+			}
+			
+			return 0;
+		}
+
+		int getScale(String value) {
+			if(value != null && value.matches("\\d+\\.\\d+")) {
+				return value.length() - 1;
+			}
+			
+			return 0;
+		}
+	},
+	DECIMAL(java.sql.Types.DECIMAL, "DECIMAL", java.math.BigDecimal.class, false, "^[-]?\\d+\\.\\d+$") {
+		@Override
+		int getPrecision(String value) {
+			
+			if(value != null && value.matches("\\d+\\.\\d+")) {
+				return value.split("\\.")[1].length();
+			}
+			
+			return 0;
+		}
+
+		int getScale(String value) {
+			if(value != null && value.matches("\\d+\\.\\d+")) {
+				return value.length() - 1;
+			}
+			
+			return 0;
+		}
+	},
 	CHAR(java.sql.Types.CHAR, "CHAR", java.lang.String.class){
 		@Override
 		boolean isPlausibleConversion(String value) {
@@ -99,7 +154,6 @@ public enum SQLDataType {
 	}
 
 	int getScale(String cellValue) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

@@ -16,23 +16,22 @@ public class EmptyColumnMetadataFactory implements ColumnMetadataFactory {
 	private EmptyColumnMetadataFactory() {
 	}
 
-	private final ColumnMetadata EMPTY_COLUMN_METADATA = DefaultColumnMetaData.builder()
-			.setTakesFirstRowValue(false)
-			.setCurrency(false)
-			.setNullability(Nullability.UNKNOWN)
-			.setSigned(false)
-			.setColumnDisplaySize(4)
-			.setColumnLabel("")
-			.setColumnName("")
-			.setPrecision(0)
-			.setScale(0)
-			.setColumnType(SQLDataType.VARCHAR)
-			.build();
-	
-
 	@Override
 	public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValuesIterable) {
-		return EMPTY_COLUMN_METADATA;
+		DefaultColumnMetadata metadata = new DefaultColumnMetadata();
+		
+		metadata.setTakesFirstRowValue(false);
+		metadata.setCurrency(false);
+		metadata.setNullability(Nullability.UNKNOWN);
+		metadata.setSigned(false);
+		metadata.setColumnDisplaySize(4);
+		metadata.setColumnLabel("");
+		metadata.setColumnName("");
+		metadata.setPrecision(0);
+		metadata.setScale(0);
+		metadata.setColumnType(SQLDataType.VARCHAR);
+		
+		return metadata;
 	}
 	
 }

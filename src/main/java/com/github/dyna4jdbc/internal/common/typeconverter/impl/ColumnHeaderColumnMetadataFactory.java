@@ -13,7 +13,7 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
 	private final Configuration configuration;
-	private static final Pattern SQL_TYPE_PATTERN = Pattern.compile("\\s(\\w+)(?:\\s*[(]\\s*(\\d+)\\s*[,]?\\s*(\\d)?\\s*[)])");
+	private static final Pattern SQL_TYPE_PATTERN = Pattern.compile("\\s*(\\w+)(?:\\s*[(]\\s*(\\d+)\\s*[,]?\\s*(\\d)?\\s*[)])?\\s*");
 	
 
 	ColumnHeaderColumnMetadataFactory(Configuration configuration) {
@@ -24,7 +24,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 		return new ColumnHeaderColumnMetadataFactory(configuration);
 	}
 
-	protected DefaultColumnMetaData.Builder configureForValues(DefaultColumnMetaData.Builder metaData,
+	protected void configureForValues(DefaultColumnMetadata metaData,
 			int columnIndex, Iterable<String> columnValuesIterable) {
 		
 		
@@ -54,17 +54,15 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 		}
 		
 		metaData.setTakesFirstRowValue(true);
-		
-		return metaData;
+
 	}
 	
-	private DefaultColumnMetaData.Builder configureHeader(DefaultColumnMetaData.Builder metaData, String header) {
-		return metaData
-				.setColumnLabel(header)
-				.setColumnName(header);
+	private void configureHeader(DefaultColumnMetadata metaData, String header) {
+		metaData.setColumnLabel(header);
+		metaData.setColumnName(header);
 	}
 	
-	private DefaultColumnMetaData.Builder configureSqlType(DefaultColumnMetaData.Builder metaData, String sqlTypeConfig) {
+	private void configureSqlType(DefaultColumnMetadata metaData, String sqlTypeConfig) {
 
 		try {
 			Matcher matcher = SQL_TYPE_PATTERN.matcher(sqlTypeConfig);
@@ -77,7 +75,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 			String precisionPart = matcher.group(3);
 			
 			
-			SQLDataType sqlDataType = SQLDataType.valueOf(sqlTypePart);
+			SQLDataType sqlDataType = SQLDataType.valueOf(sqlTypePart.toUpperCase());
 			metaData.setColumnType(sqlDataType);
 			
 			if(scalePart != null) {
@@ -89,15 +87,14 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 			}
 			
 			
-			return metaData;
 		} catch(Exception e) {
-			throw new IllegalStateException("Processing of header failed: " + sqlTypeConfig);
+			throw new IllegalStateException("Processing of header failed: " + sqlTypeConfig + "; " + e.getMessage(), e);
 		}
 
 	}
 	
-	private DefaultColumnMetaData.Builder configureAdditional(DefaultColumnMetaData.Builder metaData, String metaDataConfig) {
-		return metaData; // no-op
+	private void configureAdditional(DefaultColumnMetadata metaData, String metaDataConfig) {
+		// no-op: TODO: implement as necessary
 	}
 
 

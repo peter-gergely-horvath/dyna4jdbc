@@ -4,7 +4,6 @@ import com.github.dyna4jdbc.internal.SQLError;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata.Nullability;
-import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultColumnMetaData.Builder;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
@@ -18,12 +17,12 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
 	@Override
 	public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValuesIterable) {
-		Builder columnMetaDataBuilder = DefaultColumnMetaData.builder();
+		DefaultColumnMetadata columnMetaDataBuilder = new DefaultColumnMetadata();
 		configureForValues(columnMetaDataBuilder, columnIndex, columnValuesIterable);
-		return columnMetaDataBuilder.build();
+		return columnMetaDataBuilder;
 	}
 
-	protected DefaultColumnMetaData.Builder configureForValues(DefaultColumnMetaData.Builder metaData,
+	protected void configureForValues(DefaultColumnMetadata metaData,
 			int columnIndex, Iterable<String> columnValuesIterable) {
 
 		final int sqlColumnIndex = columnIndex + 1; 
@@ -61,8 +60,6 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 		metaData.setPrecision(maxPrecision);
 		metaData.setScale(maxScale);
 		metaData.setColumnType(columnType);
-
-		return metaData;
 	}
 
 	private static SQLDataType getColumnTypeByCurrentlySelectedTypeAndCellValue(SQLDataType currentColumnType, String cellValue) {

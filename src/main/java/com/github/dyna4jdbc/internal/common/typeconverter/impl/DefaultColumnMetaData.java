@@ -2,7 +2,7 @@ package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 
-class DefaultColumnMetaData implements ColumnMetadata {
+class DefaultColumnMetadata implements ColumnMetadata {
 
 	private boolean takesFirstRowValue;
 	private boolean currency;
@@ -16,11 +16,7 @@ class DefaultColumnMetaData implements ColumnMetadata {
 	private SQLDataType columnType;
 	private String columnTypeName;
 	private Class<?> columnClass;
-	
-	private DefaultColumnMetaData() {
-		// no instances allowed from outside 
-	}
-	
+
 	@Override
 	public boolean isTakesFirstRowValue() {
 		return takesFirstRowValue;
@@ -81,97 +77,70 @@ class DefaultColumnMetaData implements ColumnMetadata {
 		return columnClass;
 	}
 
+	public void setTakesFirstRowValue(boolean takesFirstRowValue) {
+		this.takesFirstRowValue = takesFirstRowValue;
 
-	static Builder builder() {
-		return new Builder(new DefaultColumnMetaData());
 	}
 
-	static class Builder {
-		
-		private DefaultColumnMetaData columnMetaData;
-		
-		private Builder(DefaultColumnMetaData columnMetaData) {
-			this.columnMetaData = columnMetaData;
-		}
-		
-		DefaultColumnMetaData build() {
-			if (columnMetaData == null) {
-				throw new IllegalStateException("builder is not re-usable!");
-			}
+	public void setCurrency(boolean currency) {
+		this.currency = currency;
 
-			// TODO: add validation
-			
-			DefaultColumnMetaData returnValue = columnMetaData;
-			columnMetaData = null;
+	}
 
-			return returnValue;
-		}
-		
-		public Builder setTakesFirstRowValue(boolean takesFirstRowValue) {
-			columnMetaData.takesFirstRowValue = takesFirstRowValue;
-			return this;
-		}
+	public void setNullability(Nullability nullability) {
+		this.nullability = nullability;
 
-		public Builder setCurrency(boolean currency) {
-			columnMetaData.currency = currency;
-			return this;
-		}
+	}
 
-		public Builder setNullability(Nullability nullability) {
-			columnMetaData.nullability = nullability;
-			return this;
-		}
+	public void setSigned(boolean signed) {
+		this.signed = signed;
 
-		public Builder setSigned(boolean signed) {
-			columnMetaData.signed = signed;
-			return this;
-		}
+	}
 
-		public Builder setColumnDisplaySize(int columnDisplaySize) {
-			columnMetaData.columnDisplaySize = columnDisplaySize;
-			return this;
-		}
+	public void setColumnDisplaySize(int columnDisplaySize) {
+		this.columnDisplaySize = columnDisplaySize;
 
-		public Builder setColumnLabel(String columnLabel) {
-			columnMetaData.columnLabel = columnLabel;
-			return this;
-		}
+	}
 
-		public Builder setColumnName(String columnName) {
-			columnMetaData.columnName = columnName;
-			return this;
-		}
+	public void setColumnLabel(String columnLabel) {
+		this.columnLabel = columnLabel;
 
-		public Builder setPrecision(int precision) {
-			columnMetaData.precision = precision;
-			return this;
-		}
+	}
 
-		public Builder setScale(int scale) {
-			columnMetaData.scale = scale;
-			return this;
-		}
+	public void setColumnName(String columnName) {
+		this.columnName = columnName;
 
-		public Builder setColumnType(SQLDataType columnType) {
-			columnMetaData.columnType = columnType;
-			return this;
-		}
+	}
 
-		public Builder setColumnTypeName(String columnTypeName) {
-			columnMetaData.columnTypeName = columnTypeName;
-			return this;
-		}
+	public void setPrecision(int precision) {
+		this.precision = precision;
 
-		public Builder setColumnClass(Class<?> columnClass) {
-			columnMetaData.columnClass = columnClass;
-			return this;
-		}
+	}
+
+	public void setScale(int scale) {
+		this.scale = scale;
+
+	}
+
+	public void setColumnType(SQLDataType columnType) {
+		this.columnType = columnType;
+
+	}
+
+	public void setColumnTypeName(String columnTypeName) {
+		this.columnTypeName = columnTypeName;
+
+	}
+
+	public void setColumnClass(Class<?> columnClass) {
+		this.columnClass = columnClass;
+
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("DefaultColumnMetaData[");
+		sb.append("Defaultthis[");
 		sb.append("\ntakesFirstRowValue=");
 		sb.append(takesFirstRowValue);
 		sb.append(",\ncurrency=");
@@ -200,7 +169,4 @@ class DefaultColumnMetaData implements ColumnMetadata {
 		return sb.toString();
 	}
 
-
-	
-	
 }

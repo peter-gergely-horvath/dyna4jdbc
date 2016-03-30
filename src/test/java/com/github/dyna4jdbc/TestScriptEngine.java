@@ -89,7 +89,6 @@ public class TestScriptEngine {
                 System.out.println();
             	
                 for(int i=1; i<=columnCount; i++ ) {
-                	String columnLabel = metaData.getColumnLabel(i);
                 	int columnDisplaySize = metaData.getColumnDisplaySize(i);
                 	String formatStr = "%" + columnDisplaySize + "s | ";
                 	System.out.format(String.format(formatStr, "").replace(' ', '-'));

@@ -83,6 +83,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 			}
 		}
 		
+		if(shouldTakeFirstRowValue == null) {
+			shouldTakeFirstRowValue = false;
+		}
+		
 		return shouldTakeFirstRowValue;
     }
     
