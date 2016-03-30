@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import com.github.dyna4jdbc.internal.SQLError;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
+import com.github.dyna4jdbc.internal.common.util.collection.AlwaysSkipFirstElementIterable;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
@@ -39,7 +40,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 		String sqlTypeConfig = configStringArray.length >= 2 ? configStringArray[1] : null;
 		String metaDataConfig = configStringArray.length == 3 ? configStringArray[2] : null;
 		
-		super.configureForValues(metaData, columnIndex, columnValuesIterable);
+		super.configureForValues(metaData, columnIndex, AlwaysSkipFirstElementIterable.<String>newInstance(columnValuesIterable));
 		
 		
 		if(header != null && !"".equals(header.trim())) {
