@@ -93,6 +93,15 @@ public enum SQLDataType {
 		
 		return this.acceptedPattern.matcher(value).matches();
 	}
+	
+	int getPrecision(String value) {
+		return 0;
+	}
+
+	int getScale(String cellValue) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 	
 }
