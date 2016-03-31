@@ -39,7 +39,7 @@ class GuardedResultSetState {
 
     void transitionTo(State newState) throws SQLException {
         if(!currentState.validTransitions.contains(newState)) {
-            throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException(
+            throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
                     "Transitioning from " + currentState + " to " + newState + " is illegal");
         }
 
@@ -48,7 +48,7 @@ class GuardedResultSetState {
 
     void checkValidStateForRowAccess() throws SQLException {
         if(currentState != State.ITERATING_OVER_RESULTS) {
-            throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException(
+            throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "Performing this operation in state " + currentState + " is illegal");
         }
     }

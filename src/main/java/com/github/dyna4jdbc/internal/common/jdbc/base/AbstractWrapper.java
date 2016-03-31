@@ -9,7 +9,7 @@ public class AbstractWrapper implements Wrapper {
 	
 	@Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw SQLError.CANNOT_UNWARP_OBJECT.raiseException(iface, this.getClass());
+        throw SQLError.CANNOT_UNWARP_OBJECT.raiseSQLException(iface, this.getClass());
     }
 
     @Override

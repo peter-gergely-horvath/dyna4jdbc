@@ -55,7 +55,7 @@ public abstract class AbstractResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("unwrap of " + iface);
+        throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("unwrap of " + iface);
     }
 
     @Override

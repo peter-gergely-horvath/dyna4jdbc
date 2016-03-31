@@ -33,7 +33,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
     public ScriptEngineConnection(String parameters, Properties properties) throws SQLException
     {
         if(parameters == null || "".equals(parameters.trim())) {
-        	throw SQLError.INVALID_CONFIGURATION.raiseException(
+        	throw SQLError.INVALID_CONFIGURATION.raiseSQLException(
         			"Scrip Engine Name not specified");
         }
 
@@ -43,7 +43,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
         String configurationString = engineNameAndParameters.length == 2 ? engineNameAndParameters[1] : null;
 
         if(engineName == null || "".equals(engineName.trim())) {
-        	throw SQLError.INVALID_CONFIGURATION.raiseException(
+        	throw SQLError.INVALID_CONFIGURATION.raiseSQLException(
         			"Scrip Engine Name is not specified");
         }
 
@@ -60,7 +60,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
 		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 		ScriptEngine se = scriptEngineManager.getEngineByName(engineName);
         if(se == null) {
-        	throw SQLError.INVALID_CONFIGURATION.raiseException(
+        	throw SQLError.INVALID_CONFIGURATION.raiseSQLException(
         			"ScriptEngine not found: " + engineName);
         }
         

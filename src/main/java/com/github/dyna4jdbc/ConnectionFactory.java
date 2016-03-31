@@ -32,12 +32,12 @@ class ConnectionFactory {
 		catch (MisconfigurationSQLException ex)
 		{
 			String causeMessage = ExceptionUtil.getRootCauseMessage(ex);
-			throw SQLError.INVALID_CONFIGURATION.raiseException(ex, causeMessage);
+			throw SQLError.INVALID_CONFIGURATION.raiseSQLException(ex, causeMessage);
 		}
 		catch (Exception ex)
 		{
 			String causeMessage = ExceptionUtil.getRootCauseMessage(ex);
-			throw SQLError.CONNECT_FAILED_GENERIC.raiseException(ex, causeMessage);
+			throw SQLError.CONNECT_FAILED_GENERIC.raiseSQLException(ex, causeMessage);
 		}
 	}
 

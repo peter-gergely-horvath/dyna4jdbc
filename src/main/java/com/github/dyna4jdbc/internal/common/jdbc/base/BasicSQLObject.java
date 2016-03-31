@@ -14,7 +14,7 @@ public class BasicSQLObject extends AbstractWrapper {
 
     protected final void checkNotClosed(String objectIdentifier) throws SQLException {
         if(closed) {
-            throw SQLError.OBJECT_CLOSED.raiseException(objectIdentifier);
+            throw SQLError.OBJECT_CLOSED.raiseSQLException(objectIdentifier);
         }
     }
 

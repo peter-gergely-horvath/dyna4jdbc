@@ -38,13 +38,13 @@ public class DefaultConfigurationFactory implements ConfigurationFactory {
 		
 		for(Object propKey : props.keySet()) {
 			if(!(propKey instanceof java.lang.String)) {
-				throw SQLError.INVALID_CONFIGURATION.raiseException(
+				throw SQLError.INVALID_CONFIGURATION.raiseSQLException(
 						"properties should only contain String keys!");
 			} else {
 				String key = (String)propKey;
 				
 				if(internalPropops.containsKey(key)) {
-					throw SQLError.INVALID_CONFIGURATION.raiseException(
+					throw SQLError.INVALID_CONFIGURATION.raiseSQLException(
 							"duplicated configuration between JDBC URL and properties: %s", key);
 				}
 				

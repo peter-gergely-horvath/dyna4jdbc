@@ -26,272 +26,272 @@ public class EmptyResultSet extends AbstractResultSet<List<String>> implements R
 
 	@Override
 	public boolean wasNull() throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public String getString(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public boolean getBoolean(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public byte getByte(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public short getShort(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public int getInt(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public long getLong(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public float getFloat(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public double getDouble(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public byte[] getBytes(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Date getDate(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Time getTime(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Timestamp getTimestamp(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public InputStream getAsciiStream(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public InputStream getUnicodeStream(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public InputStream getBinaryStream(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public String getString(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public boolean getBoolean(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public byte getByte(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public short getShort(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public int getInt(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public long getLong(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public float getFloat(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public double getDouble(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public byte[] getBytes(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Date getDate(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Time getTime(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Timestamp getTimestamp(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public InputStream getAsciiStream(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public InputStream getUnicodeStream(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public InputStream getBinaryStream(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public String getCursorName() throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public ResultSetMetaData getMetaData() throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Object getObject(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Object getObject(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public int findColumn(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Reader getCharacterStream(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Reader getCharacterStream(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Object getObject(String columnLabel, Map<String, Class<?>> map) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Date getDate(int columnIndex, Calendar cal) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Date getDate(String columnLabel, Calendar cal) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Time getTime(int columnIndex, Calendar cal) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Time getTime(String columnLabel, Calendar cal) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public Timestamp getTimestamp(String columnLabel, Calendar cal) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public URL getURL(int columnIndex) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public URL getURL(String columnLabel) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 	@Override
 	public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
-		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException("Result set is empty!");
+		throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
 	}
 
 

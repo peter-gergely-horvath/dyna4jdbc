@@ -34,8 +34,17 @@ class DefaultTypeHandler extends AbstractTypeHandler {
 		if (rawCellValue == null) {
 			return null;
 		}
+		
+		switch (rawCellValue.trim()) {
+		case "0":
+			return Boolean.FALSE;
+		
+		case "1":
+			return Boolean.TRUE;
 
-		return Boolean.valueOf(rawCellValue);
+		default:
+			return Boolean.valueOf(rawCellValue);
+		}
 	}
 
 	@Override

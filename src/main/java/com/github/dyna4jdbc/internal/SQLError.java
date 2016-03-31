@@ -34,14 +34,14 @@ public enum SQLError {
     }
     
     protected String getMessageTemplate() {
-    	return String.format("%s SQLError [%s]: %s", DynaDriver.DRIVER_SHORT_NAME, this.name(), this.message);
+    	return String.format("%s error [%s]: %s", DynaDriver.DRIVER_SHORT_NAME, this.name(), this.message);
     }
 
-    public SQLException raiseException(Exception ex, Object... params) throws SQLException {
+    public SQLException raiseSQLException(Exception ex, Object... params) throws SQLException {
         throw new SQLException(String.format(getMessageTemplate(), params), ex);
     }
 
-    public SQLException raiseException(Object... params) throws SQLException {
+    public SQLException raiseSQLException(Object... params) throws SQLException {
         throw new SQLException(String.format(getMessageTemplate(), params));
     }
 

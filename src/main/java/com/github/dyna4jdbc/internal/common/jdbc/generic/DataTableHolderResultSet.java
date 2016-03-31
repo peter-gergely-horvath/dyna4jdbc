@@ -133,7 +133,7 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
         List<String> currentRow = getCurrentRow();
 
         if (!(javaIndex >= 0 && javaIndex < dataTable.getColumnCount())) {
-            throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException(
+            throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "Invalid index: " + sqlIndex);
         }
         
@@ -155,10 +155,9 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 		return typeHandler;
     }
     
-    @SuppressWarnings("unchecked")
-	private <T> T checkIfNull(Object convertedValue) {
+	private <T> T setWasNullBasedOnLastValue(T convertedValue) {
     	wasNull = (convertedValue == null);
-    	return (T) convertedValue;
+    	return convertedValue;
     }
 
     @Override
@@ -173,10 +172,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		String convertedValue = typeHandler.covertToString(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.lang.String.class);
     	}
     }
@@ -188,12 +187,12 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Boolean convertedValue = typeHandler.covertToBoolean(rawCellValue);
-    		Boolean returnValue = checkIfNull(convertedValue);
+    		Boolean returnValue = setWasNullBasedOnLastValue(convertedValue);
 
     		return returnValue != null ? returnValue.booleanValue() : false; 
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "boolean");
     	}
     }
@@ -206,10 +205,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Byte convertedValue = typeHandler.covertToByte(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "byte");
     	}
     }
@@ -221,10 +220,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Short convertedValue = typeHandler.covertToShort(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "short");
     	}
     }
@@ -236,10 +235,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Integer convertedValue = typeHandler.covertToInteger(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "int");
     	}
     }
@@ -251,10 +250,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Long convertedValue = typeHandler.covertToLong(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "long");
     	}
     }
@@ -266,10 +265,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Float convertedValue = typeHandler.covertToFloat(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "float");
     	}
     }
@@ -281,10 +280,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Double convertedValue = typeHandler.covertToDouble(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "double");
     	}
     }
@@ -296,10 +295,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		BigDecimal convertedValue = typeHandler.covertToBigDecimal(rawCellValue, scale);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.math.BigDecimal.class);
     	}
     }
@@ -311,10 +310,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		byte[] convertedValue = typeHandler.covertToByteArray(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "byte[]");
     	}
     }
@@ -326,10 +325,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Date convertedValue = typeHandler.covertToDate(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.sql.Date.class);
     	}
     }
@@ -341,10 +340,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Time convertedValue = typeHandler.covertToTime(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.sql.Time.class);
     	}
     }
@@ -356,10 +355,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Timestamp convertedValue = typeHandler.covertToTimestamp(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.sql.Timestamp.class);
     	}
     }
@@ -371,10 +370,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		InputStream convertedValue = typeHandler.covertToAsciiInputStream(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "(ASCII) InputStream");
     	}
     }
@@ -386,10 +385,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		InputStream convertedValue = typeHandler.covertToUnicodeInputStream(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "(Unicode) InputStream");
     	}
     }
@@ -401,10 +400,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		InputStream convertedValue = typeHandler.covertToBinaryInputStream(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "(Binary) InputStream");
     	}
     }
@@ -493,7 +492,7 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
     @Override
     public String getCursorName() throws SQLException {
-        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseException("Retrieval of cursor name");
+        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Retrieval of cursor name");
     }
 
     @Override
@@ -515,14 +514,14 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     @Override
     public int findColumn(String columnLabel) throws SQLException {
         if (!columnNameToColumnIndexMap.containsKey(columnLabel)) {
-            throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseException(
+            throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "Invalid column label: " + columnLabel);
         }
     	
     	
     	Integer sqlIndex = columnNameToColumnIndexMap.get(columnLabel);
         if (sqlIndex == null) {
-            throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseException(
+            throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
                     "sqlIndex is null");
         }
     	
@@ -536,10 +535,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Reader convertedValue = typeHandler.covertToCharacterStream(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.io.Reader.class);
     	}
     }
@@ -556,10 +555,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		BigDecimal convertedValue = typeHandler.covertToBigDecimal(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.io.Reader.class);
     	}
     }
@@ -578,10 +577,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Object convertedValue = typeHandler.covertToObject(rawCellValue, map);
-    		return checkIfNull(convertedValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.lang.Object.class);
     	}
     }
@@ -601,11 +600,11 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Object convertedValue = typeHandler.covertToDate(rawCellValue, cal);
-    		return checkIfNull(convertedValue);
+    		Date convertedValue = typeHandler.covertToDate(rawCellValue, cal);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.sql.Date.class);
     	}
     }
@@ -621,11 +620,11 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Object convertedValue = typeHandler.covertToTime(rawCellValue, cal);
-    		return checkIfNull(convertedValue);
+    		Time convertedValue = typeHandler.covertToTime(rawCellValue, cal);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.sql.Time.class);
     	}
     }
@@ -641,11 +640,11 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Object convertedValue = typeHandler.covertToTimestamp(rawCellValue, cal);
-    		return checkIfNull(convertedValue);
+    		Timestamp convertedValue = typeHandler.covertToTimestamp(rawCellValue, cal);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.sql.Timestamp.class);
     	}
     }
@@ -661,11 +660,11 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Object convertedValue = typeHandler.covertToURL(rawCellValue);
-    		return checkIfNull(convertedValue);
+    		URL convertedValue = typeHandler.covertToURL(rawCellValue);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.net.URL.class);
     	}
     }
@@ -682,11 +681,11 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-    		Object convertedValue = typeHandler.covertToObject(rawCellValue, type);
-    		return checkIfNull(convertedValue);
+    		T convertedValue = typeHandler.covertToObject(rawCellValue, type);
+    		return setWasNullBasedOnLastValue(convertedValue);
 
     	} catch(TypeConversionException tce) {
-    		throw SQLError.DATA_CONVERSION_FAILED.raiseException(
+    		throw SQLError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, java.net.URL.class);
     	}
     }

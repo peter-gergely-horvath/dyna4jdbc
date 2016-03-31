@@ -67,7 +67,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 		try {
 			Matcher matcher = SQL_TYPE_PATTERN.matcher(sqlTypeConfig);
 			if(! matcher.matches()) {
-				throw SQLError.INVALID_CONFIGURATION_HEADER.raiseException(sqlTypeConfig);
+				throw SQLError.INVALID_CONFIGURATION_HEADER.raiseSQLException(sqlTypeConfig);
 			}
 			
 			String sqlTypePart = matcher.group(1);

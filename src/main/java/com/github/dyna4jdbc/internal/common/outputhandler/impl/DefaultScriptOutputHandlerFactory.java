@@ -112,7 +112,7 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 
 			if (resultSets.size() > 1) {
 
-				throw SQLError.RESULT_SET_MULTIPLE_EXPECTED_ONE.raiseException(resultSets.size());
+				throw SQLError.RESULT_SET_MULTIPLE_EXPECTED_ONE.raiseSQLException(resultSets.size());
 
 			} else {
 				return resultSets.get(0);

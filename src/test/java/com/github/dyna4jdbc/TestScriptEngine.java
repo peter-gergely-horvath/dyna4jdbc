@@ -43,7 +43,7 @@ public class TestScriptEngine {
 
                     for(int i=1; i<=columnCount; i++ ) {
                     	String columnLabel = metaData.getColumnLabel(i);
-                    	System.out.format("%s ", rs.getString(columnLabel));
+                    	System.out.format("%s ", rs.getLong(columnLabel));
                     }
                     System.out.println();
                 }

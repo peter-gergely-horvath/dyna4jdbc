@@ -45,12 +45,12 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 			
         } catch (ScriptExecutionException se) {
         	String message = ExceptionUtil.getRootCauseMessage(se);
-            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se, message);
+            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
         } catch (SQLException sqle) {
             throw sqle;
         } catch (Throwable t) {
         	String message = ExceptionUtil.getRootCauseMessage(t);
-            throw SQLError.UNEXPECTED_THROWABLE.raiseException(t, message);
+            throw SQLError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
         }
     }
     
@@ -66,15 +66,15 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 
         } catch (ScriptExecutionException se) {
         	String message = ExceptionUtil.getRootCauseMessage(se);
-            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se, message);
+            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
         }
         catch (OutputDisabledError t) {
         	String message = ExceptionUtil.getRootCauseMessage(t);
-        	throw SQLError.USING_STDOUT_FROM_UPDATE.raiseException(t, message);
+        	throw SQLError.USING_STDOUT_FROM_UPDATE.raiseSQLException(t, message);
         }
         catch (Throwable t) {
         	String message = ExceptionUtil.getRootCauseMessage(t);
-            throw SQLError.UNEXPECTED_THROWABLE.raiseException(t, message);
+            throw SQLError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
         }
     }
 
@@ -100,10 +100,10 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 			return resultSets;
         } catch (ScriptExecutionException se) {
         	String message = ExceptionUtil.getRootCauseMessage(se);
-            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseException(se, message);
+            throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
         } catch (Throwable t) {
         	String message = ExceptionUtil.getRootCauseMessage(t);
-            throw SQLError.UNEXPECTED_THROWABLE.raiseException(t, message);
+            throw SQLError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
         }
     }
 

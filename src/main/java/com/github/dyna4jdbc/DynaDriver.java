@@ -51,7 +51,7 @@ public class DynaDriver implements java.sql.Driver {
 	public Connection connect(String url, Properties info) throws SQLException {
 
 		if (!acceptsURL(url)) {
-			SQLError.CONNECT_FAILED_INVALID_URL.raiseException(url);
+			SQLError.CONNECT_FAILED_INVALID_URL.raiseSQLException(url);
 		}
 
 		String factoryConfiguration = url.replace(JDBC_URL_PREFIX, "");
