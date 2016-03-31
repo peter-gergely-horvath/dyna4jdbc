@@ -56,7 +56,7 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	for(DataColumn column : dataTable.columnIterable() ) {
     		TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(columnIndex++, column);
     		if (typeHandler == null) {
-    			throw SQLError.raiseInternalIllegalStateRuntimeException("typeHandler is null");
+    			throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("typeHandler is null");
     		}
 
     		typeHandlerList.add(typeHandler);
@@ -100,7 +100,7 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     		
     		ColumnMetadata columnMetadata = typeHandler.getColumnMetadata();
     		if (columnMetadata == null) {
-    			throw SQLError.raiseInternalIllegalStateRuntimeException("columnMetadata is null");
+    			throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("columnMetadata is null");
     		}
     		
     		String columnLabel = columnMetadata.getColumnLabel();

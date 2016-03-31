@@ -30,7 +30,7 @@ public enum SQLError {
 
     @Override
     public String toString() {
-        return String.format("%s SQLError [%s]", DynaDriver.DRIVER_SHORT_NAME, this.name());
+        return String.format("%s error [%s]", DynaDriver.DRIVER_SHORT_NAME, this.name());
     }
     
     protected String getMessageTemplate() {
@@ -44,8 +44,13 @@ public enum SQLError {
     public SQLException raiseSQLException(Object... params) throws SQLException {
         throw new SQLException(String.format(getMessageTemplate(), params));
     }
-
-    public static RuntimeException raiseInternalIllegalStateRuntimeException(Object... params) {
-        throw new IllegalStateException(String.format(DRIVER_BUG_UNEXPECTED_STATE.getMessageTemplate(), params));
+    
+    public RuntimeDyna4JdbcException raiseUncheckedException(Exception ex, Object... params) throws RuntimeDyna4JdbcException {
+        throw new RuntimeDyna4JdbcException(String.format(getMessageTemplate(), params), ex);
     }
+    
+    public RuntimeDyna4JdbcException raiseUncheckedException(Object... params) throws RuntimeDyna4JdbcException {
+    	throw new RuntimeDyna4JdbcException(String.format(getMessageTemplate(), params));
+    }
+
 }

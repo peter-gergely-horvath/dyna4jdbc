@@ -31,7 +31,8 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 		Iterator<String> iterator = columnValuesIterable.iterator();
 
 		if (!iterator.hasNext()) {
-			throw SQLError.raiseInternalIllegalStateRuntimeException("iterator is empty: could not extract header value");
+			throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+					"iterator is empty: could not extract header value");
 		}
 		
 		String firstValue = iterator.next();

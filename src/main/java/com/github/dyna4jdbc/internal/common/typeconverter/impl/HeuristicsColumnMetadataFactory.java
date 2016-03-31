@@ -101,7 +101,8 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 			break;
 
 		default:
-			throw SQLError.raiseInternalIllegalStateRuntimeException("Unexpected columnType: " + newColumnType);
+			throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+					"Unexpected columnType: " + newColumnType);
 		}
 		return newColumnType;
 	}

@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.OutputDisabledError;
+import com.github.dyna4jdbc.internal.RuntimeDyna4JdbcException;
 import com.github.dyna4jdbc.internal.SQLError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
@@ -43,12 +44,18 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 			
 			return outputHandler.getResultSet();
 			
-        } catch (ScriptExecutionException se) {
+        } 
+        catch (ScriptExecutionException se) {
         	String message = ExceptionUtil.getRootCauseMessage(se);
             throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
-        } catch (SQLException sqle) {
+        } 
+        catch (SQLException sqle) {
             throw sqle;
-        } catch (Throwable t) {
+        } 
+        catch (RuntimeDyna4JdbcException ex) {
+            throw new SQLException(ex.getMessage(), ex);
+        }
+        catch (Throwable t) {
         	String message = ExceptionUtil.getRootCauseMessage(t);
             throw SQLError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
         }
@@ -64,9 +71,13 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 			
 			return outputHandler.getUpdateCount();
 
-        } catch (ScriptExecutionException se) {
+        } 
+        catch (ScriptExecutionException se) {
         	String message = ExceptionUtil.getRootCauseMessage(se);
             throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
+        } 
+        catch (RuntimeDyna4JdbcException ex) {
+            throw new SQLException(ex.getMessage(), ex);
         }
         catch (OutputDisabledError t) {
         	String message = ExceptionUtil.getRootCauseMessage(t);
@@ -98,10 +109,15 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 			}
 			
 			return resultSets;
-        } catch (ScriptExecutionException se) {
+        }
+        catch (ScriptExecutionException se) {
         	String message = ExceptionUtil.getRootCauseMessage(se);
             throw SQLError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
-        } catch (Throwable t) {
+        }
+        catch (RuntimeDyna4JdbcException ex) {
+            throw new SQLException(ex.getMessage(), ex);
+        }
+        catch (Throwable t) {
         	String message = ExceptionUtil.getRootCauseMessage(t);
             throw SQLError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
         }
