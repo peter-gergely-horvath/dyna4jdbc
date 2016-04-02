@@ -1,7 +1,5 @@
 package com.github.dyna4jdbc.internal;
 
-import com.github.dyna4jdbc.DynaDriver;
-
 import java.sql.SQLException;
 
 public enum SQLError {
@@ -30,11 +28,11 @@ public enum SQLError {
 
     @Override
     public String toString() {
-        return String.format("%s error [%s]", DynaDriver.DRIVER_SHORT_NAME, this.name());
+        return String.format("JDBC Error [%s]", this.name());
     }
     
     protected String getMessageTemplate() {
-    	return String.format("%s error [%s]: %s", DynaDriver.DRIVER_SHORT_NAME, this.name(), this.message);
+    	return String.format("JDBC Error [%s]: %s", this.name(), this.message);
     }
 
     public SQLException raiseSQLException(Exception ex, Object... params) throws SQLException {

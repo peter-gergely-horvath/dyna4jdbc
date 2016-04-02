@@ -15,13 +15,19 @@ import com.github.dyna4jdbc.internal.config.impl.DriverPropertyInfoFactory;
 
 public class DynaDriver implements java.sql.Driver {
 
-	public static final int DRIVER_VERSION_MAJOR = 0;
-	public static final int DRIVER_VERSION_MINOR = 5;
+	public static final int DRIVER_VERSION_MAJOR;
+	public static final int DRIVER_VERSION_MINOR;
 
-	public static final String DRIVER_SHORT_NAME = "Dyna4JDBC";
-	public static final String DRIVER_NAME = String.format("%s Dynamic Languages For JDBC Driver", DRIVER_SHORT_NAME);
-	public static final String DRIVER_VERSION = String.format("%s.%s", DRIVER_VERSION_MAJOR, DRIVER_VERSION_MINOR);
-
+	public static final String DRIVER_NAME;
+	
+	static {
+		DriverInfo driverInfo = DriverInfo.getInstance();
+		
+		DRIVER_NAME = driverInfo.getProductName();
+		DRIVER_VERSION_MAJOR = driverInfo.getMajorVersion();
+		DRIVER_VERSION_MINOR = driverInfo.getMinorVersion();
+	}
+	
 
 	private static final String JDBC_URL_PREFIX = "jdbc:dyna4jdbc:";
 
@@ -54,8 +60,11 @@ public class DynaDriver implements java.sql.Driver {
 			SQLError.CONNECT_FAILED_INVALID_URL.raiseSQLException(url);
 		}
 
-		String factoryConfiguration = url.replace(JDBC_URL_PREFIX, "");
 		
+		/* strip JDBC URL prefix from connection string and 
+		 * delegate the remaining section to the connection factory */
+		String factoryConfiguration = url.substring(JDBC_URL_PREFIX.length());
+
 		return connectionFactory.newConnection(factoryConfiguration, info);
 	}
 

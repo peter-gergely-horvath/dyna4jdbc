@@ -26,7 +26,7 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> implements 
 	}
 
 	public String getDriverVersion() throws SQLException {
-	    return DynaDriver.DRIVER_VERSION;
+		return String.format("%s.%s", getDriverMajorVersion(), getDriverMinorVersion());
 	}
 
 	public int getDriverMajorVersion() {
