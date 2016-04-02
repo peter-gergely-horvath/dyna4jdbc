@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
 
-import com.github.dyna4jdbc.internal.UnexpectedIllegalStateReachedException;
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
 
@@ -218,7 +218,7 @@ class DefaultTypeHandler extends AbstractTypeHandler {
 		
 		SQLDataType columnType = columnMetadata.getColumnType();
 		if(columnType == null) {
-			throw UnexpectedIllegalStateReachedException.forMessage("columnType is null");
+			throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("columnType is null");
 		}
 		
 		Class<?> targetClass = map.get(columnType.name);
