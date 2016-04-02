@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 

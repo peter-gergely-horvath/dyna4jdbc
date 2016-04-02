@@ -205,7 +205,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Byte convertedValue = typeHandler.covertToByte(rawCellValue);
-    		return setWasNullBasedOnLastValue(convertedValue);
+    		
+    		Byte returnValue = setWasNullBasedOnLastValue(convertedValue);
+    		
+    		return returnValue != null ? returnValue.byteValue() : 0x0;
 
     	} catch(TypeConversionException tce) {
     		throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
@@ -220,8 +223,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Short convertedValue = typeHandler.covertToShort(rawCellValue);
-    		return setWasNullBasedOnLastValue(convertedValue);
+    		Short returnValue = setWasNullBasedOnLastValue(convertedValue);
 
+    		return returnValue != null ? returnValue.shortValue() : 0;
+    		
     	} catch(TypeConversionException tce) {
     		throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
     				tce, getRow(), columnIndex, rawCellValue, "short");
@@ -235,7 +240,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Integer convertedValue = typeHandler.covertToInteger(rawCellValue);
-    		return setWasNullBasedOnLastValue(convertedValue);
+    		
+    		Integer returnValue = setWasNullBasedOnLastValue(convertedValue);
+    		
+    		return returnValue != null ? returnValue.intValue() : 0;
 
     	} catch(TypeConversionException tce) {
     		throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
@@ -250,7 +258,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Long convertedValue = typeHandler.covertToLong(rawCellValue);
-    		return setWasNullBasedOnLastValue(convertedValue);
+    		
+    		Long returnValue = setWasNullBasedOnLastValue(convertedValue);
+    		
+    		return returnValue != null ? returnValue.longValue() : 0L;
 
     	} catch(TypeConversionException tce) {
     		throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
@@ -265,7 +276,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Float convertedValue = typeHandler.covertToFloat(rawCellValue);
-    		return setWasNullBasedOnLastValue(convertedValue);
+    		
+    		Float returnValue = setWasNullBasedOnLastValue(convertedValue);
+    		
+    		return returnValue != null ? returnValue.floatValue() : 0.0f;
 
     	} catch(TypeConversionException tce) {
     		throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
@@ -280,7 +294,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		Double convertedValue = typeHandler.covertToDouble(rawCellValue);
-    		return setWasNullBasedOnLastValue(convertedValue);
+    		
+    		Double returnValue = setWasNullBasedOnLastValue(convertedValue);
+    		
+    		return returnValue != null ? returnValue.doubleValue() : 0.0d;
 
     	} catch(TypeConversionException tce) {
     		throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
@@ -310,7 +327,10 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
     	try {
     		TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
     		byte[] convertedValue = typeHandler.covertToByteArray(rawCellValue);
-    		return setWasNullBasedOnLastValue(convertedValue);
+    		
+    		byte[] returnValue = setWasNullBasedOnLastValue(convertedValue);
+    		
+    		return returnValue != null ? returnValue : new byte[0];
 
     	} catch(TypeConversionException tce) {
     		throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
