@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
 import com.github.dyna4jdbc.internal.common.util.collection.AlwaysSkipFirstElementIterable;
 import com.github.dyna4jdbc.internal.config.Configuration;
@@ -31,7 +31,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 		Iterator<String> iterator = columnValuesIterable.iterator();
 
 		if (!iterator.hasNext()) {
-			throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+			throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
 					"iterator is empty: could not extract header value");
 		}
 		
@@ -68,7 +68,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 		try {
 			Matcher matcher = SQL_TYPE_PATTERN.matcher(sqlTypeConfig);
 			if(! matcher.matches()) {
-				throw SQLError.INVALID_CONFIGURATION_HEADER.raiseSQLException(sqlTypeConfig);
+				throw JDBCError.INVALID_CONFIGURATION_HEADER.raiseSQLException(sqlTypeConfig);
 			}
 			
 			String sqlTypePart = matcher.group(1);

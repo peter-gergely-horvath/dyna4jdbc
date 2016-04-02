@@ -2,7 +2,7 @@ package com.github.dyna4jdbc.internal;
 
 import java.sql.SQLException;
 
-public enum SQLError {
+public enum JDBCError {
 
     CONNECT_FAILED_INVALID_URL("Invalid URL: %s"),
     CONNECT_FAILED_GENERIC("Failed to connect: %s (examine stack trace for details)"),
@@ -22,7 +22,7 @@ public enum SQLError {
 
     private final String message;
 
-    SQLError(String message) {
+    JDBCError(String message) {
         this.message = message;
     }
 

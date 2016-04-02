@@ -2,7 +2,7 @@ package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import java.sql.SQLException;
 
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 
 public class BasicSQLObject extends AbstractWrapper {
 
@@ -14,7 +14,7 @@ public class BasicSQLObject extends AbstractWrapper {
 
     protected final void checkNotClosed(String objectIdentifier) throws SQLException {
         if(closed) {
-            throw SQLError.OBJECT_CLOSED.raiseSQLException(objectIdentifier);
+            throw JDBCError.OBJECT_CLOSED.raiseSQLException(objectIdentifier);
         }
     }
 

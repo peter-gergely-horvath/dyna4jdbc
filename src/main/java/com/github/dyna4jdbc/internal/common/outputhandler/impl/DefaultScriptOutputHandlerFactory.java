@@ -7,7 +7,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet;
 import com.github.dyna4jdbc.internal.common.outputhandler.MultiTypeScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
@@ -112,7 +112,7 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 
 			if (resultSets.size() > 1) {
 
-				throw SQLError.RESULT_SET_MULTIPLE_EXPECTED_ONE.raiseSQLException(resultSets.size());
+				throw JDBCError.RESULT_SET_MULTIPLE_EXPECTED_ONE.raiseSQLException(resultSets.size());
 
 			} else {
 				return resultSets.get(0);

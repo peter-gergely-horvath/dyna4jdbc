@@ -14,7 +14,7 @@ import java.sql.SQLXML;
 import java.sql.Statement;
 import java.util.Iterator;
 
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.base.GuardedResultSetState.State;
 
 public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
@@ -65,13 +65,13 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
             }
 
             case AFTER_LAST: {
-                throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Calling next() in state " + currentState);
+                throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Calling next() in state " + currentState);
             }
 
 
 
             default:
-                throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException("Unexpected currentState: " + currentState);
+                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException("Unexpected currentState: " + currentState);
         }
     }
 
@@ -89,7 +89,7 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     
     protected T getCurrentRow() throws SQLException {
         if (currentRow == null) {
-            throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
                     "currentRow is null in state: " + resultSetState);
         }
         
@@ -119,7 +119,7 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
 
     @Override
     public boolean isFirst() throws SQLException {
-     	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#isFirst()");
+     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#isFirst()");
     }
 
     @Override
@@ -129,22 +129,22 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
 
     @Override
     public void beforeFirst() throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#beforeFirst()");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#beforeFirst()");
     }
 
     @Override
     public void afterLast() throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#afterLast()");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#afterLast()");
     }
     
     @Override
     public boolean first() throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#first()");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#first()");
     }
 
     @Override
     public boolean last() throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#last()");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#last()");
     }
 
     @Override
@@ -168,19 +168,19 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     
     @Override
     public boolean absolute(int row) throws SQLException {
-        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"Moving cursor by absolute(int)");
     }
 
     @Override
     public boolean relative(int rows) throws SQLException {
-        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"Moving cursor by relative(int)");
     }
 
     @Override
     public boolean previous() throws SQLException {
-        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"Moving cursor by previous()");
     }
     
@@ -189,12 +189,12 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     	if(direction != ResultSet.FETCH_FORWARD &&
     			direction != ResultSet.FETCH_REVERSE && 
     			direction != ResultSet.FETCH_UNKNOWN) {
-    		SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+    		JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
     				"Invalid direction:" + direction);
     	}
     	
     	if(direction != ResultSet.FETCH_FORWARD) {
-    		SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+    		JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
     				"Only FETCH_FORWARD fetch direction is supported: " + direction);
     	}
     }
@@ -207,7 +207,7 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     @Override
     public void setFetchSize(int rows) throws SQLException {
         if(rows < 0) {
-        	SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+        	JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
     				"Negative fetch size: " + rows);
         }
         this.fetchSize = rows;
@@ -236,82 +236,82 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     
     @Override
     public RowId getRowId(int columnIndex) throws SQLException {
-        throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.RowId");
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.RowId");
     }
 
     @Override
     public RowId getRowId(String columnLabel) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.RowId");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.RowId");
     }
     
     @Override
     public Ref getRef(int columnIndex) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Ref");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Ref");
     }
     
     @Override
     public Ref getRef(String columnLabel) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Ref");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Ref");
     }
     
     @Override
     public Blob getBlob(int columnIndex) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
     }
 
     @Override
     public Clob getClob(int columnIndex) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Clob");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Clob");
     }
 
     @Override
     public Array getArray(int columnIndex) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Array");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Array");
     }
     
     @Override
     public Blob getBlob(String columnLabel) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
     }
 
     @Override
     public Clob getClob(String columnLabel) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Clob");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Clob");
     }
 
     @Override
     public Array getArray(String columnLabel) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
     }
     
     @Override
     public NClob getNClob(int columnIndex) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.NClob");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.NClob");
     }
 
     @Override
     public NClob getNClob(String columnLabel) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.NClob");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.NClob");
     }
 
     @Override
     public SQLXML getSQLXML(int columnIndex) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.SQLXML");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.SQLXML");
     }
 
     @Override
     public SQLXML getSQLXML(String columnLabel) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.SQLXML");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.SQLXML");
     }
 
     @Override
     public String getNString(int columnIndex) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNString(int)");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNString(int)");
     }
 
     @Override
     public String getNString(String columnLabel) throws SQLException {
-    	throw SQLError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNString(String)");
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNString(String)");
     }
 
     @Override

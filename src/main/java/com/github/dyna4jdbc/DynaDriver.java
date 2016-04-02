@@ -9,7 +9,7 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.config.impl.DriverPropertyInfoFactory;
 
 
@@ -57,7 +57,7 @@ public class DynaDriver implements java.sql.Driver {
 	public Connection connect(String url, Properties info) throws SQLException {
 
 		if (!acceptsURL(url)) {
-			SQLError.CONNECT_FAILED_INVALID_URL.raiseSQLException(url);
+			JDBCError.CONNECT_FAILED_INVALID_URL.raiseSQLException(url);
 		}
 
 		

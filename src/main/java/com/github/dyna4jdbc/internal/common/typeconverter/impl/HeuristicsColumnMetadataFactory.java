@@ -1,6 +1,6 @@
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata.Nullability;
@@ -101,7 +101,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 			break;
 
 		default:
-			throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+			throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
 					"Unexpected columnType: " + newColumnType);
 		}
 		return newColumnType;

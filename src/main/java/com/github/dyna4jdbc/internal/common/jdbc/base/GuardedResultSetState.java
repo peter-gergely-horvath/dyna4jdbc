@@ -1,6 +1,6 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -39,7 +39,7 @@ class GuardedResultSetState {
 
     void transitionTo(State newState) throws SQLException {
         if(!currentState.validTransitions.contains(newState)) {
-            throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
                     "Transitioning from " + currentState + " to " + newState + " is illegal");
         }
 
@@ -48,7 +48,7 @@ class GuardedResultSetState {
 
     void checkValidStateForRowAccess() throws SQLException {
         if(currentState != State.ITERATING_OVER_RESULTS) {
-            throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "Performing this operation in state " + currentState + " is illegal");
         }
     }

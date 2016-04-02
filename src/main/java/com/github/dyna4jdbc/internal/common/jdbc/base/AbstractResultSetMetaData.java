@@ -4,7 +4,7 @@ package com.github.dyna4jdbc.internal.common.jdbc.base;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 
 public abstract class AbstractResultSetMetaData implements ResultSetMetaData {
 
@@ -55,7 +55,7 @@ public abstract class AbstractResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("unwrap of " + iface);
+        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("unwrap of " + iface);
     }
 
     @Override

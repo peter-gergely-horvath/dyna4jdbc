@@ -12,7 +12,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
@@ -33,7 +33,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
     public ScriptEngineConnection(String parameters, Properties properties) throws SQLException
     {
         if(parameters == null || "".equals(parameters.trim())) {
-        	throw SQLError.INVALID_CONFIGURATION.raiseSQLException(
+        	throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(
         			"Scrip Engine Name not specified");
         }
 
@@ -43,7 +43,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
         String configurationString = engineNameAndParameters.length == 2 ? engineNameAndParameters[1] : null;
 
         if(engineName == null || "".equals(engineName.trim())) {
-        	throw SQLError.INVALID_CONFIGURATION.raiseSQLException(
+        	throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(
         			"Scrip Engine Name is not specified");
         }
 
@@ -60,7 +60,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
 		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 		ScriptEngine se = scriptEngineManager.getEngineByName(engineName);
         if(se == null) {
-        	throw SQLError.INVALID_CONFIGURATION.raiseSQLException(
+        	throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(
         			"ScriptEngine not found: " + engineName);
         }
         

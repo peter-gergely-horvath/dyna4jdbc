@@ -1,7 +1,7 @@
 package com.github.dyna4jdbc;
 
 import com.github.dyna4jdbc.internal.MisconfigurationSQLException;
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtil;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScriptEngineConnection;
@@ -32,12 +32,12 @@ class ConnectionFactory {
 		catch (MisconfigurationSQLException ex)
 		{
 			String causeMessage = ExceptionUtil.getRootCauseMessage(ex);
-			throw SQLError.INVALID_CONFIGURATION.raiseSQLException(ex, causeMessage);
+			throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(ex, causeMessage);
 		}
 		catch (Exception ex)
 		{
 			String causeMessage = ExceptionUtil.getRootCauseMessage(ex);
-			throw SQLError.CONNECT_FAILED_GENERIC.raiseSQLException(ex, causeMessage);
+			throw JDBCError.CONNECT_FAILED_GENERIC.raiseSQLException(ex, causeMessage);
 		}
 	}
 

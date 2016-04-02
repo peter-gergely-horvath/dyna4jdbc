@@ -1,6 +1,6 @@
 package com.github.dyna4jdbc.internal.common.jdbc.generic;
 
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractResultSetMetaData;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata.Nullability;
@@ -28,14 +28,14 @@ public class DataTableHolderResultSetMetaData extends AbstractResultSetMetaData 
 		final int javaIndex = sqlColumnIndex - 1;
 
 		if (javaIndex < 0 || javaIndex >= getColumnCount()) {
-			throw SQLError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Invalid column index: " + sqlColumnIndex);
+			throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Invalid column index: " + sqlColumnIndex);
 		}
 
 		TypeHandler typeHandler = typeHandlerList.get(javaIndex);
 
 		ColumnMetadata columnMetadata = typeHandler.getColumnMetadata();
 		if (columnMetadata == null) {
-			throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException("columnMetadata is null");
+			throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException("columnMetadata is null");
 		}
 
 		return columnMetadata;
@@ -52,7 +52,7 @@ public class DataTableHolderResultSetMetaData extends AbstractResultSetMetaData 
 		// adapt our non-JDBC specific Nullability to JDBC API values 
 		Nullability nullability = getColumnMetadataBySqlIndex(column).getNullability();
 		if(nullability == null) {
-			throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+			throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
 					"Column Nullability indicator is null.");
 		}
 
@@ -67,7 +67,7 @@ public class DataTableHolderResultSetMetaData extends AbstractResultSetMetaData 
 			return ResultSetMetaData.columnNullableUnknown;
 
 		default:
-			throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+			throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
 					"Unknown Nullability value: " + nullability);
 		}
 	}
@@ -117,7 +117,7 @@ public class DataTableHolderResultSetMetaData extends AbstractResultSetMetaData 
 		if(columnTypeName == null) {
 			SQLDataType columnType = getColumnMetadataBySqlIndex(column).getColumnType();
 			if(columnType == null) {
-				throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+				throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
 						"columnType is null");
 			}
 			
@@ -137,7 +137,7 @@ public class DataTableHolderResultSetMetaData extends AbstractResultSetMetaData 
 		if(columnClass == null) {
 			SQLDataType columnType = getColumnMetadataBySqlIndex(column).getColumnType();
 			if(columnType == null) {
-				throw SQLError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+				throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
 						"columnType is null");
 			}
 			

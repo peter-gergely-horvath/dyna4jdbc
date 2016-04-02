@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import com.github.dyna4jdbc.internal.SQLError;
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 
@@ -38,13 +38,13 @@ public class DefaultConfigurationFactory implements ConfigurationFactory {
 		
 		for(Object propKey : props.keySet()) {
 			if(!(propKey instanceof java.lang.String)) {
-				throw SQLError.INVALID_CONFIGURATION.raiseSQLException(
+				throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(
 						"properties should only contain String keys!");
 			} else {
 				String key = (String)propKey;
 				
 				if(internalPropops.containsKey(key)) {
-					throw SQLError.INVALID_CONFIGURATION.raiseSQLException(
+					throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(
 							"duplicated configuration between JDBC URL and properties: %s", key);
 				}
 				
