@@ -77,8 +77,8 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 				shouldTakeFirstRowValue = thisTypeHandlerTakesFirstRowValue;
 			} else {
 				if(shouldTakeFirstRowValue != thisTypeHandlerTakesFirstRowValue) {
-					// inconsistent header definition
-					throw new IllegalStateException("Column header type mismatch");
+					JDBCError.INCONSISTENT_HEADER_SPECIFICATION.raiseUncheckedException(
+							"Column header type mismatch");
 				}
 			}
 		}
@@ -706,7 +706,7 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
     	} catch(TypeConversionException tce) {
     		throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
-    				tce, getRow(), columnIndex, rawCellValue, java.net.URL.class);
+    				tce, getRow(), columnIndex, rawCellValue, type);
     	}
     }
 

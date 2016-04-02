@@ -16,6 +16,7 @@ import java.util.Map;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
+import com.github.dyna4jdbc.internal.common.typeconverter.TypeConverter;
 
 class DefaultTypeHandler extends AbstractTypeHandler {
 	
@@ -25,125 +26,48 @@ class DefaultTypeHandler extends AbstractTypeHandler {
 	
 	@Override
 	public String covertToString(String rawCellValue) throws TypeConversionException {
-		return rawCellValue;
+		return TypeConverterRegistry.STRING.convert(rawCellValue);
 	}
 
 	@Override
 	public Boolean covertToBoolean(String rawCellValue) throws TypeConversionException {
-
-		if (rawCellValue == null) {
-			return null;
-		}
-		
-		switch (rawCellValue.trim()) {
-		case "0":
-			return Boolean.FALSE;
-		
-		case "1":
-			return Boolean.TRUE;
-
-		default:
-			return Boolean.valueOf(rawCellValue);
-		}
+		return TypeConverterRegistry.BOOLEAN.convert(rawCellValue);
 	}
 
 	@Override
 	public Byte covertToByte(String rawCellValue) throws TypeConversionException {
-
-		try {
-			if (rawCellValue == null) {
-				return null;
-			}
-
-			return Byte.decode(rawCellValue);
-
-		} catch (NumberFormatException nfe) {
-			throw new TypeConversionException(nfe);
-		}
+		return TypeConverterRegistry.BYTE.convert(rawCellValue);
 	}
 
 	@Override
 	public Short covertToShort(String rawCellValue) throws TypeConversionException {
-
-		try {
-			if (rawCellValue == null) {
-				return null;
-			}
-
-			return Short.decode(rawCellValue);
-
-		} catch (NumberFormatException nfe) {
-			throw new TypeConversionException(nfe);
-		}
+		return TypeConverterRegistry.SHORT.convert(rawCellValue);
 	}
 
 	@Override
 	public Integer covertToInteger(String rawCellValue) throws TypeConversionException {
-		try {
-			if (rawCellValue == null) {
-				return null;
-			}
-
-			return Integer.decode(rawCellValue);
-
-		} catch (NumberFormatException nfe) {
-			throw new TypeConversionException(nfe);
-		}
+		return TypeConverterRegistry.INTEGER.convert(rawCellValue);
 	}
+
 
 	@Override
 	public Long covertToLong(String rawCellValue) throws TypeConversionException {
-		try {
-			if (rawCellValue == null) {
-				return null;
-			}
-
-			return Long.decode(rawCellValue);
-
-		} catch (NumberFormatException nfe) {
-			throw new TypeConversionException(nfe);
-		}
+		return TypeConverterRegistry.LONG.convert(rawCellValue);
 	}
 
 	@Override
 	public Float covertToFloat(String rawCellValue) throws TypeConversionException {
-		try {
-			if (rawCellValue == null) {
-				return null;
-			}
-
-			return Float.valueOf(rawCellValue);
-
-		} catch (NumberFormatException nfe) {
-			throw new TypeConversionException(nfe);
-		}
+		return TypeConverterRegistry.FLOAT.convert(rawCellValue);
 	}
 
 	@Override
 	public Double covertToDouble(String rawCellValue) throws TypeConversionException {
-		try {
-			if (rawCellValue == null) {
-				return null;
-			}
-
-			return Double.valueOf(rawCellValue);
-
-		} catch (NumberFormatException nfe) {
-			throw new TypeConversionException(nfe);
-		}
+		return TypeConverterRegistry.DOUBLE.convert(rawCellValue);
 	}
 
 	@Override
 	public BigDecimal covertToBigDecimal(String rawCellValue) throws TypeConversionException {
-		try {
-			if (rawCellValue == null) {
-				return null;
-			}
-
-			return new BigDecimal(rawCellValue);
-		} catch (NumberFormatException nfe) {
-			throw new TypeConversionException(nfe);
-		}
+		return TypeConverterRegistry.BIGDECIMAL.convert(rawCellValue);
 	}
 	
 	@Override
@@ -153,64 +77,33 @@ class DefaultTypeHandler extends AbstractTypeHandler {
 				return null;
 			}
 
-			BigDecimal bigDecimal = new BigDecimal(rawCellValue);
+			BigDecimal bigDecimal = covertToBigDecimal(rawCellValue);
 			bigDecimal.setScale(scale);
 			
 			return bigDecimal;
-		} catch (NumberFormatException nfe) {
+		} catch (ArithmeticException nfe) {
 			throw new TypeConversionException(nfe);
 		}
 	}
 
 	@Override
 	public byte[] covertToByteArray(String rawCellValue) throws TypeConversionException {
-
-		if (rawCellValue == null) {
-			return null;
-		}
-
-		return rawCellValue.getBytes();
+		return TypeConverterRegistry.BYTE_ARRAY.convert(rawCellValue);
 	}
 
 	@Override
 	public Date covertToDate(String rawCellValue) throws TypeConversionException {
-
-		try {
-			if (rawCellValue == null) {
-				return null;
-			}
-
-			return Date.valueOf(rawCellValue);
-		} catch (IllegalArgumentException e) {
-			throw new TypeConversionException(e);
-		}
+		return TypeConverterRegistry.DATE.convert(rawCellValue);
 	}
 
 	@Override
 	public Time covertToTime(String rawCellValue) throws TypeConversionException {
-
-		try {
-			if (rawCellValue == null) {
-				return null;
-			}
-
-			return Time.valueOf(rawCellValue);
-		} catch (IllegalArgumentException e) {
-			throw new TypeConversionException(e);
-		}
+		return TypeConverterRegistry.TIME.convert(rawCellValue);
 	}
 
 	@Override
 	public Timestamp covertToTimestamp(String rawCellValue) throws TypeConversionException {
-		try {
-			if (rawCellValue == null) {
-				return null;
-			}
-
-			return Timestamp.valueOf(rawCellValue);
-		} catch (IllegalArgumentException e) {
-			throw new TypeConversionException(e);
-		}
+		return TypeConverterRegistry.TIMESTAMP.convert(rawCellValue);
 	}
 
 	@Override
@@ -223,8 +116,8 @@ class DefaultTypeHandler extends AbstractTypeHandler {
 		
 		Class<?> targetClass = map.get(columnType.name);
 		if(targetClass == null) {
-			throw new TypeConversionException("No Java type is defined for mapping from SQL type : " + 
-					columnType.name);
+			throw TypeConversionException.forMessage(
+					"Mapping to %s is not supported.", targetClass);
 		}
 		
 		return covertToObject(rawCellValue, targetClass);
@@ -253,7 +146,14 @@ class DefaultTypeHandler extends AbstractTypeHandler {
 
 	@Override
 	public <T> T covertToObject(String rawCellValue, Class<T> type) throws TypeConversionException {
-		throw new TypeConversionException("Conversion not implemented to: " + type);
+		
+		TypeConverter<T> typeConverter = TypeConverterRegistry.getTypeConverterForClass(type);
+		if(typeConverter == null) {
+			throw new TypeConversionException("Conversion to the requested type is not supported: " + type);
+					
+		}
+		
+		return typeConverter.convert(rawCellValue);
 	}
 
 	@Override

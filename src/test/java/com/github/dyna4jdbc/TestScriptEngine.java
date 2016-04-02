@@ -3,7 +3,7 @@ package com.github.dyna4jdbc;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -21,6 +21,8 @@ public class TestScriptEngine {
 
         Statement statement = connection.createStatement();
 
+        
+        
         statement.executeUpdate("var msg = '123\tHello World\tI am here!'");
 
         String script = "print('42\tFoo\tBar') ; print(msg)";
@@ -39,11 +41,13 @@ public class TestScriptEngine {
                 ResultSetMetaData metaData = rs.getMetaData();
 				int columnCount = metaData.getColumnCount();
 
+
+				
                 while (rs.next()) {
 
                     for(int i=1; i<=columnCount; i++ ) {
                     	String columnLabel = metaData.getColumnLabel(i);
-                    	System.out.format("%s ", rs.getString(columnLabel));
+                    	System.out.format("%s ", rs.getObject(i,  String.class));
                     }
                     System.out.println();
                 }
