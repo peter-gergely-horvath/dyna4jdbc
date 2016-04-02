@@ -16,6 +16,9 @@ class DefaultColumnMetadata implements ColumnMetadata {
 	private SQLDataType columnType;
 	private String columnTypeName;
 	private Class<?> columnClass;
+	private String formatString;
+
+
 
 	@Override
 	public boolean isTakesFirstRowValue() {
@@ -76,6 +79,11 @@ class DefaultColumnMetadata implements ColumnMetadata {
 	public Class<?> getColumnClass() {
 		return columnClass;
 	}
+	
+	@Override
+	public String getFormatString() {
+		return formatString;
+	}
 
 	public void setTakesFirstRowValue(boolean takesFirstRowValue) {
 		this.takesFirstRowValue = takesFirstRowValue;
@@ -134,7 +142,10 @@ class DefaultColumnMetadata implements ColumnMetadata {
 
 	public void setColumnClass(Class<?> columnClass) {
 		this.columnClass = columnClass;
-
+	}
+	
+	public void setFormatString(String formatString) {
+		this.formatString = formatString;
 	}
 
 	@Override
@@ -165,6 +176,8 @@ class DefaultColumnMetadata implements ColumnMetadata {
 		sb.append(columnTypeName);
 		sb.append(",\ncolumnClass=");
 		sb.append(columnClass);
+		sb.append(",\nformatString=");
+		sb.append(formatString);
 		sb.append("]");
 		return sb.toString();
 	}

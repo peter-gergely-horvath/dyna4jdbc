@@ -1,7 +1,9 @@
 package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.Locale;
 
 import com.github.dyna4jdbc.internal.OutputDisabledError;
 
@@ -100,14 +102,15 @@ public class DisallowAllWritesPrintWriter extends java.io.PrintWriter {
     	throw raiseError();
     }
 
-    public java.io.PrintWriter format(java.util.Locale arg1, java.lang.String arg2, java.lang.Object[] arg3) {
+
+    public java.io.PrintWriter format(Locale l, String format, Object ... args) {
     	throw raiseError();
     }
 
-    public java.io.PrintWriter format(java.lang.String arg1, java.lang.Object[] arg2) {
+    public PrintWriter format(String format, Object ... args) {
     	throw raiseError();
     }
-
+    
     public void write(char[] arg1, int arg2, int arg3) {
         raiseError();
     }

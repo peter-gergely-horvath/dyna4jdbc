@@ -13,6 +13,8 @@ public enum JDBCError {
     UNEXPECTED_THROWABLE("Processing failed; caught unexpected exception: %s"),
     RESULT_SET_MULTIPLE_EXPECTED_ONE("Expected one result set, but script produced %s result sets."),
     INCONSISTENT_HEADER_SPECIFICATION("Inconsistent header specification: %s"),
+    FORMAT_STRING_UNEXPECTED_FOR_COLUMN_TYPE("Format string '%s' unexpected for column type: %s"),
+    FORMAT_STRING_INVALID("Format string '%s' is illegal: %s"),
     JDBC_FUNCTION_NOT_SUPPORTED("This JDBC API function is not supported: %s"),
     USING_STDOUT_FROM_UPDATE("Using standard output from an update call is not permitted"),
     UNSUPPORTED_CONVERSION("Conversion of value '%s' to the requeste type is not possible %s"),

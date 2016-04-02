@@ -29,5 +29,6 @@ public interface ColumnMetadata {
     String getColumnTypeName();
 
     Class<?> getColumnClass();
-
+    
+	String getFormatString();
 }

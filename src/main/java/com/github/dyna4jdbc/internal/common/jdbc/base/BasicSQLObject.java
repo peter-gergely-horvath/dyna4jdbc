@@ -25,11 +25,14 @@ public class BasicSQLObject extends AbstractWrapper {
 	}
 
 	public void close() throws SQLException {
-		closed.set(true);
-
-		closeChildObjects(children);
+		if(!closed.get()) {
 		
-		children.clear();
+			closed.set(true);
+
+			closeChildObjects(children);
+			
+			children.clear();
+		}
 	}
 
 	private static void closeChildObjects(Iterable<BasicSQLObject> childSQLObjects) throws SQLException {

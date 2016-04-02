@@ -2,9 +2,9 @@ package com.github.dyna4jdbc.internal.config.impl;
 
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.util.config.ConfigurationUtil;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 
@@ -22,19 +22,7 @@ public class DefaultConfigurationFactory implements ConfigurationFactory {
 		ConfigurationImpl configuration = new ConfigurationImpl();
 		
 		
-		Properties internalPropops = new Properties();
-		
-		if(config != null) {
-		     StringTokenizer st = new StringTokenizer(config, ";");
-		     while (st.hasMoreTokens()) {
-		         String keyValuePair = st.nextToken();
-		         String[] keyAndValue = keyValuePair.split("=", 2);
-		         String key = keyAndValue[0];
-		         String value = keyAndValue.length == 2 ? keyAndValue[1] : null;
-		         
-		         internalPropops.setProperty(key, value);
-		     }
-		}
+		Properties internalPropops = ConfigurationUtil.readStringToProperties(config);
 		
 		for(Object propKey : props.keySet()) {
 			if(!(propKey instanceof java.lang.String)) {
@@ -59,6 +47,9 @@ public class DefaultConfigurationFactory implements ConfigurationFactory {
 		
 		return configuration;
 	}
+
+
+
 	
 	
 }
