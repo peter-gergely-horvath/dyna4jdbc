@@ -5,7 +5,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class EmptyResultSetMetaData implements ResultSetMetaData {
+import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractWrapper;
+
+public class EmptyResultSetMetaData extends AbstractWrapper implements ResultSetMetaData {
     public int getColumnCount() throws SQLException {
         return 0;
     }
@@ -88,13 +90,5 @@ public class EmptyResultSetMetaData implements ResultSetMetaData {
 
     public String getColumnClassName(int column) throws SQLException {
         return java.lang.String.class.getName();
-    }
-
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw new SQLException();
-    }
-
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
     }
 }
