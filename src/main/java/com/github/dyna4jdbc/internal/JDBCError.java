@@ -7,6 +7,7 @@ public enum JDBCError {
     CONNECT_FAILED_INVALID_URL("Invalid URL: %s"),
     CONNECT_FAILED_GENERIC("Failed to connect: %s (examine stack trace for details)"),
     OBJECT_CLOSED("Object has already been closed: %s"),
+    CLOSE_FAILED("Closing of '%s' caused error: %s"),
     SCRIPT_EXECUTION_EXCEPTION("Execution of script raised exception: %s"),
     CANNOT_UNWARP_OBJECT("The requested type (%s) cannot be unwrapped from this object (%s)."),
     UNEXPECTED_THROWABLE("Processing failed; caught unexpected exception: %s"),
@@ -37,6 +38,15 @@ public enum JDBCError {
 
     public SQLException raiseSQLException(Exception ex, Object... params) throws SQLException {
         throw new SQLException(String.format(getMessageTemplate(), params), ex);
+    }
+    
+    public SQLException raiseSQLExceptionWithSupressed(String message, Iterable<? extends Throwable> supressedThrowables) throws SQLException {
+        SQLException sqlException = new SQLException(String.format(getMessageTemplate(), message));
+        
+        for(Throwable supressed : supressedThrowables) {
+        	sqlException.addSuppressed(supressed);
+        }
+        throw sqlException;
     }
 
     public SQLException raiseSQLException(Object... params) throws SQLException {

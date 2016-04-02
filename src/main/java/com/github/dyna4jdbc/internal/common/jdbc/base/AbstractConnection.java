@@ -34,6 +34,18 @@ public abstract class AbstractConnection extends BasicSQLObject implements java.
     private int holdability = ResultSet.CLOSE_CURSORS_AT_COMMIT;
     // ----------------------------------------------------------------------------------------
 
+    public final Statement createStatement() throws SQLException {
+        checkNotClosed();
+        
+        AbstractStatement<?> createdStatement = doCreateStatement();
+        
+        registerAsChild(createdStatement);
+        
+        return createdStatement;
+    }
+    
+    protected abstract AbstractStatement<?> doCreateStatement() throws SQLException;
+    
     public PreparedStatement prepareStatement(String sql) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(

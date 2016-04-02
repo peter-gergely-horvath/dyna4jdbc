@@ -2,10 +2,10 @@ package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
+import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
@@ -32,12 +32,14 @@ public class ProcessRunnerConnection extends AbstractConnection  {
         this.scriptExecutor = new ProcessRunnerScriptExecutor(configuration);
     }
 
+    @Override
     public DatabaseMetaData getMetaData() throws SQLException {
         checkNotClosed();
         return new ProcessRunnerDatabaseMetaData(this);
     }
 
-    public Statement createStatement() throws SQLException {
+    @Override
+    protected AbstractStatement<?> doCreateStatement() throws SQLException {
         checkNotClosed();
         ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
         

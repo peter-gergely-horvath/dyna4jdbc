@@ -3,7 +3,6 @@ package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 import java.io.Writer;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 
 import javax.script.ScriptEngine;
@@ -11,10 +10,11 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
+import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
@@ -72,7 +72,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
         return new ScriptEngineDatabaseMetaData(this);
     }
 
-    public Statement createStatement() throws SQLException {
+    protected AbstractStatement<?> doCreateStatement() throws SQLException {
         checkNotClosed();
         ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
         

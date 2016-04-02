@@ -35,8 +35,9 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
     }
 
     public final ResultSet executeQuery(String script) throws SQLException {
-        try {
-        	
+    	checkNotClosed();
+    	
+    	try {
             SingleResultSetScriptOutputHandler outputHandler =
 			        scriptOutputHandlerFactory.newSingleResultSetScriptOutputHandler(this, script);
 			
@@ -62,7 +63,8 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
     }
     
     public final int executeUpdate(final String script) throws SQLException {
-
+    	checkNotClosed();
+    	
         try {
             UpdateScriptOutputHandler outputHandler =
 			        scriptOutputHandlerFactory.newUpdateScriptOutputHandler(this, script);
@@ -90,8 +92,11 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
     }
 
     public final boolean execute(final String script) throws SQLException {
-
+    	checkNotClosed();
+    	
         try {
+        	checkNotClosed();
+        	
 			MultiTypeScriptOutputHandler outputHandler =
 			        scriptOutputHandlerFactory.newMultiTypeScriptOutputHandler(this, script);
 			
