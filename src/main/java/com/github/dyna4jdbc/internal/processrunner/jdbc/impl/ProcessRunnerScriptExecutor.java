@@ -43,9 +43,9 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 					System.out.println(discardedOutput);
 				}
 
+				String outputCaptured = null;
+				
 				do {
-
-					String outputCaptured = null;
 
 					if (processRunner.isErrorEmpty()) {
 						outputCaptured = processRunner.pollStandardOutput(5, TimeUnit.SECONDS);
@@ -55,7 +55,6 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 						if(outputCaptured == null) {
 							outputCaptured = processRunner.pollStandardError(50, TimeUnit.MILLISECONDS);
 						}
-						
 					}
 
 					if (outputCaptured == null) {
@@ -64,7 +63,7 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 						outputPrintWriter.println(outputCaptured);
 					}
 
-				} while (!(processRunner.isOutputEmpty() && processRunner.isErrorEmpty()));
+				} while (outputCaptured != null);
 			}
 
 		} catch (ProcessExecutionException | IOException e) {
