@@ -11,7 +11,7 @@ public class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
 
 	// "Pattern: Instances of this class are immutable and are safe for use by
 	// multiple concurrent threads."
-	private static final Pattern HEADER_PATTERN = Pattern.compile("^[^:]+:[^:]*:[^:]*$");
+	private static final Pattern HEADER_PATTERN = Pattern.compile(buildMatchPattern());
 	
 
 	private final EmptyColumnMetadataFactory emptyColumnMetadataFactory;
@@ -47,6 +47,23 @@ public class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
 
 	}
 	
+	private static String buildMatchPattern() {
+	
+		StringBuilder sqlTypeNamesSeparatedByPipeForRegex = new StringBuilder();
+		boolean isFirst = true;
+		for(SQLDataType sqlDataType : SQLDataType.values()) {
+			String sqlTypeName = sqlDataType.name;
+			if(isFirst) {
+				isFirst = false;
+			} else {
+				sqlTypeNamesSeparatedByPipeForRegex.append("|");
+			}
+			
+			sqlTypeNamesSeparatedByPipeForRegex.append(sqlTypeName);
+		}
+		
+		return String.format("^[^:]+:((?:%s)[^:]*)?:[^:]*$", sqlTypeNamesSeparatedByPipeForRegex);
+	}
 
 	
 	
