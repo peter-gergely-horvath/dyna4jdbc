@@ -1,14 +1,12 @@
 package com.github.dyna4jdbc;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+
+import org.testng.annotations.Test;
 
 public class TestScriptEngine {
 

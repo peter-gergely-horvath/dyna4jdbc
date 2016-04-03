@@ -1,74 +1,21 @@
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum SQLDataType {
 
 	// TODO: extract methods
-	BIT(java.sql.Types.BIT, "BIT", java.lang.Boolean.class, false, "^[-]?\\d+$"),
-	TINYINT(java.sql.Types.TINYINT, "TINYINT", java.lang.Short.class, false, "^[-]?\\d+$"),
-	SMALLINT(java.sql.Types.SMALLINT, "SMALLINT", java.lang.Short.class, false, "^[-]?\\d+$"),
-	INTEGER(java.sql.Types.INTEGER, "INTEGER", java.lang.Integer.class, false, "^[-]?\\d+$"),
-	BIGINT(java.sql.Types.BIGINT, "BIGINT", java.lang.Long.class, false, "^[-]?\\d+$"),
-	FLOAT(java.sql.Types.FLOAT, "FLOAT", java.lang.Float.class, false, "^[-]?\\d+\\.\\d+$"),
-	REAL(java.sql.Types.REAL, "REAL", java.lang.Float.class, false, "^[-]?\\d+\\.\\d+$"),
-	DOUBLE(java.sql.Types.DOUBLE, "DOUBLE", java.lang.Double.class, false, "^[-]?\\d+\\.\\d+$") {
-		@Override
-		int getPrecision(String value) {
-			
-			if(value != null && value.matches("\\d+\\.\\d+")) {
-				return value.split("\\.")[1].length();
-			}
-			
-			return 0;
-		}
-
-		int getScale(String value) {
-			if(value != null && value.matches("\\d+\\.\\d+")) {
-				return value.length() - 1;
-			}
-			
-			return 0;
-		}
-	},
-	NUMERIC(java.sql.Types.NUMERIC, "NUMERIC", java.lang.Double.class, false, "^[-]?\\d+\\.\\d+$") {
-		@Override
-		int getPrecision(String value) {
-			
-			if(value != null && value.matches("\\d+\\.\\d+")) {
-				return value.split("\\.")[1].length();
-			}
-			
-			return 0;
-		}
-
-		int getScale(String value) {
-			if(value != null && value.matches("\\d+\\.\\d+")) {
-				return value.length() - 1;
-			}
-			
-			return 0;
-		}
-	},
-	DECIMAL(java.sql.Types.DECIMAL, "DECIMAL", java.math.BigDecimal.class, false, "^[-]?\\d+\\.\\d+$") {
-		@Override
-		int getPrecision(String value) {
-			
-			if(value != null && value.matches("\\d+\\.\\d+")) {
-				return value.split("\\.")[1].length();
-			}
-			
-			return 0;
-		}
-
-		int getScale(String value) {
-			if(value != null && value.matches("\\d+\\.\\d+")) {
-				return value.length() - 1;
-			}
-			
-			return 0;
-		}
-	},
+	BIT(java.sql.Types.BIT, "BIT", java.lang.Boolean.class, false, "^([01])$"),
+	TINYINT(java.sql.Types.TINYINT, "TINYINT", java.lang.Short.class, false, "^[+-]?((\\d+))$"),
+	SMALLINT(java.sql.Types.SMALLINT, "SMALLINT", java.lang.Short.class, false, "^[+-]?(\\d+)$"),
+	INTEGER(java.sql.Types.INTEGER, "INTEGER", java.lang.Integer.class, false, "^[+-]?(\\d+)$"),
+	BIGINT(java.sql.Types.BIGINT, "BIGINT", java.lang.Long.class, false, "^[+-]?(\\d+)$"),
+	FLOAT(java.sql.Types.FLOAT, "FLOAT", java.lang.Float.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
+	REAL(java.sql.Types.REAL, "REAL", java.lang.Float.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
+	DOUBLE(java.sql.Types.DOUBLE, "DOUBLE", java.lang.Double.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
+	NUMERIC(java.sql.Types.NUMERIC, "NUMERIC", java.lang.Double.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
+	DECIMAL(java.sql.Types.DECIMAL, "DECIMAL", java.math.BigDecimal.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
 	CHAR(java.sql.Types.CHAR, "CHAR", java.lang.String.class){
 		@Override
 		boolean isPlausibleConversion(String value) {
@@ -150,12 +97,57 @@ public enum SQLDataType {
 	}
 	
 	int getPrecision(String value) {
+		if(value == null) {
+			return 0;
+		}
+
+		if(this.acceptedPattern == null) {
+			return 0;
+		}
+		
+		Matcher matcher = this.acceptedPattern.matcher(value);
+		if(matcher.matches()) {
+			String precisionPart = matcher.group("precision");
+			if(precisionPart != null) {
+				return precisionPart.length();
+			}
+		}
 		return 0;
 	}
 
-	int getScale(String cellValue) {
+	int getScale(String value) {
+		if(value == null) {
+			return 0;
+		}
+
+		if(this.acceptedPattern == null) {
+			return value.length();
+		}
+		
+		Matcher matcher = this.acceptedPattern.matcher(value);
+		if(matcher.matches()) {
+			final int groupCount = matcher.groupCount();
+			if(groupCount == 0) {
+				String fullMatchedString = matcher.group(0);
+				if(fullMatchedString != null) {
+					return fullMatchedString.length();
+				} else {
+					return 0;
+				}
+			} else {
+				int aggregatedLength = 0;
+				for(int i=1; i<=groupCount; i++) {
+					String group = matcher.group(i);
+					if(group != null) {
+						aggregatedLength += group.length();
+					}
+				}
+				return aggregatedLength;
+			}
+			
+			
+		}
 		return 0;
 	}
-
 	
 }
