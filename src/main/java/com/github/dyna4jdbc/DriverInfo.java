@@ -63,11 +63,11 @@ class DriverInfo {
 			String[] splitVersionString = versionString.split(VERSION_SEPARATOR);
 
 			majorVersionString = splitVersionString[VERSION_INDEX_MAJOR];
-			majorVersionString = removeNunNumberCharactersFromString(majorVersionString);
+			majorVersionString = removeNonNumberCharactersFromString(majorVersionString);
 
 			if (splitVersionString.length >= 2) {
 				minorVersionString = splitVersionString[VERSION_INDEX_MINOR];
-				minorVersionString = removeNunNumberCharactersFromString(minorVersionString);
+				minorVersionString = removeNonNumberCharactersFromString(minorVersionString);
 			}
 		}
 
@@ -110,7 +110,7 @@ class DriverInfo {
 		}
 	}
 
-	private static String removeNunNumberCharactersFromString(String str) {
+	private static String removeNonNumberCharactersFromString(String str) {
 		return str.replaceAll("\\D", "");
 	}
 
