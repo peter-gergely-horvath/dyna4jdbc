@@ -83,10 +83,14 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 			
 			if(scalePart != null) {
 				metaData.setScale(Integer.valueOf(scalePart));
+			} else {
+				metaData.setScale(0);
 			}
 				
 			if(precisionPart != null) {
 				metaData.setPrecision(Integer.valueOf(precisionPart));
+			} else {
+				metaData.setPrecision(0);
 			}
 			
 			
