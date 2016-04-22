@@ -40,8 +40,8 @@ public enum JDBCError {
     	return String.format("JDBC Error [%s]: %s", this.name(), this.message);
     }
 
-    public SQLException raiseSQLException(Exception ex, Object... params) throws SQLException {
-        throw new SQLException(String.format(getMessageTemplate(), params), ex);
+    public SQLException raiseSQLException(Throwable throwable, Object... params) throws SQLException {
+        throw new SQLException(String.format(getMessageTemplate(), params), throwable);
     }
     
     public SQLException raiseSQLExceptionWithSupressed(String message, Iterable<? extends Throwable> supressedThrowables) throws SQLException {
@@ -57,8 +57,8 @@ public enum JDBCError {
         throw new SQLException(String.format(getMessageTemplate(), params));
     }
     
-    public RuntimeDyna4JdbcException raiseUncheckedException(Exception ex, Object... params) throws RuntimeDyna4JdbcException {
-        throw new RuntimeDyna4JdbcException(String.format(getMessageTemplate(), params), ex);
+    public RuntimeDyna4JdbcException raiseUncheckedException(Throwable throwable, Object... params) throws RuntimeDyna4JdbcException {
+        throw new RuntimeDyna4JdbcException(String.format(getMessageTemplate(), params), throwable);
     }
     
     public RuntimeDyna4JdbcException raiseUncheckedException(Object... params) throws RuntimeDyna4JdbcException {

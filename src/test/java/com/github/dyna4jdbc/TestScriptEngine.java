@@ -13,14 +13,10 @@ public class TestScriptEngine {
     @Test
     public void testDriver() throws Exception {
 
-        Class.forName("com.github.dyna4jdbc.DynaDriver");
-
         Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:JavaScript");
 
         Statement statement = connection.createStatement();
 
-        
-        
         statement.executeUpdate("var msg = '123\tHello World\tI am here!'");
 
         String script = "print('42\tFoo\tBar') ; print(msg)";
@@ -59,8 +55,6 @@ public class TestScriptEngine {
     
     @Test
     public void testHeaders() throws Exception {
-
-        Class.forName("com.github.dyna4jdbc.DynaDriver");
 
         Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:JavaScript");
 

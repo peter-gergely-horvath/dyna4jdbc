@@ -6,11 +6,37 @@ import java.util.regex.Pattern;
 public enum SQLDataType {
 
 	// TODO: extract methods
-	BIT(java.sql.Types.BIT, "BIT", java.lang.Boolean.class, false, "^([01])$"),
-	TINYINT(java.sql.Types.TINYINT, "TINYINT", java.lang.Short.class, false, "^[+-]?((\\d+))$"),
-	SMALLINT(java.sql.Types.SMALLINT, "SMALLINT", java.lang.Short.class, false, "^[+-]?(\\d+)$"),
-	INTEGER(java.sql.Types.INTEGER, "INTEGER", java.lang.Integer.class, false, "^[+-]?(\\d+)$"),
-	BIGINT(java.sql.Types.BIGINT, "BIGINT", java.lang.Long.class, false, "^[+-]?(\\d+)$"),
+	BIT(java.sql.Types.BIT, "BIT", java.lang.Boolean.class, false, "^([01])$"){
+		@Override
+		int getPrecision(String value) {
+			return 0;
+		}
+	},
+	
+	TINYINT(java.sql.Types.TINYINT, "TINYINT", java.lang.Short.class, false, "^[+-]?((\\d+))$"){
+		@Override
+		int getPrecision(String value) {
+			return 0;
+		}
+	},
+	SMALLINT(java.sql.Types.SMALLINT, "SMALLINT", java.lang.Short.class, false, "^[+-]?(\\d+)$"){
+		@Override
+		int getPrecision(String value) {
+			return 0;
+		}
+	},
+	INTEGER(java.sql.Types.INTEGER, "INTEGER", java.lang.Integer.class, false, "^[+-]?(\\d+)$"){
+		@Override
+		int getPrecision(String value) {
+			return 0;
+		}
+	},
+	BIGINT(java.sql.Types.BIGINT, "BIGINT", java.lang.Long.class, false, "^[+-]?(\\d+)$"){
+		@Override
+		int getPrecision(String value) {
+			return 0;
+		}
+	},
 	FLOAT(java.sql.Types.FLOAT, "FLOAT", java.lang.Float.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
 	REAL(java.sql.Types.REAL, "REAL", java.lang.Float.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
 	DOUBLE(java.sql.Types.DOUBLE, "DOUBLE", java.lang.Double.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
