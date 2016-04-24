@@ -72,7 +72,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
         return new ScriptEngineDatabaseMetaData(this);
     }
 
-    protected AbstractStatement<?> doCreateStatement() throws SQLException {
+    protected AbstractStatement<?> createStatementInternal() throws SQLException {
         checkNotClosed();
         ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
         

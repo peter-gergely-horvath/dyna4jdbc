@@ -39,7 +39,7 @@ public class ProcessRunnerConnection extends AbstractConnection  {
     }
 
     @Override
-    protected AbstractStatement<?> doCreateStatement() throws SQLException {
+    protected AbstractStatement<?> createStatementInternal() throws SQLException {
         checkNotClosed();
         ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
         

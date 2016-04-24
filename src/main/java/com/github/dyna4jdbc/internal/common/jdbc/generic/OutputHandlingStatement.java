@@ -43,7 +43,11 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 			
 			executeScriptUsingOutputHandler(script, outputHandler);
 			
-			return outputHandler.getResultSet();
+			ResultSet resultSet = outputHandler.getResultSet();
+			
+			registerAsChild(resultSet);
+			
+			return resultSet;
 			
         } 
         catch (ScriptExecutionException se) {
@@ -105,6 +109,8 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 			boolean resultSets = outputHandler.isResultSets();
 			if(resultSets) {
 			    List<ResultSet> resultSetList = outputHandler.getResultSets();
+				registerAsChildren(resultSetList);
+			    
 			    setCurrentResultSetList(resultSetList);
 			    setUpdateCount(-1);
 			    

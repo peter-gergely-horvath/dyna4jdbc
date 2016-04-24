@@ -125,11 +125,14 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
 	@Override
 	public void close() throws SQLException {
-		checkNotClosed();
+		
+		/* "Calling the method close on a ResultSet 
+		 * object that is already closed is a no-op." */
+		if(! isClosed()) {
+			dataTable.clear();
 
-		dataTable.clear();
-
-		super.close();
+			super.close();
+		}
 	}
 
 	private String getRawCellValueBySqlIndex(int sqlIndex) throws SQLException {
@@ -197,8 +200,8 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 			return returnValue != null ? returnValue.booleanValue() : false;
 
 		} catch (TypeConversionException tce) {
-			throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(tce, getRow(), columnIndex, rawCellValue,
-					"boolean");
+			throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
+					tce, getRow(), columnIndex, rawCellValue, "boolean");
 		}
 	}
 

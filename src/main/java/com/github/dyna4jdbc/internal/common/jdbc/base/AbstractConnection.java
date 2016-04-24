@@ -38,14 +38,14 @@ public abstract class AbstractConnection extends BasicSQLObject implements java.
     public final Statement createStatement() throws SQLException {
         checkNotClosed();
         
-        AbstractStatement<?> createdStatement = doCreateStatement();
+        AbstractStatement<?> createdStatement = createStatementInternal();
         
         registerAsChild(createdStatement);
         
         return createdStatement;
     }
     
-    protected abstract AbstractStatement<?> doCreateStatement() throws SQLException;
+    protected abstract AbstractStatement<?> createStatementInternal() throws SQLException;
     
     @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {

@@ -1,5 +1,6 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
+import java.util.List;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -12,7 +13,7 @@ import com.github.dyna4jdbc.internal.JDBCError;
 public class BasicSQLObject extends AbstractWrapper {
 
 	private final AtomicBoolean closed = new AtomicBoolean(false);
-	private final Set<BasicSQLObject> children = createNewSynchronizedWeakHashSet();
+	private final Set<AutoCloseable> children = createNewSynchronizedWeakHashSet();
 
 	protected void checkNotClosed() throws SQLException {
 		checkNotClosed(this.toString());
@@ -35,22 +36,22 @@ public class BasicSQLObject extends AbstractWrapper {
 		}
 	}
 
-	private static void closeChildObjects(Iterable<BasicSQLObject> childSQLObjects) throws SQLException {
-		LinkedList<SQLException> supressedThrowables = new LinkedList<>();
+	private void closeChildObjects(Iterable<AutoCloseable> objectsToClose) throws SQLException {
+		LinkedList<Exception> supressedThrowables = new LinkedList<>();
 
-		for (BasicSQLObject sqlObject : childSQLObjects) {
+		for (AutoCloseable sqlObject : objectsToClose) {
 
 			try {
 				sqlObject.close();
-			} catch (SQLException sqle) {
+			} catch (Exception sqle) {
 				supressedThrowables.add(sqle);
 			}
 		}
 
 		if (!supressedThrowables.isEmpty()) {
 
-			throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(
-					"Closing of child object(s) caused exception(s); see supressed", supressedThrowables);
+			throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(supressedThrowables,
+					this, "Closing of child object(s) caused exception(s); see supressed");
 		}
 	}
 
@@ -58,14 +59,20 @@ public class BasicSQLObject extends AbstractWrapper {
 		return closed.get();
 	}
 
-	protected final void registerAsChild(BasicSQLObject sqlObject) throws SQLException {
+	protected final void registerAsChild(AutoCloseable closableSQLObject) throws SQLException {
 		checkNotClosed();
 
-		if (sqlObject == null) {
-			JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("sqlObject to register cannot be null");
+		if (closableSQLObject == null) {
+			JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("closableSQLObject to register cannot be null");
 		}
 
-		children.add(sqlObject);
+		children.add(closableSQLObject);
+	}
+	
+	protected final void registerAsChildren(List<? extends AutoCloseable> closableSQLObjects) throws SQLException {
+		for(AutoCloseable closableSQLObject : closableSQLObjects) {
+			registerAsChild(closableSQLObject);
+		}
 	}
 
 	private static <T> Set<T> createNewSynchronizedWeakHashSet() {
