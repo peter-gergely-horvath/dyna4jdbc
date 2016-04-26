@@ -112,7 +112,7 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> im
 
 			String columnLabel = columnMetadata.getColumnLabel();
 			if (columnNameToColumnIndexMap.containsKey(columnLabel)) {
-				throw new IllegalStateException("Duplicate column label: " + columnLabel);
+				throw JDBCError.DUPLICATED_HEADER_NAME.raiseUncheckedException(columnLabel);
 			}
 
 			columnNameToColumnIndexMap.put(columnLabel, sqlIndex);
