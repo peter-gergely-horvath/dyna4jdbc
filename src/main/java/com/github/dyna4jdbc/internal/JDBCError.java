@@ -15,6 +15,7 @@ public enum JDBCError {
     UNEXPECTED_THROWABLE("Processing failed; caught unexpected exception: %s", SQLState.SYSTEM_ERROR),
     RESULT_SET_MULTIPLE_EXPECTED_ONE("Expected one result set, but script produced %s result sets.", SQLState.CLIENT_ERROR),
     INCONSISTENT_HEADER_SPECIFICATION("Inconsistent header specification: %s", SQLState.SYNTAX_OR_ACCESS_RULE_ERROR),
+    DUPLICATED_HEADER_NAME("Duplicated header name encountered: %s", SQLState.SYNTAX_OR_ACCESS_RULE_ERROR),
     FORMAT_STRING_UNEXPECTED_FOR_COLUMN_TYPE("Format string '%s' unexpected for column type: %s", SQLState.SYNTAX_OR_ACCESS_RULE_ERROR),
     FORMAT_STRING_INVALID("Format string '%s' is illegal: %s", SQLState.SYNTAX_OR_ACCESS_RULE_ERROR),
     JDBC_FUNCTION_NOT_SUPPORTED("This JDBC API function is not supported: %s", SQLState.FEATURE_NOT_SUPPORTED),
@@ -41,8 +42,7 @@ public enum JDBCError {
     }
     
     protected String getMessageTemplate() {
-    	String sqlStateInfo = sqlState != null ? String.format("/SQLSTATE: %s", sqlState.code) : ""; 
-    	return String.format("JDBC Error [%s%s]: %s", this.name(), sqlStateInfo, this.message);
+    	return String.format("JDBC Error [%s]: %s", this.name(), this.message);
     }
     
     protected String getSqlStateAsString() {
