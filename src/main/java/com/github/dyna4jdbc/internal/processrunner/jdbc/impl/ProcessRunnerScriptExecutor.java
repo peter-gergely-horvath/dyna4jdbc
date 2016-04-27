@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
@@ -11,9 +12,7 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 
 public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor {
 
-	private final Object lock = new Object();
-
-	private ProcessRunner processRunner;
+	private final AtomicReference<ProcessRunner> processRunner = new AtomicReference<>();
 
 	private final boolean skipFirstLine;
 
@@ -27,19 +26,19 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 
 		try (PrintWriter outputPrintWriter = new PrintWriter(outWriter)) {
 
-			synchronized (lock) {
-
-				if (processRunner == null || !processRunner.isProcessRunning()) {
-					processRunner = ProcessRunner.start(script);
+			ProcessRunner currentProcess = this.processRunner.get();
+			if (currentProcess == null || !currentProcess.isProcessRunning()) {
+					currentProcess = ProcessRunner.start(script);
+					this.processRunner.set(currentProcess);
 				} else {
-					processRunner.writeToStandardInput(script);
+					currentProcess.writeToStandardInput(script);
 				}
 
 				Thread.sleep(1000);
 
 				if (skipFirstLine) {
 					// skip and discard first result line
-					String discardedOutput = processRunner.pollStandardOutput(5, TimeUnit.SECONDS);
+					String discardedOutput = currentProcess.pollStandardOutput(5, TimeUnit.SECONDS);
 					System.out.println(discardedOutput);
 				}
 
@@ -47,13 +46,13 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 				
 				do {
 
-					if (processRunner.isErrorEmpty()) {
-						outputCaptured = processRunner.pollStandardOutput(5, TimeUnit.SECONDS);
+					if (currentProcess.isErrorEmpty()) {
+						outputCaptured = currentProcess.pollStandardOutput(5, TimeUnit.SECONDS);
 					} else {
-						outputCaptured = processRunner.pollStandardOutput(50, TimeUnit.MILLISECONDS);
+						outputCaptured = currentProcess.pollStandardOutput(50, TimeUnit.MILLISECONDS);
 						
 						if(outputCaptured == null) {
-							outputCaptured = processRunner.pollStandardError(50, TimeUnit.MILLISECONDS);
+							outputCaptured = currentProcess.pollStandardError(50, TimeUnit.MILLISECONDS);
 						}
 					}
 
@@ -64,7 +63,6 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 					}
 
 				} while (outputCaptured != null);
-			}
 
 		} catch (ProcessExecutionException | IOException e) {
 			throw new ScriptExecutionException(e);
@@ -74,25 +72,13 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 		}
 	}
 
-	void cancelExecution() {
-		synchronized (lock) {
-
-			if (processRunner != null) {
-				processRunner.terminateProcess();
-				processRunner = null;
-			}
-		}
-	}
-
 	public void close() {
-		synchronized (lock) {
 
-			if (processRunner != null) {
-				processRunner.close();
-				processRunner = null;
-			}
-		}
-
+        ProcessRunner currentProcess = this.processRunner.get();
+        if(currentProcess != null) {
+            currentProcess.terminateProcess();
+            this.processRunner.set(null);
+        }
 	}
 
 }

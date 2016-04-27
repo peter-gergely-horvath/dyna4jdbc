@@ -19,6 +19,6 @@ class ProcessRunnerStatement extends OutputHandlingStatement<ProcessRunnerConnec
 
 	@Override
 	public void cancel() throws SQLException {
-		scriptExecutor.cancelExecution();
+		scriptExecutor.close();
 	}
 }
