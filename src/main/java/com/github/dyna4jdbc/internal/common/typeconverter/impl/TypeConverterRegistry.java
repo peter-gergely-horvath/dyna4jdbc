@@ -1,6 +1,7 @@
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Date;
@@ -168,6 +169,23 @@ class TypeConverterRegistry {
 
 	};
 
+    static final TypeConverter<BigInteger> BIGINTEGER = new TypeConverter<BigInteger>() {
+
+        @Override
+        public BigInteger convert(String input) throws TypeConversionException {
+            try {
+                if (input == null) {
+                    return null;
+                }
+
+                return new BigInteger(input);
+            } catch (NumberFormatException nfe) {
+                throw new TypeConversionException(nfe);
+            }
+        }
+
+    };
+
 	static final TypeConverter<byte[]> BYTE_ARRAY = new TypeConverter<byte[]>() {
 
 		@Override
@@ -252,7 +270,21 @@ class TypeConverterRegistry {
 
 		HashMap<Class<?>, TypeConverter<?>> map = new HashMap<>();
 
-		map.put(java.lang.String.class, STRING);
+		map.put(String.class, STRING);
+		map.put(Boolean.class, BOOLEAN);
+        map.put(Byte.class, BYTE);
+        map.put(Short.class, SHORT);
+        map.put(Integer.class, INTEGER);
+        map.put(Long.class, LONG);
+        map.put(Float.class, FLOAT);
+        map.put(Double.class, DOUBLE);
+        map.put(BigDecimal.class, BIGDECIMAL);
+        map.put(BigInteger.class, BIGINTEGER);
+        map.put(byte[].class, BYTE_ARRAY);
+        map.put(Date.class, DATE);
+        map.put(Time.class, TIME);
+        map.put(Timestamp.class, TIMESTAMP);
+        map.put(URL.class, URL);
 
 		TYPE_CONVERTERS = Collections.unmodifiableMap(map);
 
