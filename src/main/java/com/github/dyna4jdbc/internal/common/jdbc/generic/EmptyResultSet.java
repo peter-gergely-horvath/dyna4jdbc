@@ -196,7 +196,7 @@ public class EmptyResultSet extends AbstractResultSet<List<String>> implements R
 
 	@Override
 	public ResultSetMetaData getMetaData() throws SQLException {
-		throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Result set is empty!");
+		return new EmptyResultSetMetaData();
 	}
 
 	@Override
