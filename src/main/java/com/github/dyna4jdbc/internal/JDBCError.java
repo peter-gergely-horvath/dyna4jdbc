@@ -50,11 +50,16 @@ public enum JDBCError {
     }
 
     public SQLException raiseSQLException(Throwable throwable, Object... params) throws SQLException {
-        throw new SQLException(String.format(getMessageTemplate(), params), getSqlStateAsString(), throwable);
+        String errorMessage = buildErrorMessage(params);
+        throw new SQLException(errorMessage, getSqlStateAsString(), throwable);
     }
     
-    public SQLException raiseSQLExceptionWithSupressed(Iterable<? extends Throwable> supressedThrowables, Object... params) throws SQLException {
-        SQLException sqlException = new SQLException(String.format(getMessageTemplate(), params), getSqlStateAsString() );
+    public SQLException raiseSQLExceptionWithSupressed(
+            Iterable<? extends Throwable> supressedThrowables,
+            Object... params) throws SQLException {
+
+        String errorMessage = buildErrorMessage(params);
+        SQLException sqlException = new SQLException(errorMessage, getSqlStateAsString() );
         
         for(Throwable supressed : supressedThrowables) {
         	sqlException.addSuppressed(supressed);
@@ -63,15 +68,23 @@ public enum JDBCError {
     }
 
     public SQLException raiseSQLException(Object... params) throws SQLException {
-        throw new SQLException(String.format(getMessageTemplate(), params), getSqlStateAsString() );
+        String errorMessage = buildErrorMessage(params);
+        throw new SQLException(errorMessage, getSqlStateAsString() );
     }
     
     public RuntimeDyna4JdbcException raiseUncheckedException(Throwable throwable, Object... params) throws RuntimeDyna4JdbcException {
-        throw new RuntimeDyna4JdbcException(String.format(getMessageTemplate(), params), throwable);
+        String errorMessage = buildErrorMessage(params);
+        throw new RuntimeDyna4JdbcException(errorMessage, throwable, getSqlStateAsString() );
     }
     
     public RuntimeDyna4JdbcException raiseUncheckedException(Object... params) throws RuntimeDyna4JdbcException {
-    	throw new RuntimeDyna4JdbcException(String.format(getMessageTemplate(), params));
+        String errorMessage = buildErrorMessage(params);
+        throw new RuntimeDyna4JdbcException(errorMessage, getSqlStateAsString() );
+    }
+
+    private String buildErrorMessage(Object[] params) {
+        String formatString = getMessageTemplate();
+        return String.format(formatString, params);
     }
 
 }

@@ -58,7 +58,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
             throw sqle;
         } 
         catch (RuntimeDyna4JdbcException ex) {
-            throw new SQLException(ex.getMessage(), ex);
+            throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
         }
         catch (Throwable t) {
         	String message = ExceptionUtil.getRootCauseMessage(t);
@@ -83,7 +83,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
             throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
         } 
         catch (RuntimeDyna4JdbcException ex) {
-            throw new SQLException(ex.getMessage(), ex);
+            throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
         }
         catch (OutputDisabledError t) {
         	String message = ExceptionUtil.getRootCauseMessage(t);
@@ -126,7 +126,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
             throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
         }
         catch (RuntimeDyna4JdbcException ex) {
-            throw new SQLException(ex.getMessage(), ex);
+            throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
         }
         catch (Throwable t) {
         	String message = ExceptionUtil.getRootCauseMessage(t);

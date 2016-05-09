@@ -4,15 +4,20 @@ public class RuntimeDyna4JdbcException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public RuntimeDyna4JdbcException(String message) {
+    private final String sqlState;
+
+	public RuntimeDyna4JdbcException(String message, String sqlState) {
 		super(message);
+        this.sqlState = sqlState;
 	}
 
-	public RuntimeDyna4JdbcException(String message, Throwable cause) {
+	public RuntimeDyna4JdbcException(String message, Throwable cause, String sqlState) {
 		super(message, cause);
+        this.sqlState = sqlState;
 	}
 
-	public RuntimeDyna4JdbcException(Throwable cause) {
-		super(cause);
-	}
+    public String getSqlState() {
+        return sqlState;
+    }
+
 }
