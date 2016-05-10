@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 
-import com.github.dyna4jdbc.DynaDriver;
+import com.github.dyna4jdbc.DriverInfo;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
 
 public abstract class AbstractDatabaseMetaData<T extends Connection> implements DatabaseMetaData {
@@ -22,7 +22,7 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> implements 
 	}
 
 	public String getDriverName() throws SQLException {
-	    return DynaDriver.DRIVER_NAME;
+	    return DriverInfo.DRIVER_NAME;
 	}
 
 	public String getDriverVersion() throws SQLException {
@@ -30,11 +30,11 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> implements 
 	}
 
 	public int getDriverMajorVersion() {
-	    return DynaDriver.DRIVER_VERSION_MAJOR;
+	    return DriverInfo.DRIVER_VERSION_MAJOR;
 	}
 
 	public int getDriverMinorVersion() {
-	    return DynaDriver.DRIVER_VERSION_MINOR;
+	    return DriverInfo.DRIVER_VERSION_MINOR;
 	}
 	
 	
@@ -646,11 +646,11 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> implements 
     }
 
     public int getDatabaseMajorVersion() throws SQLException {
-        return DynaDriver.DRIVER_VERSION_MAJOR;
+        return DriverInfo.DRIVER_VERSION_MAJOR;
     }
 
     public int getDatabaseMinorVersion() throws SQLException {
-        return DynaDriver.DRIVER_VERSION_MINOR;
+        return DriverInfo.DRIVER_VERSION_MINOR;
     }
 
     public int getJDBCMajorVersion() throws SQLException {

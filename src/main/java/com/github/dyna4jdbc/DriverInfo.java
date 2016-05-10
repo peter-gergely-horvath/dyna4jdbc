@@ -4,23 +4,13 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-class DriverInfo {
+public class DriverInfo {
 
-	private final String productName;
-	private final int majorVersion;
-	private final int minorVersion;
+	public static final int DRIVER_VERSION_MAJOR;
+	public static final int DRIVER_VERSION_MINOR;
 
-	String getProductName() {
-		return productName;
-	}
+	public static final String DRIVER_NAME;
 
-	int getMajorVersion() {
-		return majorVersion;
-	}
-
-	int getMinorVersion() {
-		return minorVersion;
-	}
 
 	private static final String VERSION_PROPERTIES = "version.properties";
 
@@ -36,8 +26,9 @@ class DriverInfo {
 
 	private static final Logger LOGGER = Logger.getLogger(DriverInfo.class.getName());
 
-	static DriverInfo getInstance() {
-		String productNameString = null;
+	static {
+		String productNameString;
+
 		String majorVersionString = null;
 		String minorVersionString = null;
 
@@ -71,31 +62,10 @@ class DriverInfo {
 			}
 		}
 
-		return new DriverInfo(
-				productNameString, 
-				safeParseToInteger(majorVersionString, ZERO_VERSION_NUMBER),
-				safeParseToInteger(minorVersionString, ZERO_VERSION_NUMBER));
+		DRIVER_NAME = productNameString;
 
-	}
-
-	private DriverInfo(String productName, int majorVersion, int minorVersion) {
-		this.productName = productName;
-		this.majorVersion = majorVersion;
-		this.minorVersion = minorVersion;
-	}
-	
-	
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("DriverInfo [productName=");
-		builder.append(productName);
-		builder.append(",\nmajorVersion=");
-		builder.append(majorVersion);
-		builder.append(",\nminorVersion=");
-		builder.append(minorVersion);
-		builder.append("]");
-		return builder.toString();
+		DRIVER_VERSION_MAJOR = safeParseToInteger(majorVersionString, ZERO_VERSION_NUMBER);
+		DRIVER_VERSION_MINOR = safeParseToInteger(minorVersionString, ZERO_VERSION_NUMBER);
 	}
 
 	private static int safeParseToInteger(String str, int defaultValueIfNull) {

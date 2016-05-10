@@ -19,18 +19,7 @@ public class DynaDriver implements java.sql.Driver {
 	private static final Logger LOGGER = Logger.getLogger(DynaDriver.class.getName());
 	private static final Logger PARENT_LOGGER = Logger.getLogger(DynaDriver.class.getPackage().getName());
 
-	public static final int DRIVER_VERSION_MAJOR;
-	public static final int DRIVER_VERSION_MINOR;
-
-	public static final String DRIVER_NAME;
-	
 	static {
-		DriverInfo driverInfo = DriverInfo.getInstance();
-		
-		DRIVER_NAME = driverInfo.getProductName();
-		DRIVER_VERSION_MAJOR = driverInfo.getMajorVersion();
-		DRIVER_VERSION_MINOR = driverInfo.getMinorVersion();
-
 		try {
 			DriverManager.registerDriver(new DynaDriver());
 		}
@@ -40,7 +29,6 @@ public class DynaDriver implements java.sql.Driver {
 		}
 	}
 	
-
 	private static final String JDBC_URL_PREFIX = "jdbc:dyna4jdbc:";
 
 	private final ConnectionFactory connectionFactory;
@@ -76,11 +64,11 @@ public class DynaDriver implements java.sql.Driver {
 	}
 
 	public int getMajorVersion() {
-		return DRIVER_VERSION_MAJOR;
+		return DriverInfo.DRIVER_VERSION_MAJOR;
 	}
 
 	public int getMinorVersion() {
-		return DRIVER_VERSION_MINOR;
+		return DriverInfo.DRIVER_VERSION_MINOR;
 	}
 
 	public boolean jdbcCompliant() {
