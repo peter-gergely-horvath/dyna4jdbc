@@ -1,8 +1,14 @@
 <FindBugsFilter>
-    <!-- Incorrect identification of dead local store -->
     <Match>
-        <Class name="com.github.windpapi4j.WinDPAPI" />
-        <Method name="raiseHResultExceptionForLastError" />
-        <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+        <Class name="com.github.dyna4jdbc.internal.common.typeconverter.impl.TypeConverterRegistry$2" />
+        <Method name="convert" />
+        <Bug pattern="NP_BOOLEAN_RETURN_NULL" />
+        <!-- We explicitly want to convert null to null Boolean in the converters -->
+    </Match>
+    <Match>
+        <Class name="com.github.dyna4jdbc.internal.common.typeconverter.impl.TypeConverterRegistry$11" />
+        <Method name="convert" />
+        <Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
+        <!-- We explicitly want to convert null to null byte array in the converters -->
     </Match>
 </FindBugsFilter>

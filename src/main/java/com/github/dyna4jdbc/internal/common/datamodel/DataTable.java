@@ -29,6 +29,10 @@ public class DataTable implements Iterable<List<String>> {
 					
 					@Override
 					public DataColumn next() {
+                        if(! hasNext()) {
+                            throw new NoSuchElementException(Integer.toString(index));
+                        }
+
 						return new DataColumn(DataTable.this, index++);
 					}
 					

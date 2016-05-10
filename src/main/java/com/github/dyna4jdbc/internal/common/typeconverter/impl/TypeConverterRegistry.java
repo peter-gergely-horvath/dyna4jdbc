@@ -1,5 +1,6 @@
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConverter;
 
@@ -190,11 +192,19 @@ class TypeConverterRegistry {
 
 		@Override
 		public byte[] convert(String input) throws TypeConversionException {
-			if (input == null) {
-				return null;
-			}
+			try {
 
-			return input.getBytes();
+				if (input == null) {
+					return null;
+				}
+
+
+				return input.getBytes("UTF-8");
+
+			} catch (UnsupportedEncodingException e) {
+				throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE
+						.raiseUncheckedException("Unsupported encoding", e);
+			}
 		}
 
 	};

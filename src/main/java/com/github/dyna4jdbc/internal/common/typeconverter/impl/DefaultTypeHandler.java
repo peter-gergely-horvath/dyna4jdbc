@@ -117,7 +117,7 @@ class DefaultTypeHandler extends AbstractTypeHandler {
 		Class<?> targetClass = map.get(columnType.name);
 		if(targetClass == null) {
 			throw TypeConversionException.forMessage(
-					"Mapping to %s is not supported.", targetClass);
+					"Mapping to %s is not supported.", columnType.name);
 		}
 		
 		return covertToObject(rawCellValue, targetClass);
