@@ -3,6 +3,7 @@ package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,7 +80,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 			String precisionPart = matcher.group(3);
 			
 			
-			SQLDataType sqlDataType = SQLDataType.valueOf(sqlTypePart.toUpperCase());
+			SQLDataType sqlDataType = SQLDataType.valueOf(sqlTypePart.toUpperCase(Locale.ENGLISH));
 			metaData.setColumnType(sqlDataType);
 			
 			if(scalePart != null) {
