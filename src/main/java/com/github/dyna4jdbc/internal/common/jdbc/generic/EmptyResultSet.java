@@ -18,7 +18,7 @@ import java.util.Map;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractResultSet;
 
-public class EmptyResultSet extends AbstractResultSet<List<String>> implements ResultSet{
+public class EmptyResultSet extends AbstractResultSet<List<String>> {
 
 	public EmptyResultSet() {
 		super(new LinkedList<>(), null);

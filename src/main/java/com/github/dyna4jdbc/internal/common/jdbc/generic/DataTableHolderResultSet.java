@@ -28,7 +28,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionExceptio
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 
-public class DataTableHolderResultSet extends AbstractResultSet<List<String>> implements ResultSet {
+public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 
 	private final DataTable dataTable;
 

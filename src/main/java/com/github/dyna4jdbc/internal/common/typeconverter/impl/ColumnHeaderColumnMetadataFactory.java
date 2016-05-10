@@ -1,6 +1,7 @@
 
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -12,7 +13,7 @@ import com.github.dyna4jdbc.internal.common.util.collection.AlwaysSkipFirstEleme
 import com.github.dyna4jdbc.internal.common.util.config.ConfigurationUtil;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
+final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFactory {
 
 	private static final Pattern SQL_TYPE_PATTERN =
 			Pattern.compile("\\s*(\\w+)(?:\\s*[(]\\s*(\\d+)\\s*[,]?\\s*(\\d)?\\s*[)])?\\s*");
@@ -94,7 +95,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 			}
 			
 			
-		} catch(Exception e) {
+		} catch(SQLException | RuntimeException e) {
 			throw new IllegalStateException("Processing of header failed: " + sqlTypeConfig + "; " + e.getMessage(), e);
 		}
 

@@ -44,7 +44,7 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 
 				String outputCaptured = null;
 				
-				do {
+				while(true) {
 
 					if (currentProcess.isErrorEmpty()) {
 						outputCaptured = currentProcess.pollStandardOutput(5, TimeUnit.SECONDS);
@@ -58,11 +58,11 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 
 					if (outputCaptured == null) {
 						break;
+
 					} else {
 						outputPrintWriter.println(outputCaptured);
 					}
-
-				} while (outputCaptured != null);
+				}
 
 		} catch (ProcessExecutionException | IOException e) {
 			throw new ScriptExecutionException(e);
