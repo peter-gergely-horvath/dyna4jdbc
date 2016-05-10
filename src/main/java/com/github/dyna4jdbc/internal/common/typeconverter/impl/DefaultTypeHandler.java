@@ -78,7 +78,7 @@ class DefaultTypeHandler extends AbstractTypeHandler {
 			}
 
 			BigDecimal bigDecimal = covertToBigDecimal(rawCellValue);
-			bigDecimal.setScale(scale);
+			bigDecimal = bigDecimal.setScale(scale);
 			
 			return bigDecimal;
 		} catch (ArithmeticException nfe) {

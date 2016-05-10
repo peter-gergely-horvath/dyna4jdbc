@@ -14,9 +14,12 @@ public class ConfigurationUtil {
 		         String keyValuePair = st.nextToken();
 		         String[] keyAndValue = keyValuePair.split("=", 2);
 		         String key = keyAndValue[0];
-		         String value = keyAndValue.length == 2 ? keyAndValue[1] : null;
-		         
-		         properties.setProperty(key, value);
+
+				 if(keyAndValue.length == 2) {
+					 String value =  keyAndValue[1];
+
+					 properties.setProperty(key, value);
+				 }
 		     }
 		}
 		return properties;

@@ -10,7 +10,7 @@ enum ConfigurationEntry {
 	CELL_SEPARATOR("cellSeparator", "\t", "The character used as separator character. Default is TAB (\\t).") {
 		@Override
 		void setConfiguration(ConfigurationImpl config, String value) throws SQLException {
-			if (value == null || (value != null && value.length() != 1)) {
+			if (value == null || value.length() != 1) {
 				throw MisconfigurationSQLException.forMessage(
 						"A singe character is expected for %s, but was: '%s'",
 						this.key, value);

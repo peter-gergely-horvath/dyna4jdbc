@@ -56,10 +56,10 @@ public class ProcessRunner {
             standardOutputStreamContentQueue = new LinkedBlockingQueue<>();
             errorStreamContentQueue = new LinkedBlockingQueue<>();
 
-            executorService.submit(new BufferedReaderToBlockingQueueRunnable(
+            executorService.execute(new BufferedReaderToBlockingQueueRunnable(
                     String.format("StdOut reader of '%s'", command), stdOut,
                     standardOutputStreamContentQueue, cyclicBarrier));
-            executorService.submit(new BufferedReaderToBlockingQueueRunnable(
+            executorService.execute(new BufferedReaderToBlockingQueueRunnable(
                     String.format("StdErr reader of '%s'", command), stdErr,
                     errorStreamContentQueue, cyclicBarrier));
 

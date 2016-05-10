@@ -104,7 +104,7 @@ class DriverInfo {
 				return defaultValueIfNull;
 			}
 
-			return Integer.valueOf(str).intValue();
+			return Integer.parseInt(str);
 		} catch (NumberFormatException nfe) {
 			return -1;
 		}

@@ -14,12 +14,12 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 
 final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
-	private final Configuration configuration;
-	private static final Pattern SQL_TYPE_PATTERN = Pattern.compile("\\s*(\\w+)(?:\\s*[(]\\s*(\\d+)\\s*[,]?\\s*(\\d)?\\s*[)])?\\s*");
+	private static final Pattern SQL_TYPE_PATTERN =
+			Pattern.compile("\\s*(\\w+)(?:\\s*[(]\\s*(\\d+)\\s*[,]?\\s*(\\d)?\\s*[)])?\\s*");
 	
 
 	ColumnHeaderColumnMetadataFactory(Configuration configuration) {
-		this.configuration = configuration;
+
 	}
 
 	static ColumnHeaderColumnMetadataFactory getInstance(Configuration configuration) {
@@ -82,13 +82,13 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 			metaData.setColumnType(sqlDataType);
 			
 			if(scalePart != null) {
-				metaData.setScale(Integer.valueOf(scalePart));
+				metaData.setScale(Integer.parseInt(scalePart));
 			} else {
 				metaData.setScale(0);
 			}
 				
 			if(precisionPart != null) {
-				metaData.setPrecision(Integer.valueOf(precisionPart));
+				metaData.setPrecision(Integer.parseInt(precisionPart));
 			} else {
 				metaData.setPrecision(0);
 			}
