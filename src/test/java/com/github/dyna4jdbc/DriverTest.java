@@ -95,7 +95,7 @@ public class DriverTest {
 
         String majorVersionString = projectVersion.split("\\.")[0];
 
-        int majorVersion = driver.getMajorVersion(); // -SNAPSHOT
+        int majorVersion = driver.getMajorVersion();
 
         assertEquals(majorVersionString, Integer.toString(majorVersion));
     }
@@ -106,7 +106,10 @@ public class DriverTest {
 
         String projectVersion = mavenPropertiesCapturedDuringBuild.getProperty("project.version");
 
-        String minorVersionString = projectVersion.split("\\.")[1].replace("-SNAPSHOT", "");
+        String minorVersionString = projectVersion.split("\\.")[1];
+
+        // remove non-number characters, e.g. "-SNAPSHOT"
+        minorVersionString = minorVersionString.replaceAll("\\D", "");
 
         int minorVersion = driver.getMinorVersion();
 
