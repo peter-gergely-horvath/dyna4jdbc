@@ -16,8 +16,7 @@ import static org.testng.Assert.*;
  */
 public class DriverTest {
 
-    private static final String MAVEN_PROPERTIES_LOCATION =
-            "/test.maven.properties";
+    private static final String MAVEN_PROPERTIES_LOCATION = "/test.maven.properties";
 
 
     private final Properties mavenPropertiesCapturedDuringBuild = new Properties();
@@ -134,5 +133,22 @@ public class DriverTest {
         assertTrue( propertyInfo.length > 0 );
     }
 
+    @Test
+    public void testDriverDelegatesConnectionToConnectionFactory() throws SQLException {
+
+        ConnectionFactory mockConnectionFactory = new ConnectionFactory() {
+            @Override
+            Connection newConnection(String factoryConfiguration, Properties info) throws SQLException {
+
+                assertEquals(factoryConfiguration, "foo:bar/baz");
+
+                return null;
+            }
+        };
+
+        DynaDriver driver = new DynaDriver(mockConnectionFactory);
+
+        driver.connect("jdbc:dyna4jdbc:foo:bar/baz", new Properties());
+    }
 
 }
