@@ -1,10 +1,7 @@
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
@@ -33,11 +30,11 @@ public class ProcessRunner {
 
     private final String endOfStreamIndicator = UUID.randomUUID().toString();
 
-    static ProcessRunner start(String command) throws ProcessExecutionException {
-        return new ProcessRunner(command);
+    static ProcessRunner start(String command, String conversionCharset) throws ProcessExecutionException {
+        return new ProcessRunner(command, conversionCharset);
     }
 
-    private ProcessRunner(String command) throws ProcessExecutionException {
+    private ProcessRunner(String command, String conversionCharset) throws ProcessExecutionException {
 
         try {
             Runtime runtime = Runtime.getRuntime();
@@ -46,10 +43,13 @@ public class ProcessRunner {
 
             processReference.set(process);
 
-            processInputWriter = new PrintWriter(new BufferedWriter(new PrintWriter(process.getOutputStream())));
+            processInputWriter = new PrintWriter(new OutputStreamWriter(
+                    process.getOutputStream(), conversionCharset), true);
 
-            BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader stdErr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            BufferedReader stdOut = new BufferedReader(
+                    new InputStreamReader(process.getInputStream(), conversionCharset));
+            BufferedReader stdErr = new BufferedReader(
+                    new InputStreamReader(process.getErrorStream(), conversionCharset));
 
             CyclicBarrier cyclicBarrier = new CyclicBarrier(3);
 

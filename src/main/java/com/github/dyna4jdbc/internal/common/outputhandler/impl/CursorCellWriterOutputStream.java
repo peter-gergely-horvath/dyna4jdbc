@@ -1,8 +1,11 @@
 package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
+import com.github.dyna4jdbc.internal.JDBCError;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 
 public abstract class CursorCellWriterOutputStream extends OutputStream {
@@ -15,11 +18,13 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
 
     private ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-	private char cellSeparator;
+	private final char cellSeparator;
+    private final String charsetName;
 
 
-    public CursorCellWriterOutputStream(char cellSeparator) {
+    public CursorCellWriterOutputStream(char cellSeparator, String charsetName) {
 		this.cellSeparator = cellSeparator;
+        this.charsetName = charsetName;
 	}
 
 	@Override
@@ -58,11 +63,19 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
     protected abstract void writeCellValue(String value);
 
     private void flushBufferToCell() {
-        String cellContent = byteArrayOutputStream.toString();
 
-        writeCellValue(cellContent);
+        try {
+            String cellContent = byteArrayOutputStream.toString(charsetName);
 
-        byteArrayOutputStream = new ByteArrayOutputStream();
+            writeCellValue(cellContent);
+
+            byteArrayOutputStream = new ByteArrayOutputStream();
+
+        } catch (UnsupportedEncodingException e) {
+            // should not happen: we test the configuration before applying it
+            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(e,
+                    "The requested charsetName is not supported: " + charsetName);
+        }
     }
 
 

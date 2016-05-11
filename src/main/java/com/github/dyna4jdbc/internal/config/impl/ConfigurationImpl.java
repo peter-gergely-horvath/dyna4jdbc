@@ -7,6 +7,7 @@ class ConfigurationImpl implements Configuration {
 	private char cellSeparator;
 	private boolean skipFirstLine;
 	private boolean preferMultipleResultSets;
+	private String conversionCharset;
 
 	@Override
 	public char getCellSeparator() {
@@ -29,6 +30,14 @@ class ConfigurationImpl implements Configuration {
 	@Override
 	public boolean getPreferMultipleResultSets() {
 		return preferMultipleResultSets;
+	}
+
+	public void setConversionCharset(String conversionCharset) {
+		this.conversionCharset = conversionCharset;
+	}
+
+	public String getConversionCharset() {
+		return conversionCharset;
 	}
 
 	public void setPreferMultipleResultSets(boolean preferMultipleResultSets) {

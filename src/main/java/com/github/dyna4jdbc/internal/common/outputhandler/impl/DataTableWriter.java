@@ -19,7 +19,7 @@ public class DataTableWriter extends CursorCellWriterOutputStream{
 	private boolean preferMultipleResultSets;
 
     public DataTableWriter(Configuration configuration) {
-    	super(configuration.getCellSeparator());
+    	super(configuration.getCellSeparator(), configuration.getConversionCharset());
     	
     	dataTableList.addLast(new DataTable());
         this.skipFirstLine = configuration.getSkipFirstLine();

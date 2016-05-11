@@ -15,8 +15,10 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 	private final AtomicReference<ProcessRunner> processRunner = new AtomicReference<>();
 
 	private final boolean skipFirstLine;
+	private final Configuration configuration;
 
 	public ProcessRunnerScriptExecutor(Configuration configuration) {
+		this.configuration = configuration;
 		this.skipFirstLine = configuration.getSkipFirstLine();
 	}
 
@@ -28,7 +30,7 @@ public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecuto
 
 			ProcessRunner currentProcess = this.processRunner.get();
 			if (currentProcess == null || !currentProcess.isProcessRunning()) {
-					currentProcess = ProcessRunner.start(script);
+					currentProcess = ProcessRunner.start(script, configuration.getConversionCharset());
 					this.processRunner.set(currentProcess);
 				} else {
 					currentProcess.writeToStandardInput(script);

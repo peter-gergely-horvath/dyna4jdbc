@@ -1,6 +1,8 @@
 package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -76,12 +78,21 @@ public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFac
 		private final TypeHandlerFactory typeHandlerFactory;
 
 		public DefaultResultSetScriptOutputHandler(Statement statement, TypeHandlerFactory typeHandlerFactory, Configuration configuration) {
+			try {
+
 			this.statement = statement;
 			this.typeHandlerFactory = typeHandlerFactory;
 			
 			this.stdOut = new DataTableWriter(configuration);
-			this.printWriter = new PrintWriter(stdOut);
-			
+
+
+				this.printWriter = new PrintWriter(new OutputStreamWriter(
+                        stdOut, configuration.getConversionCharset()), true);
+			} catch (UnsupportedEncodingException e) {
+				// should not happen: we test the configuration before applying it
+				throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(e,
+						"The requested charsetName is not supported: " + configuration.getConversionCharset());
+			}
 		}
 
 		private List<ResultSet> processObjectListToResultSet() {

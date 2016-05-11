@@ -1,5 +1,7 @@
 package com.github.dyna4jdbc.internal.config.impl;
 
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 
@@ -88,7 +90,28 @@ enum ConfigurationEntry {
 			propertyInfo.choices = new String[] {"true", "false"};
 			return propertyInfo;
 		}
-	};
+	},
+	CHARSET("charset", "UTF-8", "The charset used during character conversion. Default is UTF-8.") {
+		@Override
+		void setConfiguration(ConfigurationImpl config, String charset) throws SQLException {
+			if (charset == null) {
+				throw MisconfigurationSQLException.forMessage("charset cannot be null");
+			}
+
+			try
+			{
+				if(! Charset.isSupported(charset)) {
+					throw MisconfigurationSQLException.forMessage("Charset is not supported: '%s'", charset);
+				}
+
+			} catch (IllegalCharsetNameException e) {
+				throw MisconfigurationSQLException.forMessage("Charset is illegal: '%s'", charset);
+			}
+
+			config.setConversionCharset(charset);
+		}
+	}
+	;
 
 	final String key;
 	final String defaultValue;

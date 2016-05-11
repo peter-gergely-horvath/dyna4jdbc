@@ -122,7 +122,7 @@
 				<executions>
 					<execution>
 						<id>validate</id>
-						<!--<phase>validate</phase>-->
+						<phase>validate</phase>
 						<configuration>
 							<configLocation>configuration/checkstyle.xml</configLocation>
 							<encoding>UTF-8</encoding>
@@ -131,7 +131,7 @@
 							<linkXRef>false</linkXRef>
 						</configuration>
 						<goals>
-							<goal>check</goal>
+							<!--<goal>check</goal>-->
 						</goals>
 					</execution>
 				</executions>
@@ -180,8 +180,8 @@
 					<!-- Location of FindBugs exclude filter file -->
 					<excludeFilterFile>configuration/findbugs-exclude.xml</excludeFilterFile>
 
-					<!-- TODO: Build shall fail if problems are found -->
-					<failOnError>false</failOnError>
+					<!-- Build shall fail if problems are found -->
+					<failOnError>true</failOnError>
 
 					<!-- Reports all bugs (other values are medium and max) -->
 					<threshold>Low</threshold>
@@ -258,6 +258,7 @@
 				</dependencies>
 			</plugin>
 
+			<!--
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
@@ -284,6 +285,7 @@
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
+			-->
 
 		</plugins>
 	</build>

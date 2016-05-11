@@ -258,15 +258,15 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> implements 
     }
 
     public String getSchemaTerm() throws SQLException {
-        return null;
+        return "";
     }
 
     public String getProcedureTerm() throws SQLException {
-        return null;
+        return "";
     }
 
     public String getCatalogTerm() throws SQLException {
-        return null;
+        return "";
     }
 
     public boolean isCatalogAtStart() throws SQLException {
@@ -274,7 +274,7 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> implements 
     }
 
     public String getCatalogSeparator() throws SQLException {
-        return null;
+        return "";
     }
 
     public boolean supportsSchemasInDataManipulation() throws SQLException {
