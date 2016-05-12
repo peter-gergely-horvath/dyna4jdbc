@@ -99,8 +99,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
     	checkNotClosed();
     	
         try {
-        	checkNotClosed();
-        	
+
 			MultiTypeScriptOutputHandler outputHandler =
 			        scriptOutputHandlerFactory.newMultiTypeScriptOutputHandler(this, script);
 			
