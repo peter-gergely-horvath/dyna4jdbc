@@ -1,5 +1,7 @@
 package com.github.dyna4jdbc;
 
+import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.sqlstate.SQLState;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -151,4 +153,25 @@ public class DriverTest {
         driver.connect("jdbc:dyna4jdbc:foo:bar/baz", new Properties());
     }
 
+    @Test
+    public void testHandlingOfInvalidScriptEngine() throws SQLException {
+
+        DynaDriver driver = new DynaDriver();
+
+        try {
+
+            driver.connect("jdbc:dyna4jdbc:scriptengine:FooBar", new Properties());
+
+            fail("Should throw an exception");
+        } catch (SQLException sqlex) {
+
+            String message = sqlex.getMessage();
+
+            assertTrue(message.contains(JDBCError.CONNECT_FAILED_EXCEPTION.name()),
+                    String.format("Invalid message: '%s'", message) );
+
+            String sqlState = sqlex.getSQLState();
+            assertEquals(sqlState, SQLState.ERROR_CONNECTION_UNABLE_TO_ESTABILISH.code);
+        }
+    }
 }

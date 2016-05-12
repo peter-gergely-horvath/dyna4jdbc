@@ -32,7 +32,7 @@ class ConnectionFactory {
         return INSTANCE;
     }
 
-    java.sql.Connection newConnection(String factoryConfiguration, Properties info) throws SQLException {
+    Connection newConnection(String factoryConfiguration, Properties info) throws SQLException {
         try {
             String[] bridgeNameAndConfig = factoryConfiguration.split(":", 2);
 
@@ -47,12 +47,12 @@ class ConnectionFactory {
             throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(ex, causeMessage);
         } catch (Exception ex) {
             String causeMessage = ExceptionUtil.getRootCauseMessage(ex);
-            throw JDBCError.CONNECT_FAILED_GENERIC.raiseSQLException(ex, causeMessage);
+            throw JDBCError.CONNECT_FAILED_EXCEPTION.raiseSQLException(ex, causeMessage);
         }
     }
 
 
-    private java.sql.Connection newConnection(String connectionType, String config, Properties info) throws Exception {
+    protected Connection newConnection(String connectionType, String config, Properties info) throws Exception {
         try {
 
             Class<? extends Connection> connectionClass = CONNECTION_TYPES.get(connectionType);
