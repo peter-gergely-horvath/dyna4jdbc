@@ -9,7 +9,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
 import com.github.dyna4jdbc.internal.common.util.collection.AlwaysSkipFirstElementIterable;
 import com.github.dyna4jdbc.internal.common.util.config.ConfigurationUtil;
 import com.github.dyna4jdbc.internal.config.Configuration;
