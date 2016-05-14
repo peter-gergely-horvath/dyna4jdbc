@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 
-import com.github.dyna4jdbc.DriverInfo;
+import com.github.dyna4jdbc.internal.DriverInfo;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
 
 public abstract class AbstractDatabaseMetaData<T extends Connection> implements DatabaseMetaData {

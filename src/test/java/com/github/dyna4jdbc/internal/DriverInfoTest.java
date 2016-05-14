@@ -1,7 +1,10 @@
-package com.github.dyna4jdbc;
+package com.github.dyna4jdbc.internal;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.github.dyna4jdbc.DriverTest;
+import com.github.dyna4jdbc.internal.DriverInfo;
 
 import java.io.IOException;
 import java.io.InputStream;

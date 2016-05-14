@@ -114,7 +114,7 @@ public class DriverTest {
 
         int minorVersion = driver.getMinorVersion();
 
-        assertEquals(minorVersionString, Integer.toString(minorVersion));
+        assertEquals(Integer.toString(minorVersion), minorVersionString);
     }
 
     @Test

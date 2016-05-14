@@ -1,4 +1,4 @@
-package com.github.dyna4jdbc;
+package com.github.dyna4jdbc.internal;
 
 import java.io.InputStream;
 import java.util.Properties;
