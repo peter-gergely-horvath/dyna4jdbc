@@ -5,7 +5,6 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,7 +13,6 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -124,15 +122,8 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 	}
 
 	@Override
-	public void close() throws SQLException {
-		
-		/* "Calling the method close on a ResultSet 
-		 * object that is already closed is a no-op." */
-		if(! isClosed()) {
-			dataTable.clear();
-
-			super.close();
-		}
+	protected void closeInternal() throws SQLException {
+		dataTable.clear();
 	}
 
 	private String getRawCellValueBySqlIndex(int sqlIndex) throws SQLException {

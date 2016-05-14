@@ -48,9 +48,8 @@ public class ProcessRunnerConnection extends AbstractConnection  {
     }
     
     @Override
-    public void close() throws SQLException {
+    protected void closeInternal() throws SQLException {
     	scriptExecutor.close();
-    	super.close();
     }
 
 

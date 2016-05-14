@@ -2,6 +2,7 @@ package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import java.util.List;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
@@ -25,15 +26,35 @@ public class BasicSQLObject extends AbstractWrapper {
 		}
 	}
 
-	public void close() throws SQLException {
+	public final void close() throws SQLException {
 		if(!closed.get()) {
-		
 			closed.set(true);
-
-			closeChildObjects(children);
 			
-			children.clear();
+			SQLException exceptionRaisedDuringCloseInternal = null;
+
+			try {
+				closeInternal();
+			} catch(SQLException sqlEx) {
+				exceptionRaisedDuringCloseInternal = sqlEx;
+			}
+						
+			try {
+				closeChildObjects(children);
+			} catch(SQLException exceptionRaisedDuringClosingChildren) {
+				
+				if(exceptionRaisedDuringCloseInternal == null) {
+					throw exceptionRaisedDuringClosingChildren;
+				} else {
+					throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(
+							Arrays.asList(exceptionRaisedDuringCloseInternal, exceptionRaisedDuringClosingChildren),
+							this, "Multiple exceptions raised during close; see supressed");
+				}
+			}
 		}
+	}
+
+	protected void closeInternal() throws SQLException {
+		// template method for subclasses to hook into close
 	}
 
 	private void closeChildObjects(Iterable<AutoCloseable> objectsToClose) throws SQLException {
@@ -47,11 +68,21 @@ public class BasicSQLObject extends AbstractWrapper {
 				supressedThrowables.add(sqle);
 			}
 		}
+		
+		children.clear();
 
 		if (!supressedThrowables.isEmpty()) {
-
-			throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(supressedThrowables,
-					this, "Closing of child object(s) caused exception(s); see supressed");
+			
+			if(supressedThrowables.size() == 1) {
+				// closure of a single child has failed: propagate the root cause as cause
+				throw JDBCError.CLOSE_FAILED.raiseSQLException(supressedThrowables.getFirst(),
+						this, "Closing of child object caused exception");
+				
+			} else {
+				// closure of multiple children has failed: propagate them as supressed
+				throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(supressedThrowables,
+						this, "Closing of child objects caused exceptions; see supressed");	
+			}
 		}
 	}
 
