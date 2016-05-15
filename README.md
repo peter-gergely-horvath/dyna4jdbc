@@ -6,9 +6,11 @@ Note: both development and documentation is in progress!
 
 dyna4jdbc is a JDBC driver implementation written in the Java programming language. It enables the user to execute dynamic JVM languages or console-oriented external programs through the JDBC API, captures the output generated and parses it to a standard JDBC ResultSet, which the caller application can process further. 
 
+This approach combines the power of dynamic languages with the rich ecosystem of reporting and data visualisation tools, that support the JDBC standard. You can for example write a complex Groovy/Scala/JavaScript/Jython etc. JVM script or call any console application (Shell script, Python, R language, etc.) and visualize or process the results further from your favourite JDBC-compatible tool. 
+
 ## How does it work?
 
-Any dynamic JVM language (including JavaScript, Groovy, Scala, Jython etc.)  which supports the standard Java ScriptEngine API, or console-oriented external application (Shell-script, Perl, Python etc.) can be called via this driver. The output is assumed to be a TAB (\t) delimited tabular result, which can be retrieved as a Java JDBC ResultSet from any JDBC-enabled client application. This approach combines the power of dynamic languages with the rich ecosystem of reporting and data visualisation tools, that support the JDBC standard.     
+Any dynamic JVM language (including JavaScript, Groovy, Scala, Jython etc.)  which supports the standard Java ScriptEngine API, or console-oriented external application (Shell-script, Perl, Python etc.) can be called via this driver. The output is captured and is assumed to be a TAB (\t) delimited tabular result, which is parsed by the driver can be retrieved as a Java JDBC ResultSet from any JDBC-enabled client application. 
 
 ## Status and availability
 
