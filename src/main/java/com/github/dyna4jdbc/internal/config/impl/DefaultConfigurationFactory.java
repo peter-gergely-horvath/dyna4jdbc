@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.common.util.config.ConfigurationUtil;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 
@@ -22,7 +21,7 @@ public class DefaultConfigurationFactory implements ConfigurationFactory {
 		ConfigurationImpl configuration = new ConfigurationImpl();
 		
 		
-		Properties internalPropops = ConfigurationUtil.readStringToProperties(config);
+		Properties internalPropops = ConfigurationStringParser.getInstance().parseStringToProperties(config);
 		
 		for(Object propKey : props.keySet()) {
 			if(!(propKey instanceof java.lang.String)) {

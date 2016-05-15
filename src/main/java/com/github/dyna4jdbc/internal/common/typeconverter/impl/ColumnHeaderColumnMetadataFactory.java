@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.util.collection.AlwaysSkipFirstElementIterable;
-import com.github.dyna4jdbc.internal.common.util.config.ConfigurationUtil;
 import com.github.dyna4jdbc.internal.config.Configuration;
+import com.github.dyna4jdbc.internal.config.impl.ConfigurationStringParser;
 
 final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFactory {
 
@@ -102,7 +102,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 	}
 	
 	private void configureAdditional(DefaultColumnMetadata metaData, String metaDataConfig) {
-		Properties props = ConfigurationUtil.readStringToProperties(metaDataConfig);
+		Properties props = ConfigurationStringParser.getInstance().parseStringToProperties(metaDataConfig);
 		String formatString = props.getProperty("format"); // TODO: clean this up!
 		metaData.setFormatString(formatString);
 	}
