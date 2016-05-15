@@ -34,6 +34,10 @@ This driver requires Java Runtime Environment, version 8 or later. It should be 
 
 ## User Manual
 
+### Adding data to the result set
+
+Echo your results to the standard output using the host language. Each row represents a row in the result set. By default, TAB (\t) separates cells (this can be customized in the driver configuration). The driver captures the values and makes reasonable efforts to heuristically guess the correct SQL type corresponding to the value. 
+
 ### Defining the JDBC headers
 
 Column headers can either be automatically generated from the index of the column or defined by the first output line of the scipt. In the latter case, the script must emit a special _formatting header_, wich contains three fields separated by a colon (':') character.
@@ -51,7 +55,7 @@ A first line, which does not match this criteria will be interpreted as part of 
 Examples for the first line output:
 
 1. `FOO\tBAR` ==> Columns are named as 1 and 2, while 'FOO' and 'BAR' appear in result set as the first entry.
-2. `FOO::\tBAR::` ==> Columns named as 'FOO' and 'BAR'
+2. `FOO::\tBAR::` ==> Columns named as 'FOO' and 'BAR', values from the second output row appear in the result set as first row. 
 3. `FOO:\tBAR:` ==> Columns are named as 1 and 2, while 'FOO:' and 'BAR:' appear in result set as the first entry.
 4. `FOO:\tBAR:` ==> Columns are named as 1 and 2, while 'FOO:' and 'BAR:' appear in result set as the first entry.
 5. `FOO::\tBAR:` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
