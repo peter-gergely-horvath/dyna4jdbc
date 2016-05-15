@@ -240,8 +240,8 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     }
 
     @Override
-    public RowId getRowId(String columnLabel) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.RowId");
+    public final RowId getRowId(String columnLabel) throws SQLException {
+    	return getRowId(findColumn(columnLabel));
     }
     
     @Override
@@ -250,17 +250,17 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     }
     
     @Override
-    public Ref getRef(String columnLabel) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Ref");
+    public final Ref getRef(String columnLabel) throws SQLException {
+    	return getRef(findColumn(columnLabel));
     }
     
     @Override
-    public Blob getBlob(int columnIndex) throws SQLException {
+    public final Blob getBlob(int columnIndex) throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
     }
 
     @Override
-    public Clob getClob(int columnIndex) throws SQLException {
+    public final Clob getClob(int columnIndex) throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Clob");
     }
 
@@ -270,18 +270,18 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     }
     
     @Override
-    public Blob getBlob(String columnLabel) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
+    public final Blob getBlob(String columnLabel) throws SQLException {
+    	return getBlob(findColumn(columnLabel));
     }
 
     @Override
     public Clob getClob(String columnLabel) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Clob");
+    	return getClob(findColumn(columnLabel));
     }
 
     @Override
-    public Array getArray(String columnLabel) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
+    public final Array getArray(String columnLabel) throws SQLException {
+    	return getArray(findColumn(columnLabel));
     }
     
     @Override
@@ -290,8 +290,8 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     }
 
     @Override
-    public NClob getNClob(String columnLabel) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.NClob");
+    public final NClob getNClob(String columnLabel) throws SQLException {
+    	return getNClob(findColumn(columnLabel));
     }
 
     @Override
@@ -300,27 +300,27 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     }
 
     @Override
-    public SQLXML getSQLXML(String columnLabel) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.SQLXML");
+    public final SQLXML getSQLXML(String columnLabel) throws SQLException {
+    	return getSQLXML(findColumn(columnLabel));
     }
 
     @Override
-    public String getNString(int columnIndex) throws SQLException {
+    public final String getNString(int columnIndex) throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNString(int)");
     }
 
     @Override
-    public String getNString(String columnLabel) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNString(String)");
+    public final String getNString(String columnLabel) throws SQLException {
+    	return getNString(findColumn(columnLabel));
     }
 
     @Override
     public Reader getNCharacterStream(int columnIndex) throws SQLException {
-        throw new UnsupportedOperationException("com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet#getNCharacterStream"); // TODO: implement method
+    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNCharacterStream(int)");
     }
 
     @Override
-    public Reader getNCharacterStream(String columnLabel) throws SQLException {
+    public final Reader getNCharacterStream(String columnLabel) throws SQLException {
     	return getNCharacterStream(findColumn(columnLabel));
     }
 
