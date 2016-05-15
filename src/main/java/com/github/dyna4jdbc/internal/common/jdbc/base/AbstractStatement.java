@@ -216,17 +216,6 @@ public abstract class AbstractStatement<T extends java.sql.Connection> extends B
         return false; // TODO: implement
     }
 
-    @Override
-    public <C> C unwrap(Class<C> iface) throws SQLException {
-        return null;
-    }
-
-    @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
-    }
-
-
     // -- unsupported JDBC operations
     public void addBatch(String sql) throws SQLException {
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(

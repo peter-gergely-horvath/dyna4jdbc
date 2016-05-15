@@ -15,6 +15,7 @@ import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
+import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
@@ -70,7 +71,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
 
     public DatabaseMetaData getMetaData() throws SQLException {
         checkNotClosed();
-        return new ScriptEngineDatabaseMetaData(this);
+        return new GenericDatabaseMetaData(this, getEngineDescription(), getEngineVersion());
     }
 
     protected AbstractStatement<?> createStatementInternal() throws SQLException {
@@ -81,7 +82,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
     }
 
 
-    public String getEngineDescription() {
+    private String getEngineDescription() {
         ScriptEngineFactory factory = engine.getFactory();
         if(factory != null) {
             String engineName = factory.getEngineName();
@@ -93,7 +94,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
         return null;
     }
 
-    public String getEngineVersion() {
+    private String getEngineVersion() {
 
         ScriptEngineFactory factory = engine.getFactory();
         if(factory != null) {

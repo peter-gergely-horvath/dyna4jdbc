@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import com.github.dyna4jdbc.internal.DriverInfo;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
 
-public abstract class AbstractDatabaseMetaData<T extends Connection> implements DatabaseMetaData {
+public abstract class AbstractDatabaseMetaData<T extends Connection> extends AbstractWrapper implements DatabaseMetaData {
 
 	private final T connection;
 
@@ -48,7 +48,8 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> implements 
     }
 
     public String getURL() throws SQLException {
-        return null;
+        /* "Returns the URL for this DBMS or null if it cannot be generated"  */
+    	return null;
     }
 
     public String getUserName() throws SQLException {
@@ -708,15 +709,5 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> implements 
     public boolean generatedKeyAlwaysReturned() throws SQLException {
         return false;
     }
-
-    public <C> C unwrap(Class<C> iface) throws SQLException {
-        throw new SQLException();
-    }
-
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
-    }
-
-
 
 }

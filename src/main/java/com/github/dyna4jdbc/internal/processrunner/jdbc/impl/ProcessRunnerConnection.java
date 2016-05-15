@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
+import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
@@ -16,8 +17,6 @@ import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
 public class ProcessRunnerConnection extends AbstractConnection  {
-
-
 
 	private final TypeHandlerFactory typeHandlerFactory;
 	private final Configuration configuration;
@@ -36,7 +35,7 @@ public class ProcessRunnerConnection extends AbstractConnection  {
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
         checkNotClosed();
-        return new ProcessRunnerDatabaseMetaData(this);
+        return new GenericDatabaseMetaData(this, System.getProperty("os.name"), System.getProperty("os.version") );
     }
 
     @Override
@@ -53,13 +52,4 @@ public class ProcessRunnerConnection extends AbstractConnection  {
     	scriptExecutor.close();
     }
 
-
-    public String getProductName() {
-    	return System.getProperty("os.name");
-    }
-
-    public String getProductVersion() {
-    	return System.getProperty("os.version");
-    	
-    }
 }
