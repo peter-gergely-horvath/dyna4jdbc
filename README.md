@@ -56,10 +56,10 @@ printRow "Ticker::", "Name::", "Open::", "Close::", "Change::"
 data.each { printRow it["t"], it["name"], it["op"], it["l_cur"], it["c"] }
 ```
 
-Full Java source code:
+Full Java source code (Remember: both driver JAR and Groovy JARs have to be on the classpath):
 
 ```java
-package com.github.dyna4jdbc;
+package demo;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
