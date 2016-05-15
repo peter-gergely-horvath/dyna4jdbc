@@ -1,5 +1,7 @@
 # dyna4jdbc
 
+Note: both development and documentation is in progress!
+
 ## Introduction
 
 dyna4jdbc is a JDBC driver implementation written in the Java programming language. It enables the user to execute dynamic JVM languages or console-oriented external programs through the JDBC API, captures the output generated and parses it to a standard JDBC ResultSet, which the caller application can process further. 
@@ -10,7 +12,7 @@ Any dynamic JVM language (including JavaScript, Groovy, Scala, Jython etc.)  whi
 
 ## Status and availability
 
-As of now, this library is under development and should be considered as "early beta", with many known issues and limitations. It is not yet promoted to any repository. Any potential user will have to clone the git repository and build it manually.  
+As of now, this library is under development and should be considered as "development" or "early alpha", with many known issues and limitations. It is not yet promoted to any library repository. Any potential user will have to clone the git repository and build it manually.  
 
 ## Dependencies
 
@@ -29,6 +31,35 @@ Git (to clone the repository), Maven 3 and Oracle Java 8 JDK are required to bui
 ### Requirements for running
 
 This driver requires Java Runtime Environment, version 8 or later. It should be compatible on any operating system, where Java 8 is officially available. 
+
+## User Manual
+
+### Defining the JDBC headers
+
+Column headers can either be automatically generated from the index of the column or defined by the first output line of the scipt. In the latter case, the script must emit a special _formatting header_, wich contains three fields separated by a colon (':') character.
+
+`<Column Header> : <SQL type definition> : <additional flags>`
+
+1. Column Header: The human-readable name assigned to the column (see `java.sql.ResultSetMetaData.getColumnLabel(int)`)
+2. SQL type definition(optional): the SQL type definition of the column, auto-detected if not present
+3. Additional flags(optional): additional formatting flags for the column
+
+**Important: The _formatting header_ MUST ALWAYS CONTAIN TWO COLONS, even if a field is not used!**
+
+A first line, which does not match this criteria will be interpreted as part of the result set and the column headers will be generated automatically:
+
+Examples for the first line output:
+
+1. `FOO\tBAR` ==> Columns are named as 1 and 2, while 'FOO' and 'BAR' appear in result set as the first entry.
+2. `FOO::\tBAR::` ==> Columns named as 'FOO' and 'BAR'
+3. `FOO:\tBAR:` ==> Columns are named as 1 and 2, while 'FOO:' and 'BAR:' appear in result set as the first entry.
+4. `FOO:\tBAR:` ==> Columns are named as 1 and 2, while 'FOO:' and 'BAR:' appear in result set as the first entry.
+5. `FOO::\tBAR:` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
+6. `FOO:\tBAR::` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
+7. `FOO\tBAR::` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
+8. `FOO::\tBAR:` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
+
+
 
 ## Samples
 
