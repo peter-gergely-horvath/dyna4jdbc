@@ -97,11 +97,6 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     }
 
     @Override
-    protected void checkNotClosed() throws java.sql.SQLException {
-        super.checkNotClosed("ResultSet");
-    }
-    
-    @Override
     public boolean isBeforeFirst() throws SQLException {
         return resultSetState.isInState(State.BEFORE_FIRST);
     }

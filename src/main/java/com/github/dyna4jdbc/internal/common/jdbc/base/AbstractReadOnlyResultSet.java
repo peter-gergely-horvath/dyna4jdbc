@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 
-public abstract class AbstractReadOnlyResultSet extends BasicSQLObject implements ResultSet {
+public abstract class AbstractReadOnlyResultSet extends AbstractCloseableJdbcObject implements ResultSet {
 
     @Override
     public final void updateNCharacterStream(int columnIndex, Reader x, long length) throws SQLException {
