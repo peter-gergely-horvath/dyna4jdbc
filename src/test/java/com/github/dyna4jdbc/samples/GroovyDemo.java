@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class GroovyDemo {
-	
+
 	private static final String GROOVY_SCRIPT = ""
 			+ "	import groovy.json.JsonSlurper													\n"
 			+ "																					\n"
@@ -24,16 +24,17 @@ public class GroovyDemo {
 
 			try (Statement statement = connection.createStatement()) {
 				boolean results = statement.execute(GROOVY_SCRIPT);
-				do {
-					if (results) {
+				if (results) {
+					do {
+
 						try (ResultSet rs = statement.getResultSet()) {
 
 							printResultSetWithHeaders(rs);
 						}
-					}
 
-					results = statement.getMoreResults();
-				} while (results);
+						results = statement.getMoreResults();
+					} while (results);
+				}
 			}
 		}
 	}
@@ -42,31 +43,30 @@ public class GroovyDemo {
 		ResultSetMetaData metaData = rs.getMetaData();
 		final int columnCount = metaData.getColumnCount();
 
-		for(int i=1; i<=columnCount; i++ ) {
+		for (int i = 1; i <= columnCount; i++) {
 			String columnLabel = metaData.getColumnLabel(i);
 			int columnDisplaySize = metaData.getColumnDisplaySize(i);
 			String formatStr = "%" + columnDisplaySize + "s | ";
 			System.out.format(formatStr, columnLabel);
 		}
 		System.out.println();
-		
-		for(int i=1; i<=columnCount; i++ ) {
+
+		for (int i = 1; i <= columnCount; i++) {
 			int columnDisplaySize = metaData.getColumnDisplaySize(i);
 			String formatStr = "%" + columnDisplaySize + "s | ";
 			System.out.format(String.format(formatStr, "").replace(' ', '-'));
 		}
 		System.out.println();
-		
+
 		while (rs.next()) {
 
-		    for(int i=1; i<=columnCount; i++ ) {
-		    	int columnDisplaySize = metaData.getColumnDisplaySize(i);
-		    	String formatStr = "%" + columnDisplaySize + "s | ";
-		    	System.out.format(formatStr, rs.getString(i));
-		    }
-		    System.out.println();
+			for (int i = 1; i <= columnCount; i++) {
+				int columnDisplaySize = metaData.getColumnDisplaySize(i);
+				String formatStr = "%" + columnDisplaySize + "s | ";
+				System.out.format(formatStr, rs.getString(i));
+			}
+			System.out.println();
 		}
 	}
-
 
 }
