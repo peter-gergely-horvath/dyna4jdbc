@@ -36,6 +36,8 @@ This driver requires Java Runtime Environment, version 8 or later. It should be 
 
 ## User Manual
 
+Documentation is in progress: this section contains only the essential basics required to get started. 
+
 ### Adding data to the result set
 
 Echo your results to the standard output using the host language. Each row represents a row in the result set. By default, TAB (\t) separates cells (this can be customized in the driver configuration). The driver captures the values and makes reasonable efforts to heuristically guess the correct SQL type corresponding to the value. 
@@ -65,7 +67,7 @@ Examples for the first line output:
 7. `FOO\tBAR::` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
 8. `FOO::\tBAR:` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
 
-
+Check the samples on details regarding how to generate output properly.
 
 ## Samples
 
