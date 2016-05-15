@@ -1,8 +1,8 @@
 package com.github.dyna4jdbc;
 
-import com.github.dyna4jdbc.internal.MisconfigurationSQLException;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtil;
+import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScriptEngineConnection;
 
@@ -42,7 +42,7 @@ class ConnectionFactory {
 
             return newConnection(bridgeName, config, info);
 
-        } catch (MisconfigurationSQLException ex) {
+        } catch (MisconfigurationException ex) {
             String causeMessage = ExceptionUtil.getRootCauseMessage(ex);
             throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(ex, causeMessage);
         } catch (Exception ex) {
@@ -57,7 +57,7 @@ class ConnectionFactory {
 
             Class<? extends Connection> connectionClass = CONNECTION_TYPES.get(connectionType);
             if (connectionClass == null) {
-                throw MisconfigurationSQLException.forMessage("No such connection type: '%s'", connectionType);
+                throw MisconfigurationException.forMessage("No such connection type: '%s'", connectionType);
             }
 
             Constructor<? extends Connection> connectionConstructor =

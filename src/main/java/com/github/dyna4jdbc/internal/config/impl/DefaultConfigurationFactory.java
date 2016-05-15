@@ -1,11 +1,10 @@
 package com.github.dyna4jdbc.internal.config.impl;
 
-import java.sql.SQLException;
 import java.util.Properties;
 
-import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
+import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
 public class DefaultConfigurationFactory implements ConfigurationFactory {
 
@@ -17,7 +16,7 @@ public class DefaultConfigurationFactory implements ConfigurationFactory {
 	
 	
 	@Override
-	public Configuration newConfigurationFromParameters(String config, Properties props) throws SQLException {
+	public Configuration newConfigurationFromParameters(String config, Properties props) throws MisconfigurationException {
 		ConfigurationImpl configuration = new ConfigurationImpl();
 		
 		
@@ -25,13 +24,12 @@ public class DefaultConfigurationFactory implements ConfigurationFactory {
 		
 		for(Object propKey : props.keySet()) {
 			if(!(propKey instanceof java.lang.String)) {
-				throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(
-						"properties should only contain String keys!");
+				throw MisconfigurationException.forMessage("properties should only contain String keys!");
 			} else {
 				String key = (String)propKey;
 				
 				if(internalPropops.containsKey(key)) {
-					throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(
+					throw MisconfigurationException.forMessage(
 							"duplicated configuration between JDBC URL and properties: %s", key);
 				}
 				

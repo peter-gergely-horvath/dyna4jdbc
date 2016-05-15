@@ -22,6 +22,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultTypeHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
+import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
 public class ScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
@@ -30,7 +31,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
     private final TypeHandlerFactory typeHandlerFactory;
 	private final Configuration configuration;
 
-    public ScriptEngineConnection(String parameters, Properties properties) throws SQLException
+    public ScriptEngineConnection(String parameters, Properties properties) throws SQLException, MisconfigurationException
     {
         if(parameters == null || "".equals(parameters.trim())) {
         	throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(

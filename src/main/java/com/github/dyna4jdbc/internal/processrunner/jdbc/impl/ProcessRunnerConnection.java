@@ -12,6 +12,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultTypeHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
+import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
 public class ProcessRunnerConnection extends AbstractConnection  {
@@ -23,7 +24,7 @@ public class ProcessRunnerConnection extends AbstractConnection  {
 	private final ProcessRunnerScriptExecutor scriptExecutor;
 
 
-    public ProcessRunnerConnection(String parameters, Properties properties) throws SQLException
+    public ProcessRunnerConnection(String parameters, Properties properties) throws SQLException, MisconfigurationException
     {
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
 		configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);

@@ -3,17 +3,16 @@ package com.github.dyna4jdbc.internal.config.impl;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.sql.DriverPropertyInfo;
-import java.sql.SQLException;
 
-import com.github.dyna4jdbc.internal.MisconfigurationSQLException;
+import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
 enum ConfigurationEntry {
 
 	CELL_SEPARATOR("cellSeparator", "\t", "The character used as separator character. Default is TAB (\\t).") {
 		@Override
-		void setConfiguration(ConfigurationImpl config, String value) throws SQLException {
+		void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
 			if (value == null || value.length() != 1) {
-				throw MisconfigurationSQLException.forMessage(
+				throw MisconfigurationException.forMessage(
 						"A singe character is expected for %s, but was: '%s'",
 						this.key, value);
 			}
@@ -26,10 +25,10 @@ enum ConfigurationEntry {
 	SKIP_FIRST_RESULT_LINE("skipFirstLine", "false",
 			"If set to true, the first output line is omitted from the result. Default is false.") {
 		@Override
-		void setConfiguration(ConfigurationImpl config, String value) throws SQLException {
+		void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
 
 			if (value == null || "".equals(value) || "".equals(value.trim())) {
-				throw MisconfigurationSQLException
+				throw MisconfigurationException
 						.forMessage("Value for %s cannot be null/whitespace only, but was '%s'", 
 								this.key, value);
 			}
@@ -44,7 +43,7 @@ enum ConfigurationEntry {
 				break;
 
 			default:
-				throw MisconfigurationSQLException
+				throw MisconfigurationException
 						.forMessage("Value for %s must either be 'true' or 'false', but was '%s'", 
 								this.key, value);
 			}
@@ -60,10 +59,10 @@ enum ConfigurationEntry {
 	PREFER_MULTIPLE_RESULT_SETS("preferMultipleResultSets", "false",
 			"If set to true, output with different column count will be considered as a new result set. Default is false.") {
 		@Override
-		void setConfiguration(ConfigurationImpl config, String value) throws SQLException {
+		void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
 
 			if (value == null || "".equals(value) || "".equals(value.trim())) {
-				throw MisconfigurationSQLException
+				throw MisconfigurationException
 						.forMessage("Value for %s cannot be null/whitespace only, but was '%s'", 
 								this.key, value);
 			}
@@ -78,7 +77,7 @@ enum ConfigurationEntry {
 				break;
 
 			default:
-				throw MisconfigurationSQLException
+				throw MisconfigurationException
 						.forMessage("Value for %s must either be 'true' or 'false', but was '%s'", 
 								this.key, value);
 			}
@@ -93,19 +92,19 @@ enum ConfigurationEntry {
 	},
 	CHARSET("charset", "UTF-8", "The charset used during character conversion. Default is UTF-8.") {
 		@Override
-		void setConfiguration(ConfigurationImpl config, String charset) throws SQLException {
+		void setConfiguration(ConfigurationImpl config, String charset) throws MisconfigurationException {
 			if (charset == null) {
-				throw MisconfigurationSQLException.forMessage("charset cannot be null");
+				throw MisconfigurationException.forMessage("charset cannot be null");
 			}
 
 			try
 			{
 				if(! Charset.isSupported(charset)) {
-					throw MisconfigurationSQLException.forMessage("Charset is not supported: '%s'", charset);
+					throw MisconfigurationException.forMessage("Charset is not supported: '%s'", charset);
 				}
 
 			} catch (IllegalCharsetNameException e) {
-				throw MisconfigurationSQLException.forMessage("Charset is illegal: '%s'", charset);
+				throw MisconfigurationException.forMessage("Charset is illegal: '%s'", charset);
 			}
 
 			config.setConversionCharset(charset);
@@ -123,7 +122,7 @@ enum ConfigurationEntry {
 		this.description = description;
 	}
 
-	abstract void setConfiguration(ConfigurationImpl config, String value) throws SQLException;
+	abstract void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException;
 
 	public DriverPropertyInfo getDriverPropertyInfo() {
 		DriverPropertyInfo driverPropertyInfo = new DriverPropertyInfo(this.key, defaultValue);
