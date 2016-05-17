@@ -17,15 +17,10 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import org.easymock.EasyMock;
-import org.easymock.IExpectationSetters;
-import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.Closeable;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
@@ -69,6 +64,7 @@ public class AbstractCloseableJdbcObjectTest {
     private AbstractCloseableJdbcObject closeableJdbcObject;
 
     @BeforeMethod
+    @SuppressWarnings("unchecked")
     public void beforeMethod() throws SQLException {
 
         closeMock = createMock(Callable.class);
