@@ -50,6 +50,7 @@
 
 		<!-- Dependency versions -->
 		<testng.version>6.8.21</testng.version>
+		<easymock.version>3.4</easymock.version>
 
 		<!-- Used to generate build information -->
 		<product-name>${project.name}</product-name>
@@ -85,6 +86,13 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>${testng.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>${easymock.version}</version>
 			<scope>test</scope>
 		</dependency>
 

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2016 Peter G. Horvath, All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import java.sql.SQLException;
@@ -89,31 +105,41 @@ public class AbstractCloseableJdbcObject extends AbstractWrapper {
 	 * operation shall be visible from all other threads as well, 
 	 * <i>without external synchronisation.</i>
 	 * 
-	 * @throws SQLException in case closing {@code this} object or any of the 
+	 * @throws SQLException in case closing {@code this} object or any of the the child object fails
 	 */
 	public final void close() throws SQLException {
 		if(!closed.get()) {
 			closed.set(true);
 			
-			SQLException exceptionRaisedDuringCloseInternal = null;
+			SQLException internalCloseSQLException = null;
+			SQLException childrenCloseSQLException = null;
 
 			try {
 				closeInternal();
 			} catch(SQLException sqlEx) {
-				exceptionRaisedDuringCloseInternal = sqlEx;
+				internalCloseSQLException = sqlEx;
 			}
 						
 			try {
 				closeChildObjects();
-			} catch(SQLException exceptionRaisedDuringClosingChildren) {
-				
-				if(exceptionRaisedDuringCloseInternal == null) {
-					throw exceptionRaisedDuringClosingChildren;
-				} else {
-					throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(
-							Arrays.asList(exceptionRaisedDuringCloseInternal, exceptionRaisedDuringClosingChildren),
-							this, "Multiple exceptions raised during close; see supressed");
-				}
+			} catch(SQLException sqlEx) {
+				childrenCloseSQLException = sqlEx;
+			}
+
+			if(internalCloseSQLException != null &&
+					childrenCloseSQLException != null) {
+
+				throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(
+						Arrays.asList(internalCloseSQLException, childrenCloseSQLException),
+						this, "Multiple exceptions raised during close; see supressed");
+			}
+
+			if(internalCloseSQLException != null) {
+				throw internalCloseSQLException;
+			}
+
+			if(childrenCloseSQLException != null) {
+				throw childrenCloseSQLException;
 			}
 		}
 	}
