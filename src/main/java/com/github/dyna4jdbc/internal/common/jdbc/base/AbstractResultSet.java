@@ -12,7 +12,7 @@ import java.util.Map;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.base.GuardedResultSetState.State;
 
-public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
+public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObject implements ResultSet {
 
     private final GuardedResultSetState resultSetState = new GuardedResultSetState();
 	private final Statement statement;

@@ -32,18 +32,18 @@ import static org.testng.Assert.*;
 /**
  * @author Peter Horvath
  */
-public class AbstractCloseableJdbcObjectTest {
+public class AbstractAutoCloseableJdbcObjectTest {
 
     /**
-     * A minimalistic implementation of {@code AbstractCloseableJdbcObject},
+     * A minimalistic implementation of {@code AbstractAutoCloseableJdbcObject},
      * which allows us to detect if method {@code closeInternal()} is called:
      * the {@code Callable} supplied as constructor argument can be a mock.
      */
-    private class CloseableJdbcObject extends AbstractCloseableJdbcObject {
+    private class AutoCloseableJdbcObject extends AbstractAutoCloseableJdbcObject {
 
         private final Callable<Void> closeInternalCallable;
 
-        CloseableJdbcObject(Callable<Void> closeInternalCallable) {
+        AutoCloseableJdbcObject(Callable<Void> closeInternalCallable) {
             this.closeInternalCallable = closeInternalCallable;
         }
 
@@ -61,7 +61,7 @@ public class AbstractCloseableJdbcObjectTest {
 
     private Callable<Void> closeMock;
 
-    private AbstractCloseableJdbcObject closeableJdbcObject;
+    private AbstractAutoCloseableJdbcObject closeableJdbcObject;
 
     @BeforeMethod
     @SuppressWarnings("unchecked")
@@ -69,7 +69,7 @@ public class AbstractCloseableJdbcObjectTest {
 
         closeMock = createMock(Callable.class);
 
-        closeableJdbcObject = new CloseableJdbcObject(closeMock);
+        closeableJdbcObject = new AutoCloseableJdbcObject(closeMock);
     }
 
 

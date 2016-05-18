@@ -3,22 +3,15 @@ package com.github.dyna4jdbc.internal.common.jdbc.base;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.sql.Array;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Date;
-import java.sql.NClob;
-import java.sql.Ref;
-import java.sql.ResultSet;
-import java.sql.RowId;
-import java.sql.SQLException;
-import java.sql.SQLXML;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.sql.*;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 
-public abstract class AbstractReadOnlyResultSet extends AbstractCloseableJdbcObject implements ResultSet {
+public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> {
+
+    public AbstractReadOnlyResultSet(Iterable<T> dataRowIterator, Statement statement) {
+        super(dataRowIterator, statement);
+    }
 
     @Override
     public final void updateNCharacterStream(int columnIndex, Reader x, long length) throws SQLException {

@@ -11,7 +11,7 @@ import java.util.List;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
 
-public abstract class AbstractStatement<T extends java.sql.Connection> extends AbstractCloseableJdbcObject implements java.sql.Statement {
+public abstract class AbstractStatement<T extends java.sql.Connection> extends AbstractAutoCloseableJdbcObject implements java.sql.Statement {
 
     protected final T connection;
 

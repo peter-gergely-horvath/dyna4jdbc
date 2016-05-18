@@ -15,9 +15,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractReadOnlyResultSet;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractResultSet;
 
-public class EmptyResultSet extends AbstractResultSet<List<String>> {
+public class EmptyResultSet extends AbstractReadOnlyResultSet<List<String>> {
 
 	public EmptyResultSet() {
 		super(new LinkedList<>(), null);
