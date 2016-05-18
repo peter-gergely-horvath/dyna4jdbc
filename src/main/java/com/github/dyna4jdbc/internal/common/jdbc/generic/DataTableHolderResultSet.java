@@ -30,7 +30,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 
 	private final DataTable dataTable;
 
-	private boolean wasNull = false;
 	private List<TypeHandler> typeHandlers;
 	private Map<String, Integer> columnNameToColumnIndexMap;
 
@@ -152,16 +151,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 		TypeHandler typeHandler = typeHandlers.get(javaIndex);
 
 		return typeHandler;
-	}
-
-	private <T> T setWasNullBasedOnLastValue(T convertedValue) {
-		wasNull = (convertedValue == null);
-		return convertedValue;
-	}
-
-	@Override
-	public boolean wasNull() throws SQLException {
-		return wasNull;
 	}
 
 	@Override
@@ -423,86 +412,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 	}
 
 	@Override
-	public String getString(String columnLabel) throws SQLException {
-		return getString(findColumn(columnLabel));
-	}
-
-	@Override
-	public boolean getBoolean(String columnLabel) throws SQLException {
-		return getBoolean(findColumn(columnLabel));
-	}
-
-	@Override
-	public byte getByte(String columnLabel) throws SQLException {
-		return getByte(findColumn(columnLabel));
-	}
-
-	@Override
-	public short getShort(String columnLabel) throws SQLException {
-		return getShort(findColumn(columnLabel));
-	}
-
-	@Override
-	public int getInt(String columnLabel) throws SQLException {
-		return getInt(findColumn(columnLabel));
-	}
-
-	@Override
-	public long getLong(String columnLabel) throws SQLException {
-		return getLong(findColumn(columnLabel));
-	}
-
-	@Override
-	public float getFloat(String columnLabel) throws SQLException {
-		return getFloat(findColumn(columnLabel));
-	}
-
-	@Override
-	public double getDouble(String columnLabel) throws SQLException {
-		return getDouble(findColumn(columnLabel));
-	}
-
-	@Override
-	public BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException {
-		return getBigDecimal(findColumn(columnLabel), scale);
-	}
-
-	@Override
-	public byte[] getBytes(String columnLabel) throws SQLException {
-		return getBytes(findColumn(columnLabel));
-	}
-
-	@Override
-	public Date getDate(String columnLabel) throws SQLException {
-		return getDate(findColumn(columnLabel));
-	}
-
-	@Override
-	public Time getTime(String columnLabel) throws SQLException {
-		return getTime(findColumn(columnLabel));
-	}
-
-	@Override
-	public Timestamp getTimestamp(String columnLabel) throws SQLException {
-		return getTimestamp(findColumn(columnLabel));
-	}
-
-	@Override
-	public InputStream getAsciiStream(String columnLabel) throws SQLException {
-		return getAsciiStream(findColumn(columnLabel));
-	}
-
-	@Override
-	public InputStream getUnicodeStream(String columnLabel) throws SQLException {
-		return getUnicodeStream(findColumn(columnLabel));
-	}
-
-	@Override
-	public InputStream getBinaryStream(String columnLabel) throws SQLException {
-		return getBinaryStream(findColumn(columnLabel));
-	}
-
-	@Override
 	public String getCursorName() throws SQLException {
 		throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Retrieval of cursor name");
 	}
@@ -516,11 +425,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 	public Object getObject(int columnIndex) throws SQLException {
 		return getObject(columnIndex, (Map<String, Class<?>>) null);
 
-	}
-
-	@Override
-	public Object getObject(String columnLabel) throws SQLException {
-		return getObject(findColumn(columnLabel));
 	}
 
 	@Override
@@ -553,11 +457,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 	}
 
 	@Override
-	public Reader getCharacterStream(String columnLabel) throws SQLException {
-		return getCharacterStream(findColumn(columnLabel));
-	}
-
-	@Override
 	public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
 		String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
 
@@ -570,11 +469,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 			throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(tce, getRow(), columnIndex, rawCellValue,
 					java.io.Reader.class);
 		}
-	}
-
-	@Override
-	public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
-		return getBigDecimal(findColumn(columnLabel));
 	}
 
 	@Override
@@ -593,11 +487,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 	}
 
 	@Override
-	public Object getObject(String columnLabel, Map<String, Class<?>> map) throws SQLException {
-		return getObject(findColumn(columnLabel), map);
-	}
-
-	@Override
 	public Date getDate(int columnIndex, Calendar cal) throws SQLException {
 		String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
 
@@ -610,11 +499,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 			throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(tce, getRow(), columnIndex, rawCellValue,
 					java.sql.Date.class);
 		}
-	}
-
-	@Override
-	public Date getDate(String columnLabel, Calendar cal) throws SQLException {
-		return getDate(findColumn(columnLabel), cal);
 	}
 
 	@Override
@@ -633,11 +517,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 	}
 
 	@Override
-	public Time getTime(String columnLabel, Calendar cal) throws SQLException {
-		return getTime(findColumn(columnLabel), cal);
-	}
-
-	@Override
 	public Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException {
 		String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
 
@@ -650,11 +529,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 			throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(tce, getRow(), columnIndex, rawCellValue,
 					java.sql.Timestamp.class);
 		}
-	}
-
-	@Override
-	public Timestamp getTimestamp(String columnLabel, Calendar cal) throws SQLException {
-		return getTimestamp(findColumn(columnLabel), cal);
 	}
 
 	@Override
@@ -673,11 +547,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 	}
 
 	@Override
-	public URL getURL(String columnLabel) throws SQLException {
-		return getURL(findColumn(columnLabel));
-	}
-
-	@Override
 	public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
 		String rawCellValue = getRawCellValueBySqlIndex(columnIndex);
 
@@ -689,11 +558,6 @@ public class DataTableHolderResultSet extends AbstractResultSet<List<String>> {
 		} catch (TypeConversionException tce) {
 			throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(tce, getRow(), columnIndex, rawCellValue, type);
 		}
-	}
-
-	@Override
-	public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
-		return getObject(findColumn(columnLabel), type);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -1,18 +1,13 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
+import java.io.InputStream;
 import java.io.Reader;
-import java.sql.Array;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.NClob;
-import java.sql.Ref;
-import java.sql.ResultSet;
-import java.sql.RowId;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.SQLXML;
-import java.sql.Statement;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.*;
+import java.util.Calendar;
 import java.util.Iterator;
+import java.util.Map;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.base.GuardedResultSetState.State;
@@ -21,7 +16,10 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
 
     private final GuardedResultSetState resultSetState = new GuardedResultSetState();
 	private final Statement statement;
-	private SQLWarning sqlWarning;
+
+    protected boolean wasNull = false;
+
+    private SQLWarning sqlWarning;
     
     private final Iterator<T> rowIterator;
     private int row = 0;
@@ -320,5 +318,141 @@ public abstract class AbstractResultSet<T> extends AbstractReadOnlyResultSet {
     }
 
 
-    
+    @Override
+    public Object getObject(String columnLabel) throws SQLException {
+        return getObject(findColumn(columnLabel));
+    }
+
+    @Override
+    public Reader getCharacterStream(String columnLabel) throws SQLException {
+        return getCharacterStream(findColumn(columnLabel));
+    }
+
+    @Override
+    public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
+        return getBigDecimal(findColumn(columnLabel));
+    }
+
+    @Override
+    public Object getObject(String columnLabel, Map<String, Class<?>> map) throws SQLException {
+        return getObject(findColumn(columnLabel), map);
+    }
+
+    @Override
+    public Date getDate(String columnLabel, Calendar cal) throws SQLException {
+        return getDate(findColumn(columnLabel), cal);
+    }
+
+    @Override
+    public Time getTime(String columnLabel, Calendar cal) throws SQLException {
+        return getTime(findColumn(columnLabel), cal);
+    }
+
+    @Override
+    public Timestamp getTimestamp(String columnLabel, Calendar cal) throws SQLException {
+        return getTimestamp(findColumn(columnLabel), cal);
+    }
+
+    @Override
+    public URL getURL(String columnLabel) throws SQLException {
+        return getURL(findColumn(columnLabel));
+    }
+
+    @Override
+    public String getString(String columnLabel) throws SQLException {
+        return getString(findColumn(columnLabel));
+    }
+
+    @Override
+    public boolean getBoolean(String columnLabel) throws SQLException {
+        return getBoolean(findColumn(columnLabel));
+    }
+
+    @Override
+    public byte getByte(String columnLabel) throws SQLException {
+        return getByte(findColumn(columnLabel));
+    }
+
+    @Override
+    public short getShort(String columnLabel) throws SQLException {
+        return getShort(findColumn(columnLabel));
+    }
+
+    @Override
+    public int getInt(String columnLabel) throws SQLException {
+        return getInt(findColumn(columnLabel));
+    }
+
+    @Override
+    public long getLong(String columnLabel) throws SQLException {
+        return getLong(findColumn(columnLabel));
+    }
+
+    @Override
+    public float getFloat(String columnLabel) throws SQLException {
+        return getFloat(findColumn(columnLabel));
+    }
+
+    @Override
+    public double getDouble(String columnLabel) throws SQLException {
+        return getDouble(findColumn(columnLabel));
+    }
+
+    @Override
+    public BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException {
+        return getBigDecimal(findColumn(columnLabel), scale);
+    }
+
+    @Override
+    public byte[] getBytes(String columnLabel) throws SQLException {
+        return getBytes(findColumn(columnLabel));
+    }
+
+    @Override
+    public Date getDate(String columnLabel) throws SQLException {
+        return getDate(findColumn(columnLabel));
+    }
+
+    @Override
+    public Time getTime(String columnLabel) throws SQLException {
+        return getTime(findColumn(columnLabel));
+    }
+
+    @Override
+    public Timestamp getTimestamp(String columnLabel) throws SQLException {
+        return getTimestamp(findColumn(columnLabel));
+    }
+
+    @Override
+    public InputStream getAsciiStream(String columnLabel) throws SQLException {
+        return getAsciiStream(findColumn(columnLabel));
+    }
+
+    @Override
+    public InputStream getUnicodeStream(String columnLabel) throws SQLException {
+        return getUnicodeStream(findColumn(columnLabel));
+    }
+
+    @Override
+    public InputStream getBinaryStream(String columnLabel) throws SQLException {
+        return getBinaryStream(findColumn(columnLabel));
+    }
+
+    protected  <T> T setWasNullBasedOnLastValue(T convertedValue) {
+        wasNull = (convertedValue == null);
+        return convertedValue;
+    }
+
+    @Override
+    public boolean wasNull() throws SQLException {
+        return wasNull;
+    }
+
+    @Override
+    public abstract int findColumn(String columnLabel) throws SQLException;
+
+    @Override
+    public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
+        return getObject(findColumn(columnLabel), type);
+    }
 }
