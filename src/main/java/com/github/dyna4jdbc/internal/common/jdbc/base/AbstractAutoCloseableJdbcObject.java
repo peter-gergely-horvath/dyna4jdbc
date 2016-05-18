@@ -30,7 +30,8 @@ import com.github.dyna4jdbc.internal.JDBCError;
 /**
  * {@code AbstractAutoCloseableJdbcObject} is a base class
  * for any JDBC API implementation class, which supports 
- * the {@code close()} method defined by .
+ * the {@code close()} method defined by
+ * {@code java.lang.AutoCloseable}.
  * 
  * This class provides support to register child objects
  * (which logically belong to this object) on creation, 
