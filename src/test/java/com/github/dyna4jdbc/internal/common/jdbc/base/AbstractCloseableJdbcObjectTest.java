@@ -108,6 +108,33 @@ public class AbstractCloseableJdbcObjectTest {
     }
 
     @Test
+    public void testRegisteringChildOnClosedObjectThrowsException() throws Exception {
+
+        expectCloseInternalIsCalled();
+
+        AutoCloseable childObject = createStrictMock(AutoCloseable.class);
+        replay(childObject);
+
+        closeableJdbcObject.close();
+
+        try {
+
+            closeableJdbcObject.registerAsChild(childObject);
+
+            fail("Should have thrown an exception");
+
+        } catch (SQLException sqlEx) {
+
+            String message = sqlEx.getMessage();
+            assertNotNull(message);
+            assertTrue(message.contains(JDBCError.OBJECT_CLOSED.toString()));
+        }
+
+        verify(childObject);
+
+    }
+
+    @Test
     public void testChildrenAreClosedOnceIfCloseIsCalledMultipleTimes() throws Exception {
 
         expectCloseInternalIsCalled();
@@ -338,6 +365,4 @@ public class AbstractCloseableJdbcObjectTest {
                 String.format("Stack trace does not contain the expected string '%s'", stringToSearchFor));
 
     }
-
-
 }
