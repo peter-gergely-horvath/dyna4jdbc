@@ -11,11 +11,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
-public final class DataTableHolderResultSetMetaData extends AbstractResultSetMetaData {
+public final class TypeHandlerResultSetMetaData extends AbstractResultSetMetaData {
 
 	private final List<TypeHandler> typeHandlerList;
 
-	public DataTableHolderResultSetMetaData(List<TypeHandler> typeHandlerList) {
+	public TypeHandlerResultSetMetaData(List<TypeHandler> typeHandlerList) {
 		this.typeHandlerList = typeHandlerList;
 	}
 
