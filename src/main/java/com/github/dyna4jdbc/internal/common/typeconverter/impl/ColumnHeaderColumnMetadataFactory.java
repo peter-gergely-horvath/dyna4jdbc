@@ -43,8 +43,8 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 		String header = configStringArray[0];
 		String sqlTypeConfig = configStringArray.length >= 2 ? configStringArray[1] : null;
 		String metaDataConfig = configStringArray.length == 3 ? configStringArray[2] : null;
-		
-		super.configureForValues(metaData, columnIndex, AlwaysSkipFirstElementIterable.<String>newInstance(columnValuesIterable));
+
+		super.configureForValues(metaData, columnIndex, new AlwaysSkipFirstElementIterable<>(columnValuesIterable));
 		
 		
 		if(header != null && !"".equals(header.trim())) {

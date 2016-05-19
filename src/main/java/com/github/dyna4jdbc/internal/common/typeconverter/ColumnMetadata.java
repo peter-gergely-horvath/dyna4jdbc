@@ -4,7 +4,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.impl.SQLDataType;
 
 public interface ColumnMetadata {
     
-	public enum Nullability { NOT_NULLABLE, NULLABLE, UNKNOWN }
+	enum Nullability { NOT_NULLABLE, NULLABLE, UNKNOWN }
 	
 	boolean isTakesFirstRowValue();
 	

@@ -54,7 +54,7 @@ public class DataTable implements Iterable<List<String>> {
     }
 
     public void clear() {
-        rows.forEach(theRow -> theRow.clear());
+        rows.forEach(List::clear);
         rows.clear();
     }
 
