@@ -13,7 +13,7 @@ import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
 
 public abstract class AbstractStatement<T extends java.sql.Connection> extends AbstractAutoCloseableJdbcObject implements java.sql.Statement {
 
-    protected final T connection;
+    private final T connection;
 
 
     private SQLWarning sqlWarning;
@@ -25,39 +25,39 @@ public abstract class AbstractStatement<T extends java.sql.Connection> extends A
     }
 
     @Override
-    public T getConnection() throws SQLException {
+    public final T getConnection() throws SQLException {
         return connection;
     }
 
-    protected void setUpdateCount(int updateCount) {
+    protected final void setUpdateCount(int updateCount) {
         this.currentUpdateCount = updateCount;
     }
 
-    protected void clearUpdateCount() {
+    protected final void clearUpdateCount() {
         this.currentUpdateCount = -1;
     }
 
     @Override
-    public int getUpdateCount() throws SQLException {
+    public final int getUpdateCount() throws SQLException {
         return this.currentUpdateCount;
     }
 
     @Override
-    public SQLWarning getWarnings() throws SQLException {
+    public final SQLWarning getWarnings() throws SQLException {
         return sqlWarning;
     }
 
-    protected void setSQLWarning(SQLWarning warning) {
+    protected final void setSQLWarning(SQLWarning warning) {
         this.sqlWarning = warning;
     }
 
     @Override
-    public void clearWarnings() throws SQLException {
+    public final void clearWarnings() throws SQLException {
         sqlWarning = null;
     }
 
     @Override
-    public boolean getMoreResults(int current) throws SQLException {
+    public final boolean getMoreResults(int current) throws SQLException {
         if(current != Statement.CLOSE_CURRENT_RESULT &&
                 current != Statement.KEEP_CURRENT_RESULT &&
                 current != Statement.CLOSE_ALL_RESULTS) {
@@ -73,7 +73,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection> extends A
     }
 
     @Override
-    public void setFetchDirection(int direction) throws SQLException {
+    public final void setFetchDirection(int direction) throws SQLException {
         if(direction ==  ResultSet.FETCH_FORWARD ||
                 direction == ResultSet.FETCH_REVERSE ||
                 direction == ResultSet.FETCH_UNKNOWN) {
@@ -86,12 +86,12 @@ public abstract class AbstractStatement<T extends java.sql.Connection> extends A
     }
 
     @Override
-    public int getFetchDirection() throws SQLException {
+    public final int getFetchDirection() throws SQLException {
         return ResultSet.FETCH_FORWARD;
     }
 
     @Override
-    public void setFetchSize(int rows) throws SQLException {
+    public final void setFetchSize(int rows) throws SQLException {
         if(rows < 0) {
             throw new SQLException("Invalid fetchSize: " + rows);
         }
@@ -103,7 +103,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection> extends A
     }
 
     @Override
-    public ResultSet getResultSet() throws SQLException {
+    public final ResultSet getResultSet() throws SQLException {
 
         ResultSet resultSetToReturn;
         if(resultSetIterator != null && resultSetIterator.hasNext()) {
@@ -115,78 +115,78 @@ public abstract class AbstractStatement<T extends java.sql.Connection> extends A
         return resultSetToReturn;
     }
 
-    protected void setCurrentResultSetList(List<ResultSet> currentResultSetList) {
+    protected final void setCurrentResultSetList(List<ResultSet> currentResultSetList) {
         resultSetIterator = currentResultSetList.iterator();
     }
 
     @Override
-    public boolean getMoreResults() throws SQLException {
+    public final boolean getMoreResults() throws SQLException {
         return resultSetIterator != null && resultSetIterator.hasNext();
     }
 
 
     @Override
-    public int getFetchSize() throws SQLException {
+    public final int getFetchSize() throws SQLException {
         return 0;
     }
 
     @Override
-    public int getResultSetConcurrency() throws SQLException {
+    public final int getResultSetConcurrency() throws SQLException {
         return ResultSet.CONCUR_READ_ONLY;
     }
 
     @Override
-    public int getResultSetType() throws SQLException {
+    public final int getResultSetType() throws SQLException {
         return ResultSet.TYPE_FORWARD_ONLY;
     }
 
     @Override
-    public ResultSet getGeneratedKeys() throws SQLException {
+    public final ResultSet getGeneratedKeys() throws SQLException {
         return new EmptyResultSet();
     }
 
     @Override
-    public int getResultSetHoldability() throws SQLException {
+    public final int getResultSetHoldability() throws SQLException {
         return ResultSet.HOLD_CURSORS_OVER_COMMIT;
     }
 
     @Override
-    public void setPoolable(boolean poolable) throws SQLException {
+    public final void setPoolable(boolean poolable) throws SQLException {
 
     }
 
     @Override
-    public int getMaxFieldSize() throws SQLException {
+    public final int getMaxFieldSize() throws SQLException {
         return 0;
     }
 
     @Override
-    public void setMaxFieldSize(int max) throws SQLException {
+    public final void setMaxFieldSize(int max) throws SQLException {
         // TODO: implement
     }
 
     @Override
-    public int getMaxRows() throws SQLException {
+    public final int getMaxRows() throws SQLException {
         return 0; // no limit
     }
 
     @Override
-    public void setMaxRows(int max) throws SQLException {
+    public final void setMaxRows(int max) throws SQLException {
         // TODO: implement
     }
 
     @Override
-    public void setEscapeProcessing(boolean enable) throws SQLException {
+    public final void setEscapeProcessing(boolean enable) throws SQLException {
 
     }
 
     @Override
-    public int getQueryTimeout() throws SQLException {
+    public final int getQueryTimeout() throws SQLException {
         return 0;
     }
 
     @Override
-    public void setQueryTimeout(int seconds) throws SQLException {
+    public final void setQueryTimeout(int seconds) throws SQLException {
 
     }
 

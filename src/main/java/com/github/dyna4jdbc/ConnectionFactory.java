@@ -10,7 +10,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
+import java.util.Properties;
+import java.util.Locale;
 
 class ConnectionFactory {
 
@@ -37,8 +41,13 @@ class ConnectionFactory {
             String[] bridgeNameAndConfig = factoryConfiguration.split(":", 2);
 
             String bridgeName = bridgeNameAndConfig[0].toLowerCase(Locale.ENGLISH);
-            String config = bridgeNameAndConfig.length == 2 ? bridgeNameAndConfig[1] : null;
+            String config;
 
+            if (bridgeNameAndConfig.length == 2) {
+                config = bridgeNameAndConfig[1];
+            } else {
+                config = null;
+            }
 
             return newConnection(bridgeName, config, info);
 
@@ -68,12 +77,13 @@ class ConnectionFactory {
 
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
-            if (cause instanceof RuntimeException)
+            if (cause instanceof RuntimeException) {
                 throw (RuntimeException) cause;
-            else if (cause instanceof Error)
+            } else if (cause instanceof Error) {
                 throw (Error) cause;
-            else
+            } else {
                 throw (Exception) cause;
+            }
         }
     }
 

@@ -24,27 +24,27 @@ import com.github.dyna4jdbc.internal.JDBCError;
 public abstract class AbstractResultSetMetaData extends AbstractWrapper implements ResultSetMetaData {
 
     @Override
-    public boolean isAutoIncrement(int column) throws SQLException {
+    public final boolean isAutoIncrement(int column) throws SQLException {
         // A column built from script output is NOT AutoIncrement.
         return false;
     }
 
     @Override
-    public boolean isCaseSensitive(int column) throws SQLException {
+    public final boolean isCaseSensitive(int column) throws SQLException {
         // We allow a result set to have two distinct columns
         // "foo" and "FOO": hence, columns ARE CaseSensitive.
         return true;
     }
 
     @Override
-    public boolean isSearchable(int column) throws SQLException {
+    public final boolean isSearchable(int column) throws SQLException {
         // We know nothing about the columns: hence we
         // report all as NON-Searchable.
         return false;
     }
 
     @Override
-    public String getSchemaName(int column) throws SQLException {
+    public final String getSchemaName(int column) throws SQLException {
         // Javadoc: "schema name or "" if not applicable"
 
         // Schema is not applicable for a column built
@@ -54,7 +54,7 @@ public abstract class AbstractResultSetMetaData extends AbstractWrapper implemen
     }
 
     @Override
-    public String getTableName(int column) throws SQLException {
+    public final String getTableName(int column) throws SQLException {
         // Javadoc: "table name or "" if not applicable"
 
         // Table is not applicable for a column built
@@ -64,7 +64,7 @@ public abstract class AbstractResultSetMetaData extends AbstractWrapper implemen
     }
 
     @Override
-    public String getCatalogName(int column) throws SQLException {
+    public final String getCatalogName(int column) throws SQLException {
         // Javadoc: "the name of the catalog for the table in which
         // the given column appears or "" if not applicable"
 
@@ -75,21 +75,21 @@ public abstract class AbstractResultSetMetaData extends AbstractWrapper implemen
     }
 
     @Override
-    public boolean isReadOnly(int column) throws SQLException {
+    public final boolean isReadOnly(int column) throws SQLException {
         // A column built from script output cannot
         // be written, hence we report it as read-only
         return true;
     }
 
     @Override
-    public boolean isWritable(int column) throws SQLException {
+    public final boolean isWritable(int column) throws SQLException {
         // A column built from script output cannot
         // be written, hence we report it as read-only
         return false;
     }
 
     @Override
-    public boolean isDefinitelyWritable(int column) throws SQLException {
+    public final boolean isDefinitelyWritable(int column) throws SQLException {
         // A column built from script output cannot
         // be written, hence we report it as read-only
         return false;

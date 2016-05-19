@@ -16,7 +16,7 @@ import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
-public class ProcessRunnerConnection extends AbstractConnection  {
+public final class ProcessRunnerConnection extends AbstractConnection  {
 
 	private final TypeHandlerFactory typeHandlerFactory;
 	private final Configuration configuration;

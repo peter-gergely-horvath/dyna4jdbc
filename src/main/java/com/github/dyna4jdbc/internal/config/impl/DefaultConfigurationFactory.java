@@ -6,7 +6,7 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
-public class DefaultConfigurationFactory implements ConfigurationFactory {
+public final class DefaultConfigurationFactory implements ConfigurationFactory {
 
 	private static final DefaultConfigurationFactory INSTANCE = new DefaultConfigurationFactory();
 	
@@ -38,7 +38,7 @@ public class DefaultConfigurationFactory implements ConfigurationFactory {
 		}
 		
 		for(ConfigurationEntry ce : ConfigurationEntry.values()) {
-			String property = internalPropops.getProperty(ce.key, ce.defaultValue);
+			String property = internalPropops.getProperty(ce.getKey(), ce.getDefaultValue());
 			ce.setConfiguration(configuration, property);
 		}
 		

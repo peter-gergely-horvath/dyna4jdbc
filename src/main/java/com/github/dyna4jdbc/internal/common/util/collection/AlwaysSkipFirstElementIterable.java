@@ -18,7 +18,7 @@ package com.github.dyna4jdbc.internal.common.util.collection;
 
 import java.util.Iterator;
 
-public class AlwaysSkipFirstElementIterable<E> implements Iterable<E> {
+public final class AlwaysSkipFirstElementIterable<E> implements Iterable<E> {
 
 	private final Iterable<E> delegate;
 

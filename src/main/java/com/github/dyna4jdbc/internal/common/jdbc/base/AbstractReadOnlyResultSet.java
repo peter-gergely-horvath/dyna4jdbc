@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.*;
 
+
 import com.github.dyna4jdbc.internal.JDBCError;
 
 public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> {
@@ -384,17 +385,17 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
     }
     
     @Override
-    public boolean rowUpdated() throws SQLException {
+    public final boolean rowUpdated() throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
-    public boolean rowInserted() throws SQLException {
+    public final boolean rowInserted() throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
-    public boolean rowDeleted() throws SQLException {
+    public final boolean rowDeleted() throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 

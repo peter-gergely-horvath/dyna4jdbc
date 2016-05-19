@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractDatabaseMetaData;
 
-public class GenericDatabaseMetaData extends AbstractDatabaseMetaData<Connection> {
+public final class GenericDatabaseMetaData extends AbstractDatabaseMetaData<Connection> {
 
 	private String databaseProductName;
 	private String databaseProductVersion;

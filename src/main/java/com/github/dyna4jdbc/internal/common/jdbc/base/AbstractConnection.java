@@ -48,27 +48,27 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     protected abstract AbstractStatement<?> createStatementInternal() throws SQLException;
     
     @Override
-    public PreparedStatement prepareStatement(String sql) throws SQLException {
+    public final PreparedStatement prepareStatement(String sql) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public CallableStatement prepareCall(String sql) throws SQLException {
+    public final CallableStatement prepareCall(String sql) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public String nativeSQL(String sql) throws SQLException {
+    public final String nativeSQL(String sql) throws SQLException {
         checkNotClosed();
         return sql;
     }
 
     @Override
-    public void setAutoCommit(boolean autoCommit) throws SQLException {
+    public final void setAutoCommit(boolean autoCommit) throws SQLException {
         checkNotClosed();
         if(! autoCommit) {
             throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
@@ -77,51 +77,51 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     }
 
     @Override
-    public boolean getAutoCommit() throws SQLException {
+    public final boolean getAutoCommit() throws SQLException {
         checkNotClosed();
         return true;
     }
 
     @Override
-    public void commit() throws SQLException {
+    public final void commit() throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This driver can only handle autocommit mode");
     }
 
     @Override
-    public void rollback() throws SQLException {
+    public final void rollback() throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This driver can only handle autocommit mode");
     }
 
     @Override
-    public void setReadOnly(boolean readOnly) throws SQLException {
+    public final void setReadOnly(boolean readOnly) throws SQLException {
         checkNotClosed();
         this.readOnly = readOnly;
     }
 
     @Override
-    public boolean isReadOnly() throws SQLException {
+    public final boolean isReadOnly() throws SQLException {
         checkNotClosed();
         return this.readOnly;
     }
 
     @Override
-    public void setCatalog(String catalog) throws SQLException {
+    public final void setCatalog(String catalog) throws SQLException {
         checkNotClosed();
         // "If the driver does not support catalogs, it will silently ignore this request."
     }
 
     @Override
-    public String getCatalog() throws SQLException {
+    public final String getCatalog() throws SQLException {
         checkNotClosed();
         return null; // "the current catalog name or null if there is none"
     }
 
     @Override
-    public void setTransactionIsolation(int level) throws SQLException {
+    public final void setTransactionIsolation(int level) throws SQLException {
         checkNotClosed();
         if(level != Connection.TRANSACTION_NONE) {
             throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
@@ -130,57 +130,57 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     }
 
     @Override
-    public int getTransactionIsolation() throws SQLException {
+    public final int getTransactionIsolation() throws SQLException {
         checkNotClosed();
         return Connection.TRANSACTION_NONE;
     }
 
     @Override
-    public SQLWarning getWarnings() throws SQLException {
+    public final SQLWarning getWarnings() throws SQLException {
         checkNotClosed();
         return null;
     }
 
     @Override
-    public void clearWarnings() throws SQLException {
+    public final void clearWarnings() throws SQLException {
         checkNotClosed();
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
-        checkNotClosed();
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-        		"This method is not supported");
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+    public final Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+    public final PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public Map<String, Class<?>> getTypeMap() throws SQLException {
+    public final CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+        checkNotClosed();
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+        		"This method is not supported");
+    }
+
+    @Override
+    public final Map<String, Class<?>> getTypeMap() throws SQLException {
         checkNotClosed();
         return Collections.unmodifiableMap(typeMap);
     }
 
     @Override
-    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+    public final void setTypeMap(Map<String, Class<?>> map) throws SQLException {
         checkNotClosed();
         this.typeMap = new LinkedHashMap<String, Class<?>>(map);
     }
 
     @Override
-    public void setHoldability(int holdability) throws SQLException {
+    public final void setHoldability(int holdability) throws SQLException {
         checkNotClosed();
 
         if(holdability != ResultSet.HOLD_CURSORS_OVER_COMMIT &&
@@ -192,176 +192,176 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     }
 
     @Override
-    public int getHoldability() throws SQLException {
+    public final int getHoldability() throws SQLException {
         checkNotClosed();
 
         return holdability;
     }
 
     @Override
-    public Savepoint setSavepoint() throws SQLException {
+    public final Savepoint setSavepoint() throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public Savepoint setSavepoint(String name) throws SQLException {
+    public final Savepoint setSavepoint(String name) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public void rollback(Savepoint savepoint) throws SQLException {
+    public final void rollback(Savepoint savepoint) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+    public final void releaseSavepoint(Savepoint savepoint) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+    public final Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+    public final PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+    public final CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
+    public final PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
+    public final PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
+    public final PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public Clob createClob() throws SQLException {
+    public final Clob createClob() throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public Blob createBlob() throws SQLException {
+    public final Blob createBlob() throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public NClob createNClob() throws SQLException {
+    public final NClob createNClob() throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public SQLXML createSQLXML() throws SQLException {
+    public final SQLXML createSQLXML() throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public boolean isValid(int timeout) throws SQLException {
+    public final boolean isValid(int timeout) throws SQLException {
         checkNotClosed();
         return true;
     }
 
     @Override
-    public void setClientInfo(String name, String value) throws SQLClientInfoException {
+    public final void setClientInfo(String name, String value) throws SQLClientInfoException {
         this.clientInfo.setProperty(name, value);
     }
 
     @Override
-    public void setClientInfo(Properties properties) throws SQLClientInfoException {
+    public final void setClientInfo(Properties properties) throws SQLClientInfoException {
         this.clientInfo = new Properties(properties);
     }
 
     @Override
-    public String getClientInfo(String name) throws SQLException {
+    public final String getClientInfo(String name) throws SQLException {
         checkNotClosed();
         return this.clientInfo.getProperty(name);
     }
 
     @Override
-    public Properties getClientInfo() throws SQLException {
+    public final Properties getClientInfo() throws SQLException {
         checkNotClosed();
         return new Properties(this.clientInfo);
     }
 
     @Override
-    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+    public final Array createArrayOf(String typeName, Object[] elements) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+    public final Struct createStruct(String typeName, Object[] attributes) throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"This method is not supported");
     }
 
     @Override
-    public void setSchema(String schema) throws SQLException {
+    public final void setSchema(String schema) throws SQLException {
         checkNotClosed();
     }
 
     @Override
-    public String getSchema() throws SQLException {
+    public final String getSchema() throws SQLException {
         return null;
     }
 
     @Override
-    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+    public final void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
         checkNotClosed();
         if(milliseconds < 0) throw new SQLException("milliseconds cannot be less than zero: " + milliseconds);
     }
     
     @Override
-    public int getNetworkTimeout() throws SQLException {
+    public final int getNetworkTimeout() throws SQLException {
         checkNotClosed();
         return 0;
     }
 
     @Override
-	public void abort(Executor executor) throws SQLException {
+	public final void abort(Executor executor) throws SQLException {
 
 		try {
 			executor.execute(new CloseConnectionForAbortRunnable());

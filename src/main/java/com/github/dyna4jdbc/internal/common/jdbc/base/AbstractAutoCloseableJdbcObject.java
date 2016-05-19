@@ -166,29 +166,29 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
 	 * @throws SQLException if one or more child objects throw exception one close method call
 	 */
 	private void closeChildObjects() throws SQLException {
-		LinkedList<Exception> supressedThrowables = new LinkedList<>();
+		LinkedList<Exception> suppressedThrowables = new LinkedList<>();
 
 		for (AutoCloseable closeableObject : children) {
 
 			try {
 				closeableObject.close();
 			} catch (Exception closeException) {
-				supressedThrowables.add(closeException);
+				suppressedThrowables.add(closeException);
 			}
 		}
 		
 		children.clear();
 
-		if (!supressedThrowables.isEmpty()) {
+		if (!suppressedThrowables.isEmpty()) {
 			
-			if(supressedThrowables.size() == 1) {
+			if(suppressedThrowables.size() == 1) {
 				// closure of a single child has failed: propagate the root cause as cause
-				throw JDBCError.CLOSE_FAILED.raiseSQLException(supressedThrowables.getFirst(),
+				throw JDBCError.CLOSE_FAILED.raiseSQLException(suppressedThrowables.getFirst(),
 						this, "Closing of child object caused exception");
 				
 			} else {
 				// closure of multiple children has failed: propagate them as suppressed
-				throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(supressedThrowables,
+				throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(suppressedThrowables,
 						this, "Closing of child objects caused exceptions; see supressed");	
 			}
 		}

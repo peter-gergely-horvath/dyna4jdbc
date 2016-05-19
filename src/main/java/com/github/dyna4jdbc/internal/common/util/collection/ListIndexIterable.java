@@ -35,7 +35,7 @@ public class ListIndexIterable<E> implements Iterable<E> {
 	
 	
 	@Override
-	public Iterator<E> iterator() {
+	public final Iterator<E> iterator() {
 		
 		Iterator<List<E>> iterator = delegate.iterator();
 		

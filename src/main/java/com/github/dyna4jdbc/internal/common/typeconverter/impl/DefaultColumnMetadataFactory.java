@@ -7,7 +7,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-public class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
+public final class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
 
 	// "Pattern: Instances of this class are immutable and are safe for use by
 	// multiple concurrent threads."

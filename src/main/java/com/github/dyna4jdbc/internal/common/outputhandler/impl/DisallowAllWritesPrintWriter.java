@@ -7,7 +7,7 @@ import java.util.Locale;
 
 import com.github.dyna4jdbc.internal.OutputDisabledError;
 
-public class DisallowAllWritesPrintWriter extends java.io.PrintWriter {
+public final class DisallowAllWritesPrintWriter extends java.io.PrintWriter {
 
     private String message;
 
@@ -15,18 +15,18 @@ public class DisallowAllWritesPrintWriter extends java.io.PrintWriter {
 		super(new DisableOutputWriter(message));
 		this.message = message;
     }
-    
 
 
-    private static class DisableOutputWriter extends Writer {
+
+    private static final class DisableOutputWriter extends Writer {
 
         private String message;
 
-    	protected DisableOutputWriter(String message) {
+    	private DisableOutputWriter(String message) {
         	this.message = message;
-        	
+
         }
-    	
+
         @Override
         public void write(char[] cbuf, int off, int len) throws IOException {
         	throw new OutputDisabledError(message);
@@ -46,7 +46,7 @@ public class DisallowAllWritesPrintWriter extends java.io.PrintWriter {
 	protected RuntimeException raiseError() {
 		throw new OutputDisabledError(message);
 	};
-	
+
 
     public void println(double arg) {
         raiseError();
@@ -110,7 +110,7 @@ public class DisallowAllWritesPrintWriter extends java.io.PrintWriter {
     public PrintWriter format(String format, Object ... args) {
     	throw raiseError();
     }
-    
+
     public void write(char[] arg1, int arg2, int arg3) {
         raiseError();
     }

@@ -9,7 +9,7 @@ import java.util.List;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-public class DataTableWriter extends CursorCellWriterOutputStream{
+public final class DataTableWriter extends CursorCellWriterOutputStream{
 
     private LinkedList<DataTable> dataTableList = new LinkedList<>();
     private List<String> currentRow = new ArrayList<String>();

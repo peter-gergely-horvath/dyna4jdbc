@@ -28,7 +28,7 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
 	}
 
 	@Override
-    public void write(int thisByte) throws IOException {
+    public final void write(int thisByte) throws IOException {
 
         checkNotClosed();
 

@@ -112,9 +112,17 @@ enum ConfigurationEntry {
 	}
 	;
 
-	final String key;
-	final String defaultValue;
-	final String description;
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	protected final String key;
+	private final String defaultValue;
+	private final String description;
 
 	ConfigurationEntry(String key, String defaultValue, String description) {
 		this.key = key;

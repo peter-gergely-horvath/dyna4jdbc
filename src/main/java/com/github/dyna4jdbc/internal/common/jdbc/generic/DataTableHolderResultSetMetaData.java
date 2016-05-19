@@ -11,7 +11,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
-public class DataTableHolderResultSetMetaData extends AbstractResultSetMetaData {
+public final class DataTableHolderResultSetMetaData extends AbstractResultSetMetaData {
 
 	private final List<TypeHandler> typeHandlerList;
 

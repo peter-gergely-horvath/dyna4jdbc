@@ -32,7 +32,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
         this.statement = statement;
     }
 
-    public boolean next() throws SQLException {
+    public final boolean next() throws SQLException {
         checkNotClosed();
 
         GuardedResultSetState.State currentState = resultSetState.getCurrentState();
@@ -74,18 +74,18 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     }
 
     
-    protected void skipNextRowIfPresent() {
+    protected final void skipNextRowIfPresent() {
     	if(this.rowIterator.hasNext()) {
     		rowIterator.next();
     	}
     }
     
-    protected void checkValidStateForRowAccess() throws SQLException {
+    protected final void checkValidStateForRowAccess() throws SQLException {
         checkNotClosed();
         resultSetState.checkValidStateForRowAccess();
     }
     
-    protected T getCurrentRow() throws SQLException {
+    protected final T getCurrentRow() throws SQLException {
         if (currentRow == null) {
             throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
                     "currentRow is null in state: " + resultSetState);
@@ -95,90 +95,90 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     }
 
     @Override
-    public boolean isBeforeFirst() throws SQLException {
+    public final boolean isBeforeFirst() throws SQLException {
         return resultSetState.isInState(State.BEFORE_FIRST);
     }
     
     @Override
-    public Statement getStatement() throws SQLException {
+    public final Statement getStatement() throws SQLException {
         return statement;
     }
 
 
     @Override
-    public boolean isAfterLast() throws SQLException {
+    public final boolean isAfterLast() throws SQLException {
     	return resultSetState.isInState(State.AFTER_LAST);
     }
 
     @Override
-    public boolean isFirst() throws SQLException {
+    public final boolean isFirst() throws SQLException {
      	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#isFirst()");
     }
 
     @Override
-    public boolean isLast() throws SQLException {
+    public final boolean isLast() throws SQLException {
     	return resultSetState.isInState(State.ITERATING_OVER_RESULTS) && !rowIterator.hasNext();
     }
 
     @Override
-    public void beforeFirst() throws SQLException {
+    public final void beforeFirst() throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#beforeFirst()");
     }
 
     @Override
-    public void afterLast() throws SQLException {
+    public final void afterLast() throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#afterLast()");
     }
     
     @Override
-    public boolean first() throws SQLException {
+    public final boolean first() throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#first()");
     }
 
     @Override
-    public boolean last() throws SQLException {
+    public final boolean last() throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#last()");
     }
 
     @Override
-    public int getRow() throws SQLException {
+    public final int getRow() throws SQLException {
     	return row;
     }
     
     @Override
-    public SQLWarning getWarnings() throws SQLException {
+    public final SQLWarning getWarnings() throws SQLException {
         return this.sqlWarning;
     }
 
     @Override
-    public void clearWarnings() throws SQLException {
+    public final void clearWarnings() throws SQLException {
     	this.sqlWarning = null;
     }
     
-    protected void setWarnings(SQLWarning sqlWarning) {
+    protected final void setWarnings(SQLWarning sqlWarning) {
     	this.sqlWarning = sqlWarning;
     }
     
     @Override
-    public boolean absolute(int row) throws SQLException {
+    public final boolean absolute(int row) throws SQLException {
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"Moving cursor by absolute(int)");
     }
 
     @Override
-    public boolean relative(int rows) throws SQLException {
+    public final boolean relative(int rows) throws SQLException {
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"Moving cursor by relative(int)");
     }
 
     @Override
-    public boolean previous() throws SQLException {
+    public final boolean previous() throws SQLException {
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
         		"Moving cursor by previous()");
     }
     
     @Override
-    public void setFetchDirection(int direction) throws SQLException {
+    public final void setFetchDirection(int direction) throws SQLException {
     	if(direction != ResultSet.FETCH_FORWARD &&
     			direction != ResultSet.FETCH_REVERSE && 
     			direction != ResultSet.FETCH_UNKNOWN) {
@@ -193,12 +193,12 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     }
 
     @Override
-    public int getFetchDirection() throws SQLException {
+    public final int getFetchDirection() throws SQLException {
     	return ResultSet.FETCH_FORWARD;
     }
     
     @Override
-    public void setFetchSize(int rows) throws SQLException {
+    public final void setFetchSize(int rows) throws SQLException {
         if(rows < 0) {
         	JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
     				"Negative fetch size: " + rows);
@@ -208,27 +208,27 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     
 
     @Override
-    public int getFetchSize() throws SQLException {
+    public final int getFetchSize() throws SQLException {
         return this.fetchSize;
     }
     
     @Override
-    public int getType() throws SQLException {
+    public final int getType() throws SQLException {
         return ResultSet.TYPE_FORWARD_ONLY;
     }
 
     @Override
-    public int getConcurrency() throws SQLException {
+    public final int getConcurrency() throws SQLException {
         return ResultSet.CONCUR_READ_ONLY;
     }
     
     @Override
-    public int getHoldability() throws SQLException {
+    public final int getHoldability() throws SQLException {
         return ResultSet.HOLD_CURSORS_OVER_COMMIT;
     }
     
     @Override
-    public RowId getRowId(int columnIndex) throws SQLException {
+    public final RowId getRowId(int columnIndex) throws SQLException {
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.RowId");
     }
 
@@ -238,7 +238,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     }
     
     @Override
-    public Ref getRef(int columnIndex) throws SQLException {
+    public final Ref getRef(int columnIndex) throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Ref");
     }
     
@@ -258,7 +258,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     }
 
     @Override
-    public Array getArray(int columnIndex) throws SQLException {
+    public final Array getArray(int columnIndex) throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Array");
     }
     
@@ -268,7 +268,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     }
 
     @Override
-    public Clob getClob(String columnLabel) throws SQLException {
+    public final Clob getClob(String columnLabel) throws SQLException {
     	return getClob(findColumn(columnLabel));
     }
 
@@ -278,7 +278,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     }
     
     @Override
-    public NClob getNClob(int columnIndex) throws SQLException {
+    public final NClob getNClob(int columnIndex) throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.NClob");
     }
 
@@ -288,7 +288,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     }
 
     @Override
-    public SQLXML getSQLXML(int columnIndex) throws SQLException {
+    public final SQLXML getSQLXML(int columnIndex) throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.SQLXML");
     }
 
@@ -308,7 +308,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     }
 
     @Override
-    public Reader getNCharacterStream(int columnIndex) throws SQLException {
+    public final Reader getNCharacterStream(int columnIndex) throws SQLException {
     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNCharacterStream(int)");
     }
 
@@ -319,140 +319,143 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
 
     @Override
-    public Object getObject(String columnLabel) throws SQLException {
+    public final Object getObject(String columnLabel) throws SQLException {
         return getObject(findColumn(columnLabel));
     }
 
     @Override
-    public Reader getCharacterStream(String columnLabel) throws SQLException {
+    public final Reader getCharacterStream(String columnLabel) throws SQLException {
         return getCharacterStream(findColumn(columnLabel));
     }
 
     @Override
-    public BigDecimal getBigDecimal(String columnLabel) throws SQLException {
+    public final BigDecimal getBigDecimal(String columnLabel) throws SQLException {
         return getBigDecimal(findColumn(columnLabel));
     }
 
     @Override
-    public Object getObject(String columnLabel, Map<String, Class<?>> map) throws SQLException {
+    public final Object getObject(String columnLabel, Map<String, Class<?>> map) throws SQLException {
         return getObject(findColumn(columnLabel), map);
     }
 
     @Override
-    public Date getDate(String columnLabel, Calendar cal) throws SQLException {
+    public final Date getDate(String columnLabel, Calendar cal) throws SQLException {
         return getDate(findColumn(columnLabel), cal);
     }
 
     @Override
-    public Time getTime(String columnLabel, Calendar cal) throws SQLException {
+    public final Time getTime(String columnLabel, Calendar cal) throws SQLException {
         return getTime(findColumn(columnLabel), cal);
     }
 
     @Override
-    public Timestamp getTimestamp(String columnLabel, Calendar cal) throws SQLException {
+    public final Timestamp getTimestamp(String columnLabel, Calendar cal) throws SQLException {
         return getTimestamp(findColumn(columnLabel), cal);
     }
 
     @Override
-    public URL getURL(String columnLabel) throws SQLException {
+    public final URL getURL(String columnLabel) throws SQLException {
         return getURL(findColumn(columnLabel));
     }
 
     @Override
-    public String getString(String columnLabel) throws SQLException {
+    public final String getString(String columnLabel) throws SQLException {
         return getString(findColumn(columnLabel));
     }
 
     @Override
-    public boolean getBoolean(String columnLabel) throws SQLException {
+    public final boolean getBoolean(String columnLabel) throws SQLException {
         return getBoolean(findColumn(columnLabel));
     }
 
     @Override
-    public byte getByte(String columnLabel) throws SQLException {
+    public final byte getByte(String columnLabel) throws SQLException {
         return getByte(findColumn(columnLabel));
     }
 
     @Override
-    public short getShort(String columnLabel) throws SQLException {
+    public final short getShort(String columnLabel) throws SQLException {
         return getShort(findColumn(columnLabel));
     }
 
     @Override
-    public int getInt(String columnLabel) throws SQLException {
+    public final int getInt(String columnLabel) throws SQLException {
         return getInt(findColumn(columnLabel));
     }
 
     @Override
-    public long getLong(String columnLabel) throws SQLException {
+    public final long getLong(String columnLabel) throws SQLException {
         return getLong(findColumn(columnLabel));
     }
 
     @Override
-    public float getFloat(String columnLabel) throws SQLException {
+    public final float getFloat(String columnLabel) throws SQLException {
         return getFloat(findColumn(columnLabel));
     }
 
     @Override
-    public double getDouble(String columnLabel) throws SQLException {
+    public final double getDouble(String columnLabel) throws SQLException {
         return getDouble(findColumn(columnLabel));
     }
 
     @Override
-    public BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException {
+    @SuppressWarnings("deprecation")
+    public final BigDecimal getBigDecimal(String columnLabel, int scale) throws SQLException {
         return getBigDecimal(findColumn(columnLabel), scale);
     }
 
     @Override
-    public byte[] getBytes(String columnLabel) throws SQLException {
+    public final byte[] getBytes(String columnLabel) throws SQLException {
         return getBytes(findColumn(columnLabel));
     }
 
     @Override
-    public Date getDate(String columnLabel) throws SQLException {
+    public final Date getDate(String columnLabel) throws SQLException {
         return getDate(findColumn(columnLabel));
     }
 
     @Override
-    public Time getTime(String columnLabel) throws SQLException {
+    public final Time getTime(String columnLabel) throws SQLException {
         return getTime(findColumn(columnLabel));
     }
 
     @Override
-    public Timestamp getTimestamp(String columnLabel) throws SQLException {
+    public final Timestamp getTimestamp(String columnLabel) throws SQLException {
         return getTimestamp(findColumn(columnLabel));
     }
 
     @Override
-    public InputStream getAsciiStream(String columnLabel) throws SQLException {
+    public final InputStream getAsciiStream(String columnLabel) throws SQLException {
         return getAsciiStream(findColumn(columnLabel));
     }
 
     @Override
-    public InputStream getUnicodeStream(String columnLabel) throws SQLException {
+    @SuppressWarnings("deprecation")
+    public final InputStream getUnicodeStream(String columnLabel) throws SQLException {
         return getUnicodeStream(findColumn(columnLabel));
     }
 
     @Override
-    public InputStream getBinaryStream(String columnLabel) throws SQLException {
+    public final InputStream getBinaryStream(String columnLabel) throws SQLException {
         return getBinaryStream(findColumn(columnLabel));
     }
 
-    protected  <T> T setWasNullBasedOnLastValue(T convertedValue) {
+    protected final <T> T setWasNullBasedOnLastValue(T convertedValue) {
         wasNull = (convertedValue == null);
         return convertedValue;
     }
 
     @Override
-    public boolean wasNull() throws SQLException {
+    public final boolean wasNull() throws SQLException {
         return wasNull;
+    }
+
+    @Override
+    public final <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
+        return getObject(findColumn(columnLabel), type);
     }
 
     @Override
     public abstract int findColumn(String columnLabel) throws SQLException;
 
-    @Override
-    public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
-        return getObject(findColumn(columnLabel), type);
-    }
 }

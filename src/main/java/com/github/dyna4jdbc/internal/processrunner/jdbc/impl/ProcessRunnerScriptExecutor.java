@@ -10,7 +10,7 @@ import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-public class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor {
+public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor {
 
 	private final AtomicReference<ProcessRunner> processRunner = new AtomicReference<>();
 

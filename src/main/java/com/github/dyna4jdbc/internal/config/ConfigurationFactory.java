@@ -4,5 +4,5 @@ import java.util.Properties;
 
 public interface ConfigurationFactory {
 
-	Configuration newConfigurationFromParameters(String config, Properties props) throws MisconfigurationException;
+    Configuration newConfigurationFromParameters(String config, Properties props) throws MisconfigurationException;
 }

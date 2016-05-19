@@ -16,7 +16,7 @@
 
 package com.github.dyna4jdbc.internal.common.util.exception;
 
-public class ExceptionUtil {
+public final class ExceptionUtil {
 
     private ExceptionUtil() {
         // static utility class -- no instances allowed

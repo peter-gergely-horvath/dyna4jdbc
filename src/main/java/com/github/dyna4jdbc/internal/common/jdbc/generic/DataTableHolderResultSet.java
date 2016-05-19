@@ -17,7 +17,7 @@ import java.sql.Date;
 import java.sql.*;
 import java.util.*;
 
-public class DataTableHolderResultSet extends AbstractReadOnlyResultSet<List<String>> {
+public final class DataTableHolderResultSet extends AbstractReadOnlyResultSet<List<String>> {
 
 	private final DataTable dataTable;
 

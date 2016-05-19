@@ -18,7 +18,7 @@ import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHand
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFactory {
+public final class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFactory {
 
 	// TODO: cleanup
 

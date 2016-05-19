@@ -2,7 +2,7 @@ package com.github.dyna4jdbc.internal.common.datamodel;
 
 import java.util.*;
 
-public class DataTable implements Iterable<List<String>> {
+public final class DataTable implements Iterable<List<String>> {
 
     private LinkedList<List<String>> rows = new LinkedList<>();
     private int columnCount = 0;

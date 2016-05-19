@@ -17,7 +17,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
-public class ProcessRunner {
+public final class ProcessRunner {
 
     private static final Logger LOGGER = Logger.getLogger(ProcessRunner.class.getName());
 
@@ -154,7 +154,7 @@ public class ProcessRunner {
         processInputWriter.flush();
     }
 
-    private class BufferedReaderToBlockingQueueRunnable implements Runnable {
+    private final class BufferedReaderToBlockingQueueRunnable implements Runnable {
         private final String identifier;
         private final BufferedReader bufferedReader;
         private final BlockingQueue<String> blockingQueue;

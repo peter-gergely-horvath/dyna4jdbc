@@ -26,7 +26,7 @@ import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
-public class ScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
+public final class ScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
     private final ScriptEngine engine;
     private final TypeHandlerFactory typeHandlerFactory;

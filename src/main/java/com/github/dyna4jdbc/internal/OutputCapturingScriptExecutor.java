@@ -4,6 +4,6 @@ import java.io.Writer;
 
 public interface OutputCapturingScriptExecutor {
 
-	void executeScriptUsingCustomWriters(
-			String script, Writer outWriter, Writer errorWriter) throws ScriptExecutionException;
+    void executeScriptUsingCustomWriters(
+            String script, Writer outWriter, Writer errorWriter) throws ScriptExecutionException;
 }
