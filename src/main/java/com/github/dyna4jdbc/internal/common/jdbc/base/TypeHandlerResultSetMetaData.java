@@ -1,4 +1,4 @@
-package com.github.dyna4jdbc.internal.common.jdbc.generic;
+package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractResultSetMetaData;

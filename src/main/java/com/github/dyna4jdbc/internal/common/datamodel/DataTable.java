@@ -49,7 +49,7 @@ public final class DataTable implements Iterable<List<String>> {
         return columnCount;
     }
 
-    LinkedList<List<String>> getRows() {
+    public LinkedList<List<String>> getRows() {
         return rows;
     }
 

@@ -59,8 +59,8 @@ public class ListIndexIterableTest {
 
         ListIndexIterable<String> iterable = new ListIndexIterable<>(Collections.emptyList(), 0);
 
-        assertIteratorReturnsValues(iterable.iterator(), new String[0]);
-        assertIteratorReturnsValues(iterable.iterator(), new String[0]);
+        assertIteratorReturnsValues(iterable.iterator(), new Object[0]);
+        assertIteratorReturnsValues(iterable.iterator(), new Object[0]);
     }
 
     @Test

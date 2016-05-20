@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dyna4jdbc.internal.common.jdbc.generic;
+package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractReadOnlyResultSet;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
@@ -33,16 +32,13 @@ import java.util.*;
 /**
  * @author Peter Horvath
  */
-public abstract class TypeHandlerResultSet extends AbstractReadOnlyResultSet<List<String>> {
+public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     protected final List<TypeHandler> typeHandlers;
     protected final Map<String, Integer> columnNameToColumnIndexMap;
 
-    public TypeHandlerResultSet(
-            Iterable<List<String>> dataRowIterable,
-            Statement statement, List<TypeHandler> typeHandlers) {
-
-        super(dataRowIterable, statement);
+    public TypeHandlerResultSet(Statement statement, List<TypeHandler> typeHandlers) {
+        super(statement);
         this.typeHandlers = typeHandlers;
         columnNameToColumnIndexMap = initColumnNameToColumnIndexMap(typeHandlers);
     }
@@ -243,6 +239,7 @@ public abstract class TypeHandlerResultSet extends AbstractReadOnlyResultSet<Lis
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public final BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
@@ -336,6 +333,7 @@ public abstract class TypeHandlerResultSet extends AbstractReadOnlyResultSet<Lis
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public final InputStream getUnicodeStream(int columnIndex) throws SQLException {
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 

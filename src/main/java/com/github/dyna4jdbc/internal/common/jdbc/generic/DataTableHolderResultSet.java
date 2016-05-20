@@ -3,24 +3,19 @@ package com.github.dyna4jdbc.internal.common.jdbc.generic;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.datamodel.DataColumn;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
+import com.github.dyna4jdbc.internal.common.jdbc.base.DataRowListResultSet;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.sql.Date;
 import java.sql.*;
 import java.util.*;
 
-public final class DataTableHolderResultSet extends TypeHandlerResultSet {
+public final class DataTableHolderResultSet extends DataRowListResultSet<List<String>> {
 
 	private final DataTable dataTable;
 
 	public DataTableHolderResultSet(Statement statement, DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
-		super(dataTable, statement, initTypeHandlers(dataTable, typeHandlerFactory));
+		super(dataTable.getRows(), statement, initTypeHandlers(dataTable, typeHandlerFactory));
 		this.dataTable = dataTable;
 
 		if (checkFirstRowIsSkipped(this.typeHandlers)) {

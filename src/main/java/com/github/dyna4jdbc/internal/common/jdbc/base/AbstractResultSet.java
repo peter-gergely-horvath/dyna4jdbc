@@ -14,91 +14,18 @@ import com.github.dyna4jdbc.internal.common.jdbc.base.GuardedResultSetState.Stat
 
 public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObject implements ResultSet {
 
-    private final GuardedResultSetState resultSetState = new GuardedResultSetState();
-	private final Statement statement;
+    private final Statement statement;
 
-    protected boolean wasNull = false;
+    private boolean wasNull = false;
 
     private SQLWarning sqlWarning;
-    
-    private final Iterator<T> rowIterator;
-    private int row = 0;
-	private int fetchSize;
 
-    private T currentRow = null;
+    private int fetchSize;
 
-    public AbstractResultSet(Iterable<T> dataRowIterator, Statement statement) {
-        this.rowIterator = dataRowIterator.iterator();
+    public AbstractResultSet(Statement statement) {
         this.statement = statement;
     }
 
-    public final boolean next() throws SQLException {
-        checkNotClosed();
-
-        GuardedResultSetState.State currentState = resultSetState.getCurrentState();
-        switch (currentState) {
-            case BEFORE_FIRST: {
-                if(rowIterator.hasNext()) {
-                    resultSetState.transitionTo(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
-                    currentRow = rowIterator.next();
-                    ++row;
-                } else {
-                    resultSetState.transitionTo(GuardedResultSetState.State.AFTER_LAST);
-                }
-
-                return resultSetState.isInState(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
-            }
-
-
-
-            case ITERATING_OVER_RESULTS: {
-                if(rowIterator.hasNext()) {
-                    currentRow = rowIterator.next();
-                    ++row;
-                } else {
-                    resultSetState.transitionTo(GuardedResultSetState.State.AFTER_LAST);
-                }
-
-                return resultSetState.isInState(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
-            }
-
-            case AFTER_LAST: {
-                throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Calling next() in state " + currentState);
-            }
-
-
-
-            default:
-                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException("Unexpected currentState: " + currentState);
-        }
-    }
-
-    
-    protected final void skipNextRowIfPresent() {
-    	if(this.rowIterator.hasNext()) {
-    		rowIterator.next();
-    	}
-    }
-    
-    protected final void checkValidStateForRowAccess() throws SQLException {
-        checkNotClosed();
-        resultSetState.checkValidStateForRowAccess();
-    }
-    
-    protected final T getCurrentRow() throws SQLException {
-        if (currentRow == null) {
-            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
-                    "currentRow is null in state: " + resultSetState);
-        }
-        
-        return currentRow;
-    }
-
-    @Override
-    public final boolean isBeforeFirst() throws SQLException {
-        return resultSetState.isInState(State.BEFORE_FIRST);
-    }
-    
     @Override
     public final Statement getStatement() throws SQLException {
         return statement;
@@ -106,45 +33,8 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
 
     @Override
-    public final boolean isAfterLast() throws SQLException {
-    	return resultSetState.isInState(State.AFTER_LAST);
-    }
+    public abstract int getRow() throws SQLException;
 
-    @Override
-    public final boolean isFirst() throws SQLException {
-     	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#isFirst()");
-    }
-
-    @Override
-    public final boolean isLast() throws SQLException {
-    	return resultSetState.isInState(State.ITERATING_OVER_RESULTS) && !rowIterator.hasNext();
-    }
-
-    @Override
-    public final void beforeFirst() throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#beforeFirst()");
-    }
-
-    @Override
-    public final void afterLast() throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#afterLast()");
-    }
-    
-    @Override
-    public final boolean first() throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#first()");
-    }
-
-    @Override
-    public final boolean last() throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#last()");
-    }
-
-    @Override
-    public final int getRow() throws SQLException {
-    	return row;
-    }
-    
     @Override
     public final SQLWarning getWarnings() throws SQLException {
         return this.sqlWarning;
@@ -152,81 +42,41 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final void clearWarnings() throws SQLException {
-    	this.sqlWarning = null;
+        this.sqlWarning = null;
     }
-    
+
     protected final void setWarnings(SQLWarning sqlWarning) {
-    	this.sqlWarning = sqlWarning;
-    }
-    
-    @Override
-    public final boolean absolute(int row) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-        		"Moving cursor by absolute(int)");
+        this.sqlWarning = sqlWarning;
     }
 
-    @Override
-    public final boolean relative(int rows) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-        		"Moving cursor by relative(int)");
-    }
 
-    @Override
-    public final boolean previous() throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-        		"Moving cursor by previous()");
-    }
-    
-    @Override
-    public final void setFetchDirection(int direction) throws SQLException {
-    	if(direction != ResultSet.FETCH_FORWARD &&
-    			direction != ResultSet.FETCH_REVERSE && 
-    			direction != ResultSet.FETCH_UNKNOWN) {
-    		JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
-    				"Invalid direction:" + direction);
-    	}
-    	
-    	if(direction != ResultSet.FETCH_FORWARD) {
-    		JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-    				"Only FETCH_FORWARD fetch direction is supported: " + direction);
-    	}
-    }
-
-    @Override
-    public final int getFetchDirection() throws SQLException {
-    	return ResultSet.FETCH_FORWARD;
-    }
-    
     @Override
     public final void setFetchSize(int rows) throws SQLException {
-        if(rows < 0) {
-        	JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
-    				"Negative fetch size: " + rows);
+        if (rows < 0) {
+            JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+                    "Negative fetch size: " + rows);
         }
         this.fetchSize = rows;
     }
-    
+
 
     @Override
     public final int getFetchSize() throws SQLException {
         return this.fetchSize;
     }
-    
-    @Override
-    public final int getType() throws SQLException {
-        return ResultSet.TYPE_FORWARD_ONLY;
-    }
+
+
 
     @Override
     public final int getConcurrency() throws SQLException {
         return ResultSet.CONCUR_READ_ONLY;
     }
-    
+
     @Override
     public final int getHoldability() throws SQLException {
         return ResultSet.HOLD_CURSORS_OVER_COMMIT;
     }
-    
+
     @Override
     public final RowId getRowId(int columnIndex) throws SQLException {
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.RowId");
@@ -234,87 +84,87 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final RowId getRowId(String columnLabel) throws SQLException {
-    	return getRowId(findColumn(columnLabel));
+        return getRowId(findColumn(columnLabel));
     }
-    
+
     @Override
     public final Ref getRef(int columnIndex) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Ref");
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Ref");
     }
-    
+
     @Override
     public final Ref getRef(String columnLabel) throws SQLException {
-    	return getRef(findColumn(columnLabel));
+        return getRef(findColumn(columnLabel));
     }
-    
+
     @Override
     public final Blob getBlob(int columnIndex) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
     }
 
     @Override
     public final Clob getClob(int columnIndex) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Clob");
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Clob");
     }
 
     @Override
     public final Array getArray(int columnIndex) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Array");
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Array");
     }
-    
+
     @Override
     public final Blob getBlob(String columnLabel) throws SQLException {
-    	return getBlob(findColumn(columnLabel));
+        return getBlob(findColumn(columnLabel));
     }
 
     @Override
     public final Clob getClob(String columnLabel) throws SQLException {
-    	return getClob(findColumn(columnLabel));
+        return getClob(findColumn(columnLabel));
     }
 
     @Override
     public final Array getArray(String columnLabel) throws SQLException {
-    	return getArray(findColumn(columnLabel));
+        return getArray(findColumn(columnLabel));
     }
-    
+
     @Override
     public final NClob getNClob(int columnIndex) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.NClob");
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.NClob");
     }
 
     @Override
     public final NClob getNClob(String columnLabel) throws SQLException {
-    	return getNClob(findColumn(columnLabel));
+        return getNClob(findColumn(columnLabel));
     }
 
     @Override
     public final SQLXML getSQLXML(int columnIndex) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.SQLXML");
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.SQLXML");
     }
 
     @Override
     public final SQLXML getSQLXML(String columnLabel) throws SQLException {
-    	return getSQLXML(findColumn(columnLabel));
+        return getSQLXML(findColumn(columnLabel));
     }
 
     @Override
     public final String getNString(int columnIndex) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNString(int)");
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNString(int)");
     }
 
     @Override
     public final String getNString(String columnLabel) throws SQLException {
-    	return getNString(findColumn(columnLabel));
+        return getNString(findColumn(columnLabel));
     }
 
     @Override
     public final Reader getNCharacterStream(int columnIndex) throws SQLException {
-    	throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNCharacterStream(int)");
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNCharacterStream(int)");
     }
 
     @Override
     public final Reader getNCharacterStream(String columnLabel) throws SQLException {
-    	return getNCharacterStream(findColumn(columnLabel));
+        return getNCharacterStream(findColumn(columnLabel));
     }
 
 

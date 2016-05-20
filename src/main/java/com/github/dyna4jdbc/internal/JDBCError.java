@@ -30,7 +30,13 @@ public enum JDBCError {
     FORMAT_STRING_INVALID("Format string '%s' is illegal: %s",
             SQLState.SYNTAX_OR_ACCESS_RULE_ERROR),
     JDBC_FUNCTION_NOT_SUPPORTED("This JDBC API function is not supported: %s",
-            SQLState.FEATURE_NOT_SUPPORTED),
+            SQLState.FEATURE_NOT_SUPPORTED) {
+        @Override
+        public SQLException raiseSQLException(Object... params) throws SQLException {
+            String errorMessage = buildErrorMessage(params);
+            throw new UnsupportedOperationSQLException(errorMessage, getSqlStateAsString());
+        }
+    },
     USING_STDOUT_FROM_UPDATE("Using standard output from an update call is not permitted",
             SQLState.EXTERNAL_ROUTINE_INVOCATION_EXCEPTION),
     UNSUPPORTED_CONVERSION("Conversion of value '%s' to the requeste type is not possible %s",
@@ -102,7 +108,7 @@ public enum JDBCError {
         throw new RuntimeDyna4JdbcException(errorMessage, getSqlStateAsString());
     }
 
-    private String buildErrorMessage(Object[] params) {
+    protected String buildErrorMessage(Object[] params) {
         String formatString = getMessageTemplate();
         return String.format(formatString, params);
     }

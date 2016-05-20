@@ -10,8 +10,8 @@ import com.github.dyna4jdbc.internal.JDBCError;
 
 public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> {
 
-    public AbstractReadOnlyResultSet(Iterable<T> dataRowIterator, Statement statement) {
-        super(dataRowIterator, statement);
+    public AbstractReadOnlyResultSet(Statement statement) {
+        super(statement);
     }
 
     @Override
@@ -476,5 +476,5 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
     }
 
 
-	
+
 }
