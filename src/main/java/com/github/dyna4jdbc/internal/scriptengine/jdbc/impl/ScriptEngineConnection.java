@@ -51,6 +51,10 @@ public final class ScriptEngineConnection extends AbstractConnection implements 
 
         this.engine = loadEngineByName(engineName);
 
+        if(ScalaSupport.isScalaScriptEngine(this.engine)) {
+            ScalaSupport.configureScaleScriptEngine(this.engine);
+        }
+
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
 		configuration = configurationFactory.newConfigurationFromParameters(configurationString, properties);
         
