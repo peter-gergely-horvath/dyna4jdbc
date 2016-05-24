@@ -1,6 +1,8 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
-import java.io.Writer;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -17,6 +19,8 @@ import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
+import com.github.dyna4jdbc.internal.common.outputhandler.DefaultIOHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
@@ -26,11 +30,12 @@ import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
-public final class ScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
+public class ScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
-    private final ScriptEngine engine;
+    protected final ScriptEngine engine;
     private final TypeHandlerFactory typeHandlerFactory;
-	private final Configuration configuration;
+	protected final Configuration configuration;
+    protected final IOHandlerFactory ioHandlerFactory;
 
     public ScriptEngineConnection(String parameters, Properties properties) throws SQLException, MisconfigurationException
     {
@@ -51,14 +56,11 @@ public final class ScriptEngineConnection extends AbstractConnection implements 
 
         this.engine = loadEngineByName(engineName);
 
-        if(ScalaSupport.isScalaScriptEngine(this.engine)) {
-            ScalaSupport.configureScaleScriptEngine(this.engine);
-        }
-
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
-		configuration = configurationFactory.newConfigurationFromParameters(configurationString, properties);
+        this.configuration = configurationFactory.newConfigurationFromParameters(configurationString, properties);
         
-        typeHandlerFactory = DefaultTypeHandlerFactory.getInstance(configuration);
+        this.typeHandlerFactory = DefaultTypeHandlerFactory.getInstance(configuration);
+        this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
 
     }
 
@@ -82,7 +84,7 @@ public final class ScriptEngineConnection extends AbstractConnection implements 
         checkNotClosed();
         ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
         
-		return new OutputHandlingStatement<ScriptEngineConnection>(this, outputHandlerFactory, this);
+		return new OutputHandlingStatement<>(this, outputHandlerFactory, this);
     }
 
 
@@ -109,7 +111,7 @@ public final class ScriptEngineConnection extends AbstractConnection implements 
     }
 
 	@Override
-	public void executeScriptUsingCustomWriters(String script, Writer outWriter, Writer errorWriter)
+	public void executeScriptUsingCustomWriters(String script, OutputStream stdOutputStream, OutputStream errorOutputStream)
 			throws ScriptExecutionException {
         
         synchronized (engine) {
@@ -118,12 +120,18 @@ public final class ScriptEngineConnection extends AbstractConnection implements 
 
             try {
 
-        		if (outWriter != null) {
-                    engine.getContext().setWriter(outWriter);
+        		if (stdOutputStream != null) {
+
+                    PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true);
+
+                    engine.getContext().setWriter(outputPrintWriter);
                 }
         		
-                if (errorWriter != null) {
-                    engine.getContext().setErrorWriter(errorWriter);
+                if (errorOutputStream != null) {
+
+                    PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true);
+
+                    engine.getContext().setErrorWriter(errorPrintWriter);
                 }
             	
                 engine.eval(script);

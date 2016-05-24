@@ -1,8 +1,8 @@
 package com.github.dyna4jdbc.internal.common.outputhandler;
 
-import java.io.PrintWriter;
+import java.io.OutputStream;
 
 public interface ScriptOutputHandler {
-    PrintWriter getOutPrintWriter();
-    PrintWriter getErrorPrintWriter();
+    OutputStream getOutOutputStream();
+    OutputStream getErrorOutputStream();
 }

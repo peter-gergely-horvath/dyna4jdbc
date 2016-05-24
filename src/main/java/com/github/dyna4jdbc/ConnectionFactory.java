@@ -4,6 +4,7 @@ import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtil;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
+import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScalaScriptEngineConnection;
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScriptEngineConnection;
 
 import java.lang.reflect.Constructor;
@@ -19,18 +20,6 @@ import java.util.Locale;
 class ConnectionFactory {
 
     private static final ConnectionFactory INSTANCE = new ConnectionFactory(); // thread-safe: no state is held
-
-    private static final Map<String, Class<? extends Connection>> CONNECTION_TYPES;
-
-    static {
-        Map<String, Class<? extends Connection>> connectionTypes = new HashMap<>();
-
-        connectionTypes.put("scriptengine", ScriptEngineConnection.class);
-        connectionTypes.put("process-runner", ProcessRunnerConnection.class);
-
-        CONNECTION_TYPES = Collections.unmodifiableMap(connectionTypes);
-    }
-
 
     static ConnectionFactory getInstance() {
         return INSTANCE;
@@ -62,12 +51,28 @@ class ConnectionFactory {
 
 
     protected Connection newConnection(String connectionType, String config, Properties info) throws Exception {
+
         try {
 
-            Class<? extends Connection> connectionClass = CONNECTION_TYPES.get(connectionType);
-            if (connectionClass == null) {
+        Class<? extends Connection> connectionClass;
+
+        switch (connectionType) {
+            case "process-runner":
+                connectionClass = ProcessRunnerConnection.class;
+                break;
+
+            case "scriptengine":
+                if (config == null || !config.toLowerCase(Locale.ENGLISH).startsWith("scala")) {
+                    connectionClass = ScriptEngineConnection.class;
+                } else {
+                    connectionClass = ScalaScriptEngineConnection.class;
+                }
+
+                break;
+
+            default:
                 throw MisconfigurationException.forMessage("No such connection type: '%s'", connectionType);
-            }
+        }
 
             Constructor<? extends Connection> connectionConstructor =
                     connectionClass.getConstructor(String.class, Properties.class);

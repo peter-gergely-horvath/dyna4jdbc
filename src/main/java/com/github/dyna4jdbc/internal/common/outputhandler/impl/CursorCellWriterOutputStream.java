@@ -81,6 +81,9 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
 
 
     public void close() throws IOException {
+
+        checkNotClosed();
+
         try {
             if(byteArrayOutputStream.size() > 0) {
                 flushBufferToCell();
@@ -91,7 +94,9 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
     }
 
     private void checkNotClosed() {
-        if (byteArrayOutputStream == null) throw new IllegalStateException(this + " is closed already!");
+        if (byteArrayOutputStream == null) {
+            throw new IllegalStateException(this + " is closed already!");
+        }
     }
 }
 

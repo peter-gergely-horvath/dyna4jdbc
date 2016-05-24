@@ -48,9 +48,10 @@
 		<maven.compiler.source>1.${javaVersion}</maven.compiler.source>
 		<maven.compiler.target>1.${javaVersion}</maven.compiler.target>
 
-		<!-- Dependency versions -->
+		<!-- Dependency versions: used for testing ONLY -->
 		<testng.version>6.8.21</testng.version>
 		<easymock.version>3.4</easymock.version>
+		<scala.version>2.12.0-M4</scala.version>
 
 		<!-- Used to generate build information -->
 		<product-name>${project.name}</product-name>
@@ -98,16 +99,16 @@
 
 		<dependency>
 			<groupId>org.scala-lang</groupId>
-			<artifactId>scala-dist</artifactId>
-			<version>2.12.0-M4</version>
-			<scope>test</scope>
+			<artifactId>scala-library</artifactId>
+			<version>${scala.version}</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.scala-lang</groupId>
-			<artifactId>scala-library</artifactId>
-			<version>2.12.0-M4</version>
-			<scope>test</scope>
+			<artifactId>scala-compiler</artifactId>
+			<version>${scala.version}</version>
+			<scope>compile</scope>
 		</dependency>
 
 	</dependencies>

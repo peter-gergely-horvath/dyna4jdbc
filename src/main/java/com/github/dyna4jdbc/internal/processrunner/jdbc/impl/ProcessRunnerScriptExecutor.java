@@ -1,8 +1,9 @@
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,10 +24,11 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
 	}
 
 	@Override
-	public void executeScriptUsingCustomWriters(String script, Writer outWriter, Writer errorWriter)
+	public void executeScriptUsingCustomWriters(String script, OutputStream stdOutputStream, OutputStream errorOutputStream)
 			throws ScriptExecutionException {
 
-		try (PrintWriter outputPrintWriter = new PrintWriter(outWriter)) {
+		try (PrintWriter outputPrintWriter = new PrintWriter(new OutputStreamWriter(
+				stdOutputStream, configuration.getConversionCharset()), true)) {
 
 			ProcessRunner currentProcess = this.processRunner.get();
 			if (currentProcess == null || !currentProcess.isProcessRunning()) {

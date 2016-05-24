@@ -1,7 +1,7 @@
 package com.github.dyna4jdbc.internal.common.jdbc.generic;
 
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -135,25 +135,25 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 
     
     private void executeScriptUsingOutputHandler(
-            String script, ScriptOutputHandler scriptOutputHandler) throws ScriptExecutionException {
+            String script, ScriptOutputHandler scriptOutputHandler) throws ScriptExecutionException, IOException {
 
-        PrintWriter outPrintWriter = scriptOutputHandler.getOutPrintWriter();
-        PrintWriter errorPrintWriter = scriptOutputHandler.getErrorPrintWriter();
+        OutputStream outOutputStream = scriptOutputHandler.getOutOutputStream();
+        OutputStream errorOutputStream = scriptOutputHandler.getErrorOutputStream();
 
-        executeScriptUsingCustomWriters(script, outPrintWriter, errorPrintWriter);
+        executeScriptUsingCustomWriters(script, outOutputStream, errorOutputStream);
 
-        if(outPrintWriter != null) {
-            outPrintWriter.flush();
-            outPrintWriter.close();
+        if(outOutputStream != null) {
+            outOutputStream.flush();
+            outOutputStream.close();
         }
         
-        if(errorPrintWriter != null) {
-        	errorPrintWriter.flush();
-        	errorPrintWriter.close();
+        if(errorOutputStream != null) {
+        	errorOutputStream.flush();
+        	errorOutputStream.close();
         }
     }
 
-    private void executeScriptUsingCustomWriters(final String script, Writer outWriter, Writer errorWriter)
+    private void executeScriptUsingCustomWriters(final String script, OutputStream outWriter, OutputStream errorWriter)
             throws ScriptExecutionException {
 
     	
