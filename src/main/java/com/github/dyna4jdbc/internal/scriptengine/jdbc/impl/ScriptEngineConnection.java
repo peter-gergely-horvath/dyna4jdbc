@@ -68,8 +68,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
 		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 		ScriptEngine se = scriptEngineManager.getEngineByName(engineName);
         if(se == null) {
-        	throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(
-        			"ScriptEngine not found: " + engineName);
+        	throw JDBCError.SCRIPT_ENGINE_NOT_FOUND.raiseSQLException(engineName);
         }
         
         return se;

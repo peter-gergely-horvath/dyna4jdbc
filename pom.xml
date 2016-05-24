@@ -52,6 +52,8 @@
 		<testng.version>6.8.21</testng.version>
 		<easymock.version>3.4</easymock.version>
 		<scala.version>2.12.0-M4</scala.version>
+        <jython.version>2.7.1b3</jython.version>
+        <beanshell.version>2.0b5</beanshell.version>
 
 		<!-- Used to generate build information -->
 		<product-name>${project.name}</product-name>
@@ -111,7 +113,31 @@
 			<scope>compile</scope>
 		</dependency>
 
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython</artifactId>
+            <version>${jython.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.beanshell</groupId>
+            <artifactId>bsh</artifactId>
+            <version>${beanshell.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
 	</dependencies>
+
+	<repositories>
+		<!-- Required for Renjin (R Language for Statistical Computing) test dependency -->
+		<repository>
+			<id>bedatadriven</id>
+			<name>bedatadriven public repo</name>
+			<url>https://nexus.bedatadriven.com/content/groups/public/</url>
+		</repository>
+	</repositories>
 
 	<build>
 

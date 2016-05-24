@@ -79,9 +79,16 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 
         } 
         catch (ScriptExecutionException se) {
-        	String message = ExceptionUtil.getRootCauseMessage(se);
-            throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
-        } 
+
+            Throwable rootCause = ExceptionUtil.getRootCause(se);
+            if(rootCause instanceof OutputDisabledError) {
+                throw JDBCError.USING_STDOUT_FROM_UPDATE.raiseSQLException(rootCause, rootCause.getMessage());
+
+            } else {
+                String message = rootCause.getMessage();
+                throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
+            }
+        }
         catch (RuntimeDyna4JdbcException ex) {
             throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
         }

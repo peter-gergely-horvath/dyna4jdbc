@@ -23,7 +23,6 @@ public class BasicScriptEngineTest {
 
             String message = sqlEx.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.CONNECT_FAILED_EXCEPTION.toString()), message);
             assertTrue(message.contains(JDBCError.INVALID_CONFIGURATION.toString()), message);
         }
     }
@@ -41,8 +40,7 @@ public class BasicScriptEngineTest {
 
             String message = sqlEx.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.CONNECT_FAILED_EXCEPTION.toString()), message);
-            assertTrue(message.contains(JDBCError.INVALID_CONFIGURATION.toString()), message);
+            assertTrue(message.contains(JDBCError.SCRIPT_ENGINE_NOT_FOUND.toString()), message);
         }
     }
 }

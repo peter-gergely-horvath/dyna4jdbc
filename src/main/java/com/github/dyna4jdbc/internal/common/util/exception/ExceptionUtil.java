@@ -23,18 +23,23 @@ public final class ExceptionUtil {
     }
 
 	public static String getRootCauseMessage(Throwable t) {
-		
+
+		return getRootCause(t).getMessage();
+	}
+
+	public static Throwable getRootCause(Throwable t) {
+
 		Throwable cause = t;
 		while(true) {
-			
+
 			Throwable parent = cause.getCause();
 			if(parent == null) {
 				break;
-			} 
-			
+			}
+
 			cause = parent;
 		}
-		return cause.getMessage();
+		return cause;
 	}
 	
 }

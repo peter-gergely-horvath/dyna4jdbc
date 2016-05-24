@@ -48,6 +48,8 @@ public enum JDBCError {
             SQLState.CLIENT_ERROR),
     JDBC_API_USAGE_CALLER_ERROR("Illegal JDBC API call: %s",
             SQLState.CLIENT_ERROR),
+    SCRIPT_ENGINE_NOT_FOUND("ScriptEngine not found: '%s'",
+            SQLState.CLIENT_ERROR),
     INVALID_CONFIGURATION("Configuration error: %s",
             SQLState.CLIENT_ERROR),
     DRIVER_BUG_UNEXPECTED_STATE("An unexpected state has been reached: %s",
