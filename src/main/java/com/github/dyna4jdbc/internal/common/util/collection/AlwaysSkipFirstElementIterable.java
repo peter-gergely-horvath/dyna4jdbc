@@ -20,35 +20,36 @@ import java.util.Iterator;
 
 public final class AlwaysSkipFirstElementIterable<E> implements Iterable<E> {
 
-	private final Iterable<E> delegate;
 
-	public AlwaysSkipFirstElementIterable(Iterable<E> iterable) {
-        if(iterable == null) throw new NullPointerException("argument iterable cannot be null");
-		this.delegate = iterable;
-	}
+    private final Iterable<E> delegate;
+
+    public AlwaysSkipFirstElementIterable(Iterable<E> iterable) {
+        if (iterable == null) throw new NullPointerException("argument iterable cannot be null");
+        this.delegate = iterable;
+    }
 
     public Iterator<E> iterator() {
 
-		Iterator<E> delegateIterator = delegate.iterator();
+        Iterator<E> delegateIterator = delegate.iterator();
 
-		if (delegateIterator.hasNext()) {
-			// skip first element
-			delegateIterator.next();
-		}
+        if (delegateIterator.hasNext()) {
+            // skip first element
+            delegateIterator.next();
+        }
 
-		return new Iterator<E>() {
+        return new Iterator<E>() {
 
-			@Override
-			public boolean hasNext() {
-				return delegateIterator.hasNext();
+            @Override
+            public boolean hasNext() {
+                return delegateIterator.hasNext();
 
-			}
+            }
 
-			@Override
-			public E next() {
-				return delegateIterator.next();
-			}
-		};
-	}
+            @Override
+            public E next() {
+                return delegateIterator.next();
+            }
+        };
+    }
 
 }
