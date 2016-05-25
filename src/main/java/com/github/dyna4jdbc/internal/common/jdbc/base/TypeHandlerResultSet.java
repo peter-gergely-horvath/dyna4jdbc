@@ -34,8 +34,8 @@ import java.util.*;
  */
 public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
-    protected final List<TypeHandler> typeHandlers;
-    protected final Map<String, Integer> columnNameToColumnIndexMap;
+    private final List<TypeHandler> typeHandlers;
+    private final Map<String, Integer> columnNameToColumnIndexMap;
 
     public TypeHandlerResultSet(Statement statement, List<TypeHandler> typeHandlers) {
         super(statement);
@@ -67,6 +67,10 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         }
 
         return Collections.unmodifiableMap(columnNameToColumnIndexMap);
+    }
+
+    protected final List<TypeHandler> getTypeHandlers() {
+        return typeHandlers;
     }
 
     protected abstract String getRawCellValueBySqlColumnIndex(int sqlIndex) throws SQLException;

@@ -7,22 +7,24 @@ import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractDatabaseMetaData;
 
 public final class GenericDatabaseMetaData extends AbstractDatabaseMetaData<Connection> {
 
-	private String databaseProductName;
-	private String databaseProductVersion;
+    private String databaseProductName;
+    private String databaseProductVersion;
 
-	public GenericDatabaseMetaData(Connection connection, String databaseProductName, String databaseProductVersion) {
-		super(connection);
-		this.databaseProductName = databaseProductName;
-		this.databaseProductVersion = databaseProductVersion;
-	}
+    public GenericDatabaseMetaData(Connection connection,
+            String databaseProductName, String databaseProductVersion) {
 
-	@Override
-	public String getDatabaseProductName() throws SQLException {
-		return databaseProductName;
-	}
+        super(connection);
+        this.databaseProductName = databaseProductName;
+        this.databaseProductVersion = databaseProductVersion;
+    }
 
-	@Override
-	public String getDatabaseProductVersion() throws SQLException {
-		return databaseProductVersion;
-	}
+    @Override
+    public String getDatabaseProductName() throws SQLException {
+        return databaseProductName;
+    }
+
+    @Override
+    public String getDatabaseProductVersion() throws SQLException {
+        return databaseProductVersion;
+    }
 }

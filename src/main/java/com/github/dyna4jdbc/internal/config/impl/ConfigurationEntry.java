@@ -57,8 +57,8 @@ enum ConfigurationEntry {
         }
     },
     PREFER_MULTIPLE_RESULT_SETS("preferMultipleResultSets", "false",
-            "If set to true, output with different column count " +
-                    "will be considered as a new result set. Default is false.") {
+            "If set to true, output with different column count "
+                    + "will be considered as a new result set. Default is false.") {
         @Override
         void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
 
@@ -119,7 +119,7 @@ enum ConfigurationEntry {
         return key;
     }
 
-    protected final String key;
+    private final String key;
     private final String defaultValue;
     private final String description;
 

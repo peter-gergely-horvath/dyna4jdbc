@@ -17,33 +17,33 @@ public final class DataTable implements Iterable<List<String>> {
     public List<String> getLastRow() {
         return rows.getLast();
     }
-    
-	public Iterable<DataColumn> columnIterable() {
-		return new Iterable<DataColumn>() {
-			
-			@Override
-			public Iterator<DataColumn> iterator() {
-				return new Iterator<DataColumn>() {
-					
-					private int index = 0;
-					
-					@Override
-					public DataColumn next() {
-                        if(! hasNext()) {
+
+    public Iterable<DataColumn> columnIterable() {
+        return new Iterable<DataColumn>() {
+
+            @Override
+            public Iterator<DataColumn> iterator() {
+                return new Iterator<DataColumn>() {
+
+                    private int index = 0;
+
+                    @Override
+                    public DataColumn next() {
+                        if (!hasNext()) {
                             throw new NoSuchElementException(Integer.toString(index));
                         }
 
-						return new DataColumn(DataTable.this, index++);
-					}
-					
-					@Override
-					public boolean hasNext() {
-						return index < columnCount;
-					}
-				};
-			}
-		};
-	}
+                        return new DataColumn(DataTable.this, index++);
+                    }
+
+                    @Override
+                    public boolean hasNext() {
+                        return index < columnCount;
+                    }
+                };
+            }
+        };
+    }
 
     public int getColumnCount() {
         return columnCount;
@@ -62,10 +62,10 @@ public final class DataTable implements Iterable<List<String>> {
         return rows.isEmpty();
     }
 
-	@Override
-	public Iterator<List<String>> iterator() {
-		return rows.iterator();
-	}
+    @Override
+    public Iterator<List<String>> iterator() {
+        return rows.iterator();
+    }
 
 
 }

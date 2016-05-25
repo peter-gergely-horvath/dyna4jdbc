@@ -9,7 +9,8 @@ import java.sql.SQLException;
 import com.github.dyna4jdbc.internal.DriverInfo;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
 
-public abstract class AbstractDatabaseMetaData<T extends Connection> extends AbstractWrapper implements DatabaseMetaData {
+public abstract class AbstractDatabaseMetaData<T extends Connection>
+        extends AbstractWrapper implements DatabaseMetaData {
 
     private final T connection;
 
@@ -627,8 +628,8 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> extends Abs
     public final boolean supportsResultSetConcurrency(
             int type, int concurrency) throws SQLException {
 
-        return type == ResultSet.TYPE_SCROLL_INSENSITIVE &&
-                concurrency == ResultSet.CONCUR_READ_ONLY;
+        return type == ResultSet.TYPE_SCROLL_INSENSITIVE
+                && concurrency == ResultSet.CONCUR_READ_ONLY;
     }
 
     public final boolean ownUpdatesAreVisible(int type) throws SQLException {

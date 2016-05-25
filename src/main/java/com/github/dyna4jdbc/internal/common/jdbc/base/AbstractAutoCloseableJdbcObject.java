@@ -127,8 +127,8 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
                 childrenCloseSQLException = sqlEx;
             }
 
-            if (internalCloseSQLException != null &&
-                    childrenCloseSQLException != null) {
+            if (internalCloseSQLException != null
+                    && childrenCloseSQLException != null) {
 
                 throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(
                         Arrays.asList(internalCloseSQLException, childrenCloseSQLException),
@@ -235,21 +235,21 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      */
     private static <T> Set<T> createNewWeakHashSet() {
 
-		/*
+        /*
          * From the JavaDoc: "An entry in a WeakHashMap will automatically be
-		 * removed when its key is no longer in ordinary use"
-		 */
+         * removed when its key is no longer in ordinary use"
+         */
         WeakHashMap<T, Boolean> weakHashMap = new WeakHashMap<>();
 
-		/*
-		 * java.util.Collections.newSetFromMap(Map) creates a set VIEW of the
-		 * supplied Map's KEY SET ==> Technically, it is a "WeakHashSet":
-		 * 
-		 * From the JavaDoc: "Each method invocation on the set returned by this
-		 * method results in exactly one method invocation on the backing map or
-		 * its keySet view, with one exception. The addAll method is implemented
-		 * as a sequence of put invocations on the backing map."
-		 */
+        /*
+         * java.util.Collections.newSetFromMap(Map) creates a set VIEW of the
+         * supplied Map's KEY SET ==> Technically, it is a "WeakHashSet":
+         *
+         * From the JavaDoc: "Each method invocation on the set returned by this
+         * method results in exactly one method invocation on the backing map or
+         * its keySet view, with one exception. The addAll method is implemented
+         * as a sequence of put invocations on the backing map."
+         */
 
         return Collections.newSetFromMap(weakHashMap);
     }

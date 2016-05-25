@@ -43,8 +43,8 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
         this.sqlWarning = null;
     }
 
-    protected final void setWarnings(SQLWarning sqlWarning) {
-        this.sqlWarning = sqlWarning;
+    protected final void setWarnings(SQLWarning warning) {
+        this.sqlWarning = warning;
     }
 
 

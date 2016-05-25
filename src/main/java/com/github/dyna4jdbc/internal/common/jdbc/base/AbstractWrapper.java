@@ -30,6 +30,7 @@ import com.github.dyna4jdbc.internal.JDBCError;
  */
 public abstract class AbstractWrapper implements Wrapper {
 
+    //CHECKSTYLE.OFF: DesignForExtension : incorrect detection of "is not designed for extension"
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         throw JDBCError.CANNOT_UNWARP_OBJECT.raiseSQLException(iface, this.getClass());
@@ -39,4 +40,5 @@ public abstract class AbstractWrapper implements Wrapper {
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
     }
+    //CHECKSTYLE.ON: DesignForExtension
 }

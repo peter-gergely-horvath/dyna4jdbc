@@ -22,9 +22,9 @@ public abstract class DataRowListResultSet<T> extends TypeHandlerResultSet<T> {
     private int javaIndex = -1;
 
 
-    protected final GuardedResultSetState resultSetState = new GuardedResultSetState();
+    private final GuardedResultSetState resultSetState = new GuardedResultSetState();
 
-    protected final Iterator<T> rowIterator;
+    private final Iterator<T> rowIterator;
 
     public DataRowListResultSet(
             List<T> dataRows, Statement statement, List<TypeHandler> typeHandlers) {
@@ -34,7 +34,7 @@ public abstract class DataRowListResultSet<T> extends TypeHandlerResultSet<T> {
     }
 
     @Override
-    public int getRow() throws SQLException {
+    public final int getRow() throws SQLException {
         return javaIndex + SQL_INDEX_OFFSET;
     }
 
@@ -153,9 +153,10 @@ public abstract class DataRowListResultSet<T> extends TypeHandlerResultSet<T> {
 
     @Override
     public final void setFetchDirection(int direction) throws SQLException {
-        if (direction != ResultSet.FETCH_FORWARD &&
-                direction != ResultSet.FETCH_REVERSE &&
-                direction != ResultSet.FETCH_UNKNOWN) {
+        if (direction != ResultSet.FETCH_FORWARD
+                && direction != ResultSet.FETCH_REVERSE
+                && direction != ResultSet.FETCH_UNKNOWN) {
+
             throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "Invalid direction:" + direction);
         }

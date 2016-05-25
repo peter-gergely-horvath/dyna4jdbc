@@ -3,7 +3,7 @@ package com.github.dyna4jdbc.internal.config.impl;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-public class ConfigurationStringParser {
+public final class ConfigurationStringParser {
 
     private static final ConfigurationStringParser INSTANCE = new ConfigurationStringParser();
 
@@ -37,10 +37,10 @@ public class ConfigurationStringParser {
                 String value = keyAndValue[1];
 
                 if (properties.containsKey(key)) {
-                     /* configuration string contains duplicated entries;
-                      * e.g. "foo=x;foo=y"
-		        	  * Fail-fast in such cases by throwing exception
-		        	  */
+                    /* configuration string contains duplicated entries;
+                     * e.g. "foo=x;foo=y"
+                     * Fail-fast in such cases by throwing exception
+                     */
                     throw new IllegalArgumentException(
                             String.format("Configuration string contains duplicated key '%s': "
                                     + "this is invalid!", key));
