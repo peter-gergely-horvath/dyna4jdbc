@@ -2,9 +2,6 @@ package com.github.dyna4jdbc.internal.common.typeconverter;
 
 public class TypeConversionException extends Exception {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public TypeConversionException(String message, Throwable cause) {

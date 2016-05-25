@@ -3,7 +3,6 @@ package com.github.dyna4jdbc.integrationtests;
 import com.github.dyna4jdbc.internal.JDBCError;
 import org.testng.annotations.Test;
 
-import java.io.StringWriter;
 import java.sql.*;
 
 import static org.testng.Assert.*;
@@ -40,7 +39,7 @@ public class BasicScriptEngineTest {
 
             String message = sqlEx.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.SCRIPT_ENGINE_NOT_FOUND.toString()), message);
+            assertTrue(message.contains(JDBCError.LOADING_SCRIPTENGINE_FAILED.toString()), message);
         }
     }
 }

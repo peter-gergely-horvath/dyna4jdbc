@@ -16,10 +16,11 @@ public final class DefaultConfigurationFactory implements ConfigurationFactory {
 	
 	
 	@Override
-	public Configuration newConfigurationFromParameters(String config, Properties props) throws MisconfigurationException {
+	public Configuration newConfigurationFromParameters(String config, Properties props)
+			throws MisconfigurationException {
+
 		ConfigurationImpl configuration = new ConfigurationImpl();
-		
-		
+
 		Properties internalPropops = ConfigurationStringParser.getInstance().parseStringToProperties(config);
 		
 		for(Object propKey : props.keySet()) {

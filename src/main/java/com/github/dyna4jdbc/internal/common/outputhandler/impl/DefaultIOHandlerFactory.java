@@ -1,6 +1,7 @@
-package com.github.dyna4jdbc.internal.common.outputhandler;
+package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 import java.io.*;

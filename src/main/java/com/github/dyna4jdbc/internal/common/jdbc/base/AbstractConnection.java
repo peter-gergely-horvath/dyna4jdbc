@@ -25,7 +25,7 @@ import java.util.concurrent.RejectedExecutionException;
 import com.github.dyna4jdbc.internal.JDBCError;
 
 
-public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject implements java.sql.Connection{
+public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject implements java.sql.Connection {
 
     // --- properties used only to provide a sensible default JDBC interface implementation ---
     private boolean readOnly;

@@ -10,9 +10,9 @@ import java.sql.Statement;
 
 import static org.testng.Assert.*;
 
-public class JythonShellScriptEngineTest {
+public class JythonScriptEngineTest {
 
-    @Test(enabled = false)
+    @Test
     public void testWritingFromUpdateThrowsSQLException() {
 
         try(Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:jython")) {
@@ -32,7 +32,7 @@ public class JythonShellScriptEngineTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     public void testVariableDeclaredInStatementVisibleFromAnotherStatement() throws SQLException {
 
         String expectedOutput =
@@ -45,18 +45,18 @@ public class JythonShellScriptEngineTest {
 
             try (Statement statement = connection.createStatement()) {
 
-                statement.executeUpdate(" msg = \"Hello World\"; ");
+                statement.executeUpdate("msg = \"Hello World\"; ");
             }
 
             String resultSetString = IntegrationTestUtils.executeScriptForResultSetString(
-                    "print(\"Message::\");\n print(msg) ", connection);
+                    "print \"Message::\" \nprint msg ", connection);
 
             assertEquals(resultSetString, expectedOutput);
         }
 
     }
 
-    @Test(enabled = false)
+    @Test
     public void testHeadersNotSpecified() throws Exception {
 
         String expectedOutput =
@@ -70,14 +70,14 @@ public class JythonShellScriptEngineTest {
 
         String url = "jdbc:dyna4jdbc:scriptengine:jython";
 
-        String script = "print(\"A:\tB:\");\n print(\"First A\tFirst B\");\n print(\"Second A\tSecond B\");\n";
+        String script = "print \"A:\tB:\" \nprint \"First A\tFirst B\" \nprint \"Second A\tSecond B\"";
 
         String resultSetString = IntegrationTestUtils.executeScriptForResultSetString(url, script);
 
         assertEquals(resultSetString, expectedOutput);
     }
 
-    @Test(enabled = false)
+    @Test
     public void testHeadersSpecified() throws Exception {
 
         String expectedOutput =
@@ -90,7 +90,7 @@ public class JythonShellScriptEngineTest {
 
         String url = "jdbc:dyna4jdbc:scriptengine:jython";
 
-        String script = "print(\"A::\tB::\");\n print(\"First A\tFirst B\");\n print(\"Second A\tSecond B\");";
+        String script = "print \"A::\tB::\" \nprint \"First A\tFirst B\" \nprint \"Second A\tSecond B\"";
 
         String resultSetString = IntegrationTestUtils.executeScriptForResultSetString(url, script);
 

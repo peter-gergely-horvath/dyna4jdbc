@@ -19,8 +19,6 @@ package com.github.dyna4jdbc.internal.common.jdbc.base;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import com.github.dyna4jdbc.internal.JDBCError;
-
 public abstract class AbstractResultSetMetaData extends AbstractWrapper implements ResultSetMetaData {
 
     @Override

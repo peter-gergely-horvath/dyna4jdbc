@@ -132,7 +132,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
 
 				throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(
 						Arrays.asList(internalCloseSQLException, childrenCloseSQLException),
-						this, "Multiple exceptions raised during close; see supressed");
+						this, "Multiple exceptions raised during close; see suppressed");
 			}
 
 			if(internalCloseSQLException != null) {

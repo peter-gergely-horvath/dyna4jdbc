@@ -1,17 +1,5 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.Properties;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
@@ -19,7 +7,7 @@ import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
-import com.github.dyna4jdbc.internal.common.outputhandler.DefaultIOHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
@@ -29,6 +17,17 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.Properties;
 
 public class ScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
@@ -68,7 +67,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
 		ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 		ScriptEngine se = scriptEngineManager.getEngineByName(engineName);
         if(se == null) {
-        	throw JDBCError.SCRIPT_ENGINE_NOT_FOUND.raiseSQLException(engineName);
+        	throw JDBCError.LOADING_SCRIPTENGINE_FAILED.raiseSQLException(engineName);
         }
         
         return se;

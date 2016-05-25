@@ -11,7 +11,10 @@ import java.util.List;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
 
-public abstract class AbstractStatement<T extends java.sql.Connection> extends AbstractAutoCloseableJdbcObject implements java.sql.Statement {
+public abstract class AbstractStatement<T extends java.sql.Connection>
+        extends AbstractAutoCloseableJdbcObject implements java.sql.Statement {
+
+    private static final int INVALID_UPDATE_COUNT = -1;
 
     private final T connection;
 
@@ -34,7 +37,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection> extends A
     }
 
     protected final void clearUpdateCount() {
-        this.currentUpdateCount = -1;
+        this.currentUpdateCount = INVALID_UPDATE_COUNT;
     }
 
     @Override
@@ -47,9 +50,28 @@ public abstract class AbstractStatement<T extends java.sql.Connection> extends A
         return sqlWarning;
     }
 
-    protected final void setSQLWarning(SQLWarning warning) {
-        this.sqlWarning = warning;
+    protected final void addSQLWarning(SQLWarning warning) {
+
+        if (this.sqlWarning == null) {
+            this.sqlWarning = warning;
+        } else {
+
+            SQLWarning sqlWarningToAddTo = this.sqlWarning;
+            while(true) {
+
+                SQLWarning next = sqlWarningToAddTo.getNextWarning();
+                if(next == null) {
+                    break;
+                }
+
+                sqlWarningToAddTo = next;
+            }
+
+            sqlWarningToAddTo.setNextWarning(warning);
+        }
     }
+
+
 
     @Override
     public final void clearWarnings() throws SQLException {

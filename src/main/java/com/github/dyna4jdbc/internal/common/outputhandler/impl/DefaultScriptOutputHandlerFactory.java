@@ -1,15 +1,5 @@
 package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet;
 import com.github.dyna4jdbc.internal.common.outputhandler.MultiTypeScriptOutputHandler;
@@ -18,6 +8,13 @@ import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptO
 import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
+
+import java.io.OutputStream;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFactory {
 

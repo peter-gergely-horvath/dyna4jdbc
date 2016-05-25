@@ -1,7 +1,6 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractResultSetMetaData;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata.Nullability;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;

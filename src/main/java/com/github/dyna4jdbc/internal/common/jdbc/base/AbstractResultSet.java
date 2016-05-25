@@ -1,16 +1,14 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
+import com.github.dyna4jdbc.internal.JDBCError;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.Map;
-
-import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.common.jdbc.base.GuardedResultSetState.State;
 
 public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObject implements ResultSet {
 
