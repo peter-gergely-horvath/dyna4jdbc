@@ -15,97 +15,97 @@ import com.github.dyna4jdbc.internal.config.impl.ConfigurationStringParser;
 
 final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFactory {
 
-	private static final Pattern SQL_TYPE_PATTERN =
-			Pattern.compile("\\s*(\\w+)(?:\\s*[(]\\s*(\\d+)\\s*[,]?\\s*(\\d)?\\s*[)])?\\s*");
-	
+    private static final Pattern SQL_TYPE_PATTERN =
+            Pattern.compile("\\s*(\\w+)(?:\\s*[(]\\s*(\\d+)\\s*[,]?\\s*(\\d)?\\s*[)])?\\s*");
 
-	ColumnHeaderColumnMetadataFactory(Configuration configuration) {
 
-	}
+    ColumnHeaderColumnMetadataFactory(Configuration configuration) {
 
-	static ColumnHeaderColumnMetadataFactory getInstance(Configuration configuration) {
-		return new ColumnHeaderColumnMetadataFactory(configuration);
-	}
+    }
 
-	protected void configureForValues(DefaultColumnMetadata metaData,
-			int columnIndex, Iterable<String> columnValuesIterable) {
-		
-		
-		Iterator<String> iterator = columnValuesIterable.iterator();
+    static ColumnHeaderColumnMetadataFactory getInstance(Configuration configuration) {
+        return new ColumnHeaderColumnMetadataFactory(configuration);
+    }
 
-		if (!iterator.hasNext()) {
-			throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
-					"iterator is empty: could not extract header value");
-		}
-		
-		String firstValue = iterator.next();
-		String[] configStringArray = firstValue.split(":");
-		String header = configStringArray[0];
-		String sqlTypeConfig = configStringArray.length >= 2 ? configStringArray[1] : null;
-		String metaDataConfig = configStringArray.length == 3 ? configStringArray[2] : null;
+    protected void configureForValues(DefaultColumnMetadata metaData,
+                                      int columnIndex, Iterable<String> columnValuesIterable) {
 
-		super.configureForValues(metaData, columnIndex, new AlwaysSkipFirstElementIterable<>(columnValuesIterable));
-		
-		
-		if(header != null && !"".equals(header.trim())) {
-			configureHeader(metaData, header);
-		}
-		if(sqlTypeConfig != null && !"".equals(sqlTypeConfig.trim())) {
-			configureSqlType(metaData, sqlTypeConfig);
-		}
-		if(metaDataConfig != null && !"".equals(metaDataConfig.trim())) {
-			configureAdditional(metaData, metaDataConfig);
-		}
-		
-		metaData.setTakesFirstRowValue(true);
 
-	}
-	
-	private void configureHeader(DefaultColumnMetadata metaData, String header) {
-		metaData.setColumnLabel(header);
-		metaData.setColumnName(header);
-	}
-	
-	private void configureSqlType(DefaultColumnMetadata metaData, String sqlTypeConfig) {
+        Iterator<String> iterator = columnValuesIterable.iterator();
 
-		try {
-			Matcher matcher = SQL_TYPE_PATTERN.matcher(sqlTypeConfig);
-			if(! matcher.matches()) {
-				throw JDBCError.INVALID_CONFIGURATION_HEADER.raiseSQLException(sqlTypeConfig);
-			}
-			
-			String sqlTypePart = matcher.group(1);
-			String scalePart = matcher.group(2);
-			String precisionPart = matcher.group(3);
-			
-			
-			SQLDataType sqlDataType = SQLDataType.valueOf(sqlTypePart.toUpperCase(Locale.ENGLISH));
-			metaData.setColumnType(sqlDataType);
-			
-			if(scalePart != null) {
-				metaData.setScale(Integer.parseInt(scalePart));
-			} else {
-				metaData.setScale(0);
-			}
-				
-			if(precisionPart != null) {
-				metaData.setPrecision(Integer.parseInt(precisionPart));
-			} else {
-				metaData.setPrecision(0);
-			}
-			
-			
-		} catch(SQLException | RuntimeException e) {
-			throw new IllegalStateException("Processing of header failed: " + sqlTypeConfig + "; " + e.getMessage(), e);
-		}
+        if (!iterator.hasNext()) {
+            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+                    "iterator is empty: could not extract header value");
+        }
 
-	}
-	
-	private void configureAdditional(DefaultColumnMetadata metaData, String metaDataConfig) {
-		Properties props = ConfigurationStringParser.getInstance().parseStringToProperties(metaDataConfig);
-		String formatString = props.getProperty("format"); // TODO: clean this up!
-		metaData.setFormatString(formatString);
-	}
+        String firstValue = iterator.next();
+        String[] configStringArray = firstValue.split(":");
+        String header = configStringArray[0];
+        String sqlTypeConfig = configStringArray.length >= 2 ? configStringArray[1] : null;
+        String metaDataConfig = configStringArray.length == 3 ? configStringArray[2] : null;
+
+        super.configureForValues(metaData, columnIndex, new AlwaysSkipFirstElementIterable<>(columnValuesIterable));
+
+
+        if (header != null && !"".equals(header.trim())) {
+            configureHeader(metaData, header);
+        }
+        if (sqlTypeConfig != null && !"".equals(sqlTypeConfig.trim())) {
+            configureSqlType(metaData, sqlTypeConfig);
+        }
+        if (metaDataConfig != null && !"".equals(metaDataConfig.trim())) {
+            configureAdditional(metaData, metaDataConfig);
+        }
+
+        metaData.setTakesFirstRowValue(true);
+
+    }
+
+    private void configureHeader(DefaultColumnMetadata metaData, String header) {
+        metaData.setColumnLabel(header);
+        metaData.setColumnName(header);
+    }
+
+    private void configureSqlType(DefaultColumnMetadata metaData, String sqlTypeConfig) {
+
+        try {
+            Matcher matcher = SQL_TYPE_PATTERN.matcher(sqlTypeConfig);
+            if (!matcher.matches()) {
+                throw JDBCError.INVALID_CONFIGURATION_HEADER.raiseSQLException(sqlTypeConfig);
+            }
+
+            String sqlTypePart = matcher.group(1);
+            String scalePart = matcher.group(2);
+            String precisionPart = matcher.group(3);
+
+
+            SQLDataType sqlDataType = SQLDataType.valueOf(sqlTypePart.toUpperCase(Locale.ENGLISH));
+            metaData.setColumnType(sqlDataType);
+
+            if (scalePart != null) {
+                metaData.setScale(Integer.parseInt(scalePart));
+            } else {
+                metaData.setScale(0);
+            }
+
+            if (precisionPart != null) {
+                metaData.setPrecision(Integer.parseInt(precisionPart));
+            } else {
+                metaData.setPrecision(0);
+            }
+
+
+        } catch (SQLException | RuntimeException e) {
+            throw new IllegalStateException("Processing of header failed: " + sqlTypeConfig + "; " + e.getMessage(), e);
+        }
+
+    }
+
+    private void configureAdditional(DefaultColumnMetadata metaData, String metaDataConfig) {
+        Properties props = ConfigurationStringParser.getInstance().parseStringToProperties(metaDataConfig);
+        String formatString = props.getProperty("format"); // TODO: clean this up!
+        metaData.setFormatString(formatString);
+    }
 
 
 }

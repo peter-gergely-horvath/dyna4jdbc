@@ -12,139 +12,142 @@ import java.util.List;
 
 public final class TypeHandlerResultSetMetaData extends AbstractResultSetMetaData {
 
-	private final List<TypeHandler> typeHandlerList;
 
-	public TypeHandlerResultSetMetaData(List<TypeHandler> typeHandlerList) {
-		this.typeHandlerList = typeHandlerList;
-	}
+    private final List<TypeHandler> typeHandlerList;
 
-	@Override
-	public int getColumnCount() throws SQLException {
-		return typeHandlerList.size();
-	}
+    public TypeHandlerResultSetMetaData(List<TypeHandler> typeHandlerList) {
+        this.typeHandlerList = typeHandlerList;
+    }
 
-	private ColumnMetadata getColumnMetadataBySqlIndex(int sqlColumnIndex) throws SQLException {
-		final int javaIndex = sqlColumnIndex - 1;
+    @Override
+    public int getColumnCount() throws SQLException {
+        return typeHandlerList.size();
+    }
 
-		if (javaIndex < 0 || javaIndex >= getColumnCount()) {
-			throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Invalid column index: " + sqlColumnIndex);
-		}
+    private ColumnMetadata getColumnMetadataBySqlIndex(int sqlColumnIndex) throws SQLException {
+        final int javaIndex = sqlColumnIndex - 1;
 
-		TypeHandler typeHandler = typeHandlerList.get(javaIndex);
+        if (javaIndex < 0 || javaIndex >= getColumnCount()) {
+            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Invalid column index: " + sqlColumnIndex);
+        }
 
-		ColumnMetadata columnMetadata = typeHandler.getColumnMetadata();
-		if (columnMetadata == null) {
-			throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException("columnMetadata is null");
-		}
+        TypeHandler typeHandler = typeHandlerList.get(javaIndex);
 
-		return columnMetadata;
-	}
+        ColumnMetadata columnMetadata = typeHandler.getColumnMetadata();
+        if (columnMetadata == null) {
+            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException("columnMetadata is null");
+        }
 
-	@Override
-	public boolean isCurrency(int column) throws SQLException {
-		return getColumnMetadataBySqlIndex(column).isCurrency();
-	}
+        return columnMetadata;
+    }
 
-	@Override
-	public int isNullable(int column) throws SQLException {
+    @Override
+    public boolean isCurrency(int column) throws SQLException {
+        return getColumnMetadataBySqlIndex(column).isCurrency();
+    }
 
-		// adapt our non-JDBC specific Nullability to JDBC API values 
-		Nullability nullability = getColumnMetadataBySqlIndex(column).getNullability();
-		if(nullability == null) {
-			throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
-					"Column Nullability indicator is null.");
-		}
+    @Override
+    public int isNullable(int column) throws SQLException {
 
-		switch (nullability) {
-		case NOT_NULLABLE:
-			return ResultSetMetaData.columnNoNulls;
+        // adapt our non-JDBC specific Nullability to JDBC API values
+        Nullability nullability = getColumnMetadataBySqlIndex(column).getNullability();
+        if (nullability == null) {
+            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+                    "Column Nullability indicator is null.");
+        }
 
-		case NULLABLE:
-			return ResultSetMetaData.columnNullable;
+        switch (nullability) {
+            case NOT_NULLABLE:
+                return ResultSetMetaData.columnNoNulls;
 
-		case UNKNOWN:
-			return ResultSetMetaData.columnNullableUnknown;
+            case NULLABLE:
+                return ResultSetMetaData.columnNullable;
 
-		default:
-			throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
-					"Unknown Nullability value: " + nullability);
-		}
-	}
+            case UNKNOWN:
+                return ResultSetMetaData.columnNullableUnknown;
 
-	@Override
-	public boolean isSigned(int column) throws SQLException {
-		return getColumnMetadataBySqlIndex(column).isSigned();
-	}
+            default:
+                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+                        "Unknown Nullability value: " + nullability);
+        }
+    }
 
-	@Override
-	public int getColumnDisplaySize(int column) throws SQLException {
-		return getColumnMetadataBySqlIndex(column).getColumnDisplaySize();
-	}
+    @Override
+    public boolean isSigned(int column) throws SQLException {
+        return getColumnMetadataBySqlIndex(column).isSigned();
+    }
 
-	@Override
-	public String getColumnLabel(int column) throws SQLException {
-		return getColumnMetadataBySqlIndex(column).getColumnLabel();
-	}
+    @Override
+    public int getColumnDisplaySize(int column) throws SQLException {
+        return getColumnMetadataBySqlIndex(column).getColumnDisplaySize();
+    }
 
-	@Override
-	public String getColumnName(int column) throws SQLException {
-		return getColumnMetadataBySqlIndex(column).getColumnName();
-	}
+    @Override
+    public String getColumnLabel(int column) throws SQLException {
+        return getColumnMetadataBySqlIndex(column).getColumnLabel();
+    }
 
-	@Override
-	public int getPrecision(int column) throws SQLException {
-		return getColumnMetadataBySqlIndex(column).getPrecision();
-	}
+    @Override
+    public String getColumnName(int column) throws SQLException {
+        return getColumnMetadataBySqlIndex(column).getColumnName();
+    }
 
-	@Override
-	public int getScale(int column) throws SQLException {
-		return getColumnMetadataBySqlIndex(column).getScale();
-	}
+    @Override
+    public int getPrecision(int column) throws SQLException {
+        return getColumnMetadataBySqlIndex(column).getPrecision();
+    }
 
-	@Override
-	public int getColumnType(int column) throws SQLException {
-		return getColumnMetadataBySqlIndex(column).getColumnType().javaSqlTypesInt;
-	}
+    @Override
+    public int getScale(int column) throws SQLException {
+        return getColumnMetadataBySqlIndex(column).getScale();
+    }
 
-	@Override
-	public String getColumnTypeName(int column) throws SQLException {
-		ColumnMetadata columnMetadata = getColumnMetadataBySqlIndex(column);
-		
-		String columnTypeName = columnMetadata.getColumnTypeName();
-		
-		
-		if(columnTypeName == null) {
-			SQLDataType columnType = getColumnMetadataBySqlIndex(column).getColumnType();
-			if(columnType == null) {
-				throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
-						"columnType is null");
-			}
-			
-			columnTypeName = columnType.name;
-		}
-		
-		return columnTypeName;
-	}
+    @Override
+    public int getColumnType(int column) throws SQLException {
+        return getColumnMetadataBySqlIndex(column).getColumnType().javaSqlTypesInt;
+    }
 
-	@Override
-	public String getColumnClassName(int column) throws SQLException {
-		ColumnMetadata columnMetadata = getColumnMetadataBySqlIndex(column);
-		
-		
-		Class<?> columnClass = columnMetadata.getColumnClass();
-		
-		if(columnClass == null) {
-			SQLDataType columnType = getColumnMetadataBySqlIndex(column).getColumnType();
-			if(columnType == null) {
-				throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
-						"columnType is null");
-			}
-			
-			if(columnType.mappingClass != null) {
-				columnClass = columnType.mappingClass;
-			}
-		}
-		
-		return columnClass != null ? columnClass.getName() : null;
-	}
+    @Override
+    public String getColumnTypeName(int column) throws SQLException {
+        ColumnMetadata columnMetadata = getColumnMetadataBySqlIndex(column);
+
+        String columnTypeName = columnMetadata.getColumnTypeName();
+
+
+        if (columnTypeName == null) {
+            SQLDataType columnType = getColumnMetadataBySqlIndex(column).getColumnType();
+            if (columnType == null) {
+                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+                        "columnType is null");
+            }
+
+            columnTypeName = columnType.name;
+        }
+
+        return columnTypeName;
+    }
+
+    @Override
+    public String getColumnClassName(int column) throws SQLException {
+        ColumnMetadata columnMetadata = getColumnMetadataBySqlIndex(column);
+
+
+        Class<?> columnClass = columnMetadata.getColumnClass();
+
+        if (columnClass == null) {
+            SQLDataType columnType = getColumnMetadataBySqlIndex(column).getColumnType();
+            if (columnType == null) {
+                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+                        "columnType is null");
+            }
+
+            if (columnType.mappingClass != null) {
+                columnClass = columnType.mappingClass;
+            }
+        }
+
+        //CHECKSTYLE.OFF: AvoidInlineConditionals
+        return columnClass != null ? columnClass.getName() : null;
+        //CHECKSTYLE.ON: AvoidInlineConditionals
+    }
 }

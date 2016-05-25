@@ -16,40 +16,39 @@ import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
-public final class ProcessRunnerConnection extends AbstractConnection  {
+public final class ProcessRunnerConnection extends AbstractConnection {
 
-	private final TypeHandlerFactory typeHandlerFactory;
-	private final Configuration configuration;
-	private final ProcessRunnerScriptExecutor scriptExecutor;
+    private final TypeHandlerFactory typeHandlerFactory;
+    private final Configuration configuration;
+    private final ProcessRunnerScriptExecutor scriptExecutor;
 
 
-    public ProcessRunnerConnection(String parameters, Properties properties) throws SQLException, MisconfigurationException
-    {
+    public ProcessRunnerConnection(String parameters, Properties properties) throws SQLException, MisconfigurationException {
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
-		configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
+        configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
         typeHandlerFactory = DefaultTypeHandlerFactory.getInstance(configuration);
-        
+
         this.scriptExecutor = new ProcessRunnerScriptExecutor(configuration);
     }
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
         checkNotClosed();
-        return new GenericDatabaseMetaData(this, System.getProperty("os.name"), System.getProperty("os.version") );
+        return new GenericDatabaseMetaData(this, System.getProperty("os.name"), System.getProperty("os.version"));
     }
 
     @Override
     protected AbstractStatement<?> createStatementInternal() throws SQLException {
         checkNotClosed();
         ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
-        
-		
-		return new ProcessRunnerStatement(this, outputHandlerFactory, scriptExecutor);
+
+
+        return new ProcessRunnerStatement(this, outputHandlerFactory, scriptExecutor);
     }
-    
+
     @Override
     protected void closeInternal() throws SQLException {
-    	scriptExecutor.close();
+        scriptExecutor.close();
     }
 
 }

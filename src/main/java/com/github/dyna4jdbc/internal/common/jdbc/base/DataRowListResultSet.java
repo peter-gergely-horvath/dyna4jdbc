@@ -44,7 +44,7 @@ public abstract class DataRowListResultSet<T> extends TypeHandlerResultSet<T> {
         GuardedResultSetState.State currentState = resultSetState.getCurrentState();
         switch (currentState) {
             case BEFORE_FIRST: {
-                if(rowIterator.hasNext()) {
+                if (rowIterator.hasNext()) {
                     resultSetState.transitionTo(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
                     ++javaIndex;
                     currentRow = rowIterator.next();
@@ -56,7 +56,7 @@ public abstract class DataRowListResultSet<T> extends TypeHandlerResultSet<T> {
             }
 
             case ITERATING_OVER_RESULTS: {
-                if(rowIterator.hasNext()) {
+                if (rowIterator.hasNext()) {
                     currentRow = rowIterator.next();
                     ++javaIndex;
                 } else {
@@ -70,7 +70,6 @@ public abstract class DataRowListResultSet<T> extends TypeHandlerResultSet<T> {
                 throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                         "Calling next() in state " + currentState);
             }
-
 
 
             default:
@@ -89,7 +88,7 @@ public abstract class DataRowListResultSet<T> extends TypeHandlerResultSet<T> {
     }
 
     protected final void skipNextRowIfPresent() {
-        if(this.rowIterator.hasNext()) {
+        if (this.rowIterator.hasNext()) {
             rowIterator.next();
         }
     }
@@ -154,14 +153,14 @@ public abstract class DataRowListResultSet<T> extends TypeHandlerResultSet<T> {
 
     @Override
     public final void setFetchDirection(int direction) throws SQLException {
-        if(direction != ResultSet.FETCH_FORWARD &&
+        if (direction != ResultSet.FETCH_FORWARD &&
                 direction != ResultSet.FETCH_REVERSE &&
                 direction != ResultSet.FETCH_UNKNOWN) {
             throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "Invalid direction:" + direction);
         }
 
-        if(direction != ResultSet.FETCH_FORWARD) {
+        if (direction != ResultSet.FETCH_FORWARD) {
             throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
                     "Only FETCH_FORWARD fetch direction is supported: " + direction);
         }

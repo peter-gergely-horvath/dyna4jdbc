@@ -9,19 +9,19 @@ import java.util.List;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-public final class DataTableWriter extends CursorCellWriterOutputStream{
+public final class DataTableWriter extends CursorCellWriterOutputStream {
 
     private LinkedList<DataTable> dataTableList = new LinkedList<>();
     private List<String> currentRow = new ArrayList<String>();
-	
+
     private boolean currentRowIsTheFirstLine = true;
-	private final boolean skipFirstLine;
-	private boolean preferMultipleResultSets;
+    private final boolean skipFirstLine;
+    private boolean preferMultipleResultSets;
 
     public DataTableWriter(Configuration configuration) {
-    	super(configuration.getCellSeparator(), configuration.getConversionCharset());
-    	
-    	dataTableList.addLast(new DataTable());
+        super(configuration.getCellSeparator(), configuration.getConversionCharset());
+
+        dataTableList.addLast(new DataTable());
         this.skipFirstLine = configuration.getSkipFirstLine();
         this.preferMultipleResultSets = configuration.getPreferMultipleResultSets();
     }
@@ -39,16 +39,16 @@ public final class DataTableWriter extends CursorCellWriterOutputStream{
     @Override
     protected void nextRow() {
         boolean addCurrentRowToOutput = true;
-    	if(currentRowIsTheFirstLine) {
-    		currentRowIsTheFirstLine = false;
-    		if(skipFirstLine) {
-    			addCurrentRowToOutput = false;
-    		}
+        if (currentRowIsTheFirstLine) {
+            currentRowIsTheFirstLine = false;
+            if (skipFirstLine) {
+                addCurrentRowToOutput = false;
+            }
         }
-    	
-    	if(addCurrentRowToOutput) {
-    		appendRow();
-    	}
+
+        if (addCurrentRowToOutput) {
+            appendRow();
+        }
         currentRow = new ArrayList<String>();
     }
 
@@ -62,7 +62,7 @@ public final class DataTableWriter extends CursorCellWriterOutputStream{
     public void close() throws IOException {
         super.close(); // ensure all pending content is written to currentRow
 
-        if(! currentRow.isEmpty()) {
+        if (!currentRow.isEmpty()) {
             appendRow();
         }
     }
@@ -70,7 +70,7 @@ public final class DataTableWriter extends CursorCellWriterOutputStream{
     private void appendRow() {
         DataTable currentTable = dataTableList.getLast();
 
-        if(preferMultipleResultSets) {
+        if (preferMultipleResultSets) {
             if (!currentTable.isEmpty()) {
 
                 List<String> lastRow = currentTable.getLastRow();
@@ -80,7 +80,7 @@ public final class DataTableWriter extends CursorCellWriterOutputStream{
                 }
             }
         }
-        
+
         currentTable.appendRow(currentRow);
     }
 }

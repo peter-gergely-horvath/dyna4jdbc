@@ -24,7 +24,9 @@ public final class AlwaysSkipFirstElementIterable<E> implements Iterable<E> {
     private final Iterable<E> delegate;
 
     public AlwaysSkipFirstElementIterable(Iterable<E> iterable) {
-        if (iterable == null) throw new NullPointerException("argument iterable cannot be null");
+        if (iterable == null) {
+            throw new NullPointerException("argument iterable cannot be null");
+        }
         this.delegate = iterable;
     }
 

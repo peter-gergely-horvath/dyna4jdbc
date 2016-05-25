@@ -139,7 +139,9 @@
 
         <!-- Checks for imports                              -->
         <!-- See http://checkstyle.sf.net/config_import.html -->
+        <!-- We want to allow .* form of import
         <module name="AvoidStarImport"/>
+        -->
         <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
         <module name="RedundantImport"/>
         <module name="UnusedImports">
@@ -209,7 +211,9 @@
         <module name="ArrayTypeStyle"/>
         <!-- Disabled final parameter requirement -->
         <!-- <module name="FinalParameters"/>-->
+        <!-- Do not report TO-DO comments are violations
         <module name="TodoComment"/>
+        -->
         <module name="UpperEll"/>
 
     </module>

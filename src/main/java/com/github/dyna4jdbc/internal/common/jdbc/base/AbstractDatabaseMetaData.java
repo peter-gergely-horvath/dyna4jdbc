@@ -11,35 +11,35 @@ import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
 
 public abstract class AbstractDatabaseMetaData<T extends Connection> extends AbstractWrapper implements DatabaseMetaData {
 
-	private final T connection;
+    private final T connection;
 
-	public AbstractDatabaseMetaData(T connection) {
-		this.connection = connection;
-	}
-	
-	public final T getConnection() throws SQLException {
-	    return connection;
-	}
+    public AbstractDatabaseMetaData(T connection) {
+        this.connection = connection;
+    }
 
-	public final String getDriverName() throws SQLException {
-	    return DriverInfo.DRIVER_NAME;
-	}
+    public final T getConnection() throws SQLException {
+        return connection;
+    }
 
-	public final String getDriverVersion() throws SQLException {
-		return String.format("%s.%s", getDriverMajorVersion(), getDriverMinorVersion());
-	}
+    public final String getDriverName() throws SQLException {
+        return DriverInfo.DRIVER_NAME;
+    }
 
-	public final int getDriverMajorVersion() {
-	    return DriverInfo.DRIVER_VERSION_MAJOR;
-	}
+    public final String getDriverVersion() throws SQLException {
+        return String.format("%s.%s", getDriverMajorVersion(), getDriverMinorVersion());
+    }
 
-	public final int getDriverMinorVersion() {
-	    return DriverInfo.DRIVER_VERSION_MINOR;
-	}
-	
-	
-	// --- reasonable implementation of DatabaseMetaData
-	public final boolean allProceduresAreCallable() throws SQLException {
+    public final int getDriverMajorVersion() {
+        return DriverInfo.DRIVER_VERSION_MAJOR;
+    }
+
+    public final int getDriverMinorVersion() {
+        return DriverInfo.DRIVER_VERSION_MINOR;
+    }
+
+
+    // --- reasonable implementation of DatabaseMetaData
+    public final boolean allProceduresAreCallable() throws SQLException {
         return false;
     }
 
@@ -49,7 +49,7 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> extends Abs
 
     public final String getURL() throws SQLException {
         /* "Returns the URL for this DBMS or null if it cannot be generated"  */
-    	return null;
+        return null;
     }
 
     public final String getUserName() throws SQLException {
@@ -75,7 +75,6 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> extends Abs
     public final boolean nullsAreSortedAtEnd() throws SQLException {
         return false;
     }
-
 
 
     public final boolean usesLocalFiles() throws SQLException {
@@ -490,15 +489,29 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> extends Abs
         return false;
     }
 
-    public final ResultSet getProcedures(String catalog, String schemaPattern, String procedureNamePattern) throws SQLException {
+    public final ResultSet getProcedures(
+            String catalog,
+            String schemaPattern,
+            String procedureNamePattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getProcedureColumns(String catalog, String schemaPattern, String procedureNamePattern, String columnNamePattern) throws SQLException {
+    public final ResultSet getProcedureColumns(
+            String catalog,
+            String schemaPattern,
+            String procedureNamePattern,
+            String columnNamePattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
+    public final ResultSet getTables(
+            String catalog,
+            String schemaPattern,
+            String tableNamePattern,
+            String[] types) throws SQLException {
+
         return new EmptyResultSet();
     }
 
@@ -514,39 +527,82 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> extends Abs
         return new EmptyResultSet();
     }
 
-    public final ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
+    public final ResultSet getColumns(
+            String catalog,
+            String schemaPattern,
+            String tableNamePattern,
+            String columnNamePattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getColumnPrivileges(String catalog, String schema, String table, String columnNamePattern) throws SQLException {
+    public final ResultSet getColumnPrivileges(
+            String catalog,
+            String schema,
+            String table,
+            String columnNamePattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getTablePrivileges(String catalog, String schemaPattern, String tableNamePattern) throws SQLException {
+    public final ResultSet getTablePrivileges(
+            String catalog,
+            String schemaPattern,
+            String tableNamePattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getBestRowIdentifier(String catalog, String schema, String table, int scope, boolean nullable) throws SQLException {
+    public final ResultSet getBestRowIdentifier(
+            String catalog,
+            String schema,
+            String table,
+            int scope,
+            boolean nullable) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getVersionColumns(String catalog, String schema, String table) throws SQLException {
+    public final ResultSet getVersionColumns(
+            String catalog,
+            String schema,
+            String table) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getPrimaryKeys(String catalog, String schema, String table) throws SQLException {
+    public final ResultSet getPrimaryKeys(
+            String catalog,
+            String schema,
+            String table) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getImportedKeys(String catalog, String schema, String table) throws SQLException {
+    public final ResultSet getImportedKeys(
+            String catalog,
+            String schema,
+            String table) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getExportedKeys(String catalog, String schema, String table) throws SQLException {
+    public final ResultSet getExportedKeys(
+            String catalog,
+            String schema,
+            String table) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getCrossReference(String parentCatalog, String parentSchema, String parentTable, String foreignCatalog, String foreignSchema, String foreignTable) throws SQLException {
+    public final ResultSet getCrossReference(
+            String parentCatalog,
+            String parentSchema,
+            String parentTable,
+            String foreignCatalog,
+            String foreignSchema,
+            String foreignTable) throws SQLException {
+
         return new EmptyResultSet();
     }
 
@@ -554,7 +610,13 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> extends Abs
         return new EmptyResultSet();
     }
 
-    public final ResultSet getIndexInfo(String catalog, String schema, String table, boolean unique, boolean approximate) throws SQLException {
+    public final ResultSet getIndexInfo(
+            String catalog,
+            String schema,
+            String table,
+            boolean unique,
+            boolean approximate) throws SQLException {
+
         return new EmptyResultSet();
     }
 
@@ -562,8 +624,11 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> extends Abs
         return type == ResultSet.TYPE_FORWARD_ONLY;
     }
 
-    public final boolean supportsResultSetConcurrency(int type, int concurrency) throws SQLException {
-        return type == ResultSet.TYPE_SCROLL_INSENSITIVE && concurrency == ResultSet.CONCUR_READ_ONLY;
+    public final boolean supportsResultSetConcurrency(
+            int type, int concurrency) throws SQLException {
+
+        return type == ResultSet.TYPE_SCROLL_INSENSITIVE &&
+                concurrency == ResultSet.CONCUR_READ_ONLY;
     }
 
     public final boolean ownUpdatesAreVisible(int type) throws SQLException {
@@ -606,7 +671,12 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> extends Abs
         return true;
     }
 
-    public final ResultSet getUDTs(String catalog, String schemaPattern, String typeNamePattern, int[] types) throws SQLException {
+    public final ResultSet getUDTs(
+            String catalog,
+            String schemaPattern,
+            String typeNamePattern,
+            int[] types) throws SQLException {
+
         return new EmptyResultSet();
     }
 
@@ -626,19 +696,34 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> extends Abs
         return false;
     }
 
-    public final ResultSet getSuperTypes(String catalog, String schemaPattern, String typeNamePattern) throws SQLException {
+    public final ResultSet getSuperTypes(
+            String catalog,
+            String schemaPattern,
+            String typeNamePattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getSuperTables(String catalog, String schemaPattern, String tableNamePattern) throws SQLException {
+    public final ResultSet getSuperTables(
+            String catalog,
+            String schemaPattern,
+            String tableNamePattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getAttributes(String catalog, String schemaPattern, String typeNamePattern, String attributeNamePattern) throws SQLException {
+    public final ResultSet getAttributes(
+            String catalog,
+            String schemaPattern,
+            String typeNamePattern,
+            String attributeNamePattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final boolean supportsResultSetHoldability(int holdability) throws SQLException {
+    public final boolean supportsResultSetHoldability(int holdability)
+            throws SQLException {
+
         return false;
     }
 
@@ -678,7 +763,10 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> extends Abs
         return RowIdLifetime.ROWID_UNSUPPORTED;
     }
 
-    public final ResultSet getSchemas(String catalog, String schemaPattern) throws SQLException {
+    public final ResultSet getSchemas(
+            String catalog,
+            String schemaPattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 
@@ -694,15 +782,29 @@ public abstract class AbstractDatabaseMetaData<T extends Connection> extends Abs
         return new EmptyResultSet();
     }
 
-    public final ResultSet getFunctions(String catalog, String schemaPattern, String functionNamePattern) throws SQLException {
+    public final ResultSet getFunctions(
+            String catalog,
+            String schemaPattern,
+            String functionNamePattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getFunctionColumns(String catalog, String schemaPattern, String functionNamePattern, String columnNamePattern) throws SQLException {
+    public final ResultSet getFunctionColumns(
+            String catalog,
+            String schemaPattern,
+            String functionNamePattern,
+            String columnNamePattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 
-    public final ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
+    public final ResultSet getPseudoColumns(
+            String catalog,
+            String schemaPattern,
+            String tableNamePattern,
+            String columnNamePattern) throws SQLException {
+
         return new EmptyResultSet();
     }
 

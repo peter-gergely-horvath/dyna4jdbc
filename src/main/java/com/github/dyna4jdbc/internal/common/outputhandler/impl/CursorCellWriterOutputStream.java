@@ -18,16 +18,16 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
 
     private ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-	private final char cellSeparator;
+    private final char cellSeparator;
     private final String charsetName;
 
 
     public CursorCellWriterOutputStream(char cellSeparator, String charsetName) {
-		this.cellSeparator = cellSeparator;
+        this.cellSeparator = cellSeparator;
         this.charsetName = charsetName;
-	}
+    }
 
-	@Override
+    @Override
     public final void write(int thisByte) throws IOException {
 
         checkNotClosed();
@@ -36,19 +36,19 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
                 (thisByte == LF || thisByte == CR))) {
 
 
-        	if(thisByte == LF || thisByte == CR  ) {
+            if (thisByte == LF || thisByte == CR) {
                 flushBufferToCell();
 
                 nextRow();
-                
-        	} else if(thisByte == cellSeparator) {
+
+            } else if (thisByte == cellSeparator) {
                 flushBufferToCell();
 
                 nextCell();
-                
-        	} else {
-        		byteArrayOutputStream.write(thisByte);
-        	}
+
+            } else {
+                byteArrayOutputStream.write(thisByte);
+            }
         }
 
         lastByte = thisByte;
@@ -79,13 +79,12 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
     }
 
 
-
     public void close() throws IOException {
 
         checkNotClosed();
 
         try {
-            if(byteArrayOutputStream.size() > 0) {
+            if (byteArrayOutputStream.size() > 0) {
                 flushBufferToCell();
             }
         } finally {

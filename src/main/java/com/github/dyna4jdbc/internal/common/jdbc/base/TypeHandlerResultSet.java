@@ -113,6 +113,7 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         }
     }
 
+    //CHECKSTYLE.OFF: AvoidInlineConditionals
     @Override
     public final boolean getBoolean(int columnIndex) throws SQLException {
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
@@ -487,4 +488,5 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
                     tce, getRow(), columnIndex, rawCellValue, type);
         }
     }
+    //CHECKSTYLE.ON: AvoidInlineConditionals
 }

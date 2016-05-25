@@ -16,8 +16,8 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     private static final int INVALID_UPDATE_COUNT = -1;
 
-    private final T connection;
 
+    private final T connection;
 
     private SQLWarning sqlWarning;
     private Iterator<ResultSet> resultSetIterator;
@@ -57,10 +57,10 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
         } else {
 
             SQLWarning sqlWarningToAddTo = this.sqlWarning;
-            while(true) {
+            while (true) {
 
                 SQLWarning next = sqlWarningToAddTo.getNextWarning();
-                if(next == null) {
+                if (next == null) {
                     break;
                 }
 
@@ -72,7 +72,6 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     }
 
 
-
     @Override
     public final void clearWarnings() throws SQLException {
         sqlWarning = null;
@@ -80,13 +79,13 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final boolean getMoreResults(int current) throws SQLException {
-        if(current != Statement.CLOSE_CURRENT_RESULT &&
+        if (current != Statement.CLOSE_CURRENT_RESULT &&
                 current != Statement.KEEP_CURRENT_RESULT &&
                 current != Statement.CLOSE_ALL_RESULTS) {
             throw new SQLException("Invalid value for current: " + current);
         }
 
-        if(current != Statement.CLOSE_CURRENT_RESULT) {
+        if (current != Statement.CLOSE_CURRENT_RESULT) {
             throw new SQLException(
                     "Only Statement.CLOSE_CURRENT_RESULT is supported: " +
                             current);
@@ -96,12 +95,11 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final void setFetchDirection(int direction) throws SQLException {
-        if(direction ==  ResultSet.FETCH_FORWARD ||
+        if (direction == ResultSet.FETCH_FORWARD ||
                 direction == ResultSet.FETCH_REVERSE ||
                 direction == ResultSet.FETCH_UNKNOWN) {
             // no-op: setFetchDirection is just a hint, a driver might ignore it
-        }
-        else {
+        } else {
             // signal illegal argument
             throw new SQLException("Invalid direction: " + direction);
         }
@@ -114,11 +112,11 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final void setFetchSize(int rows) throws SQLException {
-        if(rows < 0) {
+        if (rows < 0) {
             throw new SQLException("Invalid fetchSize: " + rows);
         }
 
-        if(rows > 0) {
+        if (rows > 0) {
             throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
                     "Setting a non-zero fetchSize: " + rows);
         }
@@ -128,7 +126,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     public final ResultSet getResultSet() throws SQLException {
 
         ResultSet resultSetToReturn;
-        if(resultSetIterator != null && resultSetIterator.hasNext()) {
+        if (resultSetIterator != null && resultSetIterator.hasNext()) {
             resultSetToReturn = resultSetIterator.next();
         } else {
             resultSetToReturn = null;

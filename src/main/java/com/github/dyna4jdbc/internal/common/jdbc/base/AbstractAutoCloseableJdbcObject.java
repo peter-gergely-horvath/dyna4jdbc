@@ -29,220 +29,217 @@ import com.github.dyna4jdbc.internal.JDBCError;
 
 /**
  * {@code AbstractAutoCloseableJdbcObject} is a base class
- * for any JDBC API implementation class, which supports 
+ * for any JDBC API implementation class, which supports
  * the {@code close()} method defined by
  * {@code java.lang.AutoCloseable}.
- * 
+ * <p>
  * This class provides support to register child objects
- * (which logically belong to this object) on creation, 
- * and to cascade the close operation to live ones, when 
- * this object is closed. 
- * 
+ * (which logically belong to this object) on creation,
+ * and to cascade the close operation to live ones, when
+ * this object is closed.
+ *
  * @author Peter G. Horvath
  */
 public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements AutoCloseable {
 
-	/**
-	 * A thread-safe boolean container for the closed flag, used to prevent further use 
-	 * of a concrete JDBC class implementation once {@link #close()} is called. 
-	 * We use {@code AtomicBoolean} here so that a subclass can safely be closed from a 
-	 * thread different than it was created from.
-	 * 
-	 * @see #close()
-	 * @see #checkNotClosed()
-	 */
-	private final AtomicBoolean closed = new AtomicBoolean(false);
-	
-	/**
-	 * <p>
-	 * Closing a parent object should close all the derived resources: this 
-	 * {@code Set} is used to maintain <b>live references</b> to objects created
-	 * by the actual subclass. Under the hoods, we use a "weak" {@code Set}, which
-	 * means objects registered here are not prevented from being garbage collected:
-	 * any object discarded by the garbage collector will simply be removed from the 
-	 * set. As a result, close operation will only be cascaded to live child objects.
-	 * We wrap the "weak" {@code Set} so that operations will be thread-safe.</p>
-	 * 
-	 * <p>
-	 * The intention here is to know all live objects related to {@code this}, but
-	 * do NOT prevent them from being garbage collected in case they are no longer
-	 * in use. </p>
-	 * 
-	 * @see #createNewWeakHashSet()
-	 * @see #close()
-	 */
-	private final Set<AutoCloseable> children = Collections.synchronizedSet( createNewWeakHashSet() );
+    /**
+     * A thread-safe boolean container for the closed flag, used to prevent further use
+     * of a concrete JDBC class implementation once {@link #close()} is called.
+     * We use {@code AtomicBoolean} here so that a subclass can safely be closed from a
+     * thread different than it was created from.
+     *
+     * @see #close()
+     * @see #checkNotClosed()
+     */
+    private final AtomicBoolean closed = new AtomicBoolean(false);
 
-	/**
-	 * Throws {@code SQLException} if {@code this} is closed. 
-	 * This method is thread-safe: it shall consistently report 
-	 * an object closed from one thread as closed from all other 
-	 * threads as well, <i>without external synchronisation.</i>
-	 * 
-	 * @throws SQLException if {@code this} is closed. 
-	 */
-	protected final void checkNotClosed() throws SQLException {
-		if (isClosed()) {
-			throw JDBCError.OBJECT_CLOSED.raiseSQLException(this);
-		}
-	}
-	
-	/**
-	 * Returns an indication whether {@code this} object is closed.
-	 * This method is thread-safe: it shall consistently report 
-	 * an object closed from one thread as closed from all other 
-	 * threads as well, <i>without external synchronisation.</i>
-	 *  
-	 * @return {@code true} if {@code this} object is closed, {@code false} otherwise.
-	 */
-	public final boolean isClosed() {
-		return closed.get();
-	}
-	
-	/**
-	 * Closes {@code this} object and all live registered closable child objects.
-	 * This method is thread-safe: it shall consistently close 
-	 * an object created from another thread. The results of the close
-	 * operation shall be visible from all other threads as well, 
-	 * <i>without external synchronisation.</i>
-	 * 
-	 * @throws SQLException in case closing {@code this} object or any of the the child object fails
-	 */
-	public final void close() throws SQLException {
-		if(!closed.get()) {
-			closed.set(true);
-			
-			SQLException internalCloseSQLException = null;
-			SQLException childrenCloseSQLException = null;
+    /**
+     * <p>
+     * Closing a parent object should close all the derived resources: this
+     * {@code Set} is used to maintain <b>live references</b> to objects created
+     * by the actual subclass. Under the hoods, we use a "weak" {@code Set}, which
+     * means objects registered here are not prevented from being garbage collected:
+     * any object discarded by the garbage collector will simply be removed from the
+     * set. As a result, close operation will only be cascaded to live child objects.
+     * We wrap the "weak" {@code Set} so that operations will be thread-safe.</p>
+     * <p>
+     * <p>
+     * The intention here is to know all live objects related to {@code this}, but
+     * do NOT prevent them from being garbage collected in case they are no longer
+     * in use. </p>
+     *
+     * @see #createNewWeakHashSet()
+     * @see #close()
+     */
+    private final Set<AutoCloseable> children = Collections.synchronizedSet(createNewWeakHashSet());
 
-			try {
-				closeInternal();
-			} catch(SQLException sqlEx) {
-				internalCloseSQLException = sqlEx;
-			}
-						
-			try {
-				closeChildObjects();
-			} catch(SQLException sqlEx) {
-				childrenCloseSQLException = sqlEx;
-			}
+    /**
+     * Throws {@code SQLException} if {@code this} is closed.
+     * This method is thread-safe: it shall consistently report
+     * an object closed from one thread as closed from all other
+     * threads as well, <i>without external synchronisation.</i>
+     *
+     * @throws SQLException if {@code this} is closed.
+     */
+    protected final void checkNotClosed() throws SQLException {
+        if (isClosed()) {
+            throw JDBCError.OBJECT_CLOSED.raiseSQLException(this);
+        }
+    }
 
-			if(internalCloseSQLException != null &&
-					childrenCloseSQLException != null) {
+    /**
+     * Returns an indication whether {@code this} object is closed.
+     * This method is thread-safe: it shall consistently report
+     * an object closed from one thread as closed from all other
+     * threads as well, <i>without external synchronisation.</i>
+     *
+     * @return {@code true} if {@code this} object is closed, {@code false} otherwise.
+     */
+    public final boolean isClosed() {
+        return closed.get();
+    }
 
-				throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(
-						Arrays.asList(internalCloseSQLException, childrenCloseSQLException),
-						this, "Multiple exceptions raised during close; see suppressed");
-			}
+    /**
+     * Closes {@code this} object and all live registered closable child objects.
+     * This method is thread-safe: it shall consistently close
+     * an object created from another thread. The results of the close
+     * operation shall be visible from all other threads as well,
+     * <i>without external synchronisation.</i>
+     *
+     * @throws SQLException in case closing {@code this} object or any of the the child object fails
+     */
+    public final void close() throws SQLException {
+        if (!closed.get()) {
+            closed.set(true);
 
-			if(internalCloseSQLException != null) {
-				throw internalCloseSQLException;
-			}
+            SQLException internalCloseSQLException = null;
+            SQLException childrenCloseSQLException = null;
 
-			if(childrenCloseSQLException != null) {
-				throw childrenCloseSQLException;
-			}
-		}
-	}
+            try {
+                closeInternal();
+            } catch (SQLException sqlEx) {
+                internalCloseSQLException = sqlEx;
+            }
 
-	/**
-	 * <p>
-	 * Executed when {@code this} object is closed. Concrete sub-classes might
-	 * override this method to provide their own resource disposal logic.</p>
-	 * 
-	 * <b>NOTE: the implementation of this method MUST BE THREAD-SAFE!</b>
-	 * 
-	 * @throws SQLException in case closing the resource fails 
-	 */
-	protected void closeInternal() throws SQLException {
-		// template method for subclasses to hook into close
-	}
+            try {
+                closeChildObjects();
+            } catch (SQLException sqlEx) {
+                childrenCloseSQLException = sqlEx;
+            }
 
-	/**
-	 * Closes all child objects, even if some of them throw {@code Exception} when
-	 * the close method is called on them. Any exceptions thrown by the child objects
-	 * are later re-thrown, once closing of every child is completed.
-	 * 
-	 * @throws SQLException if one or more child objects throw exception one close method call
-	 */
-	private void closeChildObjects() throws SQLException {
-		LinkedList<Exception> suppressedThrowables = new LinkedList<>();
+            if (internalCloseSQLException != null &&
+                    childrenCloseSQLException != null) {
 
-		for (AutoCloseable closeableObject : children) {
+                throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(
+                        Arrays.asList(internalCloseSQLException, childrenCloseSQLException),
+                        this, "Multiple exceptions raised during close; see suppressed");
+            }
 
-			try {
-				closeableObject.close();
-			} catch (Exception closeException) {
-				suppressedThrowables.add(closeException);
-			}
-		}
-		
-		children.clear();
+            if (internalCloseSQLException != null) {
+                throw internalCloseSQLException;
+            }
 
-		if (!suppressedThrowables.isEmpty()) {
-			
-			if(suppressedThrowables.size() == 1) {
-				// closure of a single child has failed: propagate the root cause as cause
-				throw JDBCError.CLOSE_FAILED.raiseSQLException(suppressedThrowables.getFirst(),
-						this, "Closing of child object caused exception");
-				
-			} else {
-				// closure of multiple children has failed: propagate them as suppressed
-				throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(suppressedThrowables,
-						this, "Closing of child objects caused exceptions; see supressed");	
-			}
-		}
-	}
+            if (childrenCloseSQLException != null) {
+                throw childrenCloseSQLException;
+            }
+        }
+    }
+
+    /**
+     * <p>
+     * Executed when {@code this} object is closed. Concrete sub-classes might
+     * override this method to provide their own resource disposal logic.</p>
+     * <p>
+     * <b>NOTE: the implementation of this method MUST BE THREAD-SAFE!</b>
+     *
+     * @throws SQLException in case closing the resource fails
+     */
+    protected void closeInternal() throws SQLException {
+        // template method for subclasses to hook into close
+    }
+
+    /**
+     * Closes all child objects, even if some of them throw {@code Exception} when
+     * the close method is called on them. Any exceptions thrown by the child objects
+     * are later re-thrown, once closing of every child is completed.
+     *
+     * @throws SQLException if one or more child objects throw exception one close method call
+     */
+    private void closeChildObjects() throws SQLException {
+        LinkedList<Exception> suppressedThrowables = new LinkedList<>();
+
+        for (AutoCloseable closeableObject : children) {
+
+            try {
+                closeableObject.close();
+            } catch (Exception closeException) {
+                suppressedThrowables.add(closeException);
+            }
+        }
+
+        children.clear();
+
+        if (!suppressedThrowables.isEmpty()) {
+
+            if (suppressedThrowables.size() == 1) {
+                // closure of a single child has failed: propagate the root cause as cause
+                throw JDBCError.CLOSE_FAILED.raiseSQLException(suppressedThrowables.getFirst(),
+                        this, "Closing of child object caused exception");
+
+            } else {
+                // closure of multiple children has failed: propagate them as suppressed
+                throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(suppressedThrowables,
+                        this, "Closing of child objects caused exceptions; see supressed");
+            }
+        }
+    }
 
 
+    /**
+     * Registers the object as child object, which logically belongs to {@code this} object
+     * and hence, should also be closed (if still alive), when this {@code this} objects is
+     * closed.
+     *
+     * @param closableObject the object to register
+     * @throws SQLException if {@code this} is closed already
+     */
+    protected final void registerAsChild(AutoCloseable closableObject) throws SQLException {
+        checkNotClosed();
 
-	/**
-	 * Registers the object as child object, which logically belongs to {@code this} object
-	 * and hence, should also be closed (if still alive), when this {@code this} objects is 
-	 * closed.
+        if (closableObject == null) {
+            JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("closableObject to register cannot be null");
+        }
 
-	 * @param closableObject the object to register
-	 * 
-	 * @throws SQLException if {@code this} is closed already
-	 */
-	protected final void registerAsChild(AutoCloseable closableObject) throws SQLException {
-		checkNotClosed();
+        children.add(closableObject);
+    }
 
-		if (closableObject == null) {
-			JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("closableObject to register cannot be null");
-		}
+    /**
+     * Registers all object supplied in the {@code Collection} as child objects,
+     * which logically belong to {@code this} object and hence, should also be closed
+     * (if still alive), when this {@code this} objects is closed.
+     *
+     * @param closableObjects a {@code Collection} of objects to register as children.
+     * @throws SQLException if {@code this} is closed already
+     */
+    protected final void registerAsChildren(Collection<? extends AutoCloseable> closableObjects) throws SQLException {
+        for (AutoCloseable aClosableSQLObject : closableObjects) {
+            registerAsChild(aClosableSQLObject);
+        }
+    }
 
-		children.add(closableObject);
-	}
-	
-	/**
-	 * Registers all object supplied in the {@code Collection} as child objects, 
-	 * which logically belong to {@code this} object and hence, should also be closed 
-	 * (if still alive), when this {@code this} objects is closed.
-
-	 * @param closableObjects a {@code Collection} of objects to register as children.
-	 * 
-	 * @throws SQLException if {@code this} is closed already
-	 */
-	protected final void registerAsChildren(Collection<? extends AutoCloseable> closableObjects) throws SQLException {
-		for(AutoCloseable aClosableSQLObject : closableObjects) {
-			registerAsChild(aClosableSQLObject);
-		}
-	}
-
-	/**
-	 * Construct a new "weak" {@code HashSet} according to the same specification
-	 * as described for {@link WeakHashMap}.
-	 *  
-	 * @return a new "Weak" {@code HashSet} 
-	 */
-	private static <T> Set<T> createNewWeakHashSet() {
+    /**
+     * Construct a new "weak" {@code HashSet} according to the same specification
+     * as described for {@link WeakHashMap}.
+     *
+     * @return a new "Weak" {@code HashSet}
+     */
+    private static <T> Set<T> createNewWeakHashSet() {
 
 		/*
-		 * From the JavaDoc: "An entry in a WeakHashMap will automatically be
+         * From the JavaDoc: "An entry in a WeakHashMap will automatically be
 		 * removed when its key is no longer in ordinary use"
 		 */
-		WeakHashMap<T, Boolean> weakHashMap = new WeakHashMap<>();
+        WeakHashMap<T, Boolean> weakHashMap = new WeakHashMap<>();
 
 		/*
 		 * java.util.Collections.newSetFromMap(Map) creates a set VIEW of the
@@ -254,7 +251,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
 		 * as a sequence of put invocations on the backing map."
 		 */
 
-		return Collections.newSetFromMap(weakHashMap);
-	}
+        return Collections.newSetFromMap(weakHashMap);
+    }
 
 }

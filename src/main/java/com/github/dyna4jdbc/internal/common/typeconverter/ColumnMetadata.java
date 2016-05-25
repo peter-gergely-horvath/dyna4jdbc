@@ -3,14 +3,14 @@ package com.github.dyna4jdbc.internal.common.typeconverter;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.SQLDataType;
 
 public interface ColumnMetadata {
-    
-	enum Nullability { NOT_NULLABLE, NULLABLE, UNKNOWN }
-	
-	boolean isTakesFirstRowValue();
-	
-	boolean isCurrency();
 
-	Nullability getNullability();
+    enum Nullability {NOT_NULLABLE, NULLABLE, UNKNOWN}
+
+    boolean isTakesFirstRowValue();
+
+    boolean isCurrency();
+
+    Nullability getNullability();
 
     boolean isSigned();
 
@@ -29,6 +29,6 @@ public interface ColumnMetadata {
     String getColumnTypeName();
 
     Class<?> getColumnClass();
-    
-	String getFormatString();
+
+    String getFormatString();
 }

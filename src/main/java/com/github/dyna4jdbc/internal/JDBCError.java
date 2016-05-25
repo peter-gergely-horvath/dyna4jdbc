@@ -74,7 +74,9 @@ public enum JDBCError {
     }
 
     protected String getSqlStateAsString() {
+        //CHECKSTYLE.OFF: AvoidInlineConditionals
         return sqlState != null ? sqlState.code : null;
+        //CHECKSTYLE.ON: AvoidInlineConditionals
     }
 
     public SQLException raiseSQLException(Throwable throwable, Object... params) throws SQLException {
@@ -100,7 +102,9 @@ public enum JDBCError {
         throw new SQLException(errorMessage, getSqlStateAsString());
     }
 
-    public RuntimeDyna4JdbcException raiseUncheckedException(Throwable throwable, Object... params) throws RuntimeDyna4JdbcException {
+    public RuntimeDyna4JdbcException raiseUncheckedException(
+            Throwable throwable, Object... params) throws RuntimeDyna4JdbcException {
+
         String errorMessage = buildErrorMessage(params);
         throw new RuntimeDyna4JdbcException(errorMessage, throwable, getSqlStateAsString());
     }

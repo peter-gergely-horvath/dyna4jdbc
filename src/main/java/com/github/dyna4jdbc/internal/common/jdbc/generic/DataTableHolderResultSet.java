@@ -14,7 +14,9 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
 
 	private final DataTable dataTable;
 
-	public DataTableHolderResultSet(Statement statement, DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
+	public DataTableHolderResultSet(
+			Statement statement, DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
+
 		super(dataTable.getRows(), statement, initTypeHandlers(dataTable, typeHandlerFactory));
 		this.dataTable = dataTable;
 
@@ -60,9 +62,11 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
 					final int sqlIndexOfColumn = i + 1;
 
 					JDBCError.INCONSISTENT_HEADER_SPECIFICATION.raiseUncheckedException(
-							String.format("Column specification for column %s is invalid / inconsistent: ensure SQL type is valid "
-									+ "and that explicit declaration / heuristic detection is not mixed. "
-									+ "(HINT: Isn't there any typo or unintended column separator in the header line?)", sqlIndexOfColumn));
+							String.format("Column specification for column %s is invalid / inconsistent: " +
+									"ensure SQL type is valid and that explicit declaration / " +
+									"heuristic detection is not mixed. "
+									+ "(HINT: Isn't there any typo or unintended column " +
+									"separator in the header line?)", sqlIndexOfColumn));
 				}
 			}
 		}

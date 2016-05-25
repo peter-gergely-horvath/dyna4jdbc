@@ -22,24 +22,25 @@ public final class ExceptionUtil {
         // static utility class -- no instances allowed
     }
 
-	public static String getRootCauseMessage(Throwable t) {
 
-		return getRootCause(t).getMessage();
-	}
+    public static String getRootCauseMessage(Throwable t) {
 
-	public static Throwable getRootCause(Throwable t) {
+        return getRootCause(t).getMessage();
+    }
 
-		Throwable cause = t;
-		while(true) {
+    public static Throwable getRootCause(Throwable t) {
 
-			Throwable parent = cause.getCause();
-			if(parent == null) {
-				break;
-			}
+        Throwable cause = t;
+        while (true) {
 
-			cause = parent;
-		}
-		return cause;
-	}
-	
+            Throwable parent = cause.getCause();
+            if (parent == null) {
+                break;
+            }
+
+            cause = parent;
+        }
+        return cause;
+    }
+
 }

@@ -8,134 +8,132 @@ import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
 enum ConfigurationEntry {
 
-	CELL_SEPARATOR("cellSeparator", "\t", "The character used as separator character. Default is TAB (\\t).") {
-		@Override
-		void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
-			if (value == null || value.length() != 1) {
-				throw MisconfigurationException.forMessage(
-						"A singe character is expected for %s, but was: '%s'",
-						this.key, value);
-			}
+    CELL_SEPARATOR("cellSeparator", "\t", "The character used as separator character. Default is TAB (\\t).") {
+        @Override
+        void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
+            if (value == null || value.length() != 1) {
+                throw MisconfigurationException.forMessage(
+                        "A singe character is expected for %s, but was: '%s'",
+                        this.key, value);
+            }
 
-			char charAtZero = value.charAt(0);
+            char charAtZero = value.charAt(0);
 
-			config.setCellSeparator(charAtZero);
-		}
-	},
-	SKIP_FIRST_RESULT_LINE("skipFirstLine", "false",
-			"If set to true, the first output line is omitted from the result. Default is false.") {
-		@Override
-		void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
+            config.setCellSeparator(charAtZero);
+        }
+    },
+    SKIP_FIRST_RESULT_LINE("skipFirstLine", "false",
+            "If set to true, the first output line is omitted from the result. Default is false.") {
+        @Override
+        void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
 
-			if (value == null || "".equals(value) || "".equals(value.trim())) {
-				throw MisconfigurationException
-						.forMessage("Value for %s cannot be null/whitespace only, but was '%s'", 
-								this.key, value);
-			}
+            if (value == null || "".equals(value) || "".equals(value.trim())) {
+                throw MisconfigurationException
+                        .forMessage("Value for %s cannot be null/whitespace only, but was '%s'",
+                                this.key, value);
+            }
 
-			switch (value) {
-			case "true":
-				config.setSkipFirstLine(true);
-				break;
+            switch (value) {
+                case "true":
+                    config.setSkipFirstLine(true);
+                    break;
 
-			case "false":
-				config.setSkipFirstLine(false);
-				break;
+                case "false":
+                    config.setSkipFirstLine(false);
+                    break;
 
-			default:
-				throw MisconfigurationException
-						.forMessage("Value for %s must either be 'true' or 'false', but was '%s'", 
-								this.key, value);
-			}
-		}
-		
-		@Override
-		public DriverPropertyInfo getDriverPropertyInfo() {
-			DriverPropertyInfo propertyInfo = super.getDriverPropertyInfo();
-			propertyInfo.choices = new String[] {"true", "false"};
-			return propertyInfo;
-		}
-	},
-	PREFER_MULTIPLE_RESULT_SETS("preferMultipleResultSets", "false",
-			"If set to true, output with different column count " +
-					"will be considered as a new result set. Default is false.") {
-		@Override
-		void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
+                default:
+                    throw MisconfigurationException
+                            .forMessage("Value for %s must either be 'true' or 'false', but was '%s'",
+                                    this.key, value);
+            }
+        }
 
-			if (value == null || "".equals(value) || "".equals(value.trim())) {
-				throw MisconfigurationException
-						.forMessage("Value for %s cannot be null/whitespace only, but was '%s'", 
-								this.key, value);
-			}
+        @Override
+        public DriverPropertyInfo getDriverPropertyInfo() {
+            DriverPropertyInfo propertyInfo = super.getDriverPropertyInfo();
+            propertyInfo.choices = new String[]{"true", "false"};
+            return propertyInfo;
+        }
+    },
+    PREFER_MULTIPLE_RESULT_SETS("preferMultipleResultSets", "false",
+            "If set to true, output with different column count " +
+                    "will be considered as a new result set. Default is false.") {
+        @Override
+        void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
 
-			switch (value) {
-			case "true":
-				config.setPreferMultipleResultSets(true);
-				break;
+            if (value == null || "".equals(value) || "".equals(value.trim())) {
+                throw MisconfigurationException
+                        .forMessage("Value for %s cannot be null/whitespace only, but was '%s'",
+                                this.key, value);
+            }
 
-			case "false":
-				config.setPreferMultipleResultSets(false);
-				break;
+            switch (value) {
+                case "true":
+                    config.setPreferMultipleResultSets(true);
+                    break;
 
-			default:
-				throw MisconfigurationException
-						.forMessage("Value for %s must either be 'true' or 'false', but was '%s'", 
-								this.key, value);
-			}
-		}
-		
-		@Override
-		public DriverPropertyInfo getDriverPropertyInfo() {
-			DriverPropertyInfo propertyInfo = super.getDriverPropertyInfo();
-			propertyInfo.choices = new String[] {"true", "false"};
-			return propertyInfo;
-		}
-	},
-	CHARSET("charset", "UTF-8", "The charset used during character conversion. Default is UTF-8.") {
-		@Override
-		void setConfiguration(ConfigurationImpl config, String charset) throws MisconfigurationException {
-			if (charset == null) {
-				throw MisconfigurationException.forMessage("charset cannot be null");
-			}
+                case "false":
+                    config.setPreferMultipleResultSets(false);
+                    break;
 
-			try
-			{
-				if(! Charset.isSupported(charset)) {
-					throw MisconfigurationException.forMessage("Charset is not supported: '%s'", charset);
-				}
+                default:
+                    throw MisconfigurationException
+                            .forMessage("Value for %s must either be 'true' or 'false', but was '%s'",
+                                    this.key, value);
+            }
+        }
 
-			} catch (IllegalCharsetNameException e) {
-				throw MisconfigurationException.forMessage("Charset is illegal: '%s'", charset);
-			}
+        @Override
+        public DriverPropertyInfo getDriverPropertyInfo() {
+            DriverPropertyInfo propertyInfo = super.getDriverPropertyInfo();
+            propertyInfo.choices = new String[]{"true", "false"};
+            return propertyInfo;
+        }
+    },
+    CHARSET("charset", "UTF-8", "The charset used during character conversion. Default is UTF-8.") {
+        @Override
+        void setConfiguration(ConfigurationImpl config, String charset) throws MisconfigurationException {
+            if (charset == null) {
+                throw MisconfigurationException.forMessage("charset cannot be null");
+            }
 
-			config.setConversionCharset(charset);
-		}
-	}
-	;
+            try {
+                if (!Charset.isSupported(charset)) {
+                    throw MisconfigurationException.forMessage("Charset is not supported: '%s'", charset);
+                }
 
-	public String getDefaultValue() {
-		return defaultValue;
-	}
+            } catch (IllegalCharsetNameException e) {
+                throw MisconfigurationException.forMessage("Charset is illegal: '%s'", charset);
+            }
 
-	public String getKey() {
-		return key;
-	}
+            config.setConversionCharset(charset);
+        }
+    };
 
-	protected final String key;
-	private final String defaultValue;
-	private final String description;
+    public String getDefaultValue() {
+        return defaultValue;
+    }
 
-	ConfigurationEntry(String key, String defaultValue, String description) {
-		this.key = key;
-		this.defaultValue = defaultValue;
-		this.description = description;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	abstract void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException;
+    protected final String key;
+    private final String defaultValue;
+    private final String description;
 
-	public DriverPropertyInfo getDriverPropertyInfo() {
-		DriverPropertyInfo driverPropertyInfo = new DriverPropertyInfo(this.key, defaultValue);
-		driverPropertyInfo.description = this.description;
-		return driverPropertyInfo;
-	}
+    ConfigurationEntry(String key, String defaultValue, String description) {
+        this.key = key;
+        this.defaultValue = defaultValue;
+        this.description = description;
+    }
+
+    abstract void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException;
+
+    public DriverPropertyInfo getDriverPropertyInfo() {
+        DriverPropertyInfo driverPropertyInfo = new DriverPropertyInfo(this.key, defaultValue);
+        driverPropertyInfo.description = this.description;
+        return driverPropertyInfo;
+    }
 }

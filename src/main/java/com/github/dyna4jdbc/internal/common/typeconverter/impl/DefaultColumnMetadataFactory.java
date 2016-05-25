@@ -9,63 +9,61 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 
 public final class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
 
-	// "Pattern: Instances of this class are immutable and are safe for use by
-	// multiple concurrent threads."
-	private static final Pattern HEADER_PATTERN = Pattern.compile(buildMatchPattern());
-	
+    // "Pattern: Instances of this class are immutable and are safe for use by
+    // multiple concurrent threads."
+    private static final Pattern HEADER_PATTERN = Pattern.compile(buildMatchPattern());
 
-	private final EmptyColumnMetadataFactory emptyColumnMetadataFactory;
-	private final HeuristicsColumnMetadataFactory heuristicsColumnMetadataFactory;
-	private final ColumnHeaderColumnMetadataFactory columnHeaderColumnMetadataFactory;
 
-	public DefaultColumnMetadataFactory(Configuration configuration) {
-		emptyColumnMetadataFactory = EmptyColumnMetadataFactory.getInstance(configuration);
-		heuristicsColumnMetadataFactory = HeuristicsColumnMetadataFactory.getInstance(configuration);
-		columnHeaderColumnMetadataFactory = ColumnHeaderColumnMetadataFactory.getInstance(configuration);
-		
-	}
+    private final EmptyColumnMetadataFactory emptyColumnMetadataFactory;
+    private final HeuristicsColumnMetadataFactory heuristicsColumnMetadataFactory;
+    private final ColumnHeaderColumnMetadataFactory columnHeaderColumnMetadataFactory;
 
-	@Override
-	public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValuesIterable) {
+    public DefaultColumnMetadataFactory(Configuration configuration) {
+        emptyColumnMetadataFactory = EmptyColumnMetadataFactory.getInstance(configuration);
+        heuristicsColumnMetadataFactory = HeuristicsColumnMetadataFactory.getInstance(configuration);
+        columnHeaderColumnMetadataFactory = ColumnHeaderColumnMetadataFactory.getInstance(configuration);
 
-		Iterator<String> iterator = columnValuesIterable.iterator();
+    }
 
-		if (!iterator.hasNext()) {
-			return emptyColumnMetadataFactory.getColumnMetadata(columnIndex, columnValuesIterable);
-		}
+    @Override
+    public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValuesIterable) {
 
-		final String firstValueFromColumn = iterator.next();
+        Iterator<String> iterator = columnValuesIterable.iterator();
 
-		final boolean headerSeemsToContainParseInstructions = 
-				firstValueFromColumn != null && HEADER_PATTERN.matcher(firstValueFromColumn).matches();
+        if (!iterator.hasNext()) {
+            return emptyColumnMetadataFactory.getColumnMetadata(columnIndex, columnValuesIterable);
+        }
 
-		if (headerSeemsToContainParseInstructions) {
-			return columnHeaderColumnMetadataFactory.getColumnMetadata(columnIndex, columnValuesIterable);
-		} else {
-			return heuristicsColumnMetadataFactory.getColumnMetadata(columnIndex, columnValuesIterable);
-		}
+        final String firstValueFromColumn = iterator.next();
 
-	}
-	
-	private static String buildMatchPattern() {
-	
-		StringBuilder sqlTypeNamesSeparatedByPipeForRegex = new StringBuilder();
-		boolean isFirst = true;
-		for(SQLDataType sqlDataType : SQLDataType.values()) {
-			String sqlTypeName = sqlDataType.name;
-			if(isFirst) {
-				isFirst = false;
-			} else {
-				sqlTypeNamesSeparatedByPipeForRegex.append("|");
-			}
-			
-			sqlTypeNamesSeparatedByPipeForRegex.append(sqlTypeName);
-		}
-		
-		return String.format("^[^:]+:((?:%s)[^:]*)?:[^:]*$", sqlTypeNamesSeparatedByPipeForRegex);
-	}
+        final boolean headerSeemsToContainParseInstructions =
+                firstValueFromColumn != null && HEADER_PATTERN.matcher(firstValueFromColumn).matches();
 
-	
-	
+        if (headerSeemsToContainParseInstructions) {
+            return columnHeaderColumnMetadataFactory.getColumnMetadata(columnIndex, columnValuesIterable);
+        } else {
+            return heuristicsColumnMetadataFactory.getColumnMetadata(columnIndex, columnValuesIterable);
+        }
+
+    }
+
+    private static String buildMatchPattern() {
+
+        StringBuilder sqlTypeNamesSeparatedByPipeForRegex = new StringBuilder();
+        boolean isFirst = true;
+        for (SQLDataType sqlDataType : SQLDataType.values()) {
+            String sqlTypeName = sqlDataType.name;
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sqlTypeNamesSeparatedByPipeForRegex.append("|");
+            }
+
+            sqlTypeNamesSeparatedByPipeForRegex.append(sqlTypeName);
+        }
+
+        return String.format("^[^:]+:((?:%s)[^:]*)?:[^:]*$", sqlTypeNamesSeparatedByPipeForRegex);
+    }
+
 
 }
