@@ -43,40 +43,48 @@ public abstract class DataRowListResultSet<T> extends TypeHandlerResultSet<T> {
 
         GuardedResultSetState.State currentState = resultSetState.getCurrentState();
         switch (currentState) {
-            case BEFORE_FIRST: {
-                if (rowIterator.hasNext()) {
-                    resultSetState.transitionTo(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
-                    ++javaIndex;
-                    currentRow = rowIterator.next();
-                } else {
-                    resultSetState.transitionTo(GuardedResultSetState.State.AFTER_LAST);
-                }
+            case BEFORE_FIRST:
+                return handleNextOnBeforeFirst();
 
-                return resultSetState.isInState(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
-            }
 
-            case ITERATING_OVER_RESULTS: {
-                if (rowIterator.hasNext()) {
-                    currentRow = rowIterator.next();
-                    ++javaIndex;
-                } else {
-                    resultSetState.transitionTo(GuardedResultSetState.State.AFTER_LAST);
-                }
+            case ITERATING_OVER_RESULTS:
+                return handleNextOnIteratingOverResults();
 
-                return resultSetState.isInState(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
-            }
 
-            case AFTER_LAST: {
+            case AFTER_LAST:
                 throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                         "Calling next() in state " + currentState);
-            }
-
 
             default:
                 throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
                         "Unexpected currentState: " + currentState);
         }
     }
+
+    private boolean handleNextOnBeforeFirst() throws SQLException {
+        if (rowIterator.hasNext()) {
+            resultSetState.transitionTo(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
+            ++javaIndex;
+            currentRow = rowIterator.next();
+        } else {
+            resultSetState.transitionTo(GuardedResultSetState.State.AFTER_LAST);
+        }
+
+        return resultSetState.isInState(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
+    }
+
+    private boolean handleNextOnIteratingOverResults() throws SQLException {
+        if (rowIterator.hasNext()) {
+            currentRow = rowIterator.next();
+            ++javaIndex;
+        } else {
+            resultSetState.transitionTo(GuardedResultSetState.State.AFTER_LAST);
+        }
+
+        return resultSetState.isInState(GuardedResultSetState.State.ITERATING_OVER_RESULTS);
+    }
+
+
 
     protected final T getCurrentRow() throws SQLException {
         if (currentRow == null) {

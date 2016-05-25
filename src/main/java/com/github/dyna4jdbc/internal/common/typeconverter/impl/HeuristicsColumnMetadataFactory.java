@@ -62,7 +62,8 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         metaData.setColumnType(columnType);
     }
 
-    private static SQLDataType getColumnTypeByCurrentlySelectedTypeAndCellValue(SQLDataType currentColumnType, String cellValue) {
+    private static SQLDataType getColumnTypeByCurrentlySelectedTypeAndCellValue(
+            SQLDataType currentColumnType, String cellValue) {
 
         SQLDataType newColumnType = currentColumnType;
 
