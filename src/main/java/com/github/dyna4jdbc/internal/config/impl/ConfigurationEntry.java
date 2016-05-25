@@ -119,7 +119,9 @@ enum ConfigurationEntry {
         return key;
     }
 
-    private final String key;
+    //CHECKSTYLE.OFF: VisibilityModifier
+    protected final String key;
+    //CHECKSTYLE.ON: VisibilityModifier
     private final String defaultValue;
     private final String description;
 

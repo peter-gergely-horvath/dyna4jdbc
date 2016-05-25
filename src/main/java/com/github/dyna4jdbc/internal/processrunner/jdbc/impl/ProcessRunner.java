@@ -54,7 +54,14 @@ public final class ProcessRunner {
             BufferedReader stdErr = new BufferedReader(
                     new InputStreamReader(process.getErrorStream(), conversionCharset));
 
-            CyclicBarrier cyclicBarrier = new CyclicBarrier(3);
+            final int partiesToWait = 3;
+            /*
+            CyclicBarrier should wait for three parties:
+                1.) Current thread
+                2.) Process standard output reader thread
+                3.) Process standard error reader thread
+             */
+            CyclicBarrier cyclicBarrier = new CyclicBarrier(partiesToWait);
 
             standardOutputStreamContentQueue = new LinkedBlockingQueue<>();
             errorStreamContentQueue = new LinkedBlockingQueue<>();
@@ -101,15 +108,13 @@ public final class ProcessRunner {
 
     boolean isOutputEmpty() {
         String stdOutEntry = standardOutputStreamContentQueue.peek();
-        return (stdOutEntry == null ||
-                endOfStreamIndicator.equals(stdOutEntry));
+        return (stdOutEntry == null || endOfStreamIndicator.equals(stdOutEntry));
 
     }
 
     boolean isErrorEmpty() {
         String stdErrorOutputEntry = errorStreamContentQueue.peek();
-        return (stdErrorOutputEntry == null ||
-                endOfStreamIndicator.equals(stdErrorOutputEntry));
+        return (stdErrorOutputEntry == null || endOfStreamIndicator.equals(stdErrorOutputEntry));
     }
 
     String pollStandardOutput(long timeout, TimeUnit unit) throws IOException {

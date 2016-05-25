@@ -7,6 +7,8 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 
 public final class EmptyColumnMetadataFactory implements ColumnMetadataFactory {
 
+    private static final int DEFAULT_COLUMN_DISPLAY_SIZE = 4;
+
     private static final EmptyColumnMetadataFactory INSTANCE = new EmptyColumnMetadataFactory();
 
     static EmptyColumnMetadataFactory getInstance(Configuration configuration) {
@@ -24,7 +26,7 @@ public final class EmptyColumnMetadataFactory implements ColumnMetadataFactory {
         metadata.setCurrency(false);
         metadata.setNullability(Nullability.UNKNOWN);
         metadata.setSigned(false);
-        metadata.setColumnDisplaySize(4);
+        metadata.setColumnDisplaySize(DEFAULT_COLUMN_DISPLAY_SIZE);
         metadata.setColumnLabel("");
         metadata.setColumnName("");
         metadata.setPrecision(0);

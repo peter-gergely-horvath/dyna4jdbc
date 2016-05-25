@@ -32,8 +32,8 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
 
         checkNotClosed();
 
-        if (!((lastByte == LF || lastByte == CR) &&
-                (thisByte == LF || thisByte == CR))) {
+        if (!((lastByte == LF || lastByte == CR)
+                && (thisByte == LF || thisByte == CR))) {
 
 
             if (thisByte == LF || thisByte == CR) {
@@ -79,6 +79,7 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
     }
 
 
+    //CHECKSTYLE.OFF: DesignForExtension
     public void close() throws IOException {
 
         checkNotClosed();
@@ -91,6 +92,7 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
             byteArrayOutputStream = null;
         }
     }
+    //CHECKSTYLE.ON: DesignForExtension
 
     private void checkNotClosed() {
         if (byteArrayOutputStream == null) {

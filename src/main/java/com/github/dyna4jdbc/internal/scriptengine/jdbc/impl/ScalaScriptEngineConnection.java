@@ -22,14 +22,16 @@ public final class ScalaScriptEngineConnection extends ScriptEngineConnection {
             throws SQLException, MisconfigurationException {
         super(parameters, properties);
 
-        if(!(this.engine instanceof IMain)) {
+        if (!(this.engine instanceof IMain)) {
             JDBCError.INVALID_CONFIGURATION.raiseSQLException(
-                    "Cannot configure Scala ScriptEngine of type: " + this.engine.getClass().getName() +
-                            ". Are you using a Scala version different from the one the driver was compiled for?" );
+                    "Cannot configure Scala ScriptEngine of type: "
+                            + this.engine.getClass().getName()
+                            + ". Are you using a Scala version "
+                            + "different from the one the driver was compiled for?");
         }
 
 
-        this.scalaInterpreterMain = ((IMain)this.engine);
+        this.scalaInterpreterMain = ((IMain) this.engine);
 
         this.scalaInterpreterMain.setContextClassLoader();
         this.scalaInterpreterMain.settings().processArgumentString(USEJAVACP_ARGUMENT);

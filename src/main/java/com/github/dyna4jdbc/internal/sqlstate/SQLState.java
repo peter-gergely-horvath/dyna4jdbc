@@ -31,6 +31,7 @@ public enum SQLState {
     CLIENT_ERROR(Category.ERROR, "56", "Client error"),
     SYSTEM_ERROR(Category.ERROR, "57", "System error");
 
+    //CHECKSTYLE.OFF: VisibilityModifier
     public final String code;
 
     final Category category;
@@ -39,6 +40,7 @@ public enum SQLState {
     final String classText;
     final String subClassCode;
     final String subClassText;
+    //CHECKSTYLE.ON: VisibilityModifier
 
     private static final String EMPTY_SUBCLASS_CODE = "000";
 

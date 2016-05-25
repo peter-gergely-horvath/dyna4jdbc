@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.util.collection.AlwaysSkipFirstElementIterable;
+import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.impl.ConfigurationStringParser;
 
@@ -17,6 +18,10 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 
     private static final Pattern SQL_TYPE_PATTERN =
             Pattern.compile("\\s*(\\w+)(?:\\s*[(]\\s*(\\d+)\\s*[,]?\\s*(\\d)?\\s*[)])?\\s*");
+
+    private static final int MATCHER_GROUP_INDEX_SQL_TYPE = 1;
+    private static final int MATCHER_GROUP_SCALE_PART = 2;
+    private static final int MATCHER_GROUP_PRECISION_PART = 3;
 
 
     ColumnHeaderColumnMetadataFactory(Configuration configuration) {
@@ -40,9 +45,10 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 
         String firstValue = iterator.next();
         String[] configStringArray = firstValue.split(":");
-        String header = configStringArray[0];
-        String sqlTypeConfig = configStringArray.length >= 2 ? configStringArray[1] : null;
-        String metaDataConfig = configStringArray.length == 3 ? configStringArray[2] : null;
+
+        String header = ArrayUtils.tryGetByIndex(configStringArray, 0);
+        String sqlTypeConfig = ArrayUtils.tryGetByIndex(configStringArray, 1);
+        String metaDataConfig = ArrayUtils.tryGetByIndex(configStringArray, 2);
 
         super.configureForValues(metaData, columnIndex, new AlwaysSkipFirstElementIterable<>(columnValuesIterable));
 
@@ -74,9 +80,9 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
                 throw JDBCError.INVALID_CONFIGURATION_HEADER.raiseSQLException(sqlTypeConfig);
             }
 
-            String sqlTypePart = matcher.group(1);
-            String scalePart = matcher.group(2);
-            String precisionPart = matcher.group(3);
+            String sqlTypePart = matcher.group(MATCHER_GROUP_INDEX_SQL_TYPE);
+            String scalePart = matcher.group(MATCHER_GROUP_SCALE_PART);
+            String precisionPart = matcher.group(MATCHER_GROUP_PRECISION_PART);
 
 
             SQLDataType sqlDataType = SQLDataType.valueOf(sqlTypePart.toUpperCase(Locale.ENGLISH));

@@ -67,14 +67,18 @@ public final class DefaultScriptOutputHandlerFactory implements ScriptOutputHand
         }
     }
 
-    private static class DefaultResultSetScriptOutputHandler
+    private static final class DefaultResultSetScriptOutputHandler
             implements SingleResultSetScriptOutputHandler, MultiTypeScriptOutputHandler {
 
         private final Statement statement;
         private final DataTableWriter stdOut;
         private final TypeHandlerFactory typeHandlerFactory;
 
-        public DefaultResultSetScriptOutputHandler(Statement statement, TypeHandlerFactory typeHandlerFactory, Configuration configuration) {
+        private DefaultResultSetScriptOutputHandler(
+                Statement statement,
+                TypeHandlerFactory typeHandlerFactory,
+                Configuration configuration) {
+
             this.statement = statement;
             this.typeHandlerFactory = typeHandlerFactory;
 

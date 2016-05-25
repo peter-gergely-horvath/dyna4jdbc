@@ -8,7 +8,7 @@ import java.io.OutputStream;
 /**
  * @author Peter Horvath
  */
-public class DisallowAllWritesOutputStream extends OutputStream {
+public final class DisallowAllWritesOutputStream extends OutputStream {
 
     private final String message;
 

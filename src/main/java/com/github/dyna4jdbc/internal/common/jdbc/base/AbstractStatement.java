@@ -216,13 +216,15 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     }
 
+    //CHECKSTYLE.OFF: DesignForExtension
     @Override
-    public final void cancel() throws SQLException {
+    public void cancel() throws SQLException {
         // TODO: implement
 
-        JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
                 "java.sql.Statement.cancel()");
     }
+    //CHECKSTYLE.ON: DesignForExtension
 
     @Override
     public void setCursorName(String name) throws SQLException {

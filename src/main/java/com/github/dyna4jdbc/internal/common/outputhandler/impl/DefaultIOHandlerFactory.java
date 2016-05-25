@@ -12,21 +12,21 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @author Peter Horvath
  */
-public class DefaultIOHandlerFactory implements IOHandlerFactory {
+public final class DefaultIOHandlerFactory implements IOHandlerFactory {
 
     private final String characterSetName;
 
     private static final AtomicReference<DefaultIOHandlerFactory> INSTANCE = new AtomicReference<>();
 
-    private DefaultIOHandlerFactory(String characterSetName) {
-        validateCharacterSetName(characterSetName);
+    private DefaultIOHandlerFactory(String nameOfCharacterSet) {
+        validateCharacterSetName(nameOfCharacterSet);
 
-        this.characterSetName = characterSetName;
+        this.characterSetName = nameOfCharacterSet;
     }
 
-    private void validateCharacterSetName(String characterSetName) {
+    private static void validateCharacterSetName(String characterSetName) {
         try {
-            if(! Charset.isSupported(characterSetName)) {
+            if (!Charset.isSupported(characterSetName)) {
                 throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
                         "Unsupported characterSetName: " + characterSetName);
             }
@@ -41,12 +41,12 @@ public class DefaultIOHandlerFactory implements IOHandlerFactory {
 
         DefaultIOHandlerFactory current = INSTANCE.get();
         String requestedCharacterSetName = configuration.getConversionCharset();
-        if (current == null ||
-                !requestedCharacterSetName.equals(current.characterSetName)) {
+        if (current == null
+                || !requestedCharacterSetName.equals(current.characterSetName)) {
 
-                    current = new DefaultIOHandlerFactory(requestedCharacterSetName);
-                    INSTANCE.set(current);
-                }
+            current = new DefaultIOHandlerFactory(requestedCharacterSetName);
+            INSTANCE.set(current);
+        }
 
         return current;
     }

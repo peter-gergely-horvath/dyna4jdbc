@@ -7,18 +7,19 @@ import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFac
 
 class ProcessRunnerStatement extends OutputHandlingStatement<ProcessRunnerConnection> {
 
-	private final ProcessRunnerScriptExecutor scriptExecutor;
+    private final ProcessRunnerScriptExecutor scriptExecutor;
 
-	ProcessRunnerStatement(ProcessRunnerConnection connection, 
-			ScriptOutputHandlerFactory scriptOutputHandlerFactory,
-			ProcessRunnerScriptExecutor scriptExecutor) {
-		super(connection, scriptOutputHandlerFactory, scriptExecutor);
+    ProcessRunnerStatement(ProcessRunnerConnection connection,
+                           ScriptOutputHandlerFactory scriptOutputHandlerFactory,
+                           ProcessRunnerScriptExecutor scriptExecutor) {
 
-		this.scriptExecutor = scriptExecutor;
-	}
+        super(connection, scriptOutputHandlerFactory, scriptExecutor);
 
-	@Override
-	public void cancel() throws SQLException {
-		scriptExecutor.close();
-	}
+        this.scriptExecutor = scriptExecutor;
+    }
+
+    @Override
+    public void cancel() throws SQLException {
+        scriptExecutor.close();
+    }
 }

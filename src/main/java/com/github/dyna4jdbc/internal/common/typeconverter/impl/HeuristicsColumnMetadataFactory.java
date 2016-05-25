@@ -10,6 +10,8 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
     private static final HeuristicsColumnMetadataFactory INSTANCE = new HeuristicsColumnMetadataFactory();
 
+    private static final int MINIMUM_DISPLAY_SIZE = 15;
+
     static HeuristicsColumnMetadataFactory getInstance(Configuration configuration) {
         return INSTANCE;
     }
@@ -48,7 +50,16 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
             }
         }
 
-        final int columnDisplaySize = maxSize >= 15 ? maxSize : 15;
+
+        final int columnDisplaySize;
+        if (maxSize >= MINIMUM_DISPLAY_SIZE) {
+
+            columnDisplaySize = maxSize;
+        } else {
+
+            columnDisplaySize = MINIMUM_DISPLAY_SIZE;
+        }
+
 
         metaData.setTakesFirstRowValue(false);
         metaData.setCurrency(false);

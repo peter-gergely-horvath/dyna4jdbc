@@ -13,76 +13,86 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 
 public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor {
 
-	private final AtomicReference<ProcessRunner> processRunner = new AtomicReference<>();
+    private static final int MINIMAL_POLL_INTERVAL_MS = 5;
+    private static final int DEFAULT_POLL_INTERVAL_MS = 50;
+    private static final int WAIT_BEFORE_CONSUMING_OUTPUT_MS = 1000;
 
-	private final boolean skipFirstLine;
-	private final Configuration configuration;
+    private final AtomicReference<ProcessRunner> processRunner = new AtomicReference<>();
 
-	public ProcessRunnerScriptExecutor(Configuration configuration) {
-		this.configuration = configuration;
-		this.skipFirstLine = configuration.getSkipFirstLine();
-	}
+    private final boolean skipFirstLine;
+    private final Configuration configuration;
 
-	@Override
-	public void executeScriptUsingCustomWriters(String script, OutputStream stdOutputStream, OutputStream errorOutputStream)
-			throws ScriptExecutionException {
+    public ProcessRunnerScriptExecutor(Configuration configuration) {
+        this.configuration = configuration;
+        this.skipFirstLine = configuration.getSkipFirstLine();
+    }
 
-		try (PrintWriter outputPrintWriter = new PrintWriter(new OutputStreamWriter(
-				stdOutputStream, configuration.getConversionCharset()), true)) {
+    @Override
+    public void executeScriptUsingCustomWriters(
+            String script,
+            OutputStream stdOutputStream,
+            OutputStream errorOutputStream) throws ScriptExecutionException {
 
-			ProcessRunner currentProcess = this.processRunner.get();
-			if (currentProcess == null || !currentProcess.isProcessRunning()) {
-					currentProcess = ProcessRunner.start(script, configuration.getConversionCharset());
-					this.processRunner.set(currentProcess);
-				} else {
-					currentProcess.writeToStandardInput(script);
-				}
+        try (PrintWriter outputPrintWriter = new PrintWriter(new OutputStreamWriter(
+                stdOutputStream, configuration.getConversionCharset()), true)) {
 
-				Thread.sleep(1000);
+            ProcessRunner currentProcess = this.processRunner.get();
+            if (currentProcess == null || !currentProcess.isProcessRunning()) {
+                currentProcess = ProcessRunner.start(script, configuration.getConversionCharset());
+                this.processRunner.set(currentProcess);
+            } else {
+                currentProcess.writeToStandardInput(script);
+            }
 
-				if (skipFirstLine) {
-					// skip and discard first result line
-					String discardedOutput = currentProcess.pollStandardOutput(5, TimeUnit.SECONDS);
-					System.out.println(discardedOutput);
-				}
+            Thread.sleep(WAIT_BEFORE_CONSUMING_OUTPUT_MS);
 
-				String outputCaptured = null;
-				
-				while(true) {
+            if (skipFirstLine) {
+                // skip and discard first result line
+                String discardedOutput = currentProcess.pollStandardOutput(
+                        MINIMAL_POLL_INTERVAL_MS, TimeUnit.SECONDS);
+                System.out.println(discardedOutput);
+            }
 
-					if (currentProcess.isErrorEmpty()) {
-						outputCaptured = currentProcess.pollStandardOutput(5, TimeUnit.SECONDS);
-					} else {
-						outputCaptured = currentProcess.pollStandardOutput(50, TimeUnit.MILLISECONDS);
-						
-						if(outputCaptured == null) {
-							outputCaptured = currentProcess.pollStandardError(50, TimeUnit.MILLISECONDS);
-						}
-					}
+            String outputCaptured = null;
 
-					if (outputCaptured == null) {
-						break;
+            while (true) {
 
-					} else {
-						outputPrintWriter.println(outputCaptured);
-					}
-				}
+                if (currentProcess.isErrorEmpty()) {
+                    outputCaptured = currentProcess.pollStandardOutput(
+                            MINIMAL_POLL_INTERVAL_MS, TimeUnit.SECONDS);
+                } else {
+                    outputCaptured = currentProcess.pollStandardOutput(
+                            DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
 
-		} catch (ProcessExecutionException | IOException e) {
-			throw new ScriptExecutionException(e);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new ScriptExecutionException("Interrupted", e);
-		}
-	}
+                    if (outputCaptured == null) {
+                        outputCaptured = currentProcess.pollStandardError(
+                                DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
+                    }
+                }
 
-	public void close() {
+                if (outputCaptured == null) {
+                    break;
+
+                } else {
+                    outputPrintWriter.println(outputCaptured);
+                }
+            }
+
+        } catch (ProcessExecutionException | IOException e) {
+            throw new ScriptExecutionException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ScriptExecutionException("Interrupted", e);
+        }
+    }
+
+    public void close() {
 
         ProcessRunner currentProcess = this.processRunner.get();
-        if(currentProcess != null) {
+        if (currentProcess != null) {
             currentProcess.terminateProcess();
             this.processRunner.set(null);
         }
-	}
+    }
 
 }

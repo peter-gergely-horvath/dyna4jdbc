@@ -27,8 +27,12 @@ public class ListIndexIterable<E> implements Iterable<E> {
 
 
     public ListIndexIterable(List<List<E>> delegate, int index) {
-        if (delegate == null) throw new NullPointerException("argument delegate cannot be null");
-        if (index < 0) throw new IllegalArgumentException("index cannot be negative");
+        if (delegate == null) {
+            throw new NullPointerException("argument delegate cannot be null");
+        }
+        if (index < 0) {
+            throw new IllegalArgumentException("index cannot be negative");
+        }
 
         this.delegate = delegate;
         this.index = index;

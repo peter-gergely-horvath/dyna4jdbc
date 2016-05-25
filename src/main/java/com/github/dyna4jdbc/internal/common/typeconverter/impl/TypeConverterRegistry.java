@@ -16,160 +16,164 @@ import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConverter;
 
-class TypeConverterRegistry {
+final class TypeConverterRegistry {
 
-	@SuppressWarnings("unchecked")
-	static <T> TypeConverter<T> getTypeConverterForClass(Class<T> clazz) {
-		return ((TypeConverter<T>) TYPE_CONVERTERS.get(clazz));
-	}
+    private TypeConverterRegistry() {
+        // static utility class
+    }
 
-	static final TypeConverter<String> STRING = new TypeConverter<String>() {
+    @SuppressWarnings("unchecked")
+    static <T> TypeConverter<T> getTypeConverterForClass(Class<T> clazz) {
+        return ((TypeConverter<T>) TYPE_CONVERTERS.get(clazz));
+    }
 
-		@Override
-		public String convert(String input) {
-			return input;
-		}
-	};
+    static final TypeConverter<String> STRING = new TypeConverter<String>() {
 
-	static final TypeConverter<Boolean> BOOLEAN = new TypeConverter<Boolean>() {
+        @Override
+        public String convert(String input) {
+            return input;
+        }
+    };
 
-		@Override
-		public Boolean convert(String input) {
-			if (input == null) {
-				return null;
-			}
+    static final TypeConverter<Boolean> BOOLEAN = new TypeConverter<Boolean>() {
 
-			switch (input.trim()) {
-			case "0":
-				return Boolean.FALSE;
+        @Override
+        public Boolean convert(String input) {
+            if (input == null) {
+                return null;
+            }
 
-			case "1":
-				return Boolean.TRUE;
+            switch (input.trim()) {
+                case "0":
+                    return Boolean.FALSE;
 
-			default:
-				return Boolean.valueOf(input);
-			}
-		}
-	};
+                case "1":
+                    return Boolean.TRUE;
 
-	static final TypeConverter<Byte> BYTE = new TypeConverter<Byte>() {
+                default:
+                    return Boolean.valueOf(input);
+            }
+        }
+    };
 
-		@Override
-		public Byte convert(String input) throws TypeConversionException {
-			try {
-				if (input == null) {
-					return null;
-				}
+    static final TypeConverter<Byte> BYTE = new TypeConverter<Byte>() {
 
-				return Byte.decode(input);
+        @Override
+        public Byte convert(String input) throws TypeConversionException {
+            try {
+                if (input == null) {
+                    return null;
+                }
 
-			} catch (NumberFormatException nfe) {
-				throw new TypeConversionException(nfe);
-			}
-		}
-	};
+                return Byte.decode(input);
 
-	static final TypeConverter<Short> SHORT = new TypeConverter<Short>() {
+            } catch (NumberFormatException nfe) {
+                throw new TypeConversionException(nfe);
+            }
+        }
+    };
 
-		@Override
-		public Short convert(String input) throws TypeConversionException {
-			try {
-				if (input == null) {
-					return null;
-				}
+    static final TypeConverter<Short> SHORT = new TypeConverter<Short>() {
 
-				return Short.decode(input);
+        @Override
+        public Short convert(String input) throws TypeConversionException {
+            try {
+                if (input == null) {
+                    return null;
+                }
 
-			} catch (NumberFormatException nfe) {
-				throw new TypeConversionException(nfe);
-			}
-		}
+                return Short.decode(input);
 
-	};
+            } catch (NumberFormatException nfe) {
+                throw new TypeConversionException(nfe);
+            }
+        }
 
-	static final TypeConverter<Integer> INTEGER = new TypeConverter<Integer>() {
+    };
 
-		@Override
-		public Integer convert(String input) throws TypeConversionException {
-			try {
-				if (input == null) {
-					return null;
-				}
+    static final TypeConverter<Integer> INTEGER = new TypeConverter<Integer>() {
 
-				return Integer.decode(input);
+        @Override
+        public Integer convert(String input) throws TypeConversionException {
+            try {
+                if (input == null) {
+                    return null;
+                }
 
-			} catch (NumberFormatException nfe) {
-				throw new TypeConversionException(nfe);
-			}
-		}
-	};
-	static final TypeConverter<Long> LONG = new TypeConverter<Long>() {
+                return Integer.decode(input);
 
-		@Override
-		public Long convert(String input) throws TypeConversionException {
-			try {
-				if (input == null) {
-					return null;
-				}
+            } catch (NumberFormatException nfe) {
+                throw new TypeConversionException(nfe);
+            }
+        }
+    };
+    static final TypeConverter<Long> LONG = new TypeConverter<Long>() {
 
-				return Long.decode(input);
+        @Override
+        public Long convert(String input) throws TypeConversionException {
+            try {
+                if (input == null) {
+                    return null;
+                }
 
-			} catch (NumberFormatException nfe) {
-				throw new TypeConversionException(nfe);
-			}
-		}
-	};
+                return Long.decode(input);
 
-	static final TypeConverter<Float> FLOAT = new TypeConverter<Float>() {
+            } catch (NumberFormatException nfe) {
+                throw new TypeConversionException(nfe);
+            }
+        }
+    };
 
-		@Override
-		public Float convert(String input) throws TypeConversionException {
-			try {
-				if (input == null) {
-					return null;
-				}
+    static final TypeConverter<Float> FLOAT = new TypeConverter<Float>() {
 
-				return Float.valueOf(input);
+        @Override
+        public Float convert(String input) throws TypeConversionException {
+            try {
+                if (input == null) {
+                    return null;
+                }
 
-			} catch (NumberFormatException nfe) {
-				throw new TypeConversionException(nfe);
-			}
-		}
-	};
+                return Float.valueOf(input);
 
-	static final TypeConverter<Double> DOUBLE = new TypeConverter<Double>() {
+            } catch (NumberFormatException nfe) {
+                throw new TypeConversionException(nfe);
+            }
+        }
+    };
 
-		@Override
-		public Double convert(String input) throws TypeConversionException {
-			try {
-				if (input == null) {
-					return null;
-				}
+    static final TypeConverter<Double> DOUBLE = new TypeConverter<Double>() {
 
-				return Double.valueOf(input);
+        @Override
+        public Double convert(String input) throws TypeConversionException {
+            try {
+                if (input == null) {
+                    return null;
+                }
 
-			} catch (NumberFormatException nfe) {
-				throw new TypeConversionException(nfe);
-			}
-		}
-	};
+                return Double.valueOf(input);
 
-	static final TypeConverter<BigDecimal> BIGDECIMAL = new TypeConverter<BigDecimal>() {
+            } catch (NumberFormatException nfe) {
+                throw new TypeConversionException(nfe);
+            }
+        }
+    };
 
-		@Override
-		public BigDecimal convert(String input) throws TypeConversionException {
-			try {
-				if (input == null) {
-					return null;
-				}
+    static final TypeConverter<BigDecimal> BIGDECIMAL = new TypeConverter<BigDecimal>() {
 
-				return new BigDecimal(input);
-			} catch (NumberFormatException nfe) {
-				throw new TypeConversionException(nfe);
-			}
-		}
+        @Override
+        public BigDecimal convert(String input) throws TypeConversionException {
+            try {
+                if (input == null) {
+                    return null;
+                }
 
-	};
+                return new BigDecimal(input);
+            } catch (NumberFormatException nfe) {
+                throw new TypeConversionException(nfe);
+            }
+        }
+
+    };
 
     static final TypeConverter<BigInteger> BIGINTEGER = new TypeConverter<BigInteger>() {
 
@@ -188,100 +192,100 @@ class TypeConverterRegistry {
 
     };
 
-	static final TypeConverter<byte[]> BYTE_ARRAY = new TypeConverter<byte[]>() {
+    static final TypeConverter<byte[]> BYTE_ARRAY = new TypeConverter<byte[]>() {
 
-		@Override
-		public byte[] convert(String input) throws TypeConversionException {
-			try {
+        @Override
+        public byte[] convert(String input) throws TypeConversionException {
+            try {
 
-				if (input == null) {
-					return null;
-				}
+                if (input == null) {
+                    return null;
+                }
 
 
-				return input.getBytes("UTF-8");
+                return input.getBytes("UTF-8");
 
-			} catch (UnsupportedEncodingException e) {
-				throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE
-						.raiseUncheckedException("Unsupported encoding", e);
-			}
-		}
+            } catch (UnsupportedEncodingException e) {
+                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE
+                        .raiseUncheckedException("Unsupported encoding", e);
+            }
+        }
 
-	};
+    };
 
-	static final TypeConverter<Date> DATE = new TypeConverter<Date>() {
+    static final TypeConverter<Date> DATE = new TypeConverter<Date>() {
 
-		@Override
-		public Date convert(String input) throws TypeConversionException {
-			try {
-				if (input == null) {
-					return null;
-				}
+        @Override
+        public Date convert(String input) throws TypeConversionException {
+            try {
+                if (input == null) {
+                    return null;
+                }
 
-				return Date.valueOf(input);
-			} catch (IllegalArgumentException e) {
-				throw new TypeConversionException(e);
-			}
-		}
+                return Date.valueOf(input);
+            } catch (IllegalArgumentException e) {
+                throw new TypeConversionException(e);
+            }
+        }
 
-	};
-	static final TypeConverter<Time> TIME = new TypeConverter<Time>() {
+    };
+    static final TypeConverter<Time> TIME = new TypeConverter<Time>() {
 
-		@Override
-		public Time convert(String input) throws TypeConversionException {
+        @Override
+        public Time convert(String input) throws TypeConversionException {
 
-			try {
-				if (input == null) {
-					return null;
-				}
+            try {
+                if (input == null) {
+                    return null;
+                }
 
-				return Time.valueOf(input);
-			} catch (IllegalArgumentException e) {
-				throw new TypeConversionException(e);
-			}
-		}
+                return Time.valueOf(input);
+            } catch (IllegalArgumentException e) {
+                throw new TypeConversionException(e);
+            }
+        }
 
-	};
-	static final TypeConverter<Timestamp> TIMESTAMP = new TypeConverter<Timestamp>() {
+    };
+    static final TypeConverter<Timestamp> TIMESTAMP = new TypeConverter<Timestamp>() {
 
-		@Override
-		public Timestamp convert(String input) throws TypeConversionException {
-			try {
-				if (input == null) {
-					return null;
-				}
+        @Override
+        public Timestamp convert(String input) throws TypeConversionException {
+            try {
+                if (input == null) {
+                    return null;
+                }
 
-				return Timestamp.valueOf(input);
-			} catch (IllegalArgumentException e) {
-				throw new TypeConversionException(e);
-			}
-		}
-	};
+                return Timestamp.valueOf(input);
+            } catch (IllegalArgumentException e) {
+                throw new TypeConversionException(e);
+            }
+        }
+    };
 
-	static final TypeConverter<URL> URL = new TypeConverter<URL>() {
+    static final TypeConverter<URL> URL = new TypeConverter<URL>() {
 
-		@Override
-		public URL convert(String input) throws TypeConversionException {
-			try {
-				if (input == null) {
-					return null;
-				}
+        @Override
+        public URL convert(String input) throws TypeConversionException {
+            try {
+                if (input == null) {
+                    return null;
+                }
 
-				return new URL(input);
-			} catch (MalformedURLException e) {
-				throw new TypeConversionException(e);
-			}
-		}
-	};
+                return new URL(input);
+            } catch (MalformedURLException e) {
+                throw new TypeConversionException(e);
+            }
+        }
+    };
 
-	private static final Map<Class<?>, TypeConverter<?>> TYPE_CONVERTERS;
+    private static final Map<Class<?>, TypeConverter<?>> TYPE_CONVERTERS;
 
-	static {
+    static {
 
-		HashMap<Class<?>, TypeConverter<?>> map = new HashMap<>();
+        HashMap<Class<?>, TypeConverter<?>> map = new HashMap<>();
 
-		map.put(String.class, STRING);
-		map.put(Boolean.class, BOOLEAN);
+        map.put(String.class, STRING);
+        map.put(Boolean.class, BOOLEAN);
         map.put(Byte.class, BYTE);
         map.put(Short.class, SHORT);
         map.put(Integer.class, INTEGER);
@@ -296,8 +300,8 @@ class TypeConverterRegistry {
         map.put(Timestamp.class, TIMESTAMP);
         map.put(URL.class, URL);
 
-		TYPE_CONVERTERS = Collections.unmodifiableMap(map);
+        TYPE_CONVERTERS = Collections.unmodifiableMap(map);
 
-	}
+    }
 
 }

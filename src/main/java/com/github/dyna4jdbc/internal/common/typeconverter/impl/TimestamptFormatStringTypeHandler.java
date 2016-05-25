@@ -12,44 +12,44 @@ import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionExceptio
 
 class TimestamptFormatStringTypeHandler extends DefaultTypeHandler {
 
-	private final String formatString;
-	private DateFormat formatter;
+    private final String formatString;
+    private DateFormat formatter;
 
-	TimestamptFormatStringTypeHandler(ColumnMetadata columnMetadata, String formatString) {
-		super(columnMetadata);
+    TimestamptFormatStringTypeHandler(ColumnMetadata columnMetadata, String formatString) {
+        super(columnMetadata);
 
-		try {
-			this.formatString = formatString;
-			this.formatter = new SimpleDateFormat(formatString);
-			this.formatter.setLenient(false);
-		} catch (IllegalArgumentException e) {
-			throw JDBCError.FORMAT_STRING_UNEXPECTED_FOR_COLUMN_TYPE.raiseUncheckedException(e, formatString,
-					e.getMessage());
-		}
-	}
+        try {
+            this.formatString = formatString;
+            this.formatter = new SimpleDateFormat(formatString);
+            this.formatter.setLenient(false);
+        } catch (IllegalArgumentException e) {
+            throw JDBCError.FORMAT_STRING_UNEXPECTED_FOR_COLUMN_TYPE.raiseUncheckedException(
+                    e, formatString, e.getMessage());
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T covertToObject(String rawCellValue, Class<T> type) throws TypeConversionException {
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T covertToObject(String rawCellValue, Class<T> type) throws TypeConversionException {
 
-		if (type == Timestamp.class) {
-			return (T) covertToTimestamp(rawCellValue);
-		} else {
-			return super.covertToObject(rawCellValue, type);
-		}
-	}
+        if (type == Timestamp.class) {
+            return (T) covertToTimestamp(rawCellValue);
+        } else {
+            return super.covertToObject(rawCellValue, type);
+        }
+    }
 
-	public Timestamp covertToTimestamp(String rawCellValue) throws TypeConversionException {
+    public Timestamp covertToTimestamp(String rawCellValue) throws TypeConversionException {
 
-		try {
-			Date parsedDate = formatter.parse(rawCellValue);
-			return new Timestamp(parsedDate.getTime());
+        try {
+            Date parsedDate = formatter.parse(rawCellValue);
+            return new Timestamp(parsedDate.getTime());
 
-		} catch (ParseException e) {
-			throw new TypeConversionException(
-					"Could not parse '" + rawCellValue + "' according to format string '" + formatString + "'", e);
+        } catch (ParseException e) {
+            throw new TypeConversionException("Could not parse '" + rawCellValue
+                            + "' according to format string '" + formatString + "'", e);
 
-		}
-	}
+        }
+    }
 
 }

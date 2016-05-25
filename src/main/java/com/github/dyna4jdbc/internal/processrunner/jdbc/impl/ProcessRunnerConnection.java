@@ -23,9 +23,14 @@ public final class ProcessRunnerConnection extends AbstractConnection {
     private final ProcessRunnerScriptExecutor scriptExecutor;
 
 
-    public ProcessRunnerConnection(String parameters, Properties properties) throws SQLException, MisconfigurationException {
+    public ProcessRunnerConnection(
+            String parameters,
+            Properties properties)
+            throws SQLException, MisconfigurationException {
+
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
         configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
+
         typeHandlerFactory = DefaultTypeHandlerFactory.getInstance(configuration);
 
         this.scriptExecutor = new ProcessRunnerScriptExecutor(configuration);
@@ -34,14 +39,16 @@ public final class ProcessRunnerConnection extends AbstractConnection {
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
         checkNotClosed();
-        return new GenericDatabaseMetaData(this, System.getProperty("os.name"), System.getProperty("os.version"));
+        return new GenericDatabaseMetaData(this,
+                System.getProperty("os.name"),
+                System.getProperty("os.version"));
     }
 
     @Override
     protected AbstractStatement<?> createStatementInternal() throws SQLException {
         checkNotClosed();
-        ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
-
+        ScriptOutputHandlerFactory outputHandlerFactory =
+                new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
 
         return new ProcessRunnerStatement(this, outputHandlerFactory, scriptExecutor);
     }

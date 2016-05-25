@@ -13,6 +13,7 @@ import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFac
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultTypeHandlerFactory;
+import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
@@ -31,12 +32,17 @@ import java.util.Properties;
 
 public class ScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
+    //CHECKSTYLE.OFF: VisibilityModifier
     protected final ScriptEngine engine;
-    private final TypeHandlerFactory typeHandlerFactory;
-    protected final Configuration configuration;
     protected final IOHandlerFactory ioHandlerFactory;
+    //CHECKSTYLE.ON: VisibilityModifier
 
-    public ScriptEngineConnection(String parameters, Properties properties) throws SQLException, MisconfigurationException {
+    private final TypeHandlerFactory typeHandlerFactory;
+    private final Configuration configuration;
+
+    public ScriptEngineConnection(String parameters, Properties properties)
+            throws SQLException, MisconfigurationException {
+
         if (parameters == null || "".equals(parameters.trim())) {
             throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(
                     "Scrip Engine Name not specified");
@@ -45,7 +51,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
         String[] engineNameAndParameters = parameters.split(":", 2);
 
         String engineName = engineNameAndParameters[0];
-        String configurationString = engineNameAndParameters.length == 2 ? engineNameAndParameters[1] : null;
+        String configurationString = ArrayUtils.tryGetByIndex(engineNameAndParameters, 1);
 
         if (engineName == null || "".equals(engineName.trim())) {
             throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(
@@ -55,7 +61,8 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
         this.engine = loadEngineByName(engineName);
 
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
-        this.configuration = configurationFactory.newConfigurationFromParameters(configurationString, properties);
+        this.configuration =
+                configurationFactory.newConfigurationFromParameters(configurationString, properties);
 
         this.typeHandlerFactory = DefaultTypeHandlerFactory.getInstance(configuration);
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
@@ -72,14 +79,17 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
         return se;
     }
 
-    public DatabaseMetaData getMetaData() throws SQLException {
+    @Override
+    public final DatabaseMetaData getMetaData() throws SQLException {
         checkNotClosed();
         return new GenericDatabaseMetaData(this, getEngineDescription(), getEngineVersion());
     }
 
-    protected AbstractStatement<?> createStatementInternal() throws SQLException {
+    @Override
+    protected final AbstractStatement<?> createStatementInternal() throws SQLException {
         checkNotClosed();
-        ScriptOutputHandlerFactory outputHandlerFactory = new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
+        ScriptOutputHandlerFactory outputHandlerFactory =
+                new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
 
         return new OutputHandlingStatement<>(this, outputHandlerFactory, this);
     }
@@ -107,9 +117,12 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
         return null;
     }
 
+    //CHECKSTYLE.OFF: DesignForExtension
     @Override
-    public void executeScriptUsingCustomWriters(String script, OutputStream stdOutputStream, OutputStream errorOutputStream)
-            throws ScriptExecutionException {
+    public void executeScriptUsingCustomWriters(
+            String script,
+            OutputStream stdOutputStream,
+            OutputStream errorOutputStream) throws ScriptExecutionException {
 
         synchronized (engine) {
             Writer originalWriter = engine.getContext().getWriter();
@@ -119,14 +132,16 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
 
                 if (stdOutputStream != null) {
 
-                    PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true);
+                    PrintWriter outputPrintWriter =
+                            ioHandlerFactory.newPrintWriter(stdOutputStream, true);
 
                     engine.getContext().setWriter(outputPrintWriter);
                 }
 
                 if (errorOutputStream != null) {
 
-                    PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true);
+                    PrintWriter errorPrintWriter =
+                            ioHandlerFactory.newPrintWriter(errorOutputStream, true);
 
                     engine.getContext().setErrorWriter(errorPrintWriter);
                 }
@@ -140,4 +155,5 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
             }
         }
     }
+    //CHECKSTYLE.ON: DesignForExtension
 }
