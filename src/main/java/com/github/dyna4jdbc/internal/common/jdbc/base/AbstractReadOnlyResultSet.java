@@ -475,5 +475,28 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
+    @Override
+    public final void updateObject(int columnIndex, Object x, SQLType targetSqlType) throws SQLException {
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+    }
+
+    @Override
+    public final void updateObject(int columnIndex, Object x,
+                              SQLType targetSqlType, int scaleOrLength)  throws SQLException {
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+    }
+
+    @Override
+    public final void updateObject(String columnLabel, Object x,
+                              SQLType targetSqlType, int scaleOrLength) throws SQLException {
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+    }
+
+    @Override
+    public final void updateObject(String columnLabel, Object x,
+                              SQLType targetSqlType) throws SQLException {
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+    }
+
 
 }

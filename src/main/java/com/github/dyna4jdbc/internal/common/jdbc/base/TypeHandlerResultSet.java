@@ -479,12 +479,12 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
     }
 
     @Override
-    public final <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
+    public final <R> R getObject(int columnIndex, Class<R> type) throws SQLException {
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
             TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            T convertedValue = typeHandler.covertToObject(rawCellValue, type);
+            R convertedValue = typeHandler.covertToObject(rawCellValue, type);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {

@@ -288,7 +288,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
         return getBinaryStream(findColumn(columnLabel));
     }
 
-    protected final <T> T setWasNullBasedOnLastValue(T convertedValue) {
+    protected final <R> R setWasNullBasedOnLastValue(R convertedValue) {
         wasNull = (convertedValue == null);
         return convertedValue;
     }
@@ -299,7 +299,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     }
 
     @Override
-    public final <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
+    public final <R> R getObject(String columnLabel, Class<R> type) throws SQLException {
         return getObject(findColumn(columnLabel), type);
     }
 

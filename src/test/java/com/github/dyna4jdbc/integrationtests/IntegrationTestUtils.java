@@ -11,6 +11,8 @@ public class IntegrationTestUtils {
     private IntegrationTestUtils() {
         throw new AssertionError("static utility class");
     }
+    
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
 
     static String executeScriptForResultSetString(String url, String script) throws SQLException {
@@ -34,7 +36,7 @@ public class IntegrationTestUtils {
 
                     rsCount++;
 
-                    stringWriter.append(String.format("RESULT SET #%s %n", rsCount));
+                    stringWriter.append(String.format("RESULT SET #%s %s", rsCount, LINE_SEPARATOR));
                     ResultSetMetaData metaData = rs.getMetaData();
                     final int columnCount = metaData.getColumnCount();
 
@@ -44,14 +46,14 @@ public class IntegrationTestUtils {
                         String formatStr = "%" + columnDisplaySize + "s | ";
                         stringWriter.append(String.format(formatStr, columnLabel));
                     }
-                    stringWriter.append("\n");
+                    stringWriter.append(LINE_SEPARATOR);
 
                     for (int i = 1; i <= columnCount; i++) {
                         int columnDisplaySize = metaData.getColumnDisplaySize(i);
                         String formatStr = "%" + columnDisplaySize + "s | ";
                         stringWriter.append(String.format(formatStr, "").replace(' ', '-'));
                     }
-                    stringWriter.append("\n");
+                    stringWriter.append(LINE_SEPARATOR);
 
 
                     while (rs.next()) {
@@ -61,7 +63,7 @@ public class IntegrationTestUtils {
                             String formatStr = "%" + columnDisplaySize + "s | ";
                             stringWriter.append(String.format(formatStr, rs.getString(i)));
                         }
-                        stringWriter.append("\n");
+                        stringWriter.append(LINE_SEPARATOR);
                     }
 
                 }
@@ -72,5 +74,13 @@ public class IntegrationTestUtils {
             return stringWriter.toString();
         }
 
+    }
+    
+    static String newLineSeparated(String... inputStrings) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for(String string : inputStrings) {
+            stringBuilder.append(string).append(LINE_SEPARATOR);
+        }
+        return stringBuilder.toString();
     }
 }

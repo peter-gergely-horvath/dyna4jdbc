@@ -17,7 +17,7 @@ import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
-import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtil;
+import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 
 public class OutputHandlingStatement<T extends java.sql.Connection> extends AbstractStatement<T> {
 
@@ -50,14 +50,14 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
             return resultSet;
 
         } catch (ScriptExecutionException se) {
-            String message = ExceptionUtil.getRootCauseMessage(se);
+            String message = ExceptionUtils.getRootCauseMessage(se);
             throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
         } catch (SQLException sqle) {
             throw sqle;
         } catch (RuntimeDyna4JdbcException ex) {
             throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
         } catch (Throwable t) {
-            String message = ExceptionUtil.getRootCauseMessage(t);
+            String message = ExceptionUtils.getRootCauseMessage(t);
             throw JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
         }
     }
@@ -75,7 +75,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 
         } catch (ScriptExecutionException se) {
 
-            Throwable rootCause = ExceptionUtil.getRootCause(se);
+            Throwable rootCause = ExceptionUtils.getRootCause(se);
             if (rootCause instanceof OutputDisabledError) {
                 throw JDBCError.USING_STDOUT_FROM_UPDATE.raiseSQLException(rootCause, rootCause.getMessage());
 
@@ -86,10 +86,10 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         } catch (RuntimeDyna4JdbcException ex) {
             throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
         } catch (OutputDisabledError t) {
-            String message = ExceptionUtil.getRootCauseMessage(t);
+            String message = ExceptionUtils.getRootCauseMessage(t);
             throw JDBCError.USING_STDOUT_FROM_UPDATE.raiseSQLException(t, message);
         } catch (Throwable t) {
-            String message = ExceptionUtil.getRootCauseMessage(t);
+            String message = ExceptionUtils.getRootCauseMessage(t);
             throw JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
         }
     }
@@ -119,12 +119,12 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 
             return resultSets;
         } catch (ScriptExecutionException se) {
-            String message = ExceptionUtil.getRootCauseMessage(se);
+            String message = ExceptionUtils.getRootCauseMessage(se);
             throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
         } catch (RuntimeDyna4JdbcException ex) {
             throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
         } catch (Throwable t) {
-            String message = ExceptionUtil.getRootCauseMessage(t);
+            String message = ExceptionUtils.getRootCauseMessage(t);
             throw JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
         }
     }

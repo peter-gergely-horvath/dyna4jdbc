@@ -1,7 +1,7 @@
 package com.github.dyna4jdbc;
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtil;
+import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScalaScriptEngineConnection;
@@ -38,10 +38,10 @@ class ConnectionFactory {
             return newConnection(bridgeName, config, info);
 
         } catch (MisconfigurationException ex) {
-            String causeMessage = ExceptionUtil.getRootCauseMessage(ex);
+            String causeMessage = ExceptionUtils.getRootCauseMessage(ex);
             throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(ex, causeMessage);
         } catch (Exception ex) {
-            String causeMessage = ExceptionUtil.getRootCauseMessage(ex);
+            String causeMessage = ExceptionUtils.getRootCauseMessage(ex);
             throw JDBCError.CONNECT_FAILED_EXCEPTION.raiseSQLException(ex, causeMessage);
         }
     }

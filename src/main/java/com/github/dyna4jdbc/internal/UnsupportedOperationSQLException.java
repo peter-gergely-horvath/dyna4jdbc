@@ -7,6 +7,8 @@ import java.sql.SQLException;
  */
 public class UnsupportedOperationSQLException extends SQLException {
 
+    private static final long serialVersionUID = 1L;
+
     public UnsupportedOperationSQLException(String message, String sqlState) {
         super(message, sqlState);
     }

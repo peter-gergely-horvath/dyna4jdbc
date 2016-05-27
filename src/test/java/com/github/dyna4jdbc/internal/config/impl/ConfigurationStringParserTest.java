@@ -15,16 +15,12 @@
  */
 package com.github.dyna4jdbc.internal.config.impl;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-
-import java.util.Properties;
-
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.github.dyna4jdbc.internal.config.impl.ConfigurationStringParser;
+import java.util.Properties;
+
+import static org.testng.Assert.*;
 
 public class ConfigurationStringParserTest {
 	

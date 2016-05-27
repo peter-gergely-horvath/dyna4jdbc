@@ -8,7 +8,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.*;
 import static org.testng.Assert.*;
+
 
 public class JythonScriptEngineTest {
 
@@ -35,11 +37,11 @@ public class JythonScriptEngineTest {
     @Test
     public void testVariableDeclaredInStatementVisibleFromAnotherStatement() throws SQLException {
 
-        String expectedOutput =
-                        "RESULT SET #1 \n" +
-                        "        Message | \n" +
-                        "----------------|-\n" +
-                        "    Hello World | \n";
+        String expectedOutput = newLineSeparated(
+                        "RESULT SET #1 ", 
+                        "        Message | ",
+                        "----------------|-",
+                        "    Hello World | ");
 
         try(Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:jython")) {
 
@@ -48,7 +50,7 @@ public class JythonScriptEngineTest {
                 statement.executeUpdate("msg = \"Hello World\"; ");
             }
 
-            String resultSetString = IntegrationTestUtils.executeScriptForResultSetString(
+            String resultSetString = executeScriptForResultSetString(
                     "print \"Message::\" \nprint msg ", connection);
 
             assertEquals(resultSetString, expectedOutput);
@@ -59,20 +61,20 @@ public class JythonScriptEngineTest {
     @Test
     public void testHeadersNotSpecified() throws Exception {
 
-        String expectedOutput =
-                "RESULT SET #1 \n" +
-                        "              1 |               2 | \n" +
-                        "----------------|-----------------|-\n" +
-                        "             A: |              B: | \n" +
-                        "        First A |         First B | \n" +
-                        "       Second A |        Second B | \n";
+        String expectedOutput = newLineSeparated(
+                "RESULT SET #1 ",
+                        "              1 |               2 | ", 
+                        "----------------|-----------------|-", 
+                        "             A: |              B: | ", 
+                        "        First A |         First B | ", 
+                        "       Second A |        Second B | ");
 
 
         String url = "jdbc:dyna4jdbc:scriptengine:jython";
 
         String script = "print \"A:\tB:\" \nprint \"First A\tFirst B\" \nprint \"Second A\tSecond B\"";
 
-        String resultSetString = IntegrationTestUtils.executeScriptForResultSetString(url, script);
+        String resultSetString = executeScriptForResultSetString(url, script);
 
         assertEquals(resultSetString, expectedOutput);
     }
@@ -80,19 +82,19 @@ public class JythonScriptEngineTest {
     @Test
     public void testHeadersSpecified() throws Exception {
 
-        String expectedOutput =
-                "RESULT SET #1 \n" +
-                "              A |               B | \n" +
-                "----------------|-----------------|-\n" +
-                "        First A |         First B | \n" +
-                "       Second A |        Second B | \n";
+        String expectedOutput = newLineSeparated(
+                "RESULT SET #1 ",
+                "              A |               B | ",
+                "----------------|-----------------|-",
+                "        First A |         First B | ",
+                "       Second A |        Second B | ");
 
 
         String url = "jdbc:dyna4jdbc:scriptengine:jython";
 
         String script = "print \"A::\tB::\" \nprint \"First A\tFirst B\" \nprint \"Second A\tSecond B\"";
 
-        String resultSetString = IntegrationTestUtils.executeScriptForResultSetString(url, script);
+        String resultSetString = executeScriptForResultSetString(url, script);
 
         assertEquals(resultSetString, expectedOutput);
     }

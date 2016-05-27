@@ -1,18 +1,16 @@
 package com.github.dyna4jdbc.integrationtests;
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.testng.annotations.Test;
 
-import java.security.Permission;
 import java.sql.*;
 
 import static org.testng.Assert.*;
+import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.*;
 
 public class ScalaScriptEngineTest {
 
     @Test
-    @Ignore
     public void testWritingFromUpdateThrowsSQLException() {
 
         try(Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:scala")) {
@@ -35,11 +33,11 @@ public class ScalaScriptEngineTest {
     @Test
     public void testVariableDeclaredInStatementVisibleFromAnotherStatement() throws SQLException {
 
-        String expectedOutput =
-                        "RESULT SET #1 \n" +
-                        "        Message | \n" +
-                        "----------------|-\n" +
-                        "            Foo | \n";
+        String expectedOutput = newLineSeparated( 
+                        "RESULT SET #1 ",
+                        "        Message | ",
+                        "----------------|-",
+                        "            Foo | ");
 
         try(Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:scala")) {
 
@@ -48,7 +46,7 @@ public class ScalaScriptEngineTest {
                 statement.executeUpdate(" var msg : String = \"Foo\" ");
             }
 
-            String resultSetString = IntegrationTestUtils.executeScriptForResultSetString(
+            String resultSetString = executeScriptForResultSetString(
                     "println(\"Message::\"); println(msg) ", connection);
 
             assertEquals(resultSetString, expectedOutput);
@@ -59,20 +57,20 @@ public class ScalaScriptEngineTest {
     @Test
     public void testHeadersNotSpecified() throws Exception {
 
-        String expectedOutput =
-                "RESULT SET #1 \n" +
-                        "              1 |               2 | \n" +
-                        "----------------|-----------------|-\n" +
-                        "             A: |              B: | \n" +
-                        "        First A |         First B | \n" +
-                        "       Second A |        Second B | \n";
+        String expectedOutput = newLineSeparated( 
+                "RESULT SET #1 ",
+                        "              1 |               2 | ",
+                        "----------------|-----------------|-",
+                        "             A: |              B: | ",
+                        "        First A |         First B | ",
+                        "       Second A |        Second B | ");
 
 
         String url = "jdbc:dyna4jdbc:scriptengine:scala";
 
         String script = "println(\"A:\tB:\") \n println(\"First A\tFirst B\") \n println(\"Second A\tSecond B\");";
 
-        String resultSetString = IntegrationTestUtils.executeScriptForResultSetString(url, script);
+        String resultSetString = executeScriptForResultSetString(url, script);
 
         assertEquals(resultSetString, expectedOutput);
     }
@@ -80,19 +78,19 @@ public class ScalaScriptEngineTest {
     @Test
     public void testHeadersSpecified() throws Exception {
 
-        String expectedOutput =
-                "RESULT SET #1 \n" +
-                "              A |               B | \n" +
-                "----------------|-----------------|-\n" +
-                "        First A |         First B | \n" +
-                "       Second A |        Second B | \n";
+        String expectedOutput = newLineSeparated( 
+                "RESULT SET #1 ",
+                "              A |               B | ",
+                "----------------|-----------------|-",
+                "        First A |         First B | ",
+                "       Second A |        Second B | ");
 
 
         String url = "jdbc:dyna4jdbc:scriptengine:scala";
 
         String script = "println(\"A::\tB::\") \n println(\"First A\tFirst B\") \n print(\"Second A\tSecond B\")";
 
-        String resultSetString = IntegrationTestUtils.executeScriptForResultSetString(url, script);
+        String resultSetString = executeScriptForResultSetString(url, script);
 
         assertEquals(resultSetString, expectedOutput);
     }
