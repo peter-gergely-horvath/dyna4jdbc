@@ -23,7 +23,7 @@ class TimestamptFormatStringTypeHandler extends DefaultTypeHandler {
             this.formatter = new SimpleDateFormat(formatString);
             this.formatter.setLenient(false);
         } catch (IllegalArgumentException e) {
-            throw JDBCError.FORMAT_STRING_UNEXPECTED_FOR_COLUMN_TYPE.raiseUncheckedException(
+            throw JDBCError.FORMAT_STRING_INVALID.raiseUncheckedException(
                     e, formatString, e.getMessage());
         }
     }
