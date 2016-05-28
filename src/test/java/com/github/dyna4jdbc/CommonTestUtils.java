@@ -1,6 +1,5 @@
 package com.github.dyna4jdbc;
 
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
