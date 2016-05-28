@@ -29,7 +29,6 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
 
 
     // --- properties used only to provide a sensible default JDBC interface implementation ---
-    private boolean readOnly;
     private LinkedHashMap<String, Class<?>> typeMap = new LinkedHashMap<String, Class<?>>();
     private Properties clientInfo = new Properties();
     private int holdability = ResultSet.CLOSE_CURSORS_AT_COMMIT;
@@ -100,13 +99,16 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     @Override
     public final void setReadOnly(boolean readOnly) throws SQLException {
         checkNotClosed();
-        this.readOnly = readOnly;
+        if (!readOnly) {
+            throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+                    "This driver can only handle read-only mode");
+        }
     }
 
     @Override
     public final boolean isReadOnly() throws SQLException {
         checkNotClosed();
-        return this.readOnly;
+        return true;
     }
 
     @Override
@@ -153,8 +155,15 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
             int resultSetConcurrency) throws SQLException {
 
         checkNotClosed();
+        
+        if(resultSetType == ResultSet.TYPE_FORWARD_ONLY 
+            && resultSetConcurrency == ResultSet.CONCUR_READ_ONLY) {
+            
+            return createStatement();
+        }
+        
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-                "This method is not supported");
+                "Creating non-forward-only or non read-only statements");
     }
 
     @Override
