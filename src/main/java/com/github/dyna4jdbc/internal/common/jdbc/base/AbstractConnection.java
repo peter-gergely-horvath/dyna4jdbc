@@ -95,6 +95,34 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
                 "This driver can only handle autocommit mode");
     }
+    
+    @Override
+    public final Savepoint setSavepoint() throws SQLException {
+        checkNotClosed();
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+                "This method is not supported");
+    }
+    
+    @Override
+    public final Savepoint setSavepoint(String name) throws SQLException {
+        checkNotClosed();
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+                "This method is not supported");
+    }
+
+    @Override
+    public final void rollback(Savepoint savepoint) throws SQLException {
+        checkNotClosed();
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+                "This method is not supported");
+    }
+
+    @Override
+    public final void releaseSavepoint(Savepoint savepoint) throws SQLException {
+        checkNotClosed();
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+                "This method is not supported");
+    }
 
     @Override
     public final void setReadOnly(boolean readOnly) throws SQLException {
@@ -155,13 +183,13 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
             int resultSetConcurrency) throws SQLException {
 
         checkNotClosed();
-        
-        if(resultSetType == ResultSet.TYPE_FORWARD_ONLY 
+
+        if (resultSetType == ResultSet.TYPE_FORWARD_ONLY
             && resultSetConcurrency == ResultSet.CONCUR_READ_ONLY) {
-            
+
             return createStatement();
         }
-        
+
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
                 "Creating non-forward-only or non read-only statements");
     }
@@ -218,34 +246,6 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
         checkNotClosed();
 
         return holdability;
-    }
-
-    @Override
-    public final Savepoint setSavepoint() throws SQLException {
-        checkNotClosed();
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-                "This method is not supported");
-    }
-
-    @Override
-    public final Savepoint setSavepoint(String name) throws SQLException {
-        checkNotClosed();
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-                "This method is not supported");
-    }
-
-    @Override
-    public final void rollback(Savepoint savepoint) throws SQLException {
-        checkNotClosed();
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-                "This method is not supported");
-    }
-
-    @Override
-    public final void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        checkNotClosed();
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-                "This method is not supported");
     }
 
     @Override

@@ -1,15 +1,13 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
-import static com.github.dyna4jdbc.CommonTestUtils.assertThrowsSQLExceptionWithFunctionNotSupportedMessage;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+
+import static org.testng.Assert.*;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 import java.util.Properties;
 
 import org.testng.annotations.BeforeMethod;
@@ -17,6 +15,10 @@ import org.testng.annotations.Test;
 
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScriptEngineConnection;
+
+import scala.collection.immutable.HashMap;
+
+import static com.github.dyna4jdbc.CommonTestUtils.*;
 
 public class AbstractConnectionTest {
 
@@ -69,6 +71,19 @@ public class AbstractConnectionTest {
         assertTrue(abstractConnection.getAutoCommit());
     }
 
+    
+    @Test
+    public void testSetSavepoint() throws SQLException {
+
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(() -> abstractConnection.setSavepoint());
+    }
+    
+    @Test
+    public void testSetSavepointString() throws SQLException {
+
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(() -> abstractConnection.setSavepoint("foobar"));
+    }
+    
     @Test
     public void testCommit() throws SQLException {
 
@@ -165,6 +180,118 @@ public class AbstractConnectionTest {
 
         assertThrowsSQLExceptionWithFunctionNotSupportedMessage(() -> abstractConnection
                 .createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY));
+    }
+    
+    @Test
+    public void testPrepareStatementStringIntInt() throws SQLException {
+
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareStatement(
+                        "foobar",
+                        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE));
+        
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareStatement(
+                        "foobar",
+                        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY));
+        
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareStatement(
+                        "foobar",
+                        ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE));
+        
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareStatement(
+                        "foobar",
+                        ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY));
+        
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareStatement(
+                        "foobar",
+                        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE));
+        
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareStatement(
+                        "foobar",
+                        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY));
+    }
+    
+    @Test
+    public void testPepareCallStringIntInt() throws SQLException {
+
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareCall(
+                        "foobar",
+                        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE));
+        
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareCall(
+                        "foobar",
+                        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY));
+        
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareCall(
+                        "foobar",
+                        ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE));
+        
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareCall(
+                        "foobar",
+                        ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY));
+        
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareCall(
+                        "foobar",
+                        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE));
+        
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareCall(
+                        "foobar",
+                        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY));
+    }
+    
+    @Test
+    public void testGetTypeMap() throws SQLException {
+        
+        Map<String, Class<?>> typeMap = abstractConnection.getTypeMap();
+        
+        assertNotNull(typeMap);
+        
+        
+        try {
+            typeMap.put("foo", String.class);
+            
+            fail("Should have thrown an exception");
+            
+        } catch(UnsupportedOperationException uoe) {
+            // expected exception
+        }
+    }
+    
+    @Test
+    public void testSetTypeMap() throws SQLException {
+        
+        Map<String, Class<?>> typeMap = abstractConnection.getTypeMap();
+        
+        assertFalse(typeMap.containsKey("foobar"));
+        
+        Map<String, Class<?>> newTypeMap = new java.util.HashMap<>();
+        
+        newTypeMap.put("foobar", String.class);
+        
+        abstractConnection.setTypeMap(newTypeMap);
+        
+        typeMap = abstractConnection.getTypeMap();
+        
+        assertEquals(typeMap, newTypeMap);
+        
+        assertTrue(typeMap.containsKey("foobar"));
+        
+        newTypeMap.remove("foobar");
+        
+        // changing the outer map is not reflected in the contained one 
+        assertTrue(abstractConnection.getTypeMap().containsKey("foobar")); 
+        
     }
     
     // TODO: add tests for additional methods
