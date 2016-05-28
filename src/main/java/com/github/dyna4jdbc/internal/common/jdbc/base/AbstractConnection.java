@@ -27,11 +27,12 @@ import com.github.dyna4jdbc.internal.JDBCError;
 
 public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject implements java.sql.Connection {
 
+    
+    private static final int SUPPORTED_HOLDABILITY = ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
     // --- properties used only to provide a sensible default JDBC interface implementation ---
     private LinkedHashMap<String, Class<?>> typeMap = new LinkedHashMap<String, Class<?>>();
     private Properties clientInfo = new Properties();
-    private int holdability = ResultSet.CLOSE_CURSORS_AT_COMMIT;
     // ----------------------------------------------------------------------------------------
 
     @Override
@@ -46,6 +47,42 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     }
 
     protected abstract AbstractStatement<?> createStatementInternal() throws SQLException;
+    
+    @Override
+    public final Statement createStatement(
+            int resultSetType,
+            int resultSetConcurrency) throws SQLException {
+
+        checkNotClosed();
+
+        if (resultSetType == ResultSet.TYPE_FORWARD_ONLY
+            && resultSetConcurrency == ResultSet.CONCUR_READ_ONLY) {
+
+            return createStatement();
+        }
+
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+                "Creating non-forward-only or non read-only statements");
+    }
+    
+    @Override
+    public final Statement createStatement(
+            int resultSetType,
+            int resultSetConcurrency,
+            int resultSetHoldability) throws SQLException {
+
+        checkNotClosed();
+        
+        if (resultSetType == ResultSet.TYPE_FORWARD_ONLY
+                && resultSetConcurrency == ResultSet.CONCUR_READ_ONLY
+                && resultSetHoldability == SUPPORTED_HOLDABILITY) {
+
+                return createStatement();
+            }
+
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+                "Creating non-forward-only, non read-only or not over-commit held statements");
+    }
 
     @Override
     public final PreparedStatement prepareStatement(String sql) throws SQLException {
@@ -95,14 +132,14 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
                 "This driver can only handle autocommit mode");
     }
-    
+
     @Override
     public final Savepoint setSavepoint() throws SQLException {
         checkNotClosed();
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
                 "This method is not supported");
     }
-    
+
     @Override
     public final Savepoint setSavepoint(String name) throws SQLException {
         checkNotClosed();
@@ -178,23 +215,6 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     }
 
     @Override
-    public final Statement createStatement(
-            int resultSetType,
-            int resultSetConcurrency) throws SQLException {
-
-        checkNotClosed();
-
-        if (resultSetType == ResultSet.TYPE_FORWARD_ONLY
-            && resultSetConcurrency == ResultSet.CONCUR_READ_ONLY) {
-
-            return createStatement();
-        }
-
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-                "Creating non-forward-only or non read-only statements");
-    }
-
-    @Override
     public final PreparedStatement prepareStatement(
             String sql,
             int resultSetType,
@@ -235,29 +255,24 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
         if (holdability != ResultSet.HOLD_CURSORS_OVER_COMMIT
                 && holdability != ResultSet.CLOSE_CURSORS_AT_COMMIT) {
 
-            throw new SQLException("Invalid holdability: " + holdability);
+            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+                    "Invalid holdability: " + holdability);
         }
 
-        this.holdability = holdability;
+        if (holdability != SUPPORTED_HOLDABILITY) {
+            throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+                    "Unsupported holdability: " + holdability);
+        }
     }
 
     @Override
     public final int getHoldability() throws SQLException {
         checkNotClosed();
 
-        return holdability;
+        return SUPPORTED_HOLDABILITY;
     }
 
-    @Override
-    public final Statement createStatement(
-            int resultSetType,
-            int resultSetConcurrency,
-            int resultSetHoldability) throws SQLException {
 
-        checkNotClosed();
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-                "This method is not supported");
-    }
 
     @Override
     public final PreparedStatement prepareStatement(
@@ -340,8 +355,13 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
 
     @Override
     public final boolean isValid(int timeout) throws SQLException {
-        checkNotClosed();
-        return true;
+
+        if (timeout < 0) {
+            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+                    "Negative timeout: " + timeout);
+        }
+
+        return !isClosed();
     }
 
     @Override
@@ -355,7 +375,10 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     public final void setClientInfo(
             Properties properties) throws SQLClientInfoException {
 
-        this.clientInfo = new Properties(properties);
+        // Caution: Properties constructor sets the
+        // *defaults* of the Properties
+        this.clientInfo = new Properties();
+        this.clientInfo.putAll(properties);
     }
 
     @Override
@@ -391,18 +414,22 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     @Override
     public final void setSchema(String schema) throws SQLException {
         checkNotClosed();
+        // No-op: "If the driver does not support schemas, it will silently ignore this request."
     }
 
     @Override
     public final String getSchema() throws SQLException {
-        return null;
+        checkNotClosed();
+        // "the current schema name or null if there is none"
+         return null;
     }
 
     @Override
     public final void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
         checkNotClosed();
         if (milliseconds < 0) {
-            throw new SQLException("milliseconds cannot be less than zero: " + milliseconds);
+            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+                    "milliseconds cannot be less than zero: " + milliseconds);
         }
     }
 
@@ -414,14 +441,17 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
 
     @Override
     public final void abort(Executor executor) throws SQLException {
-
-        try {
-            executor.execute(new CloseConnectionForAbortRunnable());
-        } catch (RejectedExecutionException ree) {
-            JDBCError.CLOSE_FAILED.raiseSQLException(ree,
-                    "The close task has been rejected");
+        if (!isClosed()) {
+            try {
+                executor.execute(new CloseConnectionForAbortRunnable());
+            } catch (RejectedExecutionException ree) {
+                // Best effort handling of unexpected failures:
+                // still mark this as closed.
+                markClosedInternal();
+                JDBCError.CLOSE_FAILED.raiseSQLException(ree,
+                        this, "The close task has been rejected");
+            }
         }
-
     }
 
     private final class CloseConnectionForAbortRunnable implements Runnable {
@@ -431,7 +461,9 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
                 close();
             } catch (SQLException ex) {
                 JDBCError.CLOSE_FAILED.raiseUncheckedException(ex,
-                        "Async close failed, examine chained exception stack trace for root cause");
+                        AbstractConnection.this, "Async close failed, "
+                                + "examine chained exception stack trace "
+                                + "for root cause");
             }
         }
     }

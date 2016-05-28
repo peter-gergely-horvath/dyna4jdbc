@@ -98,7 +98,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
     public final boolean isClosed() {
         return closed.get();
     }
-
+    
     /**
      * Closes {@code this} object and all live registered closable child objects.
      * This method is thread-safe: it shall consistently close
@@ -109,8 +109,8 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * @throws SQLException in case closing {@code this} object or any of the the child object fails
      */
     public final void close() throws SQLException {
-        if (!closed.get()) {
-            closed.set(true);
+        if (!isClosed()) {
+            markClosedInternal();
 
             SQLException internalCloseSQLException = null;
             SQLException childrenCloseSQLException = null;
@@ -143,6 +143,15 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
                 throw childrenCloseSQLException;
             }
         }
+    }
+    
+    /**
+     * Sets the closed flag, but does not perform any of the resource closure.
+     * Must not be used except the infrastructure code use to handle 
+     * closing and resources.
+     */
+    protected final void markClosedInternal() {
+        closed.set(true);
     }
 
     /**

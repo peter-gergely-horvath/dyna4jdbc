@@ -31,6 +31,20 @@ public class CommonTestUtils {
             }
         });
     }
+    
+    public static void assertThrowsSQLExceptionWithJDBCError(JDBCError jdbcError, VoidCallable callable) {
+        assertThrowsSQLExceptionAndMessageContains(jdbcError.name(), 
+                new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                
+                callable.call();
+                
+                return null;
+            }
+        });
+    }
 
     public static void assertThrowsSQLExceptionWithFunctionNotSupportedMessage(Callable<?> callable) {
         assertThrowsSQLExceptionAndMessageContains(JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.name(), callable);
@@ -56,7 +70,9 @@ public class CommonTestUtils {
             
         } catch (Exception ex) {
 
-            assertTrue(expectedExceptionClazz.isAssignableFrom(ex.getClass()));
+            assertTrue(expectedExceptionClazz.isAssignableFrom(ex.getClass()),
+                    String.format("Expected to be '%s' (or a subclass), but was '%s'.", 
+                            expectedExceptionClazz, ex));
 
             String message = ex.getMessage();
 
