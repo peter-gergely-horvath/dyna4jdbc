@@ -4,7 +4,8 @@ import java.io.OutputStream;
 
 public interface OutputCapturingScriptExecutor {
 
-    void executeScriptUsingCustomWriters(String script,
-                                         OutputStream stdOutputStream,
-                                         OutputStream errorOutputStream) throws ScriptExecutionException;
+    void executeScriptUsingStreams(
+            String script,
+            OutputStream stdOutOutputStream,
+            OutputStream errorOutputStream) throws ScriptExecutionException;
 }

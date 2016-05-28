@@ -153,7 +153,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
             throws ScriptExecutionException {
 
 
-        outputCapturingScriptExecutor.executeScriptUsingCustomWriters(script, outWriter, errorWriter);
+        outputCapturingScriptExecutor.executeScriptUsingStreams(script, outWriter, errorWriter);
 
     }
 }

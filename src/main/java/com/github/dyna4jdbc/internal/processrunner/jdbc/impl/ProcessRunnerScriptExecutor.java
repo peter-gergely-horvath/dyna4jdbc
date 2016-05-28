@@ -28,7 +28,7 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
     }
 
     @Override
-    public void executeScriptUsingCustomWriters(
+    public void executeScriptUsingStreams(
             String script,
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {

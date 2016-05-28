@@ -119,7 +119,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
 
     //CHECKSTYLE.OFF: DesignForExtension
     @Override
-    public void executeScriptUsingCustomWriters(
+    public void executeScriptUsingStreams(
             String script,
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {

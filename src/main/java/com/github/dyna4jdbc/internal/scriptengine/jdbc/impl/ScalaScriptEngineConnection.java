@@ -50,7 +50,7 @@ public final class ScalaScriptEngineConnection extends ScriptEngineConnection {
     }
 
     @Override
-    public void executeScriptUsingCustomWriters(
+    public void executeScriptUsingStreams(
             String script, OutputStream stdOutputStream, OutputStream errorOutputStream)
             throws ScriptExecutionException {
 
@@ -115,7 +115,7 @@ public final class ScalaScriptEngineConnection extends ScriptEngineConnection {
             String script, OutputStream stdOutputStream, OutputStream errorOutputStream) {
         try {
 
-            super.executeScriptUsingCustomWriters(script, stdOutputStream, errorOutputStream);
+            super.executeScriptUsingStreams(script, stdOutputStream, errorOutputStream);
 
         } catch (ScriptExecutionException e) {
             throw new RuntimeException(e);
