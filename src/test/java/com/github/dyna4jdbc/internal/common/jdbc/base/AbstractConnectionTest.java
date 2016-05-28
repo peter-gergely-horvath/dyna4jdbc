@@ -27,7 +27,7 @@ public class AbstractConnectionTest {
     @BeforeMethod
     public void beforeMethod() throws SQLException, MisconfigurationException {
 
-        // we ScriptEngineConnectionwe to test AbstractConnection
+        // we use JavaScript ScriptEngineConnection to test AbstractConnection
         this.abstractConnection = new ScriptEngineConnection("JavaScript", new Properties());
     }
 
