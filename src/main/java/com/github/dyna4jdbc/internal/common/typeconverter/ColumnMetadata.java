@@ -26,9 +26,5 @@ public interface ColumnMetadata {
 
     SQLDataType getColumnType();
 
-    String getColumnTypeName();
-
-    Class<?> getColumnClass();
-
     String getFormatString();
 }

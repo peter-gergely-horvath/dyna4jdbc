@@ -14,8 +14,6 @@ class DefaultColumnMetadata implements ColumnMetadata {
     private int precision;
     private int scale;
     private SQLDataType columnType;
-    private String columnTypeName;
-    private Class<?> columnClass;
     private String formatString;
 
 
@@ -67,16 +65,6 @@ class DefaultColumnMetadata implements ColumnMetadata {
     @Override
     public SQLDataType getColumnType() {
         return columnType;
-    }
-
-    @Override
-    public String getColumnTypeName() {
-        return columnTypeName;
-    }
-
-    @Override
-    public Class<?> getColumnClass() {
-        return columnClass;
     }
 
     @Override
@@ -134,15 +122,6 @@ class DefaultColumnMetadata implements ColumnMetadata {
 
     }
 
-    public void setColumnTypeName(String columnTypeName) {
-        this.columnTypeName = columnTypeName;
-
-    }
-
-    public void setColumnClass(Class<?> columnClass) {
-        this.columnClass = columnClass;
-    }
-
     public void setFormatString(String formatString) {
         this.formatString = formatString;
     }
@@ -171,10 +150,6 @@ class DefaultColumnMetadata implements ColumnMetadata {
         sb.append(scale);
         sb.append(",\ncolumnType=");
         sb.append(columnType);
-        sb.append(",\ncolumnTypeName=");
-        sb.append(columnTypeName);
-        sb.append(",\ncolumnClass=");
-        sb.append(columnClass);
         sb.append(",\nformatString=");
         sb.append(formatString);
         sb.append("]");

@@ -109,45 +109,30 @@ public final class TypeHandlerResultSetMetaData extends AbstractResultSetMetaDat
 
     @Override
     public String getColumnTypeName(int column) throws SQLException {
-        ColumnMetadata columnMetadata = getColumnMetadataBySqlIndex(column);
-
-        String columnTypeName = columnMetadata.getColumnTypeName();
-
-
-        if (columnTypeName == null) {
-            SQLDataType columnType = getColumnMetadataBySqlIndex(column).getColumnType();
-            if (columnType == null) {
+        SQLDataType columnType = getColumnMetadataBySqlIndex(column).getColumnType();
+        if (columnType == null) {
                 throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
                         "columnType is null");
-            }
-
-            columnTypeName = columnType.name;
         }
 
-        return columnTypeName;
+        return columnType.name;
     }
 
     @Override
     public String getColumnClassName(int column) throws SQLException {
-        ColumnMetadata columnMetadata = getColumnMetadataBySqlIndex(column);
-
-
-        Class<?> columnClass = columnMetadata.getColumnClass();
-
-        if (columnClass == null) {
-            SQLDataType columnType = getColumnMetadataBySqlIndex(column).getColumnType();
-            if (columnType == null) {
-                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
-                        "columnType is null");
-            }
-
-            if (columnType.mappingClass != null) {
-                columnClass = columnType.mappingClass;
-            }
+        SQLDataType columnType = getColumnMetadataBySqlIndex(column).getColumnType();
+        if (columnType == null) {
+            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+                    "columnType is null");
         }
-
-        //CHECKSTYLE.OFF: AvoidInlineConditionals
-        return columnClass != null ? columnClass.getName() : null;
-        //CHECKSTYLE.ON: AvoidInlineConditionals
+        
+        String columnClassName;
+        if (columnType.mappingClass == null) {
+            columnClassName = null;
+        } else {
+            columnClassName = columnType.mappingClass.getName();
+        }
+        
+        return columnClassName;
     }
 }
