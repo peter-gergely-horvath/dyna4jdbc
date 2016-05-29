@@ -10,8 +10,6 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
     private static final HeuristicsColumnMetadataFactory INSTANCE = new HeuristicsColumnMetadataFactory();
 
-    private static final int MINIMUM_DISPLAY_SIZE = 15;
-
     static HeuristicsColumnMetadataFactory getInstance(Configuration configuration) {
         return INSTANCE;
     }
@@ -25,7 +23,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
     }
 
     protected void configureForValues(DefaultColumnMetadata metaData,
-                                      int columnIndex, Iterable<String> columnValuesIterable) {
+                                      int columnIndex, Iterable<String> cellValues) {
 
         final int sqlColumnIndex = columnIndex + 1;
 
@@ -37,7 +35,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
         SQLDataType columnType = SQLDataType.OTHER;
 
-        for (String cellValue : columnValuesIterable) {
+        for (String cellValue : cellValues) {
 
             columnType = getColumnTypeByCurrentlySelectedTypeAndCellValue(columnType, cellValue);
 
@@ -50,26 +48,30 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
             }
         }
 
-
-        final int columnDisplaySize;
-        if (maxSize >= MINIMUM_DISPLAY_SIZE) {
-
-            columnDisplaySize = maxSize;
+        
+        final int separatorSize;
+        if (maxScale > 0 && maxPrecision > 0) {
+            separatorSize = 1;
         } else {
-
-            columnDisplaySize = MINIMUM_DISPLAY_SIZE;
+            separatorSize = 0;
         }
 
-
+        final int columnDisplaySize;
+        if (maxSize > 0) {
+            columnDisplaySize = maxSize + separatorSize;
+        } else {
+            columnDisplaySize = ColumnMetadata.MINIMUM_DISPLAY_SIZE + separatorSize;
+        }
+        
         metaData.setTakesFirstRowValue(false);
         metaData.setCurrency(false);
         metaData.setNullability(nullability);
         metaData.setSigned(columnType != SQLDataType.VARCHAR);
-        metaData.setColumnDisplaySize(columnDisplaySize);
         metaData.setColumnLabel(String.valueOf(sqlColumnIndex));
         metaData.setColumnName(String.valueOf(sqlColumnIndex));
         metaData.setPrecision(maxPrecision);
         metaData.setScale(maxScale);
+        metaData.setColumnDisplaySize(columnDisplaySize);
         metaData.setColumnType(columnType);
     }
 

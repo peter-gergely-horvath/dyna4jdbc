@@ -6,6 +6,8 @@ public interface ColumnMetadata {
 
     enum Nullability { NOT_NULLABLE, NULLABLE, UNKNOWN }
 
+    int MINIMUM_DISPLAY_SIZE = 4;
+    
     boolean isTakesFirstRowValue();
 
     boolean isCurrency();
