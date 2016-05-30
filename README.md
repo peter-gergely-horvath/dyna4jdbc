@@ -113,7 +113,7 @@ public class GroovyDemo {
             + "																						\n"
             + " def printRow(String... values) { println values.join(\"\t\") }						\n"
             + " def jsonData = new URL('http://www.google.com/finance/info?"
-            + "infotype=infoquoteall&q=NASDAQ:AAPL,IBM,MSFT,GOOG').text.replaceFirst('//', '')	\n"
+                + "infotype=infoquoteall&q=NASDAQ:AAPL,IBM,MSFT,GOOG').text.replaceFirst('//', '')	\n"
             + " def data = new JsonSlurper().parseText(jsonData)									\n"
             + " printRow 'Ticker::', 'Name::', 'Open::', 'Close::', 'Change::'						\n"
             + " data.each { printRow it['t'], it['name'], it['op'], it['l_cur'], it['c'] } 			\n";
