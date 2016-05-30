@@ -167,11 +167,11 @@ public class DriverTest {
 
             String message = sqlex.getMessage();
 
-            assertTrue(message.contains(JDBCError.CONNECT_FAILED_EXCEPTION.name()),
+            assertTrue(message.contains(JDBCError.LOADING_SCRIPTENGINE_FAILED.name()),
                     String.format("Invalid message: '%s'", message) );
 
             String sqlState = sqlex.getSQLState();
-            assertEquals(sqlState, SQLState.ERROR_CONNECTION_UNABLE_TO_ESTABILISH.code);
+            assertEquals(sqlState, SQLState.SYSTEM_ERROR.code);
         }
     }
 }

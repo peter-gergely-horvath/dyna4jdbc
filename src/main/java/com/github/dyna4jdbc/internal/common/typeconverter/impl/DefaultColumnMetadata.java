@@ -4,7 +4,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 
 class DefaultColumnMetadata implements ColumnMetadata {
 
-    private boolean takesFirstRowValue;
+    private boolean consumesFirstRowValue;
     private boolean currency;
     private Nullability nullability;
     private boolean signed;
@@ -16,9 +16,8 @@ class DefaultColumnMetadata implements ColumnMetadata {
     private SQLDataType columnType;
     private String formatString;
 
-    @Override
-    public boolean isTakesFirstRowValue() {
-        return takesFirstRowValue;
+    public boolean isConsumesFirstRowValue() {
+        return consumesFirstRowValue;
     }
 
     @Override
@@ -71,8 +70,8 @@ class DefaultColumnMetadata implements ColumnMetadata {
         return formatString;
     }
 
-    public void setTakesFirstRowValue(boolean takesFirstRowValue) {
-        this.takesFirstRowValue = takesFirstRowValue;
+    public void setConsumesFirstRowValue(boolean consumesFirstRowValue) {
+        this.consumesFirstRowValue = consumesFirstRowValue;
 
     }
 
@@ -129,8 +128,8 @@ class DefaultColumnMetadata implements ColumnMetadata {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("DefaultColumnMetadata[");
-        sb.append("\ntakesFirstRowValue=");
-        sb.append(takesFirstRowValue);
+        sb.append("\nconsumesFirstRowValue=");
+        sb.append(consumesFirstRowValue);
         sb.append(",\ncurrency=");
         sb.append(currency);
         sb.append(",\nnullability=");
@@ -171,7 +170,7 @@ class DefaultColumnMetadata implements ColumnMetadata {
         result = prime * result + precision;
         result = prime * result + scale;
         result = prime * result + (signed ? 1231 : 1237);
-        result = prime * result + (takesFirstRowValue ? 1231 : 1237);
+        result = prime * result + (consumesFirstRowValue ? 1231 : 1237);
         return result;
     }
     //CHECKSTYLE.ON: MagicNumber : generated hashCode
@@ -215,7 +214,7 @@ class DefaultColumnMetadata implements ColumnMetadata {
             return false;
         if (signed != other.signed)
             return false;
-        if (takesFirstRowValue != other.takesFirstRowValue)
+        if (consumesFirstRowValue != other.consumesFirstRowValue)
             return false;
         return true;
     }

@@ -44,17 +44,19 @@ public enum JDBCError {
     DATA_CONVERSION_FAILED(
             "Data conversion failed in row %1$s, column %2$s. Value '%3$s' could not be converted to %4$s.",
             SQLState.ERROR_DATA_CONVERSION_FAILED),
-    INVALID_CONFIGURATION_HEADER("Encountered invalid configuration header: %s",
+    INVALID_FORMATTING_HEADER("Invalid formatting header detected in column %s: Value '%s' is invalid: %s",
             SQLState.CLIENT_ERROR),
     JDBC_API_USAGE_CALLER_ERROR("Illegal JDBC API call: %s",
             SQLState.CLIENT_ERROR),
     LOADING_SCRIPTENGINE_FAILED("Could not load ScriptEngine '%s'",
-            SQLState.CLIENT_ERROR),
+            SQLState.SYSTEM_ERROR),
     INVALID_CONFIGURATION("Configuration error: %s",
             SQLState.CLIENT_ERROR),
     DRIVER_BUG_UNEXPECTED_STATE("An unexpected state has been reached: %s",
             SQLState.SYSTEM_ERROR);
 
+
+    private static final int VENDOR_CODE_COMPLETION_FAILURE = 2;
 
     private final String message;
     private final SQLState sqlState;
@@ -70,7 +72,7 @@ public enum JDBCError {
     }
 
     protected String getMessageTemplate() {
-        return String.format("JDBC Error [%s]: %s", this.name(), this.message);
+        return String.format("[%s]: %s", this.name(), this.message);
     }
 
     protected String getSqlStateAsString() {
@@ -99,7 +101,7 @@ public enum JDBCError {
 
     public SQLException raiseSQLException(Object... params) throws SQLException {
         String errorMessage = buildErrorMessage(params);
-        throw new SQLException(errorMessage, getSqlStateAsString());
+        throw new SQLException(errorMessage, getSqlStateAsString(), VENDOR_CODE_COMPLETION_FAILURE);
     }
 
     public RuntimeDyna4JdbcException raiseUncheckedException(

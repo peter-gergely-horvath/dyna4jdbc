@@ -15,6 +15,7 @@
  */
 package com.github.dyna4jdbc.internal.config.impl;
 
+import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -33,7 +34,7 @@ public class ConfigurationStringParserTest {
 	
 	
 	@Test
-	public void testNullArgumentYieldsEmptyProperties() {
+	public void testNullArgumentYieldsEmptyProperties() throws MisconfigurationException {
 		
 		Properties properties = configurationStringParser.parseStringToProperties(null);
 		
@@ -43,7 +44,7 @@ public class ConfigurationStringParserTest {
 	}
 	
 	@Test
-	public void testStandardArgumentParsing() {
+	public void testStandardArgumentParsing() throws MisconfigurationException {
 		Properties properties = configurationStringParser.parseStringToProperties("foo=fooValue;bar=barValue");
 		
 		assertEquals(properties.getProperty("foo"), "fooValue");
@@ -55,14 +56,14 @@ public class ConfigurationStringParserTest {
 		assertTrue(properties.keySet().size() == 2);
 	}
 	
-	@Test(expectedExceptions=IllegalArgumentException.class)
-	public void testHandlingOfDuplicateEntriesInString() {
+	@Test(expectedExceptions=MisconfigurationException.class)
+	public void testHandlingOfDuplicateEntriesInString() throws MisconfigurationException {
 		
 		configurationStringParser.parseStringToProperties("foo=fooValue1;bar=barValue;foo=fooValue2");
 	}
 	
 	@Test
-	public void testEmptyValueHandling() {
+	public void testEmptyValueHandling() throws MisconfigurationException {
 		
 		Properties properties = configurationStringParser.parseStringToProperties("foo=fooValue;bar=;baz=bazValue");
 		
@@ -73,8 +74,8 @@ public class ConfigurationStringParserTest {
 		assertEquals(properties.getProperty("baz"), "bazValue");
 	}
 	
-	@Test(expectedExceptions=IllegalArgumentException.class)
-	public void testHandlingOfStringWithoutEqualsSign() {
+	@Test(expectedExceptions=MisconfigurationException.class)
+	public void testHandlingOfStringWithoutEqualsSign() throws MisconfigurationException {
 		
 		configurationStringParser.parseStringToProperties("foobar");
 	}

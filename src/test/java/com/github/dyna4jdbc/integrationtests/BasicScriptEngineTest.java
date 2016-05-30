@@ -22,7 +22,7 @@ public class BasicScriptEngineTest {
 
             String message = sqlEx.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.INVALID_CONFIGURATION.toString()), message);
+            assertTrue(message.contains(JDBCError.INVALID_CONFIGURATION.name().toString()), message);
         }
     }
 
@@ -39,7 +39,7 @@ public class BasicScriptEngineTest {
 
             String message = sqlEx.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.LOADING_SCRIPTENGINE_FAILED.toString()), message);
+            assertTrue(message.contains(JDBCError.LOADING_SCRIPTENGINE_FAILED.name().toString()), message);
         }
     }
 }

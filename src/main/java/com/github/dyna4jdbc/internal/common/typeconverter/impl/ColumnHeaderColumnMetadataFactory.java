@@ -12,6 +12,7 @@ import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.util.collection.AlwaysSkipFirstElementIterable;
 import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
 import com.github.dyna4jdbc.internal.config.Configuration;
+import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.ConfigurationStringParser;
 
 final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFactory {
@@ -57,13 +58,13 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
             configureHeader(metaData, header);
         }
         if (sqlTypeConfig != null && !"".equals(sqlTypeConfig.trim())) {
-            configureSqlType(metaData, sqlTypeConfig);
+            configureSqlType(metaData, sqlTypeConfig, columnIndex);
         }
         if (metaDataConfig != null && !"".equals(metaDataConfig.trim())) {
-            configureAdditional(metaData, metaDataConfig);
+            configureAdditional(metaData, metaDataConfig, columnIndex);
         }
 
-        metaData.setTakesFirstRowValue(true);
+        metaData.setConsumesFirstRowValue(true);
 
     }
 
@@ -72,12 +73,12 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
         metaData.setColumnName(header);
     }
 
-    private void configureSqlType(DefaultColumnMetadata metaData, String sqlTypeConfig) {
+    private void configureSqlType(DefaultColumnMetadata metaData, String sqlTypeConfig, int columnIndex) {
 
         try {
             Matcher matcher = SQL_TYPE_PATTERN.matcher(sqlTypeConfig);
             if (!matcher.matches()) {
-                throw JDBCError.INVALID_CONFIGURATION_HEADER.raiseSQLException(sqlTypeConfig);
+                throw JDBCError.INVALID_FORMATTING_HEADER.raiseSQLException(sqlTypeConfig);
             }
 
             String sqlTypePart = matcher.group(MATCHER_GROUP_INDEX_SQL_TYPE);
@@ -102,15 +103,26 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
 
 
         } catch (SQLException | RuntimeException e) {
-            throw new IllegalStateException("Processing of header failed: " + sqlTypeConfig + "; " + e.getMessage(), e);
+            final int jdbcColumnIndex = columnIndex + 1;
+
+            throw JDBCError.INVALID_FORMATTING_HEADER.raiseUncheckedException(e,
+                    jdbcColumnIndex, sqlTypeConfig, e.getMessage());
         }
 
     }
 
-    private void configureAdditional(DefaultColumnMetadata metaData, String metaDataConfig) {
-        Properties props = ConfigurationStringParser.getInstance().parseStringToProperties(metaDataConfig);
-        String formatString = props.getProperty("format"); // TODO: clean this up!
-        metaData.setFormatString(formatString);
+    private void configureAdditional(DefaultColumnMetadata metaData, String metaDataConfig, int columnIndex) {
+        try {
+            Properties props = ConfigurationStringParser.getInstance().parseStringToProperties(metaDataConfig);
+            String formatString = props.getProperty("format"); // TODO: clean this up!
+            metaData.setFormatString(formatString);
+
+        } catch (MisconfigurationException ex) {
+            final int jdbcColumnIndex = columnIndex + 1;
+
+            throw JDBCError.INVALID_FORMATTING_HEADER.raiseUncheckedException(ex,
+                    jdbcColumnIndex, metaDataConfig, ex.getMessage());
+        }
     }
 
 

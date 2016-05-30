@@ -127,7 +127,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
 
             String message = sqlEx.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.OBJECT_CLOSED.toString()));
+            assertTrue(message.contains(JDBCError.OBJECT_CLOSED.name().toString()));
         }
 
         verify(childObject);
@@ -257,7 +257,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
 
             String message = sqlEx.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.CLOSE_FAILED.toString()));
+            assertTrue(message.contains(JDBCError.CLOSE_FAILED.name().toString()));
 
             assertStrackTraceContainsString(sqlEx, "CloseInternal throws exception");
             assertStrackTraceContainsString(sqlEx, "childTwo.close() throws exception");
@@ -301,7 +301,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
 
             String message = sqlEx.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.CLOSE_FAILED.toString()));
+            assertTrue(message.contains(JDBCError.CLOSE_FAILED.name().toString()));
 
             assertStrackTraceContainsString(sqlEx, "CloseInternal throws exception");
             assertStrackTraceContainsString(sqlEx, "childOne.close() throws exception");
@@ -346,7 +346,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
         } catch (SQLException sqlEx) {
             String message = sqlEx.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.CLOSE_FAILED.toString()));
+            assertTrue(message.contains(JDBCError.CLOSE_FAILED.name().toString()));
 
             assertStrackTraceContainsString(sqlEx, "childTwo.close() throws exception");
         }

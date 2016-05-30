@@ -40,9 +40,29 @@ class ConnectionFactory {
         } catch (MisconfigurationException ex) {
             String causeMessage = ExceptionUtils.getRootCauseMessage(ex);
             throw JDBCError.INVALID_CONFIGURATION.raiseSQLException(ex, causeMessage);
+
+        } catch (SQLException sqlEx) {
+            // re-throw SQLExceptions received from lower layers: we expect that
+            // their message will be detailed enough for the user to understand.
+            throw sqlEx;
+
         } catch (Exception ex) {
             String causeMessage = ExceptionUtils.getRootCauseMessage(ex);
             throw JDBCError.CONNECT_FAILED_EXCEPTION.raiseSQLException(ex, causeMessage);
+
+        } catch (Throwable throwable) {
+            /*
+            We do not trust any external library here: some script languages
+            might e.g. attempt to load native libraries, which can cause an
+            UnsatisfiedLinkError. While a GUI client application might be prepared
+            to properly handle SQLExceptions, it might break if we let any unexpected
+            Throwables escape the driver layer.
+
+            Hence, we intentionally and knowingly catch all Throwables (including
+            Errors) and wrap them into an SQLException.
+            */
+            String causeMessage = ExceptionUtils.getRootCauseMessage(throwable);
+            throw JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(throwable, causeMessage);
         }
     }
 
@@ -59,10 +79,10 @@ class ConnectionFactory {
                 break;
 
             case "scriptengine":
-                if (config == null || !config.toLowerCase(Locale.ENGLISH).startsWith("scala")) {
-                    connectionClass = ScriptEngineConnection.class;
-                } else {
+                if (config != null && config.toLowerCase(Locale.ENGLISH).startsWith("scala")) {
                     connectionClass = ScalaScriptEngineConnection.class;
+                } else {
+                    connectionClass = ScriptEngineConnection.class;
                 }
 
                 break;

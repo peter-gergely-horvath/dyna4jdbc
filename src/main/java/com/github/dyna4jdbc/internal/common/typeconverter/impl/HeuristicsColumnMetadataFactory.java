@@ -58,12 +58,12 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
         final int columnDisplaySize;
         if (maxSize > 0) {
-            columnDisplaySize = maxSize + separatorSize;
+            columnDisplaySize = Math.max(maxSize + separatorSize, ColumnMetadata.MINIMUM_DISPLAY_SIZE);
         } else {
             columnDisplaySize = ColumnMetadata.MINIMUM_DISPLAY_SIZE + separatorSize;
         }
         
-        metaData.setTakesFirstRowValue(false);
+        metaData.setConsumesFirstRowValue(false);
         metaData.setCurrency(false);
         metaData.setNullability(nullability);
         metaData.setSigned(columnType != SQLDataType.VARCHAR);

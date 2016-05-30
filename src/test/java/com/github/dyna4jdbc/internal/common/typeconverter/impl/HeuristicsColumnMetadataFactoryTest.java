@@ -148,7 +148,7 @@ public class HeuristicsColumnMetadataFactoryTest {
         
         DefaultColumnMetadata metadata = new DefaultColumnMetadata();
         
-        metadata.setTakesFirstRowValue(false);
+        metadata.setConsumesFirstRowValue(false);
         metadata.setColumnDisplaySize(scale);
         metadata.setNullability(nullability);
         metadata.setSigned(false);
@@ -167,7 +167,7 @@ public class HeuristicsColumnMetadataFactoryTest {
         
         DefaultColumnMetadata metadata = new DefaultColumnMetadata();
         
-        metadata.setTakesFirstRowValue(false);
+        metadata.setConsumesFirstRowValue(false);
         metadata.setColumnDisplaySize(scale);
         metadata.setNullability(nullability);
         metadata.setSigned(true);
@@ -186,7 +186,7 @@ public class HeuristicsColumnMetadataFactoryTest {
         
         DefaultColumnMetadata metadata = new DefaultColumnMetadata();
         
-        metadata.setTakesFirstRowValue(false);
+        metadata.setConsumesFirstRowValue(false);
         
         if(precision == 0) {
             metadata.setColumnDisplaySize(scale); 

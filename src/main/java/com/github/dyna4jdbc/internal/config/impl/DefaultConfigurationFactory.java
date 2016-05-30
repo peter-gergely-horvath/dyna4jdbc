@@ -21,7 +21,7 @@ public final class DefaultConfigurationFactory implements ConfigurationFactory {
 
         ConfigurationImpl configuration = new ConfigurationImpl();
 
-        Properties internalPropops = ConfigurationStringParser.getInstance().parseStringToProperties(config);
+        Properties internalProps = ConfigurationStringParser.getInstance().parseStringToProperties(config);
 
         for (Object propKey : props.keySet()) {
             if (!(propKey instanceof java.lang.String)) {
@@ -29,17 +29,17 @@ public final class DefaultConfigurationFactory implements ConfigurationFactory {
             } else {
                 String key = (String) propKey;
 
-                if (internalPropops.containsKey(key)) {
+                if (internalProps.containsKey(key)) {
                     throw MisconfigurationException.forMessage(
                             "duplicated configuration between JDBC URL and properties: %s", key);
                 }
 
-                internalPropops.setProperty(key, props.getProperty(key));
+                internalProps.setProperty(key, props.getProperty(key));
             }
         }
 
         for (ConfigurationEntry ce : ConfigurationEntry.values()) {
-            String property = internalPropops.getProperty(ce.getKey(), ce.getDefaultValue());
+            String property = internalProps.getProperty(ce.getKey(), ce.getDefaultValue());
             ce.setConfiguration(configuration, property);
         }
 

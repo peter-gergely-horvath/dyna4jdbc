@@ -1,5 +1,7 @@
 package com.github.dyna4jdbc.internal.config.impl;
 
+import com.github.dyna4jdbc.internal.config.MisconfigurationException;
+
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -16,20 +18,20 @@ public final class ConfigurationStringParser {
 
     }
 
-    public Properties parseStringToProperties(String configuirationString) {
+    public Properties parseStringToProperties(String configurationString) throws MisconfigurationException {
         Properties properties = new Properties();
 
-        if (configuirationString != null) {
-            StringTokenizer st = new StringTokenizer(configuirationString, ";");
+        if (configurationString != null) {
+            StringTokenizer st = new StringTokenizer(configurationString, ";");
             while (st.hasMoreTokens()) {
                 String keyValuePair = st.nextToken();
                 String[] keyAndValue = keyValuePair.split("=", 2);
 
                 if (keyAndValue.length == 1) {
-                    throw new IllegalArgumentException(
-                            String.format("Configuration string '%s' cannot be interpreted as '=' "
-                                    + "character separated key-value pairs: "
-                                    + "this is invalid!", configuirationString));
+                    throw MisconfigurationException.forMessage(
+                            "Configuration string '%s' cannot be interpreted as '=' "
+                                    + "character separated key-value pairs.",
+                            configurationString);
                 }
 
 
@@ -41,9 +43,9 @@ public final class ConfigurationStringParser {
                      * e.g. "foo=x;foo=y"
                      * Fail-fast in such cases by throwing exception
                      */
-                    throw new IllegalArgumentException(
-                            String.format("Configuration string contains duplicated key '%s': "
-                                    + "this is invalid!", key));
+                    throw MisconfigurationException.forMessage(
+                            "Configuration string contains duplicated key '%s'.",
+                            key);
                 }
 
                 properties.setProperty(key, value);

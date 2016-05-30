@@ -8,7 +8,7 @@ public interface ColumnMetadata {
 
     int MINIMUM_DISPLAY_SIZE = 4;
     
-    boolean isTakesFirstRowValue();
+    boolean isConsumesFirstRowValue();
 
     boolean isCurrency();
 

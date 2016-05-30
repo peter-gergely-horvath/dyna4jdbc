@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 import static org.testng.Assert.*;
 
-public class BaiscConnectionTest {
+public class BasicConnectionTest {
 
     @Test
     public void testMalformedUrlThrowsSQLException() {
@@ -24,7 +24,7 @@ public class BaiscConnectionTest {
             String message = sqlEx.getMessage();
             assertNotNull(message);
 
-            assertTrue(message.contains(JDBCError.CONNECT_FAILED_INVALID_URL.toString()), message);
+            assertTrue(message.contains(JDBCError.CONNECT_FAILED_INVALID_URL.name().toString()), message);
         }
     }
 
@@ -42,7 +42,7 @@ public class BaiscConnectionTest {
             String message = sqlEx.getMessage();
             assertNotNull(message);
 
-            assertTrue(message.contains(JDBCError.INVALID_CONFIGURATION.toString()), message);
+            assertTrue(message.contains(JDBCError.INVALID_CONFIGURATION.name().toString()), message);
         }
     }
 
@@ -60,7 +60,7 @@ public class BaiscConnectionTest {
             String message = sqlEx.getMessage();
             assertNotNull(message);
 
-            assertTrue(message.contains(JDBCError.INVALID_CONFIGURATION.toString()), message);
+            assertTrue(message.contains(JDBCError.INVALID_CONFIGURATION.name().toString()), message);
         }
     }
 }
