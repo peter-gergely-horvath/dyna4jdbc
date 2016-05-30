@@ -40,7 +40,7 @@ Documentation is in progress: this section contains only the essential basics re
 
 ### Adding data to the result set
 
-Echo your results to the standard output using the host language. Each line emitted represents a row in the result set. By default, TAB (\t) separates cells (this can be customized in the driver configuration). The driver captures the values and makes reasonable efforts to heuristically guess the correct SQL type corresponding to the value. 
+Simply *echo (print)* your results to the standard output using the host language. Each line emitted represents a row in the result set. By default, TAB (`\t`) separates cells (this can be customized in the driver configuration). The driver captures the values and makes reasonable efforts to heuristically guess the correct SQL type corresponding to the value. 
 
 ### Defining the JDBC headers
 
@@ -77,9 +77,9 @@ Check the samples on details regarding how to generate output properly.
 
 In addition to the driver JAR itself, the full Groovy language pack has to be available on the classpath.
 
-The following sample demonstrates fetching JSON data from Google Finance Internet service, transforming it into a tabular format 
+The following sample demonstrates fetching JSON data from Google Finance Internet service and transforming it into a tabular format. (NOTE: This is just a *technical sample*: please consule Google Use of Service Conditions before you actually use any data from their API!) 
 
-Connect URL: `jdbc:dyna4jdbc:scriptengine:groovy`
+JDBC Connect URL: `jdbc:dyna4jdbc:scriptengine:groovy`
 
 Executed Groovy script:
 
