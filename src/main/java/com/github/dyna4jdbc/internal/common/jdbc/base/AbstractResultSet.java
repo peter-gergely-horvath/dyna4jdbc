@@ -1,6 +1,7 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningUtils;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -43,8 +44,9 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
         this.sqlWarning = null;
     }
 
-    protected final void setWarnings(SQLWarning warning) {
-        this.sqlWarning = warning;
+    protected final void addSQLWarning(SQLWarning warning) {
+
+        this.sqlWarning = SQLWarningUtils.chainSQLWarning(this.sqlWarning, warning);
     }
 
 

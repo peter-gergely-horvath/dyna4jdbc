@@ -23,6 +23,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningUtils;
 
 
 public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject implements java.sql.Connection {
@@ -33,6 +34,8 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     // --- properties used only to provide a sensible default JDBC interface implementation ---
     private LinkedHashMap<String, Class<?>> typeMap = new LinkedHashMap<String, Class<?>>();
     private Properties clientInfo = new Properties();
+
+    private SQLWarning sqlWarning;
     // ----------------------------------------------------------------------------------------
 
     @Override
@@ -206,12 +209,18 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     @Override
     public final SQLWarning getWarnings() throws SQLException {
         checkNotClosed();
-        return null;
+        return this.sqlWarning;
     }
 
     @Override
     public final void clearWarnings() throws SQLException {
         checkNotClosed();
+        this.sqlWarning = null;
+    }
+
+    protected final void addSQLWarning(SQLWarning warning) {
+
+        this.sqlWarning = SQLWarningUtils.chainSQLWarning(this.sqlWarning, warning);
     }
 
     @Override

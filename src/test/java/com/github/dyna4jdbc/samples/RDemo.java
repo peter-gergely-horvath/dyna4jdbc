@@ -1,12 +1,8 @@
 package com.github.dyna4jdbc.samples;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-public class GroovyDemo {
+import java.sql.*;
+
+public class RDemo {
 
     private static final String GROOVY_SCRIPT = ""
             + "	import groovy.json.JsonSlurper														\n"

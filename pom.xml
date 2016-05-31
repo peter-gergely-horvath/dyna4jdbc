@@ -52,8 +52,10 @@
 		<testng.version>6.8.21</testng.version>
 		<easymock.version>3.4</easymock.version>
 		<commons-lang3.version>3.4</commons-lang3.version>
-		<scala.version>2.12.0-M4</scala.version>
+        <groovy.version>2.4.6</groovy.version>
+        <scala.version>2.12.0-M4</scala.version>
         <jython-shaded.version>2.5.3</jython-shaded.version>
+        <jruby.version>9.1.2.0</jruby.version>
         <beanshell.version>2.0b5</beanshell.version>
 
 		<!-- Used to generate build information -->
@@ -76,11 +78,14 @@
 	<url>https://github.com/peter-gergely-horvath/dyna4jdbc</url>
 	<description>
 		DYNA4JDBC is a JDBC driver implementation that allows running dynamic JVM language
-		(JavaScript, Groovy, Jython etc.) scripts or external console-oriented programs
-		(written in shell, PERL, Python, etc.) via the JDBC API.
+		(Scala, JavaScript, Groovy, Jython, BeanShell, R (Renjin), JRuby etc.) scripts or
+        external console-oriented programs (written in shell, PERL, C/C++, etc.) via the
+        JDBC API.
 
-		The console output of the scripts is captured and presented to the caller
-		application as a standard JDBC ResultSet, allowing it to be processed further.
+		The console output of the scripts/external programs is captured, parsed and
+        presented to the caller application as a standard JDBC ResultSet, allowing it
+        to be processed further for various purposes like analyzation with other
+        tools or building complex reports using any business intelligence applications.
 	</description>
 	<inceptionYear>2016</inceptionYear>
 
@@ -108,6 +113,13 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+            <version>${groovy.version}</version>
+            <scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-library</artifactId>
 			<version>${scala.version}</version>
@@ -129,10 +141,23 @@
 		</dependency>
 
         <dependency>
+            <groupId>org.jruby</groupId>
+            <artifactId>jruby-complete</artifactId>
+            <version>${jruby.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.beanshell</groupId>
             <artifactId>bsh</artifactId>
             <version>${beanshell.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.renjin</groupId>
+            <artifactId>renjin-script-engine</artifactId>
+            <version>RELEASE</version>
         </dependency>
 
 

@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
-import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScriptEngineConnection;
+import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DefaultScriptEngineConnection;
 
 public class AbstractConnectionTest {
 
@@ -32,8 +32,8 @@ public class AbstractConnectionTest {
     @BeforeMethod
     public void beforeMethod() throws SQLException, MisconfigurationException {
 
-        // we use JavaScript ScriptEngineConnection to test AbstractConnection
-        this.abstractConnection = new ScriptEngineConnection("JavaScript", new Properties());
+        // we use JavaScript DefaultScriptEngineConnection to test AbstractConnection
+        this.abstractConnection = new DefaultScriptEngineConnection("JavaScript", new Properties());
     }
 
     @Test

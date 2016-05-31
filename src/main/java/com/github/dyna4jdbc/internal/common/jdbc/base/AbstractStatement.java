@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
+import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningUtils;
 
 public abstract class AbstractStatement<T extends java.sql.Connection>
         extends AbstractAutoCloseableJdbcObject implements java.sql.Statement {
@@ -53,23 +54,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     protected final void addSQLWarning(SQLWarning warning) {
 
-        if (this.sqlWarning == null) {
-            this.sqlWarning = warning;
-        } else {
-
-            SQLWarning sqlWarningToAddTo = this.sqlWarning;
-            while (true) {
-
-                SQLWarning next = sqlWarningToAddTo.getNextWarning();
-                if (next == null) {
-                    break;
-                }
-
-                sqlWarningToAddTo = next;
-            }
-
-            sqlWarningToAddTo.setNextWarning(warning);
-        }
+        this.sqlWarning = SQLWarningUtils.chainSQLWarning(this.sqlWarning, warning);
     }
 
 

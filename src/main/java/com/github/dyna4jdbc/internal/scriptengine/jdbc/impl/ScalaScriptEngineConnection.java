@@ -12,7 +12,7 @@ import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public final class ScalaScriptEngineConnection extends ScriptEngineConnection {
+public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnection {
 
     private static final String USEJAVACP_ARGUMENT = "-usejavacp";
 

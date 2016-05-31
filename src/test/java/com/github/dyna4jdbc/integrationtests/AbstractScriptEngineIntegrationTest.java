@@ -64,7 +64,7 @@ public class AbstractScriptEngineIntegrationTest {
 
     protected void assertHeadersNotSpecifiedCausesNumbersToBeUsed(String script) throws SQLException {
         String expectedOutput = newLineSeparated(
-                "RESULT SET #1 ",
+                        "RESULT SET #1 ",
                         "       1 |        2 | ",
                         "---------|----------|-",
                         "      A: |       B: | ",

@@ -7,9 +7,9 @@ import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
-import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultTypeHandlerFactory;
@@ -30,7 +30,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class ScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
+public class DefaultScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
     //CHECKSTYLE.OFF: VisibilityModifier
     protected final ScriptEngine engine;
@@ -40,7 +40,7 @@ public class ScriptEngineConnection extends AbstractConnection implements Output
     private final TypeHandlerFactory typeHandlerFactory;
     private final Configuration configuration;
 
-    public ScriptEngineConnection(String parameters, Properties properties)
+    public DefaultScriptEngineConnection(String parameters, Properties properties)
             throws SQLException, MisconfigurationException {
 
         if (parameters == null || "".equals(parameters.trim())) {
