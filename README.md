@@ -40,7 +40,7 @@ Documentation is in progress: this section contains only the essential basics re
 
 ### Adding data to the result set
 
-Echo your results to the standard output using the host language. Each line emitted represents a row in the result set. By default, TAB (\t) separates cells (this can be customized in the driver configuration). The driver captures the values and makes reasonable efforts to heuristically guess the correct SQL type corresponding to the value. 
+Simply *echo (print)* your results to the standard output using the host language. Each line emitted represents a row in the result set. By default, TAB (`\t`) separates cells (this can be customized in the driver configuration). The driver captures the values and makes reasonable efforts to heuristically guess the correct SQL type corresponding to the value. 
 
 ### Defining the JDBC headers
 
@@ -77,9 +77,9 @@ Check the samples on details regarding how to generate output properly.
 
 In addition to the driver JAR itself, the full Groovy language pack has to be available on the classpath.
 
-The following sample demonstrates fetching JSON data from Google Finance Internet service, transforming it into a tabular format 
+The following sample demonstrates fetching JSON data from Google Finance Internet service and transforming it into a tabular format. (NOTE: This is just a *technical sample*: please consule Google Use of Service Conditions before you actually use any data from their API!) 
 
-Connect URL: `jdbc:dyna4jdbc:scriptengine:groovy`
+JDBC Connect URL: `jdbc:dyna4jdbc:scriptengine:groovy`
 
 Executed Groovy script:
 
@@ -98,7 +98,7 @@ data.each { printRow it["t"], it["name"], it["op"], it["l_cur"], it["c"] }
 Full Java source code (Remember: both driver JAR and Groovy JARs have to be on the classpath):
 
 ```java
-package demo;
+package samples;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -106,67 +106,65 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 public class GroovyDemo {
-	
-	private static final String GROOVY_SCRIPT = ""
-			+ "	import groovy.json.JsonSlurper													\n"
-			+ "																					\n"
-			+ " def printRow(String... values) { println values.join(\"\t\") }					\n"
-			+ " def jsonData = new URL('http://www.google.com/finance/info?infotype=infoquoteall&q=NASDAQ:AAPL,IBM,MSFT,GOOG').text.replaceFirst('//', '')	\n"
-			+ " def data = new JsonSlurper().parseText(jsonData)								\n"
-			+ " printRow 'Ticker::', 'Name::', 'Open::', 'Close::', 'Change::'					\n"
-			+ " data.each { printRow it['t'], it['name'], it['op'], it['l_cur'], it['c'] } 		\n";
 
-	public static void main(String[] args) throws SQLException {
+    private static final String GROOVY_SCRIPT = ""
+            + "	import groovy.json.JsonSlurper														\n"
+            + "																						\n"
+            + " def printRow(String... values) { println values.join(\"\t\") }						\n"
+            + " def jsonData = new URL('http://www.google.com/finance/info?"
+                + "infotype=infoquoteall&q=NASDAQ:AAPL,IBM,MSFT,GOOG').text.replaceFirst('//', '')	\n"
+            + " def data = new JsonSlurper().parseText(jsonData)									\n"
+            + " printRow 'Ticker::', 'Name::', 'Open::', 'Close::', 'Change::'						\n"
+            + " data.each { printRow it['t'], it['name'], it['op'], it['l_cur'], it['c'] } 			\n";
 
-		try (Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:Groovy")) {
+    public static void main(String[] args) throws SQLException {
 
-			try (Statement statement = connection.createStatement()) {
-				boolean results = statement.execute(GROOVY_SCRIPT);
-				do {
-					if (results) {
-						try (ResultSet rs = statement.getResultSet()) {
+        try (Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:groovy")) {
 
-							printResultSetWithHeaders(rs);
-						}
-					}
+            try (Statement statement = connection.createStatement()) {
+                boolean results = statement.execute(GROOVY_SCRIPT);
+                while (results) {
+                    try (ResultSet rs = statement.getResultSet()) {
 
-					results = statement.getMoreResults();
-				} while (results);
-			}
-		}
-	}
+                        printResultSetWithHeaders(rs);
+                    }
 
-	private static void printResultSetWithHeaders(ResultSet rs) throws SQLException {
-		ResultSetMetaData metaData = rs.getMetaData();
-		final int columnCount = metaData.getColumnCount();
+                    results = statement.getMoreResults();
+                }
+            }
+        }
+    }
 
-		for(int i=1; i<=columnCount; i++ ) {
-			String columnLabel = metaData.getColumnLabel(i);
-			int columnDisplaySize = metaData.getColumnDisplaySize(i);
-			String formatStr = "%" + columnDisplaySize + "s | ";
-			System.out.format(formatStr, columnLabel);
-		}
-		System.out.println();
-		
-		for(int i=1; i<=columnCount; i++ ) {
-			int columnDisplaySize = metaData.getColumnDisplaySize(i);
-			String formatStr = "%" + columnDisplaySize + "s | ";
-			System.out.format(String.format(formatStr, "").replace(' ', '-'));
-		}
-		System.out.println();
-		
-		while (rs.next()) {
+    private static void printResultSetWithHeaders(ResultSet rs) throws SQLException {
+        ResultSetMetaData metaData = rs.getMetaData();
+        final int columnCount = metaData.getColumnCount();
 
-		    for(int i=1; i<=columnCount; i++ ) {
-		    	int columnDisplaySize = metaData.getColumnDisplaySize(i);
-		    	String formatStr = "%" + columnDisplaySize + "s | ";
-		    	System.out.format(formatStr, rs.getString(i));
-		    }
-		    System.out.println();
-		}
-	}
+        for (int i = 1; i <= columnCount; i++) {
+            String columnLabel = metaData.getColumnLabel(i);
+            int columnDisplaySize = metaData.getColumnDisplaySize(i);
+            String formatStr = "%" + columnDisplaySize + "s | ";
+            System.out.format(formatStr, columnLabel);
+        }
+        System.out.println();
+
+        for (int i = 1; i <= columnCount; i++) {
+            int columnDisplaySize = metaData.getColumnDisplaySize(i);
+            String formatStr = "%" + columnDisplaySize + "s | ";
+            System.out.format(String.format(formatStr, "").replace(' ', '-'));
+        }
+        System.out.println();
+
+        while (rs.next()) {
+
+            for (int i = 1; i <= columnCount; i++) {
+                int columnDisplaySize = metaData.getColumnDisplaySize(i);
+                String formatStr = "%" + columnDisplaySize + "s | ";
+                System.out.format(formatStr, rs.getString(i));
+            }
+            System.out.println();
+        }
+    }
 
 }
 ```
