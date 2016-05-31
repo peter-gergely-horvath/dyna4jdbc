@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningUtils;
@@ -28,7 +30,10 @@ import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningUtils;
 
 public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject implements java.sql.Connection {
 
-    
+    private static final Logger LOGGER = Logger.getLogger(AbstractConnection.class.getName());
+
+    private static final int SUPPORTED_RESULT_SET_TYPE = ResultSet.TYPE_FORWARD_ONLY;
+    private static final int SUPPORTED_RESULT_SET_CONCURRENCY = ResultSet.CONCUR_READ_ONLY;
     private static final int SUPPORTED_HOLDABILITY = ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
     // --- properties used only to provide a sensible default JDBC interface implementation ---
@@ -42,6 +47,15 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     public final Statement createStatement() throws SQLException {
         checkNotClosed();
 
+        /*
+        To ensure, that Statements created from within this Connection
+        are always registered, we introduced createStatementInternal()
+        internal template method: all concrete subclasses have to
+        implement that and can forget about registering the object
+        completely.
+
+        This method is final, hence it cannot be overridden accidentally.
+         */
         AbstractStatement<?> createdStatement = createStatementInternal();
 
         registerAsChild(createdStatement);
@@ -58,8 +72,18 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
 
         checkNotClosed();
 
-        if (resultSetType == ResultSet.TYPE_FORWARD_ONLY
-            && resultSetConcurrency == ResultSet.CONCUR_READ_ONLY) {
+        /*
+        A client application can specify the requested ResultSet type and
+        concurrency. We are prepared to handle cases, where the driver is
+        inquired about its capabilities and this method is called with the
+        supported type and concurrency combination: the call is delegated
+        to the standard createStatement() method.
+
+        Every other case is rejected as error JDBC_FUNCTION_NOT_SUPPORTED.
+        */
+
+        if (resultSetType == SUPPORTED_RESULT_SET_TYPE
+            && resultSetConcurrency == SUPPORTED_RESULT_SET_CONCURRENCY) {
 
             return createStatement();
         }
@@ -75,9 +99,20 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
             int resultSetHoldability) throws SQLException {
 
         checkNotClosed();
-        
-        if (resultSetType == ResultSet.TYPE_FORWARD_ONLY
-                && resultSetConcurrency == ResultSet.CONCUR_READ_ONLY
+
+        /*
+        A client application can specify the requested ResultSet type,
+        concurrency and holdability. We are prepared to handle cases,
+        where the driver is inquired about its capabilities and this
+        method is called with the supported type, concurrency
+        holdability combination: the call is delegated to the standard
+        createStatement() method.
+
+        Every other case is rejected as error JDBC_FUNCTION_NOT_SUPPORTED.
+        */
+
+        if (resultSetType == SUPPORTED_RESULT_SET_TYPE
+                && resultSetConcurrency == SUPPORTED_RESULT_SET_CONCURRENCY
                 && resultSetHoldability == SUPPORTED_HOLDABILITY) {
 
                 return createStatement();
@@ -104,7 +139,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     @Override
     public final String nativeSQL(String sql) throws SQLException {
         checkNotClosed();
-        return sql;
+        return sql; // no change in the statement
     }
 
     @Override
@@ -194,6 +229,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     @Override
     public final void setTransactionIsolation(int level) throws SQLException {
         checkNotClosed();
+        // we only accept if isolation level TRANSACTION_NONE is requested
         if (level != Connection.TRANSACTION_NONE) {
             throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
                     "This driver does not support transaction isolation");
@@ -254,7 +290,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     @Override
     public final void setTypeMap(Map<String, Class<?>> map) throws SQLException {
         checkNotClosed();
-        this.typeMap = new LinkedHashMap<String, Class<?>>(map);
+        this.typeMap = new LinkedHashMap<>(map);
     }
 
     @Override
@@ -469,10 +505,11 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
             try {
                 close();
             } catch (SQLException ex) {
+                LOGGER.log(Level.SEVERE, "Async close failed: " + ex.getMessage(), ex);
                 JDBCError.CLOSE_FAILED.raiseUncheckedException(ex,
-                        AbstractConnection.this, "Async close failed, "
-                                + "examine chained exception stack trace "
-                                + "for root cause");
+                        AbstractConnection.this,
+                        "Async close failed, examine exception "
+                                + "stack trace for root cause");
             }
         }
     }

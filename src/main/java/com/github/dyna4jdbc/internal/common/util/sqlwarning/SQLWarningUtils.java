@@ -11,26 +11,29 @@ public final class SQLWarningUtils {
         // static utility class -- no instances allowed
     }
 
-    public static SQLWarning chainSQLWarning(SQLWarning current, SQLWarning newWarning) {
+    public static SQLWarning chainSQLWarning(
+            final SQLWarning current,
+            final SQLWarning newWarning) {
+
         if (current == null) {
             return newWarning;
-        } else {
+        }
 
-            SQLWarning last = current;
-            while (true) {
+        SQLWarning last = current;
+        while (true) {
 
-                SQLWarning next = last.getNextWarning();
-                if (next == null) {
-                    break;
-                }
-
-                last = next;
+            SQLWarning next = last.getNextWarning();
+            if (next == null) {
+                break;
             }
 
-            last.setNextWarning(newWarning);
-
-            return last;
+            last = next;
         }
+
+        last.setNextWarning(newWarning);
+
+        return current;
+
     }
 
 }
