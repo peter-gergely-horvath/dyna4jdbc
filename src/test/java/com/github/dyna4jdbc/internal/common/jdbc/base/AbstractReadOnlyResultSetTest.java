@@ -42,7 +42,7 @@ public class AbstractReadOnlyResultSetTest {
     }
 
 
-    private EmptyResultSet abstractReadOnlyResultSet;
+    private AbstractReadOnlyResultSet abstractReadOnlyResultSet;
 
     @BeforeMethod
     public void beforeMethod()  {

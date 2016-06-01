@@ -30,6 +30,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         int maxSize = 0;
         int maxPrecision = 0;
         int maxScale = 0;
+        int maxBeforeDecimalPoint = 0;
 
         Nullability nullability = Nullability.NOT_NULLABLE;
 
@@ -42,27 +43,36 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
             if (cellValue == null) {
                 nullability = Nullability.NULLABLE;
             } else {
+
+                final int scale = columnType.getScale(cellValue);
+                final int precision = columnType.getPrecision(cellValue);
+
+                maxBeforeDecimalPoint = Math.max(maxBeforeDecimalPoint, scale - precision);
+
                 maxSize = Math.max(maxSize, cellValue.length());
-                maxPrecision = Math.max(maxPrecision, columnType.getPrecision(cellValue));
-                maxScale = Math.max(maxScale, columnType.getScale(cellValue));
+
+                maxPrecision = Math.max(maxPrecision, precision);
+
+
+                maxScale = Math.max(maxScale, scale);
             }
         }
 
-        
-        final int separatorSize;
-        if (maxScale > 0 && maxPrecision > 0) {
-            separatorSize = 1;
+        int maxColumnDisplaySize;
+        if (maxPrecision == 0) {
+            maxColumnDisplaySize = maxSize;
         } else {
-            separatorSize = 0;
+            maxColumnDisplaySize = maxBeforeDecimalPoint + 1 + maxPrecision;
+
+            maxScale = Math.max(maxScale, maxBeforeDecimalPoint + maxPrecision);
         }
 
-        final int columnDisplaySize;
-        if (maxSize > 0) {
-            columnDisplaySize = Math.max(maxSize + separatorSize, ColumnMetadata.MINIMUM_DISPLAY_SIZE);
-        } else {
-            columnDisplaySize = ColumnMetadata.MINIMUM_DISPLAY_SIZE + separatorSize;
+        if (maxPrecision > 0 && columnType == SQLDataType.VARCHAR) {
+            maxScale = maxSize;
+            maxColumnDisplaySize = maxSize;
+            maxPrecision = 0;
         }
-        
+
         metaData.setConsumesFirstRowValue(false);
         metaData.setCurrency(false);
         metaData.setNullability(nullability);
@@ -71,7 +81,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         metaData.setColumnName(String.valueOf(sqlColumnIndex));
         metaData.setPrecision(maxPrecision);
         metaData.setScale(maxScale);
-        metaData.setColumnDisplaySize(columnDisplaySize);
+        metaData.setColumnDisplaySize(maxColumnDisplaySize);
         metaData.setColumnType(columnType);
     }
 
@@ -90,6 +100,11 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
                     newColumnType = SQLDataType.INTEGER;
                     break;
                 }
+                if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
+                    newColumnType = SQLDataType.TIMESTAMP;
+                    break;
+                }
+
                 if (SQLDataType.VARCHAR.isPlausibleConversion(cellValue)) {
                     newColumnType = SQLDataType.VARCHAR;
                     break;
@@ -107,6 +122,12 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
                 if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)
                         || SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
                     newColumnType = SQLDataType.DOUBLE;
+                    break;
+                }
+
+            case TIMESTAMP:
+                if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
+                    newColumnType = SQLDataType.TIMESTAMP;
                     break;
                 }
 

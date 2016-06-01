@@ -78,7 +78,15 @@ public enum SQLDataType {
     TIME(java.sql.Types.TIME,
             "TIME", java.sql.Time.class),
     TIMESTAMP(java.sql.Types.TIMESTAMP,
-            "TIMESTAMP", java.sql.Timestamp.class),
+            "TIMESTAMP", java.sql.Timestamp.class, false,
+            "\\d{4}-\\d{1,2}-\\d{1,2} \\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?") {
+        int getPrecision(String value) {
+            return 0;
+        }
+        int getScale(String value)  {
+            return 0;
+        }
+    },
     BINARY(java.sql.Types.BINARY,
             "BINARY", java.lang.Byte.class, true),
     VARBINARY(java.sql.Types.VARBINARY,
@@ -213,10 +221,14 @@ public enum SQLDataType {
                 }
                 return aggregatedLength;
             }
-
-
         }
-        return 0;
+
+        /*
+        TODO: Clean up: required for handling of edge cases like:
+        DOUBLE type is used to establish the scale of an integer
+        e.g. 1234 does not match double pattern, however can be
+        interpreted as a double value. */
+        return value.length();
     }
 
 }
