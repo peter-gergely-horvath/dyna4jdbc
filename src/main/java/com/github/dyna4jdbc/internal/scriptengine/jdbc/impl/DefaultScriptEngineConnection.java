@@ -71,18 +71,32 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
     private static ScriptEngine loadEngineByName(String engineName) throws SQLException {
         ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-        ScriptEngine se = scriptEngineManager.getEngineByName(engineName);
-        if (se == null) {
+        ScriptEngine scriptEngine = scriptEngineManager.getEngineByName(engineName);
+        if (scriptEngine == null) {
             throw JDBCError.LOADING_SCRIPTENGINE_FAILED.raiseSQLException(engineName);
         }
 
-        return se;
+        return scriptEngine;
     }
 
     @Override
     public final DatabaseMetaData getMetaData() throws SQLException {
         checkNotClosed();
-        return new GenericDatabaseMetaData(this, getEngineDescription(), getEngineVersion());
+
+        ScriptEngineFactory factory = engine.getFactory();
+
+        String engineDescription = null;
+        String engineVersion = null;
+
+        if (factory != null) {
+            String engineName = factory.getEngineName();
+            String languageVersion = factory.getLanguageVersion();
+
+            engineDescription = String.format("%s (%s)", engineName, languageVersion);
+            engineVersion = factory.getEngineVersion();
+        }
+
+        return new GenericDatabaseMetaData(this, engineDescription, engineVersion);
     }
 
     @Override
@@ -94,28 +108,6 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
         return new OutputHandlingStatement<>(this, outputHandlerFactory, this);
     }
 
-
-    private String getEngineDescription() {
-        ScriptEngineFactory factory = engine.getFactory();
-        if (factory != null) {
-            String engineName = factory.getEngineName();
-            String languageVersion = factory.getLanguageVersion();
-
-            return String.format("%s (%s)", engineName, languageVersion);
-        }
-
-        return null;
-    }
-
-    private String getEngineVersion() {
-
-        ScriptEngineFactory factory = engine.getFactory();
-        if (factory != null) {
-            return factory.getEngineVersion();
-        }
-
-        return null;
-    }
 
     //CHECKSTYLE.OFF: DesignForExtension
     @Override

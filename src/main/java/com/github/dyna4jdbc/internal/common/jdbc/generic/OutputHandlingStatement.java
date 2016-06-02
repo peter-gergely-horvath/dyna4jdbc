@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.util.List;
 
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
@@ -12,17 +13,20 @@ import com.github.dyna4jdbc.internal.RuntimeDyna4JdbcException;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
-import com.github.dyna4jdbc.internal.common.outputhandler.MultiTypeScriptOutputHandler;
-import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandler;
-import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
-import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptOutputHandler;
-import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.outputhandler.*;
 import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 
 public class OutputHandlingStatement<T extends java.sql.Connection> extends AbstractStatement<T> {
 
     private final ScriptOutputHandlerFactory scriptOutputHandlerFactory;
     private final OutputCapturingScriptExecutor outputCapturingScriptExecutor;
+
+    private final SQLWarningSink warningSink = new SQLWarningSink() {
+        @Override
+        public void onSQLWarning(SQLWarning warning) {
+            addSQLWarning(warning);
+        }
+    };
 
     public OutputHandlingStatement(
             T connection,
@@ -38,8 +42,8 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         checkNotClosed();
 
         try {
-            SingleResultSetScriptOutputHandler outputHandler =
-                    scriptOutputHandlerFactory.newSingleResultSetScriptOutputHandler(this, script);
+            SingleResultSetQueryScriptOutputHandler outputHandler =
+                    scriptOutputHandlerFactory.newSingleResultSetQueryScriptOutputHandler(this, script, warningSink);
 
             executeScriptUsingOutputHandler(script, outputHandler);
 
@@ -67,7 +71,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 
         try {
             UpdateScriptOutputHandler outputHandler =
-                    scriptOutputHandlerFactory.newUpdateScriptOutputHandler(this, script);
+                    scriptOutputHandlerFactory.newUpdateScriptOutputHandler(this, script, warningSink);
 
             executeScriptUsingOutputHandler(script, outputHandler);
 
@@ -99,8 +103,8 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 
         try {
 
-            MultiTypeScriptOutputHandler outputHandler =
-                    scriptOutputHandlerFactory.newMultiTypeScriptOutputHandler(this, script);
+            UpdateOrQueryScriptOutputHandler outputHandler =
+                    scriptOutputHandlerFactory.newUpdateOrQueryScriptOutputHandler(this, script, warningSink);
 
             executeScriptUsingOutputHandler(script, outputHandler);
 
@@ -149,7 +153,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         }
     }
 
-    private void executeScriptUsingCustomWriters(final String script, OutputStream outWriter, OutputStream errorWriter)
+    private void executeScriptUsingCustomWriters(String script, OutputStream outWriter, OutputStream errorWriter)
             throws ScriptExecutionException {
 
 
