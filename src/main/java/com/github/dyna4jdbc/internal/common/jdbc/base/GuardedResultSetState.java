@@ -19,7 +19,8 @@ class GuardedResultSetState {
         private final Set<State> validTransitions;
 
         State(State... validTransitions) {
-            this.validTransitions = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(validTransitions)));
+            this.validTransitions = Collections.unmodifiableSet(
+                    new HashSet<>(Arrays.asList(validTransitions)));
         }
     }
 
@@ -44,13 +45,6 @@ class GuardedResultSetState {
         }
 
         this.currentState = newState;
-    }
-
-    void checkValidStateForRowAccess() throws SQLException {
-        if (currentState != State.ITERATING_OVER_RESULTS) {
-            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
-                    "Performing this operation in state " + currentState + " is illegal");
-        }
     }
 
     @Override
