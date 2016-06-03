@@ -1,11 +1,12 @@
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
+import static org.testng.Assert.fail;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,8 +22,6 @@ import org.testng.annotations.Test;
 
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
-
-import static org.testng.Assert.*;
 
 public class HeuristicsColumnMetadataFactoryTest {
 

@@ -1,16 +1,8 @@
 package com.github.dyna4jdbc.integrationtests;
 
-import com.github.dyna4jdbc.internal.JDBCError;
-import org.testng.annotations.Test;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 
-import static org.testng.Assert.*;
-
-import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.*;
+import org.testng.annotations.Test;
 
 public class BeanShellScriptEngineTest extends AbstractScriptEngineIntegrationTest {
 
