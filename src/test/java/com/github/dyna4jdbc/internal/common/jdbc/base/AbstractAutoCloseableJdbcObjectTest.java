@@ -17,6 +17,8 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.RuntimeDyna4JdbcException;
+
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -28,6 +30,8 @@ import java.util.concurrent.Callable;
 
 import static org.easymock.EasyMock.*;
 import static org.testng.Assert.*;
+
+import static com.github.dyna4jdbc.CommonTestUtils.*;
 
 /**
  * @author Peter Horvath
@@ -105,6 +109,20 @@ public class AbstractAutoCloseableJdbcObjectTest {
         closeableJdbcObject.close();
         closeableJdbcObject.close();
         closeableJdbcObject.close();
+    }
+    
+    @Test
+    public void testRegisteringNullChildThrowsException() throws Exception {
+
+        assertThrowsExceptionAndMessageContains(
+                RuntimeDyna4JdbcException.class, 
+                JDBCError.DRIVER_BUG_UNEXPECTED_STATE.name().toString(), 
+                () -> closeableJdbcObject.registerAsChild(null));
+        
+        expectCloseInternalIsCalled();
+
+        closeableJdbcObject.close();
+        
     }
 
     @Test

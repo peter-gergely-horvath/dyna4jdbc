@@ -12,6 +12,7 @@ import static org.testng.Assert.fail;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.Map;
 import java.util.Properties;
@@ -22,18 +23,39 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DefaultScriptEngineConnection;
 
 public class AbstractConnectionTest {
 
     private AbstractConnection abstractConnection;
+    private SQLWarningSink connectionWarningSink; 
 
     @BeforeMethod
     public void beforeMethod() throws SQLException, MisconfigurationException {
 
         // we use JavaScript DefaultScriptEngineConnection to test AbstractConnection
-        this.abstractConnection = new DefaultScriptEngineConnection("JavaScript", new Properties());
+        class TestingAbstractConnection extends DefaultScriptEngineConnection {
+
+            public TestingAbstractConnection(String parameters, Properties properties)
+                    throws SQLException, MisconfigurationException {
+                super(parameters, properties);
+            }
+        }
+        
+        TestingAbstractConnection connection = 
+                new TestingAbstractConnection("JavaScript", new Properties());
+        
+        connectionWarningSink = new SQLWarningSink() {
+            
+            @Override
+            public void onSQLWarning(SQLWarning warning) {
+                connection.addSQLWarning(warning);
+            }
+        };
+        
+        this.abstractConnection = connection;
     }
 
     @Test
@@ -99,6 +121,18 @@ public class AbstractConnectionTest {
     public void testRollback() throws SQLException {
 
         assertThrowsSQLExceptionWithFunctionNotSupportedMessage(() -> abstractConnection.rollback());
+    }
+    
+    @Test
+    public void testRollbackSavePoint() throws SQLException {
+
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(() -> abstractConnection.rollback(null));
+    }
+    
+    @Test
+    public void testReleaseSavepoint() throws SQLException {
+
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(() -> abstractConnection.releaseSavepoint(null));
     }
 
     @Test
@@ -167,7 +201,7 @@ public class AbstractConnectionTest {
 
         abstractConnection.clearWarnings();
     }
-
+    
     @Test
     public void testCreateStatementIntInt() throws SQLException {
 
@@ -188,8 +222,21 @@ public class AbstractConnectionTest {
     }
     
     @Test
+    public void testPrepareStatementString() throws SQLException {
+
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
+                () -> abstractConnection.prepareStatement("foobar"));
+    }
+    
+    @Test
     public void testPrepareStatementStringIntInt() throws SQLException {
 
+        try (Statement statement = abstractConnection.createStatement(ResultSet.TYPE_FORWARD_ONLY,
+                ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT )) {
+
+            assertNotNull(statement);
+        }
+        
         assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
                 () -> abstractConnection.prepareStatement(
                         "foobar",
@@ -407,6 +454,17 @@ public class AbstractConnectionTest {
     }
     
     @Test
+    public void testPrepareStatementStringIntIntInt() {
+        
+        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(() -> 
+            abstractConnection.prepareStatement("foobar", 
+                    ResultSet.TYPE_SCROLL_SENSITIVE, 
+                    ResultSet.CONCUR_READ_ONLY, 
+                    ResultSet.CLOSE_CURSORS_AT_COMMIT) );
+        
+    }
+    
+    @Test
     public void testPrepareStatementStringInt() throws SQLException {
         
         assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
@@ -561,6 +619,32 @@ public class AbstractConnectionTest {
         assertTrue(abstractConnection.isClosed());
         
     }
+    
+    
+    @Test
+    public void testSQLWarnings() throws SQLException {
+        
+        SQLWarning warnings;
+        
+        warnings = abstractConnection.getWarnings();
+        
+        assertNull(warnings);
+        
+        
+        connectionWarningSink.onSQLWarning(new SQLWarning("foo"));
+        connectionWarningSink.onSQLWarning(new SQLWarning("bar"));
+        
+        
+        warnings = abstractConnection.getWarnings();
+        
+        assertNotNull(warnings);
+        assertEquals(warnings.getMessage(), "foo");
+        
+        assertNotNull(warnings.getNextWarning());
+        
+        assertNotNull(warnings.getNextWarning().getMessage(), "bar");
+    }
+    
     
     @Test
     public void testAbortRejected() throws SQLException {
