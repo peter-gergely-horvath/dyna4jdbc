@@ -23,18 +23,20 @@ public final class DefaultConfigurationFactory implements ConfigurationFactory {
 
         Properties internalProps = ConfigurationStringParser.getInstance().parseStringToProperties(config);
 
-        for (Object propKey : props.keySet()) {
-            if (!(propKey instanceof java.lang.String)) {
-                throw MisconfigurationException.forMessage("properties should only contain String keys!");
-            } else {
-                String key = (String) propKey;
+        if(props != null) {
+            for (Object propKey : props.keySet()) {
+                if (!(propKey instanceof java.lang.String)) {
+                    throw MisconfigurationException.forMessage("properties should only contain String keys!");
+                } else {
+                    String key = (String) propKey;
 
-                if (internalProps.containsKey(key)) {
-                    throw MisconfigurationException.forMessage(
-                            "duplicated configuration between JDBC URL and properties: %s", key);
+                    if (internalProps.containsKey(key)) {
+                        throw MisconfigurationException.forMessage(
+                                "duplicated configuration between JDBC URL and properties: %s", key);
+                    }
+
+                    internalProps.setProperty(key, props.getProperty(key));
                 }
-
-                internalProps.setProperty(key, props.getProperty(key));
             }
         }
 
