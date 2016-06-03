@@ -320,7 +320,7 @@
                         <artifactId>clover-maven-plugin</artifactId>
                         <version>${clover.version}</version>
                         <configuration>
-                            <licenseLocation>configuration/clover_eval.license</licenseLocation>
+                            <licenseLocation>configuration/clover/dyna4jdbc_clover.license</licenseLocation>
                         </configuration>
                         <executions>
                             <execution>
