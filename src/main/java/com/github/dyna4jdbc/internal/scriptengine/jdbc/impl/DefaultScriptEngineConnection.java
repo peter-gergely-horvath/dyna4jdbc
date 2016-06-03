@@ -32,10 +32,8 @@ import java.util.Properties;
 
 public class DefaultScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
-    //CHECKSTYLE.OFF: VisibilityModifier
-    protected final ScriptEngine engine;
-    protected final IOHandlerFactory ioHandlerFactory;
-    //CHECKSTYLE.ON: VisibilityModifier
+    private final ScriptEngine engine;
+    private final IOHandlerFactory ioHandlerFactory;
 
     private final TypeHandlerFactory typeHandlerFactory;
     private final Configuration configuration;
@@ -83,7 +81,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
     public final DatabaseMetaData getMetaData() throws SQLException {
         checkNotClosed();
 
-        ScriptEngineFactory factory = engine.getFactory();
+        ScriptEngineFactory factory = getEngine().getFactory();
 
         String engineDescription = null;
         String engineVersion = null;
@@ -116,36 +114,44 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
-        synchronized (engine) {
-            Writer originalWriter = engine.getContext().getWriter();
-            Writer originalErrorWriter = engine.getContext().getErrorWriter();
+        synchronized (getEngine()) {
+            Writer originalWriter = getEngine().getContext().getWriter();
+            Writer originalErrorWriter = getEngine().getContext().getErrorWriter();
 
             try {
 
                 if (stdOutputStream != null) {
 
                     PrintWriter outputPrintWriter =
-                            ioHandlerFactory.newPrintWriter(stdOutputStream, true);
+                            getIoHandlerFactory().newPrintWriter(stdOutputStream, true);
 
-                    engine.getContext().setWriter(outputPrintWriter);
+                    getEngine().getContext().setWriter(outputPrintWriter);
                 }
 
                 if (errorOutputStream != null) {
 
                     PrintWriter errorPrintWriter =
-                            ioHandlerFactory.newPrintWriter(errorOutputStream, true);
+                            getIoHandlerFactory().newPrintWriter(errorOutputStream, true);
 
-                    engine.getContext().setErrorWriter(errorPrintWriter);
+                    getEngine().getContext().setErrorWriter(errorPrintWriter);
                 }
 
-                engine.eval(script);
+                getEngine().eval(script);
             } catch (ScriptException e) {
                 throw new ScriptExecutionException(e);
             } finally {
-                engine.getContext().setWriter(originalWriter);
-                engine.getContext().setErrorWriter(originalErrorWriter);
+                getEngine().getContext().setWriter(originalWriter);
+                getEngine().getContext().setErrorWriter(originalErrorWriter);
             }
         }
     }
     //CHECKSTYLE.ON: DesignForExtension
+
+    protected final ScriptEngine getEngine() {
+        return engine;
+    }
+
+    protected final IOHandlerFactory getIoHandlerFactory() {
+        return ioHandlerFactory;
+    }
 }

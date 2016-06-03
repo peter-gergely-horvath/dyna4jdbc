@@ -2,6 +2,7 @@ package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
+import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import org.renjin.primitives.io.connections.ConnectionTable;
 import org.renjin.script.RenjinScriptEngine;
@@ -27,15 +28,15 @@ public class RenjinScriptEngineConnection extends DefaultScriptEngineConnection 
             throws SQLException, MisconfigurationException {
         super(parameters, properties);
 
-        if (!(this.engine instanceof RenjinScriptEngine)) {
+        if (!(this.getEngine() instanceof RenjinScriptEngine)) {
             JDBCError.INVALID_CONFIGURATION.raiseSQLException(
                     "Cannot configure Renjin ScriptEngine of type: "
-                            + this.engine.getClass().getName()
+                            + this.getEngine().getClass().getName()
                             + ". Are you using a Renjin version "
                             + "different from the one the driver was compiled for?");
         }
 
-        renjinConnectionTable = ((RenjinScriptEngine) this.engine).getSession().getConnectionTable();
+        renjinConnectionTable = ((RenjinScriptEngine) this.getEngine()).getSession().getConnectionTable();
     }
 
     @Override
@@ -52,6 +53,7 @@ public class RenjinScriptEngineConnection extends DefaultScriptEngineConnection 
             originalStdOut = renjinConnectionTable.getStdout().getPrintWriter();
             originalError = renjinConnectionTable.getStderr().getPrintWriter();
 
+            IOHandlerFactory ioHandlerFactory = getIoHandlerFactory();
             if (stdOutputStream != null) {
 
                 PrintWriter outputPrintWriter =

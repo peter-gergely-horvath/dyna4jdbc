@@ -22,16 +22,16 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
             throws SQLException, MisconfigurationException {
         super(parameters, properties);
 
-        if (!(this.engine instanceof IMain)) {
+        if (!(this.getEngine() instanceof IMain)) {
             JDBCError.INVALID_CONFIGURATION.raiseSQLException(
                     "Cannot configure Scala ScriptEngine of type: "
-                            + this.engine.getClass().getName()
+                            + this.getEngine().getClass().getName()
                             + ". Are you using a Scala version "
                             + "different from the one the driver was compiled for?");
         }
 
 
-        this.scalaInterpreterMain = ((IMain) this.engine);
+        this.scalaInterpreterMain = ((IMain) this.getEngine());
 
         this.scalaInterpreterMain.setContextClassLoader();
         this.scalaInterpreterMain.settings().processArgumentString(USEJAVACP_ARGUMENT);
@@ -69,7 +69,7 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
                         createErrorCapturingInvokerFunction(errorOutputStream, invokerFunction);
             }
 
-            Console.withOut(ioHandlerFactory.newPrintStream(stdOutputStream), invokerFunction);
+            Console.withOut(getIoHandlerFactory().newPrintStream(stdOutputStream), invokerFunction);
 
         } catch (RuntimeException re) {
             Throwable cause = re.getCause();
@@ -89,7 +89,7 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
             @Override
             public Void apply() {
 
-                Console.withErr(ioHandlerFactory.newPrintStream(errorOutputStream), executeScriptFunction);
+                Console.withErr(getIoHandlerFactory().newPrintStream(errorOutputStream), executeScriptFunction);
 
                 return null;
             }

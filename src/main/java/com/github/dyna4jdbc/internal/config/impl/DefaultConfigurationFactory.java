@@ -23,7 +23,7 @@ public final class DefaultConfigurationFactory implements ConfigurationFactory {
 
         Properties internalProps = ConfigurationStringParser.getInstance().parseStringToProperties(config);
 
-        if(props != null) {
+        if (props != null) {
             for (Object propKey : props.keySet()) {
                 if (!(propKey instanceof java.lang.String)) {
                     throw MisconfigurationException.forMessage("properties should only contain String keys!");
