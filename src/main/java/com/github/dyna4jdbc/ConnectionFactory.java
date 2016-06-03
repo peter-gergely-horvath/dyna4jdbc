@@ -1,6 +1,7 @@
 package com.github.dyna4jdbc;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
 import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
@@ -28,13 +29,7 @@ class ConnectionFactory {
             String[] bridgeNameAndConfig = factoryConfiguration.split(":", 2);
 
             String bridgeName = bridgeNameAndConfig[0].toLowerCase(Locale.ENGLISH);
-            String config;
-
-            if (bridgeNameAndConfig.length == 2) {
-                config = bridgeNameAndConfig[1];
-            } else {
-                config = null;
-            }
+            String config = ArrayUtils.tryGetByIndex(bridgeNameAndConfig, 1);
 
             return newConnection(bridgeName, config, info);
 
