@@ -10,6 +10,8 @@ import java.util.List;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.OutputDisabledError;
 import com.github.dyna4jdbc.internal.RuntimeDyna4JdbcException;
+import com.github.dyna4jdbc.internal.CancelException;
+import com.github.dyna4jdbc.internal.ExecutionAbortedError;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
@@ -60,6 +62,9 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
             throw sqle;
         } catch (RuntimeDyna4JdbcException ex) {
             throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
+        } catch (ExecutionAbortedError e) {
+            String message = ExceptionUtils.getRootCauseMessage(e);
+            throw JDBCError.EXECUTION_ABORTED_AT_CLIENT_REQUEST.raiseSQLException(e, message);
         } catch (Throwable t) {
             String message = ExceptionUtils.getRootCauseMessage(t);
             throw JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
@@ -92,6 +97,9 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         } catch (OutputDisabledError t) {
             String message = ExceptionUtils.getRootCauseMessage(t);
             throw JDBCError.USING_STDOUT_FROM_UPDATE.raiseSQLException(t, message);
+        } catch (ExecutionAbortedError e) {
+            String message = ExceptionUtils.getRootCauseMessage(e);
+            throw JDBCError.EXECUTION_ABORTED_AT_CLIENT_REQUEST.raiseSQLException(e, message);
         } catch (Throwable t) {
             String message = ExceptionUtils.getRootCauseMessage(t);
             throw JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
@@ -127,6 +135,9 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
             throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
         } catch (RuntimeDyna4JdbcException ex) {
             throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
+        } catch (ExecutionAbortedError e) {
+            String message = ExceptionUtils.getRootCauseMessage(e);
+            throw JDBCError.EXECUTION_ABORTED_AT_CLIENT_REQUEST.raiseSQLException(e, message);
         } catch (Throwable t) {
             String message = ExceptionUtils.getRootCauseMessage(t);
             throw JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
@@ -159,5 +170,14 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 
         outputCapturingScriptExecutor.executeScriptUsingStreams(script, outWriter, errorWriter);
 
+    }
+    
+    @Override
+    public final void cancel() throws SQLException {
+        try {
+            outputCapturingScriptExecutor.cancel();
+        } catch (CancelException e) {
+            throw new SQLException(e);
+        }
     }
 }

@@ -5,7 +5,8 @@ public enum SQLState {
     SUCCESSFUL_COMPLETION(Category.SUCCESS, "00", "Completed successfully"),
 
     WARNING_CLASS(Category.WARNING, "01", "Warning"),
-
+    CLIENT_ABORT(SQLState.WARNING_CLASS, "001", "Client abort"),
+    
     NOT_FOUND_CLASS(Category.NO_DATA, "02", "No data"),
 
     DYNAMIC_SQL_ERROR(Category.ERROR, "07", "Dynamic SQL error"),

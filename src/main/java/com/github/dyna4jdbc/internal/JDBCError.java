@@ -13,6 +13,8 @@ public enum JDBCError {
     OBJECT_CLOSED("Object has already been closed: %s", null),
     CLOSE_FAILED("Closing of '%s' caused error: %s",
             SQLState.CLIENT_ERROR),
+    EXECUTION_ABORTED_AT_CLIENT_REQUEST("Execution aborted at client request",
+            SQLState.CLIENT_ABORT),
     SCRIPT_EXECUTION_EXCEPTION("Execution of script raised exception: %s",
             SQLState.DYNAMIC_SQL_ERROR),
     CANNOT_UNWARP_OBJECT("The requested type (%s) cannot be unwrapped from this object (%s).",

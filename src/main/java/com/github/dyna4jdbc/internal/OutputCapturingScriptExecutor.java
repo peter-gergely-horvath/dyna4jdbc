@@ -8,4 +8,6 @@ public interface OutputCapturingScriptExecutor {
             String script,
             OutputStream stdOutOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException;
+
+    void cancel() throws CancelException;
 }

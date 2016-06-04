@@ -201,16 +201,6 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     }
 
-    //CHECKSTYLE.OFF: DesignForExtension
-    @Override
-    public void cancel() throws SQLException {
-        // TODO: implement
-
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-                "java.sql.Statement.cancel()");
-    }
-    //CHECKSTYLE.ON: DesignForExtension
-
     @Override
     public void setCursorName(String name) throws SQLException {
         // No-op: "If the database does not support positioned update/delete, this method is a noop"

@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.config.Configuration;
@@ -93,6 +94,11 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
             currentProcess.terminateProcess();
             this.processRunner.set(null);
         }
+    }
+
+    @Override
+    public void cancel() throws CancelException {
+        close();
     }
 
 }

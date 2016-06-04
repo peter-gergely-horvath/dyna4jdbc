@@ -1,5 +1,6 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
+import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
@@ -9,6 +10,7 @@ import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.impl.AbortableOutputStream;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
@@ -37,6 +39,9 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
     private final TypeHandlerFactory typeHandlerFactory;
     private final Configuration configuration;
+    
+    private volatile AbortableOutputStream abortableOutputStreamForStandardOut;
+    private volatile AbortableOutputStream abortableOutputStreamForStandardError;
 
     public DefaultScriptEngineConnection(String parameters, Properties properties)
             throws SQLException, MisconfigurationException {
@@ -115,6 +120,13 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
         synchronized (getEngine()) {
+            
+            this.abortableOutputStreamForStandardOut = new AbortableOutputStream(stdOutputStream);
+            this.abortableOutputStreamForStandardError = new AbortableOutputStream(errorOutputStream);
+                    
+            stdOutputStream = this.abortableOutputStreamForStandardOut;
+            errorOutputStream = this.abortableOutputStreamForStandardError;
+            
             Writer originalWriter = getEngine().getContext().getWriter();
             Writer originalErrorWriter = getEngine().getContext().getErrorWriter();
 
@@ -154,4 +166,11 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
     protected final IOHandlerFactory getIoHandlerFactory() {
         return ioHandlerFactory;
     }
+
+    @Override
+    public final void cancel() throws CancelException {
+        abortableOutputStreamForStandardOut.abort();
+        abortableOutputStreamForStandardError.abort();
+    }
 }
+
