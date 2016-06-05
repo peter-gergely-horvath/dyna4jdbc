@@ -86,7 +86,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
     public final DatabaseMetaData getMetaData() throws SQLException {
         checkNotClosed();
 
-        ScriptEngineFactory factory = getEngine().getFactory();
+        ScriptEngineFactory factory = engine.getFactory();
 
         String engineDescription = null;
         String engineVersion = null;
@@ -119,7 +119,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
-        synchronized (getEngine()) {
+        synchronized (engine) {
             
             this.abortableOutputStreamForStandardOut = new AbortableOutputStream(stdOutputStream);
             this.abortableOutputStreamForStandardError = new AbortableOutputStream(errorOutputStream);
@@ -127,8 +127,8 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
             stdOutputStream = this.abortableOutputStreamForStandardOut;
             errorOutputStream = this.abortableOutputStreamForStandardError;
             
-            Writer originalWriter = getEngine().getContext().getWriter();
-            Writer originalErrorWriter = getEngine().getContext().getErrorWriter();
+            Writer originalWriter = engine.getContext().getWriter();
+            Writer originalErrorWriter = engine.getContext().getErrorWriter();
 
             try {
 
@@ -137,7 +137,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
                     PrintWriter outputPrintWriter =
                             getIoHandlerFactory().newPrintWriter(stdOutputStream, true);
 
-                    getEngine().getContext().setWriter(outputPrintWriter);
+                    engine.getContext().setWriter(outputPrintWriter);
                 }
 
                 if (errorOutputStream != null) {
@@ -145,15 +145,15 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
                     PrintWriter errorPrintWriter =
                             getIoHandlerFactory().newPrintWriter(errorOutputStream, true);
 
-                    getEngine().getContext().setErrorWriter(errorPrintWriter);
+                    engine.getContext().setErrorWriter(errorPrintWriter);
                 }
 
-                getEngine().eval(script);
+                engine.eval(script);
             } catch (ScriptException e) {
                 throw new ScriptExecutionException(e);
             } finally {
-                getEngine().getContext().setWriter(originalWriter);
-                getEngine().getContext().setErrorWriter(originalErrorWriter);
+                engine.getContext().setWriter(originalWriter);
+                engine.getContext().setErrorWriter(originalErrorWriter);
             }
         }
     }
