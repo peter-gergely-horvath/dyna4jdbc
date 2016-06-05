@@ -39,6 +39,11 @@
 			<timezone>Europe/Vienna</timezone>
 		</developer>
 	</developers>
+	
+	<issueManagement>
+		<system>GitHub issue tracker of dyna4jdbc project</system>
+		<url>https://github.com/peter-gergely-horvath/dyna4jdbc/issues</url>
+	</issueManagement>
 
 	<properties>
 		<!-- Project configuration -->
