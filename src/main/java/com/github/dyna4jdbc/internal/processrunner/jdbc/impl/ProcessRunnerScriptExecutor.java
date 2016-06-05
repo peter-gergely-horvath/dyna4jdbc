@@ -2,7 +2,6 @@ package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -10,6 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
+import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor {
@@ -19,13 +19,15 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
     private static final int WAIT_BEFORE_CONSUMING_OUTPUT_MS = 1000;
 
     private final AtomicReference<ProcessRunner> processRunner = new AtomicReference<>();
-
+    private DefaultIOHandlerFactory ioHandlerFactory; 
+    
     private final boolean skipFirstLine;
     private final Configuration configuration;
 
     public ProcessRunnerScriptExecutor(Configuration configuration) {
         this.configuration = configuration;
         this.skipFirstLine = configuration.getSkipFirstLine();
+        ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
     }
 
     @Override
@@ -34,8 +36,9 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
-        try (PrintWriter outputPrintWriter = new PrintWriter(new OutputStreamWriter(
-                stdOutputStream, configuration.getConversionCharset()), true)) {
+        PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true);
+        
+        try  {
 
             ProcessRunner currentProcess = this.processRunner.get();
             if (currentProcess == null || !currentProcess.isProcessRunning()) {
