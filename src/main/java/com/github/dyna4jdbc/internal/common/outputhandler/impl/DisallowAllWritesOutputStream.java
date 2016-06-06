@@ -8,11 +8,11 @@ import java.io.OutputStream;
 /**
  * @author Peter Horvath
  */
-public final class DisallowAllWritesOutputStream extends OutputStream {
+final class DisallowAllWritesOutputStream extends OutputStream {
 
     private final String message;
 
-    public DisallowAllWritesOutputStream(String message) {
+    DisallowAllWritesOutputStream(String message) {
         this.message = message;
     }
 

@@ -3,6 +3,7 @@ package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.impl.CloseSuppressingOutputStream;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import org.renjin.primitives.io.connections.ConnectionTable;
 import org.renjin.script.RenjinScriptEngine;
@@ -45,33 +46,20 @@ public class RenjinScriptEngineConnection extends DefaultScriptEngineConnection 
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
-        PrintWriter originalStdOut = null;
-        PrintWriter originalError = null;
+        PrintWriter originalStdOut = renjinConnectionTable.getStdout().getPrintWriter();
+        PrintWriter originalError = renjinConnectionTable.getStderr().getPrintWriter();
 
-        try {
+        IOHandlerFactory ioHandlerFactory = getIoHandlerFactory();
 
-            originalStdOut = renjinConnectionTable.getStdout().getPrintWriter();
-            originalError = renjinConnectionTable.getStderr().getPrintWriter();
+        try (PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true);
+             PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true)) {
 
-            IOHandlerFactory ioHandlerFactory = getIoHandlerFactory();
-            if (stdOutputStream != null) {
+            renjinConnectionTable.getStdout().setOutputStream(outputPrintWriter);
+            renjinConnectionTable.getStderr().setOutputStream(errorPrintWriter);
 
-                PrintWriter outputPrintWriter =
-                        ioHandlerFactory.newPrintWriter(stdOutputStream, true);
-
-                renjinConnectionTable.getStdout().setOutputStream(outputPrintWriter);
-            }
-
-
-            if (errorOutputStream != null) {
-
-                PrintWriter errorPrintWriter =
-                        ioHandlerFactory.newPrintWriter(errorOutputStream, true);
-
-                renjinConnectionTable.getStderr().setOutputStream(errorPrintWriter);
-            }
-
-            super.executeScriptUsingStreams(script, stdOutputStream, errorOutputStream);
+            super.executeScriptUsingStreams(script,
+                    new CloseSuppressingOutputStream(stdOutputStream),
+                    new CloseSuppressingOutputStream(errorOutputStream));
 
         } finally {
 

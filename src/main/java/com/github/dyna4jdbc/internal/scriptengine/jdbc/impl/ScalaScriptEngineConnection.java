@@ -2,13 +2,15 @@ package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
+import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.impl.CloseSuppressingOutputStream;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import scala.Console;
-import scala.Function0;
 import scala.runtime.AbstractFunction0;
 import scala.tools.nsc.interpreter.IMain;
 
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -54,22 +56,31 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
             String script, OutputStream stdOutputStream, OutputStream errorOutputStream)
             throws ScriptExecutionException {
 
-        if (stdOutputStream == null) {
-            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("stdOutputStream is null");
-        }
+        IOHandlerFactory ioHandlerFactory = getIoHandlerFactory();
 
-        try {
+        // TODO: abort handling??
 
-            Function0<Void> invokerFunction =
-                    createOutputCapturingInvokerFunction(script, stdOutputStream, errorOutputStream);
+        try (PrintStream outPrintStream = ioHandlerFactory.newPrintStream(stdOutputStream);
+             PrintStream errorPrintStream = ioHandlerFactory.newPrintStream(errorOutputStream)) {
 
-            if (errorOutputStream != null) {
+            Console.withOut(outPrintStream, new AbstractFunction0<Void>() {
+                @Override
+                public Void apply() {
 
-                invokerFunction =
-                        createErrorCapturingInvokerFunction(errorOutputStream, invokerFunction);
-            }
 
-            Console.withOut(getIoHandlerFactory().newPrintStream(stdOutputStream), invokerFunction);
+                    Console.withErr(errorPrintStream, new AbstractFunction0<Void>() {
+                        @Override
+                        public Void apply() {
+
+                            doExecuteScriptUsingStreams(script, stdOutputStream, errorOutputStream);
+
+                            return null;
+                        }
+                    });
+
+                    return null;
+                }
+            });
 
         } catch (RuntimeException re) {
             Throwable cause = re.getCause();
@@ -82,40 +93,13 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
 
     }
 
-    private Function0<Void> createErrorCapturingInvokerFunction(
-            final OutputStream errorOutputStream, final Function0<Void> executeScriptFunction) {
-
-        return new AbstractFunction0<Void>() {
-            @Override
-            public Void apply() {
-
-                Console.withErr(getIoHandlerFactory().newPrintStream(errorOutputStream), executeScriptFunction);
-
-                return null;
-            }
-        };
-    }
-
-    private Function0<Void> createOutputCapturingInvokerFunction(
-            String script, OutputStream stdOutputStream, OutputStream errorOutputStream) {
-
-        return new AbstractFunction0<Void>() {
-            @Override
-            public Void apply() {
-
-                doExecuteScriptUsingCustomWriters(script, stdOutputStream, errorOutputStream);
-
-                return null;
-            }
-        };
-
-    }
-
-    private void doExecuteScriptUsingCustomWriters(
+    private void doExecuteScriptUsingStreams(
             String script, OutputStream stdOutputStream, OutputStream errorOutputStream) {
         try {
 
-            super.executeScriptUsingStreams(script, stdOutputStream, errorOutputStream);
+            super.executeScriptUsingStreams(script,
+                    new CloseSuppressingOutputStream(stdOutputStream),
+                    new CloseSuppressingOutputStream(errorOutputStream));
 
         } catch (ScriptExecutionException e) {
             throw new RuntimeException(e);

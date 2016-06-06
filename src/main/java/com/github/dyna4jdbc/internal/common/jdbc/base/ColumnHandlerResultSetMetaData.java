@@ -1,27 +1,27 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata.Nullability;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.SQLDataType;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
-public final class TypeHandlerResultSetMetaData extends AbstractResultSetMetaData {
+public final class ColumnHandlerResultSetMetaData extends AbstractResultSetMetaData {
 
 
-    private final List<TypeHandler> typeHandlerList;
+    private final List<ColumnHandler> columnHandlerList;
 
-    public TypeHandlerResultSetMetaData(List<TypeHandler> typeHandlerList) {
-        this.typeHandlerList = typeHandlerList;
+    public ColumnHandlerResultSetMetaData(List<ColumnHandler> columnHandlerList) {
+        this.columnHandlerList = columnHandlerList;
     }
 
     @Override
     public int getColumnCount() throws SQLException {
-        return typeHandlerList.size();
+        return columnHandlerList.size();
     }
 
     private ColumnMetadata getColumnMetadataBySqlIndex(int sqlColumnIndex) throws SQLException {
@@ -31,9 +31,9 @@ public final class TypeHandlerResultSetMetaData extends AbstractResultSetMetaDat
             throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Invalid column index: " + sqlColumnIndex);
         }
 
-        TypeHandler typeHandler = typeHandlerList.get(javaIndex);
+        ColumnHandler columnHandler = columnHandlerList.get(javaIndex);
 
-        ColumnMetadata columnMetadata = typeHandler.getColumnMetadata();
+        ColumnMetadata columnMetadata = columnHandler.getColumnMetadata();
         if (columnMetadata == null) {
             throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException("columnMetadata is null");
         }

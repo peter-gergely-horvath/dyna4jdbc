@@ -17,9 +17,9 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -32,26 +32,26 @@ import java.util.*;
 /**
  * @author Peter Horvath
  */
-public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
+public abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
-    private final List<TypeHandler> typeHandlers;
+    private final List<ColumnHandler> columnHandlers;
     private final Map<String, Integer> columnNameToColumnIndexMap;
 
-    public TypeHandlerResultSet(Statement statement, List<TypeHandler> typeHandlers) {
+    public ColumnHandlerResultSet(Statement statement, List<ColumnHandler> columnHandlers) {
         super(statement);
-        this.typeHandlers = typeHandlers;
-        columnNameToColumnIndexMap = initColumnNameToColumnIndexMap(typeHandlers);
+        this.columnHandlers = columnHandlers;
+        columnNameToColumnIndexMap = initColumnNameToColumnIndexMap(columnHandlers);
     }
 
-    private static Map<String, Integer> initColumnNameToColumnIndexMap(List<TypeHandler> columnTypeHandlers) {
+    private static Map<String, Integer> initColumnNameToColumnIndexMap(List<ColumnHandler> columnColumnHandlers) {
 
         HashMap<String, Integer> columnNameToColumnIndexMap = new HashMap<>();
 
         int sqlIndex = 1;
 
-        for (TypeHandler typeHandler : columnTypeHandlers) {
+        for (ColumnHandler columnHandler : columnColumnHandlers) {
 
-            ColumnMetadata columnMetadata = typeHandler.getColumnMetadata();
+            ColumnMetadata columnMetadata = columnHandler.getColumnMetadata();
             if (columnMetadata == null) {
                 throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("columnMetadata is null");
             }
@@ -69,18 +69,18 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         return Collections.unmodifiableMap(columnNameToColumnIndexMap);
     }
 
-    protected final List<TypeHandler> getTypeHandlers() {
-        return typeHandlers;
+    protected final List<ColumnHandler> getColumnHandlers() {
+        return columnHandlers;
     }
 
     protected abstract String getRawCellValueBySqlColumnIndex(int sqlIndex) throws SQLException;
 
-    private TypeHandler getTypeHandlerByBySqlIndex(int sqlIndex) throws SQLException {
+    private ColumnHandler getColumnHandlerBySqlIndex(int sqlIndex) throws SQLException {
         final int javaIndex = sqlIndex - 1;
 
-        TypeHandler typeHandler = typeHandlers.get(javaIndex);
+        ColumnHandler columnHandler = columnHandlers.get(javaIndex);
 
-        return typeHandler;
+        return columnHandler;
     }
 
     @Override
@@ -99,7 +99,7 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
 
     @Override
     public final ResultSetMetaData getMetaData() throws SQLException {
-        return new TypeHandlerResultSetMetaData(typeHandlers);
+        return new ColumnHandlerResultSetMetaData(columnHandlers);
     }
 
     @Override
@@ -107,8 +107,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            String convertedValue = typeHandler.covertToString(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            String convertedValue = columnHandler.covertToString(rawCellValue);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -123,8 +123,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Boolean convertedValue = typeHandler.covertToBoolean(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Boolean convertedValue = columnHandler.covertToBoolean(rawCellValue);
             Boolean returnValue = setWasNullBasedOnLastValue(convertedValue);
 
             return returnValue != null ? returnValue.booleanValue() : false;
@@ -141,8 +141,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Byte convertedValue = typeHandler.covertToByte(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Byte convertedValue = columnHandler.covertToByte(rawCellValue);
 
             Byte returnValue = setWasNullBasedOnLastValue(convertedValue);
 
@@ -159,8 +159,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Short convertedValue = typeHandler.covertToShort(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Short convertedValue = columnHandler.covertToShort(rawCellValue);
             Short returnValue = setWasNullBasedOnLastValue(convertedValue);
 
             return returnValue != null ? returnValue.shortValue() : 0;
@@ -176,8 +176,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Integer convertedValue = typeHandler.covertToInteger(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Integer convertedValue = columnHandler.covertToInteger(rawCellValue);
 
             Integer returnValue = setWasNullBasedOnLastValue(convertedValue);
 
@@ -194,8 +194,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Long convertedValue = typeHandler.covertToLong(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Long convertedValue = columnHandler.covertToLong(rawCellValue);
 
             Long returnValue = setWasNullBasedOnLastValue(convertedValue);
 
@@ -212,8 +212,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Float convertedValue = typeHandler.covertToFloat(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Float convertedValue = columnHandler.covertToFloat(rawCellValue);
 
             Float returnValue = setWasNullBasedOnLastValue(convertedValue);
 
@@ -230,8 +230,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Double convertedValue = typeHandler.covertToDouble(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Double convertedValue = columnHandler.covertToDouble(rawCellValue);
 
             Double returnValue = setWasNullBasedOnLastValue(convertedValue);
 
@@ -249,8 +249,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            BigDecimal convertedValue = typeHandler.covertToBigDecimal(rawCellValue, scale);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            BigDecimal convertedValue = columnHandler.covertToBigDecimal(rawCellValue, scale);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -264,8 +264,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            byte[] convertedValue = typeHandler.covertToByteArray(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            byte[] convertedValue = columnHandler.covertToByteArray(rawCellValue);
 
             byte[] returnValue = setWasNullBasedOnLastValue(convertedValue);
 
@@ -282,8 +282,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Date convertedValue = typeHandler.covertToDate(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Date convertedValue = columnHandler.covertToDate(rawCellValue);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -297,8 +297,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Time convertedValue = typeHandler.covertToTime(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Time convertedValue = columnHandler.covertToTime(rawCellValue);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -312,8 +312,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Timestamp convertedValue = typeHandler.covertToTimestamp(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Timestamp convertedValue = columnHandler.covertToTimestamp(rawCellValue);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -327,8 +327,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            InputStream convertedValue = typeHandler.covertToAsciiInputStream(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            InputStream convertedValue = columnHandler.covertToAsciiInputStream(rawCellValue);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -343,8 +343,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            InputStream convertedValue = typeHandler.covertToUnicodeInputStream(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            InputStream convertedValue = columnHandler.covertToUnicodeInputStream(rawCellValue);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -358,8 +358,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            InputStream convertedValue = typeHandler.covertToBinaryInputStream(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            InputStream convertedValue = columnHandler.covertToBinaryInputStream(rawCellValue);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -378,8 +378,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Reader convertedValue = typeHandler.covertToCharacterStream(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Reader convertedValue = columnHandler.covertToCharacterStream(rawCellValue);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -393,8 +393,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            BigDecimal convertedValue = typeHandler.covertToBigDecimal(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            BigDecimal convertedValue = columnHandler.covertToBigDecimal(rawCellValue);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -408,8 +408,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Object convertedValue = typeHandler.covertToObject(rawCellValue, map);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Object convertedValue = columnHandler.covertToObject(rawCellValue, map);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -423,8 +423,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Date convertedValue = typeHandler.covertToDate(rawCellValue, cal);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Date convertedValue = columnHandler.covertToDate(rawCellValue, cal);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -438,8 +438,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Time convertedValue = typeHandler.covertToTime(rawCellValue, cal);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Time convertedValue = columnHandler.covertToTime(rawCellValue, cal);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -453,8 +453,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            Timestamp convertedValue = typeHandler.covertToTimestamp(rawCellValue, cal);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            Timestamp convertedValue = columnHandler.covertToTimestamp(rawCellValue, cal);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -468,8 +468,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            URL convertedValue = typeHandler.covertToURL(rawCellValue);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            URL convertedValue = columnHandler.covertToURL(rawCellValue);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {
@@ -483,8 +483,8 @@ public abstract class TypeHandlerResultSet<T> extends AbstractReadOnlyResultSet<
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
-            TypeHandler typeHandler = getTypeHandlerByBySqlIndex(columnIndex);
-            R convertedValue = typeHandler.covertToObject(rawCellValue, type);
+            ColumnHandler columnHandler = getColumnHandlerBySqlIndex(columnIndex);
+            R convertedValue = columnHandler.covertToObject(rawCellValue, type);
             return setWasNullBasedOnLastValue(convertedValue);
 
         } catch (TypeConversionException tce) {

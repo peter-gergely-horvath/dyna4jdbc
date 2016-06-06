@@ -15,7 +15,8 @@ import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningUtils;
 public abstract class AbstractStatement<T extends java.sql.Connection>
         extends AbstractAutoCloseableJdbcObject implements java.sql.Statement {
 
-    private static final int INVALID_UPDATE_COUNT = -1;
+    protected static final int INVALID_UPDATE_COUNT = -1;
+    protected static final int ZERO_UPDATE_COUNT = 0;
 
 
     private final T connection;
@@ -23,7 +24,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     private SQLWarning sqlWarning;
     private Iterator<ResultSet> resultSetIterator;
-    private int currentUpdateCount;
+    private int currentUpdateCount = INVALID_UPDATE_COUNT;
 
     public AbstractStatement(T connection) {
         this.connection = connection;
@@ -36,10 +37,6 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     protected final void setUpdateCount(int updateCount) {
         this.currentUpdateCount = updateCount;
-    }
-
-    protected final void clearUpdateCount() {
-        this.currentUpdateCount = INVALID_UPDATE_COUNT;
     }
 
     @Override

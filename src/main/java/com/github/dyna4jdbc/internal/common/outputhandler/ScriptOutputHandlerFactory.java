@@ -4,10 +4,10 @@ import java.sql.Statement;
 
 public interface ScriptOutputHandlerFactory {
 
-    SingleResultSetQueryScriptOutputHandler
+    SingleResultSetScriptOutputHandler
         newSingleResultSetQueryScriptOutputHandler(Statement statement, String script, SQLWarningSink warningSink);
 
-    UpdateOrQueryScriptOutputHandler
+    MultipleResultSetScriptOutputHandler
         newUpdateOrQueryScriptOutputHandler(Statement statement, String script, SQLWarningSink warningSink);
 
     UpdateScriptOutputHandler

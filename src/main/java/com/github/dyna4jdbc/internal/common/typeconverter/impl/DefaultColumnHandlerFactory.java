@@ -1,26 +1,26 @@
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-public final class DefaultTypeHandlerFactory implements TypeHandlerFactory {
+public final class DefaultColumnHandlerFactory implements ColumnHandlerFactory {
 
     private final ColumnMetadataFactory columnMetadataFactory;
 
-    private DefaultTypeHandlerFactory(Configuration configuration) {
+    private DefaultColumnHandlerFactory(Configuration configuration) {
         this.columnMetadataFactory = new DefaultColumnMetadataFactory(configuration);
     }
 
-    public static DefaultTypeHandlerFactory getInstance(Configuration configuration) {
-        return new DefaultTypeHandlerFactory(configuration);
+    public static DefaultColumnHandlerFactory getInstance(Configuration configuration) {
+        return new DefaultColumnHandlerFactory(configuration);
     }
 
     @Override
-    public TypeHandler newTypeHandler(
+    public ColumnHandler newTypeHandler(
             int columnNumber, Iterable<String> columnIterable) {
 
         ColumnMetadata columnMetadata = columnMetadataFactory.getColumnMetadata(columnNumber, columnIterable);
@@ -30,10 +30,10 @@ public final class DefaultTypeHandlerFactory implements TypeHandlerFactory {
             return createFormatStringBaseTypeHandler(columnMetadata, formatString);
         }
 
-        return new DefaultTypeHandler(columnMetadata);
+        return new DefaultColumnHandler(columnMetadata);
     }
 
-    private static TypeHandler createFormatStringBaseTypeHandler(
+    private static ColumnHandler createFormatStringBaseTypeHandler(
             ColumnMetadata columnMetadata, String formatString) {
 
         SQLDataType columnType = columnMetadata.getColumnType();
@@ -45,7 +45,7 @@ public final class DefaultTypeHandlerFactory implements TypeHandlerFactory {
         switch (columnType) {
         case TIMESTAMP:
         case TIMESTAMP_WITH_TIMEZONE:
-            return new TimestamptFormatStringTypeHandler(columnMetadata, formatString);
+            return new TimestamptFormatStringColumnHandler(columnMetadata, formatString);
 
         default:
             throw JDBCError.FORMAT_STRING_UNEXPECTED_FOR_COLUMN_TYPE.raiseUncheckedException(

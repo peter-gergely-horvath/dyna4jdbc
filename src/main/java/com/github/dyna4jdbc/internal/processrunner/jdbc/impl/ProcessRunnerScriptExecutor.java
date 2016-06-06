@@ -36,9 +36,9 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
-        PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true);
-        
-        try  {
+        // TODO: errorOutputStream is not used!!
+        try (PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true)
+            /*PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true);*/)  {
 
             ProcessRunner currentProcess = this.processRunner.get();
             if (currentProcess == null || !currentProcess.isProcessRunning()) {

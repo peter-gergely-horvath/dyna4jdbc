@@ -13,8 +13,8 @@ import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFac
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.AbortableOutputStream;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
-import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultTypeHandlerFactory;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
+import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultColumnHandlerFactory;
 import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
@@ -34,12 +34,14 @@ import java.util.Properties;
 
 public class DefaultScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
+    private final Object lock = new Object();
+
     private final ScriptEngine engine;
     private final IOHandlerFactory ioHandlerFactory;
 
-    private final TypeHandlerFactory typeHandlerFactory;
+    private final ColumnHandlerFactory columnHandlerFactory;
     private final Configuration configuration;
-    
+
     private volatile AbortableOutputStream abortableOutputStreamForStandardOut;
     private volatile AbortableOutputStream abortableOutputStreamForStandardError;
 
@@ -67,7 +69,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
         this.configuration =
                 configurationFactory.newConfigurationFromParameters(configurationString, properties);
 
-        this.typeHandlerFactory = DefaultTypeHandlerFactory.getInstance(configuration);
+        this.columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
 
     }
@@ -106,7 +108,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
     protected final AbstractStatement<?> createStatementInternal() throws SQLException {
         checkNotClosed();
         ScriptOutputHandlerFactory outputHandlerFactory =
-                new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
+                new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
 
         return new OutputHandlingStatement<>(this, outputHandlerFactory, this);
     }
@@ -119,41 +121,54 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
-        synchronized (engine) {
-            
-            this.abortableOutputStreamForStandardOut = new AbortableOutputStream(stdOutputStream);
-            this.abortableOutputStreamForStandardError = new AbortableOutputStream(errorOutputStream);
-                    
-            stdOutputStream = this.abortableOutputStreamForStandardOut;
-            errorOutputStream = this.abortableOutputStreamForStandardError;
-            
+        executeScriptUsingAbortableStreams(script,
+                new AbortableOutputStream(stdOutputStream),
+                new AbortableOutputStream(errorOutputStream));
+    }
+
+    private void executeScriptUsingAbortableStreams(
+            String script,
+            AbortableOutputStream stdOutputStream,
+            AbortableOutputStream errorOutputStream) throws ScriptExecutionException {
+
+        synchronized (lock) {
+            /* We synchronize so that the execution of two concurrently commenced Statements cannot interfere
+             * with each other: remember that ScriptEngines store state and hence are NOT thread-safe.
+             * By synchronizing here, we basically implement a mutual exclusion policy for the ScriptEngine.
+             *
+             * Note that we *write* the fields abortableOutputStreamForStandardOut and
+             * abortableOutputStreamForStandardError, while holding the monitor of object lock, while they are
+             * *read*, WITHOUT the lock monitor being held in the method cancel(). For this to work correctly,
+             * both fields HAVE TO be _volatile_.
+             */
+
+            this.abortableOutputStreamForStandardOut = stdOutputStream;
+            this.abortableOutputStreamForStandardError = errorOutputStream;
+
             Writer originalWriter = engine.getContext().getWriter();
             Writer originalErrorWriter = engine.getContext().getErrorWriter();
 
-            try {
+            try (PrintWriter outputPrintWriter = getIoHandlerFactory().newPrintWriter(stdOutputStream, true);
+                 PrintWriter errorPrintWriter = getIoHandlerFactory().newPrintWriter(errorOutputStream, true)) {
 
-                if (stdOutputStream != null) {
 
-                    PrintWriter outputPrintWriter =
-                            getIoHandlerFactory().newPrintWriter(stdOutputStream, true);
+                engine.getContext().setWriter(outputPrintWriter);
+                engine.getContext().setErrorWriter(errorPrintWriter);
 
-                    engine.getContext().setWriter(outputPrintWriter);
-                }
-
-                if (errorOutputStream != null) {
-
-                    PrintWriter errorPrintWriter =
-                            getIoHandlerFactory().newPrintWriter(errorOutputStream, true);
-
-                    engine.getContext().setErrorWriter(errorPrintWriter);
-                }
 
                 engine.eval(script);
+
+
             } catch (ScriptException e) {
                 throw new ScriptExecutionException(e);
+
             } finally {
+
                 engine.getContext().setWriter(originalWriter);
                 engine.getContext().setErrorWriter(originalErrorWriter);
+
+                this.abortableOutputStreamForStandardOut = null;
+                this.abortableOutputStreamForStandardError = null;
             }
         }
     }
@@ -169,8 +184,31 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
     @Override
     public final void cancel() throws CancelException {
-        abortableOutputStreamForStandardOut.abort();
-        abortableOutputStreamForStandardError.abort();
+        /* NOTE: the fields abortableOutputStreamForStandardOut and abortableOutputStreamForStandardOut are
+         * *written* while the monitor of lock is held (synchronized (lock)). We read the fields here, without
+         * synchronizing on lock. This is required, as a thread requesting the execution of retains the monitor
+         * of lock, until the execution of the script is finished (either normally or abruptly). A ScriptEngine
+         * stuck on spinning by an broken user script reatins the lock monitor and hence, the request to
+         * synchronize on lock would be blocked forever (deadlock).
+         *
+         * To avoid such scenarios, we access fields abortableOutputStreamForStandardOut and
+         * abortableOutputStreamForStandardOut without synchronizing on lock. For this to work correctly,
+         * both fields HAVE TO be _volatile_.
+         */
+        try {
+            if (abortableOutputStreamForStandardOut != null) {
+                abortableOutputStreamForStandardOut.abort();
+            }
+
+            if (abortableOutputStreamForStandardError != null) {
+                abortableOutputStreamForStandardError.abort();
+            }
+        } catch (IllegalStateException ise) {
+            throw JDBCError.CANCEL_REQUESTED_ALREADY.raiseUncheckedException(
+                    ise, "Cancellation requested already.");
+        }
+
+
     }
 }
 

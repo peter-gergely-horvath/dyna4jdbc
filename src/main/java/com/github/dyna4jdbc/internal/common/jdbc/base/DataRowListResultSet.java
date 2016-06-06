@@ -1,7 +1,7 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author Peter Horvath
  */
-public abstract class DataRowListResultSet<T> extends TypeHandlerResultSet<T> {
+public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> {
 
     private static final int SQL_INDEX_OFFSET = 1;
     private static final int SQL_INDEX_FIRST_ROW = 1;
@@ -27,8 +27,8 @@ public abstract class DataRowListResultSet<T> extends TypeHandlerResultSet<T> {
     private final Iterator<T> rowIterator;
 
     public DataRowListResultSet(
-            List<T> dataRows, Statement statement, List<TypeHandler> typeHandlers) {
-        super(statement, typeHandlers);
+            List<T> dataRows, Statement statement, List<ColumnHandler> columnHandlers) {
+        super(statement, columnHandlers);
 
         this.rowIterator = dataRows.iterator();
     }

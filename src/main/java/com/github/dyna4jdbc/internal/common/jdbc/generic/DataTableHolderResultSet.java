@@ -4,8 +4,8 @@ import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.datamodel.DataColumn;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
 import com.github.dyna4jdbc.internal.common.jdbc.base.DataRowListResultSet;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandler;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandler;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
 
 import java.sql.*;
 import java.util.*;
@@ -15,47 +15,47 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
     private final DataTable dataTable;
 
     public DataTableHolderResultSet(
-            Statement statement, DataTable dataTable, TypeHandlerFactory typeHandlerFactory) {
+            Statement statement, DataTable dataTable, ColumnHandlerFactory columnHandlerFactory) {
 
-        super(dataTable.getRows(), statement, initTypeHandlers(dataTable, typeHandlerFactory));
+        super(dataTable.getRows(), statement, initTypeHandlers(dataTable, columnHandlerFactory));
         this.dataTable = dataTable;
 
-        if (checkFirstRowIsSkipped(getTypeHandlers())) {
+        if (checkFirstRowIsSkipped(getColumnHandlers())) {
             super.skipNextRowIfPresent();
         }
     }
 
-    private static List<TypeHandler> initTypeHandlers(DataTable dataTable,
-                                                      TypeHandlerFactory typeHandlerFactory) {
+    private static List<ColumnHandler> initTypeHandlers(DataTable dataTable,
+                                                        ColumnHandlerFactory columnHandlerFactory) {
 
-        LinkedList<TypeHandler> typeHandlerList = new LinkedList<>();
+        LinkedList<ColumnHandler> columnHandlerList = new LinkedList<>();
 
         int columnIndex = 0;
 
         for (DataColumn column : dataTable.columnIterable()) {
-            TypeHandler typeHandler = typeHandlerFactory.newTypeHandler(columnIndex++, column);
-            if (typeHandler == null) {
+            ColumnHandler columnHandler = columnHandlerFactory.newTypeHandler(columnIndex++, column);
+            if (columnHandler == null) {
                 throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
-                        "typeHandler is null");
+                        "columnHandler is null");
             }
 
-            typeHandlerList.add(typeHandler);
+            columnHandlerList.add(columnHandler);
         }
 
-        return Collections.unmodifiableList(typeHandlerList);
+        return Collections.unmodifiableList(columnHandlerList);
     }
 
-    private static boolean checkFirstRowIsSkipped(List<TypeHandler> typeHandlers) {
+    private static boolean checkFirstRowIsSkipped(List<ColumnHandler> columnHandlers) {
 
         Boolean shouldTakeFirstRowValue = null;
 
-        final int typeHandlerNumber = typeHandlers.size();
+        final int typeHandlerNumber = columnHandlers.size();
         for (int i = 0; i < typeHandlerNumber; i++) {
 
-            TypeHandler typeHandler = typeHandlers.get(i);
+            ColumnHandler columnHandler = columnHandlers.get(i);
 
             final boolean thisTypeHandlerTakesFirstRowValue =
-                    typeHandler.getColumnMetadata().isConsumesFirstRowValue();
+                    columnHandler.getColumnMetadata().isConsumesFirstRowValue();
 
             if (shouldTakeFirstRowValue == null) {
                 shouldTakeFirstRowValue = thisTypeHandlerTakesFirstRowValue;

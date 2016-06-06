@@ -10,8 +10,8 @@ import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeHandlerFactory;
-import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultTypeHandlerFactory;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
+import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultColumnHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
@@ -19,7 +19,7 @@ import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
 public final class ProcessRunnerConnection extends AbstractConnection {
 
-    private final TypeHandlerFactory typeHandlerFactory;
+    private final ColumnHandlerFactory columnHandlerFactory;
     private final Configuration configuration;
     private final ProcessRunnerScriptExecutor scriptExecutor;
 
@@ -32,7 +32,7 @@ public final class ProcessRunnerConnection extends AbstractConnection {
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
         configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
 
-        typeHandlerFactory = DefaultTypeHandlerFactory.getInstance(configuration);
+        columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
 
         this.scriptExecutor = new ProcessRunnerScriptExecutor(configuration);
     }
@@ -49,7 +49,7 @@ public final class ProcessRunnerConnection extends AbstractConnection {
     protected AbstractStatement<?> createStatementInternal() throws SQLException {
         checkNotClosed();
         ScriptOutputHandlerFactory outputHandlerFactory =
-                new DefaultScriptOutputHandlerFactory(typeHandlerFactory, configuration);
+                new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
 
         return new OutputHandlingStatement<ProcessRunnerConnection>(this, outputHandlerFactory, scriptExecutor);
     }

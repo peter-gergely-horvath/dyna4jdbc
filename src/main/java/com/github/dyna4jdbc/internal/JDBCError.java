@@ -31,6 +31,10 @@ public enum JDBCError {
             SQLState.SYNTAX_OR_ACCESS_RULE_ERROR),
     FORMAT_STRING_INVALID("Format string '%s' is illegal: %s",
             SQLState.SYNTAX_OR_ACCESS_RULE_ERROR),
+    CANCEL_REQUESTED_ALREADY("Cancellation requested already: %s",
+            SQLState.CLIENT_ERROR),
+    CANCEL_FAILED("Failed to cancel the operation: %s",
+            SQLState.SYSTEM_ERROR),
     JDBC_FUNCTION_NOT_SUPPORTED("This JDBC API function is not supported: %s",
             SQLState.FEATURE_NOT_SUPPORTED) {
         @Override
