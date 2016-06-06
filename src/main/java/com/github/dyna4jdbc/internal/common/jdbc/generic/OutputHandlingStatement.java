@@ -47,8 +47,16 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
             return executeQueryInternal(script);
 
         } catch (ScriptExecutionException se) {
-            String message = ExceptionUtils.getRootCauseMessage(se);
-            throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
+
+            Throwable rootCause = ExceptionUtils.getRootCause(se);
+            if (rootCause instanceof AbortedError) {
+                throw JDBCError.EXECUTION_ABORTED_AT_CLIENT_REQUEST.raiseSQLException(
+                        rootCause, rootCause.getMessage());
+            } else {
+                String message = rootCause.getMessage();
+                throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
+            }
+
         } catch (SQLException sqle) {
             throw sqle;
         } catch (RuntimeDyna4JdbcException ex) {
@@ -89,6 +97,9 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
             if (rootCause instanceof OutputDisabledError) {
                 throw JDBCError.USING_STDOUT_FROM_UPDATE.raiseSQLException(rootCause, rootCause.getMessage());
 
+            } else if (rootCause instanceof AbortedError) {
+                throw JDBCError.EXECUTION_ABORTED_AT_CLIENT_REQUEST.raiseSQLException(
+                        rootCause, rootCause.getMessage());
             } else {
                 String message = rootCause.getMessage();
                 throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
@@ -125,8 +136,16 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
             return executeInternal(script);
 
         } catch (ScriptExecutionException se) {
-            String message = ExceptionUtils.getRootCauseMessage(se);
-            throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
+
+            Throwable rootCause = ExceptionUtils.getRootCause(se);
+            if (rootCause instanceof AbortedError) {
+                throw JDBCError.EXECUTION_ABORTED_AT_CLIENT_REQUEST.raiseSQLException(
+                        rootCause, rootCause.getMessage());
+            } else {
+                String message = rootCause.getMessage();
+                throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
+            }
+
         } catch (RuntimeDyna4JdbcException ex) {
             throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
         } catch (AbortedError e) {
