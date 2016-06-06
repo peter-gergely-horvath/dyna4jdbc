@@ -64,7 +64,6 @@ public final class AbortableOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        checkNotAborted();
 
         delegate.close();
     }

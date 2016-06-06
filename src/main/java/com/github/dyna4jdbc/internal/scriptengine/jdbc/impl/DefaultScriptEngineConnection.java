@@ -125,6 +125,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
                 new AbortableOutputStream(stdOutputStream),
                 new AbortableOutputStream(errorOutputStream));
     }
+    //CHECKSTYLE.ON: DesignForExtension
 
     private void executeScriptUsingAbortableStreams(
             String script,
@@ -172,7 +173,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
             }
         }
     }
-    //CHECKSTYLE.ON: DesignForExtension
+
 
     protected final ScriptEngine getEngine() {
         return engine;
@@ -188,7 +189,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
          * *written* while the monitor of lock is held (synchronized (lock)). We read the fields here, without
          * synchronizing on lock. This is required, as a thread requesting the execution of retains the monitor
          * of lock, until the execution of the script is finished (either normally or abruptly). A ScriptEngine
-         * stuck on spinning by an broken user script reatins the lock monitor and hence, the request to
+         * stuck on spinning by an broken user script retains the lock monitor and hence, the request to
          * synchronize on lock would be blocked forever (deadlock).
          *
          * To avoid such scenarios, we access fields abortableOutputStreamForStandardOut and
