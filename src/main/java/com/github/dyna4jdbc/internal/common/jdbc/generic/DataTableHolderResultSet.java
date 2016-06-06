@@ -33,7 +33,7 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
         int columnIndex = 0;
 
         for (DataColumn column : dataTable.columnIterable()) {
-            ColumnHandler columnHandler = columnHandlerFactory.newTypeHandler(columnIndex++, column);
+            ColumnHandler columnHandler = columnHandlerFactory.newColumnHandler(columnIndex++, column);
             if (columnHandler == null) {
                 throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
                         "columnHandler is null");
@@ -64,7 +64,7 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
 
                     final int sqlIndexOfColumn = i + 1;
 
-                    JDBCError.INCONSISTENT_HEADER_SPECIFICATION.raiseUncheckedException(
+                    throw JDBCError.INCONSISTENT_HEADER_SPECIFICATION.raiseUncheckedException(
                             String.format(
                                     "Column specification for column %s is invalid / inconsistent: "
                                     + "ensure SQL type is valid and that explicit declaration / "

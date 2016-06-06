@@ -7,7 +7,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-public final class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
+final class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
 
     // "Pattern: Instances of this class are immutable and are safe for use by
     // multiple concurrent threads."
@@ -18,7 +18,7 @@ public final class DefaultColumnMetadataFactory implements ColumnMetadataFactory
     private final HeuristicsColumnMetadataFactory heuristicsColumnMetadataFactory;
     private final ColumnHeaderColumnMetadataFactory columnHeaderColumnMetadataFactory;
 
-    public DefaultColumnMetadataFactory(Configuration configuration) {
+    DefaultColumnMetadataFactory(Configuration configuration) {
         emptyColumnMetadataFactory = EmptyColumnMetadataFactory.getInstance(configuration);
         heuristicsColumnMetadataFactory = HeuristicsColumnMetadataFactory.getInstance(configuration);
         columnHeaderColumnMetadataFactory = ColumnHeaderColumnMetadataFactory.getInstance(configuration);
@@ -26,12 +26,12 @@ public final class DefaultColumnMetadataFactory implements ColumnMetadataFactory
     }
 
     @Override
-    public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValuesIterable) {
+    public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValues) {
 
-        Iterator<String> iterator = columnValuesIterable.iterator();
+        Iterator<String> iterator = columnValues.iterator();
 
         if (!iterator.hasNext()) {
-            return emptyColumnMetadataFactory.getColumnMetadata(columnIndex, columnValuesIterable);
+            return emptyColumnMetadataFactory.getColumnMetadata(columnIndex, columnValues);
         }
 
         final String firstValueFromColumn = iterator.next();
@@ -40,9 +40,9 @@ public final class DefaultColumnMetadataFactory implements ColumnMetadataFactory
                 firstValueFromColumn != null && HEADER_PATTERN.matcher(firstValueFromColumn).matches();
 
         if (headerSeemsToContainParseInstructions) {
-            return columnHeaderColumnMetadataFactory.getColumnMetadata(columnIndex, columnValuesIterable);
+            return columnHeaderColumnMetadataFactory.getColumnMetadata(columnIndex, columnValues);
         } else {
-            return heuristicsColumnMetadataFactory.getColumnMetadata(columnIndex, columnValuesIterable);
+            return heuristicsColumnMetadataFactory.getColumnMetadata(columnIndex, columnValues);
         }
 
     }

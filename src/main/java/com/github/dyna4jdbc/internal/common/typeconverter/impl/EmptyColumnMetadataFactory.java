@@ -5,7 +5,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata.Nullability;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-public final class EmptyColumnMetadataFactory implements ColumnMetadataFactory {
+final class EmptyColumnMetadataFactory implements ColumnMetadataFactory {
 
     private static final int DEFAULT_COLUMN_DISPLAY_SIZE = 4;
 
@@ -19,7 +19,7 @@ public final class EmptyColumnMetadataFactory implements ColumnMetadataFactory {
     }
 
     @Override
-    public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValuesIterable) {
+    public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValues) {
         DefaultColumnMetadata metadata = new DefaultColumnMetadata();
 
         metadata.setConsumesFirstRowValue(false);

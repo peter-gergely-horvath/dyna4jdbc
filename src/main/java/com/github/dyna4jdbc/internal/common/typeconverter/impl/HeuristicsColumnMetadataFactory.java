@@ -16,9 +16,9 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
 
     @Override
-    public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValuesIterable) {
+    public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValues) {
         DefaultColumnMetadata columnMetaData = new DefaultColumnMetadata();
-        configureForValues(columnMetaData, columnIndex, columnValuesIterable);
+        configureForValues(columnMetaData, columnIndex, columnValues);
         return columnMetaData;
     }
 

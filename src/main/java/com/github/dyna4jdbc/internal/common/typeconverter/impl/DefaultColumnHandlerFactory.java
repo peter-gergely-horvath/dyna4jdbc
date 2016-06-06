@@ -20,10 +20,10 @@ public final class DefaultColumnHandlerFactory implements ColumnHandlerFactory {
     }
 
     @Override
-    public ColumnHandler newTypeHandler(
-            int columnNumber, Iterable<String> columnIterable) {
+    public ColumnHandler newColumnHandler(
+            int columnNumber, Iterable<String> columnValues) {
 
-        ColumnMetadata columnMetadata = columnMetadataFactory.getColumnMetadata(columnNumber, columnIterable);
+        ColumnMetadata columnMetadata = columnMetadataFactory.getColumnMetadata(columnNumber, columnValues);
 
         String formatString = columnMetadata.getFormatString();
         if (formatString != null) {
