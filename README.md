@@ -16,7 +16,7 @@ dyna4jdbc implements (a subset of the) JDBC API, so that reporting tools can int
 
 ## Which languages does it work with?
 
-dyna4jdbc is confirmed (via integration tests executed during every build) to work with the following langages:
+dyna4jdbc is confirmed (via [integration tests](https://github.com/peter-gergely-horvath/dyna4jdbc/tree/master/src/test/java/com/github/dyna4jdbc/integrationtests) executed during every build) to work with the following langages:
 
 * [JavaScript (Java 8 Nashorn)](http://www.oracle.com/technetwork/articles/java/jf14-nashorn-2126515.html)
 * [Groovy](http://groovy-lang.org/)
