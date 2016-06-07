@@ -20,7 +20,7 @@ dyna4jdbc is confirmed (via integration tests executed during every build) to wo
 
 * [JavaScript (Java 8 Nashorn)](http://www.oracle.com/technetwork/articles/java/jf14-nashorn-2126515.html)
 * [Groovy](http://groovy-lang.org/)
-* [Scala](www.scala-lang.org)
+* [Scala](http://www.scala-lang.org)
 * [Python (jython)](http://www.jython.org/)
 * [JRuby](http://jruby.org/)
 * [R language (using Renjin JVM-based interpreter for the R language)](http://www.renjin.org/)
