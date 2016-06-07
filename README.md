@@ -115,7 +115,7 @@ def printRow(String... values) { println values.join("\t") }
 def jsonData = new URL("http://www.google.com/finance/info?infotype=infoquoteall&q=NASDAQ:AAPL,IBM,MSFT,GOOG").text.replaceFirst("//", "")
 def data = new JsonSlurper().parseText(jsonData)
 
-printRow "Ticker::", "Name::", "Open::", "Close::", "Change::"
+printRow "Ticker::", "Name::", "Open::", "Close::", "Change::" // first line with the formatting header
 data.each { printRow it["t"], it["name"], it["op"], it["l_cur"], it["c"] }
 ```
 
