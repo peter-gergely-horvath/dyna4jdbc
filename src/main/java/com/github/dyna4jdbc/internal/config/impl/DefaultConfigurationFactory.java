@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
+import com.github.dyna4jdbc.internal.config.DuplicatedKeyInConfigurationException;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
 public final class DefaultConfigurationFactory implements ConfigurationFactory {
@@ -29,13 +30,18 @@ public final class DefaultConfigurationFactory implements ConfigurationFactory {
                     throw MisconfigurationException.forMessage("properties should only contain String keys!");
                 } else {
                     String key = (String) propKey;
+                    String propertyValue = props.getProperty(key);
 
                     if (internalProps.containsKey(key)) {
-                        throw MisconfigurationException.forMessage(
-                                "duplicated configuration between JDBC URL and properties: %s", key);
+                        String previouslyFoundPropertyValue = internalProps.getProperty(key);
+
+                        throw DuplicatedKeyInConfigurationException.forMessage(
+                                "Duplicated configuration key encountered: %s=%s and %s=%s",
+                                    key, propertyValue, key, previouslyFoundPropertyValue);
                     }
 
-                    internalProps.setProperty(key, props.getProperty(key));
+
+                    internalProps.setProperty(key, propertyValue);
                 }
             }
         }

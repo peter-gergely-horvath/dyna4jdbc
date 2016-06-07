@@ -10,16 +10,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.testng.Assert.assertTrue;
 
 /**
+ * A very simple unit test to prove that all methods of {@code AbstractReadOnlyResultSet}
+ * throw {@code SQLException} with error code JDBC_FUNCTION_NOT_SUPPORTED.
+ *
  * @author Peter Horvath
  */
 public class AbstractReadOnlyResultSetTest {
@@ -68,11 +69,21 @@ public class AbstractReadOnlyResultSetTest {
     public static Iterator<Object[]> updateMethodsAbstractReadOnlyResultSet() throws Exception {
 
         return Stream.of(ResultSet.class.getMethods())
-                .filter(method -> method.getName().startsWith("update"))
+                .filter(filterMethods())
                 .map(method -> mapMethod(method) )
                 .map(m -> new Object[] { m} )
                 .collect(Collectors.toList())
                 .iterator();
+    }
+
+    private static Predicate<Method> filterMethods() {
+
+        Set methodNames = new HashSet<>(Arrays.asList(
+                "deleteRow", "cancelRowUpdates", "moveToInsertRow", "moveToCurrentRow",
+                "rowUpdated", "rowInserted", "rowDeleted", "insertRow" ));
+
+        return method -> method.getName().startsWith("update")
+                || methodNames.contains(method.getName());
     }
 
     public static class MethodReference {

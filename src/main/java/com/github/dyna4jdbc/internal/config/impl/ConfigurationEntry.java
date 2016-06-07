@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.sql.DriverPropertyInfo;
 
+import com.github.dyna4jdbc.internal.config.InvalidConfigurationValueException;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
 enum ConfigurationEntry {
@@ -12,7 +13,7 @@ enum ConfigurationEntry {
         @Override
         void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
             if (value == null || value.length() != 1) {
-                throw MisconfigurationException.forMessage(
+                throw InvalidConfigurationValueException.forMessage(
                         "A singe character is expected for %s, but was: '%s'",
                         this.key, value);
             }
@@ -28,7 +29,7 @@ enum ConfigurationEntry {
         void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
 
             if (value == null || "".equals(value) || "".equals(value.trim())) {
-                throw MisconfigurationException
+                throw InvalidConfigurationValueException
                         .forMessage("Value for %s cannot be null/whitespace only, but was '%s'",
                                 this.key, value);
             }
@@ -43,7 +44,7 @@ enum ConfigurationEntry {
                     break;
 
                 default:
-                    throw MisconfigurationException
+                    throw InvalidConfigurationValueException
                             .forMessage("Value for %s must either be 'true' or 'false', but was '%s'",
                                     this.key, value);
             }
@@ -63,7 +64,7 @@ enum ConfigurationEntry {
         void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
 
             if (value == null || "".equals(value) || "".equals(value.trim())) {
-                throw MisconfigurationException
+                throw InvalidConfigurationValueException
                         .forMessage("Value for %s cannot be null/whitespace only, but was '%s'",
                                 this.key, value);
             }
@@ -78,7 +79,7 @@ enum ConfigurationEntry {
                     break;
 
                 default:
-                    throw MisconfigurationException
+                    throw InvalidConfigurationValueException
                             .forMessage("Value for %s must either be 'true' or 'false', but was '%s'",
                                     this.key, value);
             }
@@ -100,11 +101,11 @@ enum ConfigurationEntry {
 
             try {
                 if (!Charset.isSupported(charset)) {
-                    throw MisconfigurationException.forMessage("Charset is not supported: '%s'", charset);
+                    throw InvalidConfigurationValueException.forMessage("Charset is not supported: '%s'", charset);
                 }
 
             } catch (IllegalCharsetNameException e) {
-                throw MisconfigurationException.forMessage("Charset is illegal: '%s'", charset);
+                throw InvalidConfigurationValueException.forMessage("Charset is illegal: '%s'", charset);
             }
 
             config.setConversionCharset(charset);

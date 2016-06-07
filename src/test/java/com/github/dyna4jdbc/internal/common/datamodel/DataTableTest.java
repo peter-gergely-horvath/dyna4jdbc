@@ -93,7 +93,7 @@ public class DataTableTest {
 
 
 
-        @Test
+    @Test
     public void testAppendedRow() {
 
         assertTrue(dataTable.isEmpty());
@@ -171,7 +171,39 @@ public class DataTableTest {
         } catch (NoSuchElementException nse) {
             // expected exception
         }
+    }
 
+    @Test
+    public void testRowData() {
 
+        List<List<String>> expectedElements = new LinkedList<>();
+
+        for(List<String> row : TEST_DATA) {
+
+            expectedElements.add(row);
+
+            dataTable.appendRow(row);
+        }
+
+        Iterator<List<String>> dataRowIterator = dataTable.iterator();
+
+        assertIteratorReturnsValues(dataRowIterator, expectedElements.toArray());
+    }
+
+    @Test(expectedExceptions = NoSuchElementException.class)
+    public void testEmptyTableGetLastRow() {
+
+        dataTable.getLastRow();
+    }
+
+    @Test
+    public void testNonEmptyTableGetLastRow() {
+
+        for(List<String> row : TEST_DATA) {
+
+            dataTable.appendRow(row);
+
+            assertEquals(dataTable.getLastRow(), row);
+        }
     }
 }
