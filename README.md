@@ -21,9 +21,10 @@ dyna4jdbc is confirmed (via [integration tests](https://github.com/peter-gergely
 * [JavaScript (Java 8 Nashorn)](http://www.oracle.com/technetwork/articles/java/jf14-nashorn-2126515.html)
 * [Groovy](http://groovy-lang.org/)
 * [Scala](http://www.scala-lang.org)
+* [Clojure](https://clojure.org/)
 * [Python (jython)](http://www.jython.org/)
 * [JRuby](http://jruby.org/)
-* [R language (using Renjin JVM-based interpreter for the R language)](http://www.renjin.org/)
+* [R language (using Renjin JVM-based interpreter)](http://www.renjin.org/)
 * [BeanShell](http://www.beanshell.org/)
 
 Any other language, which properly implements [`ScriptEngine` API (JSR-223: Scripting for the JavaTM Platform)](https://jcp.org/aboutJava/communityprocess/final/jsr223/index.html) should work out of the box.
