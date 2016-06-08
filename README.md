@@ -4,17 +4,42 @@ Note: both development and documentation is in progress!
 
 ## Introduction
 
-dyna4jdbc is a JDBC driver implementation written in the Java programming language. It enables the user to execute dynamic JVM languages or console-oriented external programs through the JDBC API, captures the output generated and parses it to a standard JDBC ResultSet, which the caller application can process further. 
+dyna4jdbc is a JDBC driver implementation written in the Java programming language. It enables users to execute dynamic JVM languages or console-oriented external programs through the JDBC API, captures the output generated and parses it to a standard JDBC ResultSet, which the caller application can process further. 
 
 This approach combines the power of dynamic languages with the rich ecosystem of reporting and data visualisation tools, that support the JDBC standard. You can for example write a complex Groovy/Scala/JavaScript/Jython etc. JVM script or call any console application (Shell script, Python, R language, etc.) and visualize or process the results further from your favourite JDBC-compatible tool. 
 
 ## How does it work?
 
-Any dynamic JVM language (including JavaScript, Groovy, Scala, Jython etc.)  which supports the standard Java ScriptEngine API, or console-oriented external application (Shell-script, Perl, Python etc.) can be called via this driver. The output is captured and is assumed to be a TAB (\t) delimited tabular result, which is parsed by the driver can be retrieved as a Java JDBC ResultSet from any JDBC-enabled client application. 
+dyna4jdbc implements (a subset of the) JDBC API, so that reporting tools can interact with it like any other JDBC driver, which actually connect to a database. Internally, Java [`ScriptEngine` API](http://docs.oracle.com/javase/7/docs/technotes/guides/scripting/programmer_guide/) is used to invoke dynamic JVM languages (Scala, JavaScript, Groovy, Jython etc.) or a new process is started to run external console programs. The output is captured and is assumed to be a TAB (\t) delimited tabular result, which is parsed by the driver:
+* tabulators ( `\t` ) separate cells (columns)
+* newline ( `\n` ) starts a new row in the result set
+
+## Which languages does it work with?
+
+dyna4jdbc is confirmed (via [integration tests](https://github.com/peter-gergely-horvath/dyna4jdbc/tree/master/src/test/java/com/github/dyna4jdbc/integrationtests) executed during every build) to work with the following langages:
+
+* [JavaScript (Java 8 Nashorn)](http://www.oracle.com/technetwork/articles/java/jf14-nashorn-2126515.html)
+* [Groovy](http://groovy-lang.org/)
+* [Scala](http://www.scala-lang.org)
+* [Python (jython)](http://www.jython.org/)
+* [JRuby](http://jruby.org/)
+* [R language (using Renjin JVM-based interpreter for the R language)](http://www.renjin.org/)
+* [BeanShell](http://www.beanshell.org/)
+
+Any other language, which properly implements [`ScriptEngine` API (JSR-223: Scripting for the JavaTM Platform)](https://jcp.org/aboutJava/communityprocess/final/jsr223/index.html) should work out of the box.
+
+As of now, the console application support is experimental / implemented partially.
+
+## Tool support
+
+dyna4jdbc should work with any JDBC-compatible tool. It is tested with the following softwares:
+
+* [DbVisualizer](https://www.dbvis.com/)
+* [Squirrel SQL](http://squirrel-sql.sourceforge.net/)
 
 ## Status and availability
 
-As of now, this library is under development and should be considered as "development" or "early alpha", with many known issues and limitations. It is not yet promoted to any library repository. Any potential user will have to clone the git repository and build it manually.  
+As of now, this library is under development and should be considered as "alpha", with some limitations. It is not yet promoted to Maven Central library repository. Any potential user will have to clone the git repository and build it manually.  
 
 ## Dependencies
 
@@ -58,14 +83,13 @@ A first line, which does not match this criteria will be interpreted as part of 
 
 Examples for the first line output:
 
-1. `FOO\tBAR` ==> Columns are named as 1 and 2, while 'FOO' and 'BAR' appear in result set as the first entry.
-2. `FOO::\tBAR::` ==> Columns named as 'FOO' and 'BAR', values from the second output row appear in the result set as first row. 
-3. `FOO:\tBAR:` ==> Columns are named as 1 and 2, while 'FOO:' and 'BAR:' appear in result set as the first entry.
-4. `FOO:\tBAR:` ==> Columns are named as 1 and 2, while 'FOO:' and 'BAR:' appear in result set as the first entry.
-5. `FOO::\tBAR:` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
-6. `FOO:\tBAR::` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
-7. `FOO\tBAR::` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
-8. `FOO::\tBAR:` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
+1. `FOO::\tBAR::` ==> Columns named as 'FOO' and 'BAR', values from the second output row appear in the result set as first row. 
+2. `FOO:\tBAR:` ==> Columns are named as 1 and 2, while 'FOO:' and 'BAR:' appear in result set as the first entry.
+3. `FOO\tBAR` ==> Columns are named as 1 and 2, while 'FOO' and 'BAR' appear in result set as the first entry.
+4. `FOO::\tBAR:` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
+5. `FOO:\tBAR::` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
+6. `FOO\tBAR::` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
+7. `FOO::\tBAR:` ==> Error condition detected by the driver, error INCONSISTENT_HEADER_SPECIFICATION is emitted.
 
 Check the samples on details regarding how to generate output properly.
 
@@ -77,7 +101,7 @@ Check the samples on details regarding how to generate output properly.
 
 In addition to the driver JAR itself, the full Groovy language pack has to be available on the classpath.
 
-The following sample demonstrates fetching JSON data from Google Finance Internet service and transforming it into a tabular format. (NOTE: This is just a *technical sample*: please consule Google Use of Service Conditions before you actually use any data from their API!) 
+The following sample demonstrates fetching JSON data from Google Finance Internet service and transforming it into a tabular format. (NOTE: This is just a *technical sample* to demonstrate the capabilities of the tool: please consult Google Use of Service Conditions before you actually use any data from their API!) 
 
 JDBC Connect URL: `jdbc:dyna4jdbc:scriptengine:groovy`
 
@@ -91,7 +115,7 @@ def printRow(String... values) { println values.join("\t") }
 def jsonData = new URL("http://www.google.com/finance/info?infotype=infoquoteall&q=NASDAQ:AAPL,IBM,MSFT,GOOG").text.replaceFirst("//", "")
 def data = new JsonSlurper().parseText(jsonData)
 
-printRow "Ticker::", "Name::", "Open::", "Close::", "Change::"
+printRow "Ticker::", "Name::", "Open::", "Close::", "Change::" // first line with the formatting header
 data.each { printRow it["t"], it["name"], it["op"], it["l_cur"], it["c"] }
 ```
 
