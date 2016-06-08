@@ -51,7 +51,7 @@ public final class ProcessRunnerConnection extends AbstractConnection {
         ScriptOutputHandlerFactory outputHandlerFactory =
                 new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
 
-        return new OutputHandlingStatement<ProcessRunnerConnection>(this, outputHandlerFactory, scriptExecutor);
+        return new OutputHandlingStatement<>(this, outputHandlerFactory, scriptExecutor);
     }
 
     @Override

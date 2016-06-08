@@ -62,6 +62,7 @@
         <jython-shaded.version>2.5.3</jython-shaded.version>
         <jruby.version>9.1.2.0</jruby.version>
         <beanshell.version>2.0b5</beanshell.version>
+        <clojure.version>1.8.0</clojure.version>
 
 		<!-- Used to generate build information -->
 		<product-name>${project.name}</product-name>
@@ -164,8 +165,22 @@
             <groupId>org.renjin</groupId>
             <artifactId>renjin-script-engine</artifactId>
             <version>RELEASE</version>
+            <scope>compile</scope>
         </dependency>
 
+		<dependency>
+			<groupId>org.clojure</groupId>
+			<artifactId>clojure</artifactId>
+			<version>${clojure.version}</version>
+            <scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.clojars.ato</groupId>
+			<artifactId>clojure-jsr223</artifactId>
+			<version>1.5.1</version>
+            <scope>test</scope>
+		</dependency>
 
 	</dependencies>
 
@@ -175,6 +190,11 @@
 			<id>bedatadriven</id>
 			<name>bedatadriven public repo</name>
 			<url>https://nexus.bedatadriven.com/content/groups/public/</url>
+		</repository>
+		<repository>
+			<id>clojars</id>
+			<name>Clojars repository</name>
+			<url>https://clojars.org/repo</url>
 		</repository>
 	</repositories>
 
