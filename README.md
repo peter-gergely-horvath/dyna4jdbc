@@ -1,4 +1,6 @@
-# dyna4jdbc
+# dyna4jdbc: 
+
+A JDBC driver for running dynamic JVM languages and external programs.
 
 ## Introduction
 
