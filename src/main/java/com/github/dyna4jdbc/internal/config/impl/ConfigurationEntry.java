@@ -3,6 +3,8 @@ package com.github.dyna4jdbc.internal.config.impl;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.sql.DriverPropertyInfo;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import com.github.dyna4jdbc.internal.config.InvalidConfigurationValueException;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
@@ -109,6 +111,27 @@ enum ConfigurationEntry {
             }
 
             config.setConversionCharset(charset);
+        }
+    },
+    ENF_OF_DATA_REGEX("endOfDataRegex", null,
+                                "The regular expression to detect end of data for interactive console applications.") {
+        @Override
+        void setConfiguration(ConfigurationImpl config, String endOfDataRegex) throws MisconfigurationException {
+
+            if(endOfDataRegex != null) {
+
+                try {
+
+                    Pattern pattern = Pattern.compile(endOfDataRegex);
+
+                    config.setEndOfDataPattern(pattern);
+                }
+                catch (PatternSyntaxException pse) {
+                    throw InvalidConfigurationValueException.forMessage(
+                            "The value for %s cannot be interpreted as a Java Regular Expression: '%s'",
+                            this.key, endOfDataRegex);
+                }
+            }
         }
     };
 

@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
@@ -23,10 +24,12 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
     
     private final boolean skipFirstLine;
     private final Configuration configuration;
+    private final Pattern endOfDataPattern;
 
     public ProcessRunnerScriptExecutor(Configuration configuration) {
         this.configuration = configuration;
         this.skipFirstLine = configuration.getSkipFirstLine();
+        this.endOfDataPattern = configuration.getEndOfDataPattern();
         ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
     }
 
@@ -42,7 +45,7 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
 
             ProcessRunner currentProcess = this.processRunner.get();
             if (currentProcess == null || !currentProcess.isProcessRunning()) {
-                currentProcess = ProcessRunner.start(script, configuration.getConversionCharset());
+                currentProcess = ProcessRunner.start(script, configuration);
                 this.processRunner.set(currentProcess);
             } else {
                 currentProcess.writeToStandardInput(script);
@@ -58,6 +61,7 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
             }
 
             String outputCaptured = null;
+            String errorCaptured = null;
 
             while (true) {
 
@@ -65,8 +69,7 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
                     outputCaptured = currentProcess.pollStandardOutput(
                             MINIMAL_POLL_INTERVAL_MS, TimeUnit.SECONDS);
                 } else {
-                    outputCaptured = currentProcess.pollStandardOutput(
-                            DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
+
 
                     if (outputCaptured == null) {
                         outputCaptured = currentProcess.pollStandardError(
@@ -78,7 +81,13 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
                     break;
 
                 } else {
-                    outputPrintWriter.println(outputCaptured);
+
+                    if(endOfDataPattern != null
+                            && endOfDataPattern.matcher(outputCaptured).matches()) {
+                            break;
+                    } else {
+                        outputPrintWriter.println(outputCaptured);
+                    }
                 }
             }
 

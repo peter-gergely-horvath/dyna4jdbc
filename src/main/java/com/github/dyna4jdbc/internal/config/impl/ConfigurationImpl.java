@@ -2,12 +2,15 @@ package com.github.dyna4jdbc.internal.config.impl;
 
 import com.github.dyna4jdbc.internal.config.Configuration;
 
+import java.util.regex.Pattern;
+
 class ConfigurationImpl implements Configuration {
 
     private char cellSeparator;
     private boolean skipFirstLine;
     private boolean preferMultipleResultSets;
     private String conversionCharset;
+    private Pattern endOfDataPattern;
 
     @Override
     public char getCellSeparator() {
@@ -32,6 +35,11 @@ class ConfigurationImpl implements Configuration {
         return preferMultipleResultSets;
     }
 
+    @Override
+    public Pattern getEndOfDataPattern() {
+        return endOfDataPattern;
+    }
+
     public void setConversionCharset(String conversionCharset) {
         this.conversionCharset = conversionCharset;
     }
@@ -42,6 +50,10 @@ class ConfigurationImpl implements Configuration {
 
     public void setPreferMultipleResultSets(boolean preferMultipleResultSets) {
         this.preferMultipleResultSets = preferMultipleResultSets;
+    }
+
+    public void setEndOfDataPattern(Pattern endOfDataPattern) {
+        this.endOfDataPattern = endOfDataPattern;
     }
 
 }

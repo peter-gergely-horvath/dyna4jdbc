@@ -1,5 +1,7 @@
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
+import com.github.dyna4jdbc.internal.config.Configuration;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,8 +35,8 @@ public final class ProcessRunner {
 
     private final String endOfStreamIndicator = UUID.randomUUID().toString();
 
-    static ProcessRunner start(String command, String conversionCharset) throws ProcessExecutionException {
-        return new ProcessRunner(command, conversionCharset);
+    static ProcessRunner start(String command, Configuration configuration) throws ProcessExecutionException {
+        return new ProcessRunner(command, configuration.getConversionCharset());
     }
 
     private ProcessRunner(String command, String conversionCharset) throws ProcessExecutionException {
