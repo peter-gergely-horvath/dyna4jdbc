@@ -1,10 +1,8 @@
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.*;
 import java.util.regex.Pattern;
 
 import com.github.dyna4jdbc.internal.CancelException;
@@ -15,21 +13,25 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 
 public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor {
 
-    private static final int MINIMAL_POLL_INTERVAL_MS = 5;
-    private static final int DEFAULT_POLL_INTERVAL_MS = 50;
-    private static final int WAIT_BEFORE_CONSUMING_OUTPUT_MS = 1000;
+    private static final int DEFAULT_POLL_INTERVAL_MS = 500;
 
-    private final AtomicReference<ProcessRunner> processRunner = new AtomicReference<>();
+    private volatile ProcessRunner processRunner;
+
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    
     private DefaultIOHandlerFactory ioHandlerFactory; 
     
     private final boolean skipFirstLine;
     private final Configuration configuration;
     private final Pattern endOfDataPattern;
 
+    private long expirationIntervalMs;
+
     public ProcessRunnerScriptExecutor(Configuration configuration) {
         this.configuration = configuration;
         this.skipFirstLine = configuration.getSkipFirstLine();
         this.endOfDataPattern = configuration.getEndOfDataPattern();
+        this.expirationIntervalMs = configuration.getExternalCallQuietPeriodThresholdMs();
         ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
     }
 
@@ -39,78 +41,114 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
-        // TODO: errorOutputStream is not used!!
-        try (PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true)
-            /*PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true);*/)  {
+        try (PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true);
+            PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true))  {
 
-            ProcessRunner currentProcess = this.processRunner.get();
-            if (currentProcess == null || !currentProcess.isProcessRunning()) {
-                currentProcess = ProcessRunner.start(script, configuration);
-                this.processRunner.set(currentProcess);
+            if (this.processRunner == null) {
+                this.processRunner = ProcessRunner.start(script, configuration);
+            } else if (this.processRunner != null && !this.processRunner.isProcessRunning()) {
+                this.processRunner.discard();
+                this.processRunner = ProcessRunner.start(script, configuration);
             } else {
-                currentProcess.writeToStandardInput(script);
+                this.processRunner.writeToStandardInput(script);
             }
 
-            Thread.sleep(WAIT_BEFORE_CONSUMING_OUTPUT_MS);
+            Future<Void> standardOutFuture = executorService.submit(
+                    stdOutWatcher(outputPrintWriter, processRunner));
 
-            if (skipFirstLine) {
-                // skip and discard first result line
-                String discardedOutput = currentProcess.pollStandardOutput(
-                        MINIMAL_POLL_INTERVAL_MS, TimeUnit.SECONDS);
-                System.out.println(discardedOutput);
-            }
+            Future<Void> standardErrorFuture = executorService.submit(
+                    stdErrWatcher(errorPrintWriter, processRunner));
 
-            String outputCaptured = null;
-            String errorCaptured = null;
+            standardOutFuture.get();
+            standardErrorFuture.get();
 
-            while (true) {
-
-                if (currentProcess.isErrorEmpty()) {
-                    outputCaptured = currentProcess.pollStandardOutput(
-                            MINIMAL_POLL_INTERVAL_MS, TimeUnit.SECONDS);
-                } else {
-
-
-                    if (outputCaptured == null) {
-                        outputCaptured = currentProcess.pollStandardError(
-                                DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
-                    }
-                }
-
-                if (outputCaptured == null) {
-                    break;
-
-                } else {
-
-                    if(endOfDataPattern != null
-                            && endOfDataPattern.matcher(outputCaptured).matches()) {
-                            break;
-                    } else {
-                        outputPrintWriter.println(outputCaptured);
-                    }
-                }
-            }
-
-        } catch (ProcessExecutionException | IOException e) {
-            throw new ScriptExecutionException(e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ScriptExecutionException("Interrupted", e);
+
+        } catch (ExecutionException e) {
+            Throwable actualThrowable = e.getCause();
+            throw new ScriptExecutionException(actualThrowable);
+
+        } catch (ProcessExecutionException e) {
+            throw new ScriptExecutionException(e);
         }
     }
 
-    public void close() {
 
-        ProcessRunner currentProcess = this.processRunner.get();
-        if (currentProcess != null) {
-            currentProcess.terminateProcess();
-            this.processRunner.set(null);
-        }
+
+    private Callable<Void> stdOutWatcher(final PrintWriter outputPrintWriter, final ProcessRunner currentProcess) {
+        return () -> {
+
+            long expirationTime = System.currentTimeMillis() + expirationIntervalMs;
+
+            boolean firstLine = true;
+
+            while (System.currentTimeMillis()  < expirationTime) {
+                String outputCaptured = currentProcess.pollStandardOutput(
+                        DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
+
+                if (outputCaptured != null) {
+
+                    expirationTime = System.currentTimeMillis() + expirationIntervalMs;
+
+                    if (endOfDataPattern != null
+                            && endOfDataPattern.matcher(outputCaptured).matches()) {
+                        break;
+                    }
+
+                    if (firstLine) {
+                        firstLine = false;
+
+                        if (skipFirstLine) {
+                            continue;
+                        }
+                    }
+
+                    outputPrintWriter.println(outputCaptured);
+                }
+            }
+
+            return null;
+        };
+    }
+
+    private Callable<Void> stdErrWatcher(final PrintWriter errorPrintWriter, final ProcessRunner currentProcess) {
+        return () -> {
+
+            long expirationTime = System.currentTimeMillis() + expirationIntervalMs;
+
+            while (System.currentTimeMillis()  < expirationTime) {
+                String outputCaptured = currentProcess.pollStandardError(
+                        DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
+
+                if (outputCaptured != null) {
+                    expirationTime = System.currentTimeMillis() + expirationIntervalMs;
+                    errorPrintWriter.println(outputCaptured);
+                }
+            }
+
+            return null;
+        };
+    }
+
+    public void close() {
+        abortProcessIfRunning();
     }
 
     @Override
     public void cancel() throws CancelException {
-        close();
+        abortProcessIfRunning();
+    }
+
+    private void abortProcessIfRunning() {
+        executorService.shutdownNow();
+
+        ProcessRunner currentProcess = processRunner;
+        if (currentProcess != null) {
+            currentProcess.terminateProcess();
+            processRunner = null;
+        }
     }
 
 }

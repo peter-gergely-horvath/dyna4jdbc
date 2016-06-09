@@ -11,6 +11,8 @@ class ConfigurationImpl implements Configuration {
     private boolean preferMultipleResultSets;
     private String conversionCharset;
     private Pattern endOfDataPattern;
+    private long externalCallQuietPeriodThresholdMs;
+
 
     @Override
     public char getCellSeparator() {
@@ -40,6 +42,13 @@ class ConfigurationImpl implements Configuration {
         return endOfDataPattern;
     }
 
+    @Override
+    public long getExternalCallQuietPeriodThresholdMs() {
+        return externalCallQuietPeriodThresholdMs;
+    }
+
+
+
     public void setConversionCharset(String conversionCharset) {
         this.conversionCharset = conversionCharset;
     }
@@ -54,6 +63,10 @@ class ConfigurationImpl implements Configuration {
 
     public void setEndOfDataPattern(Pattern endOfDataPattern) {
         this.endOfDataPattern = endOfDataPattern;
+    }
+
+    public void setExternalCallQuietPeriodThresholdMs(long externalCallQuietPeriodThresholdMs) {
+        this.externalCallQuietPeriodThresholdMs = externalCallQuietPeriodThresholdMs;
     }
 
 }

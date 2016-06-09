@@ -118,19 +118,47 @@ enum ConfigurationEntry {
         @Override
         void setConfiguration(ConfigurationImpl config, String endOfDataRegex) throws MisconfigurationException {
 
-            if(endOfDataRegex != null) {
+            if (endOfDataRegex != null) {
 
                 try {
 
                     Pattern pattern = Pattern.compile(endOfDataRegex);
 
                     config.setEndOfDataPattern(pattern);
-                }
-                catch (PatternSyntaxException pse) {
+
+                } catch (PatternSyntaxException pse) {
                     throw InvalidConfigurationValueException.forMessage(
                             "The value for %s cannot be interpreted as a Java Regular Expression: '%s'",
                             this.key, endOfDataRegex);
                 }
+            }
+        }
+    },
+    EXTERNAL_COMMAND_NO_OUTPUT_EXPIRATION_INTERVAL_MS("externalCallQuietPeriodMeansFinishedThreshold_ms", "3000",
+            "If an external program does not print anything more, it is considered as finish after this timespan (ms). "
+                    + "Default is 3000") {
+        @Override
+        void setConfiguration(ConfigurationImpl config, String value)
+                throws MisconfigurationException {
+
+
+            try {
+
+                Long threshold = Long.valueOf(value);
+
+                if (threshold <= 0) {
+                    throw InvalidConfigurationValueException.forMessage(
+                            "The value for %s must be a positive value", this.key);
+                }
+
+                config.setExternalCallQuietPeriodThresholdMs(threshold);
+
+            } catch (NumberFormatException nfe) {
+
+                throw InvalidConfigurationValueException.forMessage(
+                        "The value for %s cannot be interpreted as a number: '%s'",
+                        this.key, value);
+
             }
         }
     };

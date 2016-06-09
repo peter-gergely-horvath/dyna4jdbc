@@ -9,5 +9,5 @@ public interface Configuration {
     boolean getPreferMultipleResultSets();
     String getConversionCharset();
     Pattern getEndOfDataPattern();
-
+    long getExternalCallQuietPeriodThresholdMs();
 }

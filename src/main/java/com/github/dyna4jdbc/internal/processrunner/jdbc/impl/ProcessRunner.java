@@ -1,22 +1,14 @@
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
+import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 public final class ProcessRunner {
@@ -27,7 +19,8 @@ public final class ProcessRunner {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    private final AtomicReference<Process> processReference = new AtomicReference<>();
+    private Process processReference;
+
     private final PrintWriter processInputWriter;
 
     private final BlockingQueue<String> standardOutputStreamContentQueue;
@@ -36,25 +29,11 @@ public final class ProcessRunner {
     private final String endOfStreamIndicator = UUID.randomUUID().toString();
 
     static ProcessRunner start(String command, Configuration configuration) throws ProcessExecutionException {
-        return new ProcessRunner(command, configuration.getConversionCharset());
-    }
-
-    private ProcessRunner(String command, String conversionCharset) throws ProcessExecutionException {
 
         try {
-            Runtime runtime = Runtime.getRuntime();
+            Process process = Runtime.getRuntime().exec(command);
 
-            Process process = runtime.exec(command);
-
-            processReference.set(process);
-
-            processInputWriter = new PrintWriter(new OutputStreamWriter(
-                    process.getOutputStream(), conversionCharset), true);
-
-            BufferedReader stdOut = new BufferedReader(
-                    new InputStreamReader(process.getInputStream(), conversionCharset));
-            BufferedReader stdErr = new BufferedReader(
-                    new InputStreamReader(process.getErrorStream(), conversionCharset));
+            ProcessRunner processRunner = new ProcessRunner(process, configuration);
 
             final int partiesToWait = 3;
             /*
@@ -65,58 +44,75 @@ public final class ProcessRunner {
              */
             CyclicBarrier cyclicBarrier = new CyclicBarrier(partiesToWait);
 
-            standardOutputStreamContentQueue = new LinkedBlockingQueue<>();
-            errorStreamContentQueue = new LinkedBlockingQueue<>();
+            BufferedReader stdOut = new BufferedReader(
+                    new InputStreamReader(processRunner.processReference.getInputStream(),
+                            configuration.getConversionCharset()));
 
-            executorService.execute(new BufferedReaderToBlockingQueueRunnable(
+            BufferedReader stdErr = new BufferedReader(
+                    new InputStreamReader(processRunner.processReference.getErrorStream(),
+                            configuration.getConversionCharset()));
+
+
+            BufferedReaderToBlockingQueueRunnable stdOutReader = new BufferedReaderToBlockingQueueRunnable(
                     String.format("StdOut reader of '%s'", command), stdOut,
-                    standardOutputStreamContentQueue, cyclicBarrier));
-            executorService.execute(new BufferedReaderToBlockingQueueRunnable(
+                    processRunner.standardOutputStreamContentQueue, cyclicBarrier, processRunner.endOfStreamIndicator);
+
+            BufferedReaderToBlockingQueueRunnable stdErrReader = new BufferedReaderToBlockingQueueRunnable(
                     String.format("StdErr reader of '%s'", command), stdErr,
-                    errorStreamContentQueue, cyclicBarrier));
+                    processRunner.errorStreamContentQueue, cyclicBarrier, processRunner.endOfStreamIndicator);
+
+            processRunner.executorService.execute(stdOutReader);
+            processRunner.executorService.execute(stdErrReader);
 
             cyclicBarrier.await(DEFAULT_TIMEOUT_MILLI_SECONDS, TimeUnit.MILLISECONDS);
+
+            return processRunner;
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ProcessExecutionException(e);
         } catch (BrokenBarrierException | TimeoutException | IOException e) {
             throw new ProcessExecutionException(e);
-        } finally {
-            LOGGER.exiting("ProcessRunner", "<init>");
         }
+    }
+
+    private ProcessRunner(Process process, Configuration configuration) throws ProcessExecutionException {
+
+        DefaultIOHandlerFactory ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
+
+
+            processReference = process;
+
+            processInputWriter = ioHandlerFactory.newPrintWriter(process.getOutputStream(), true);
+
+            standardOutputStreamContentQueue = new LinkedBlockingQueue<>();
+            errorStreamContentQueue = new LinkedBlockingQueue<>();
     }
 
     private void checkProcessState() {
 
-        Process process = processReference.get();
-        if (process == null) {
+        if (processReference == null) {
             throw new IllegalStateException("Process is not running");
         }
     }
 
     boolean isProcessRunning() {
-        Process process = processReference.get();
+        Process process = processReference;
         return process != null && process.isAlive();
     }
 
     void terminateProcess() {
+        checkProcessState();
 
         executorService.shutdownNow();
-        Process process = processReference.get();
-        process.destroyForcibly();
-        processReference.set(null);
+        processReference.destroyForcibly();
+        processReference = null;
     }
 
-    boolean isOutputEmpty() {
-        String stdOutEntry = standardOutputStreamContentQueue.peek();
-        return (stdOutEntry == null || endOfStreamIndicator.equals(stdOutEntry));
+    void discard() {
 
-    }
-
-    boolean isErrorEmpty() {
-        String stdErrorOutputEntry = errorStreamContentQueue.peek();
-        return (stdErrorOutputEntry == null || endOfStreamIndicator.equals(stdErrorOutputEntry));
+        executorService.shutdownNow();
+        processReference = null;
     }
 
     String pollStandardOutput(long timeout, TimeUnit unit) throws IOException {
@@ -161,21 +157,23 @@ public final class ProcessRunner {
         processInputWriter.flush();
     }
 
-    private final class BufferedReaderToBlockingQueueRunnable implements Runnable {
+    private static final class BufferedReaderToBlockingQueueRunnable implements Runnable {
         private final String identifier;
         private final BufferedReader bufferedReader;
         private final BlockingQueue<String> blockingQueue;
         private CyclicBarrier cyclicBarrier;
+        private final String endOfStreamIndicator;
 
         private BufferedReaderToBlockingQueueRunnable(String identifier, BufferedReader bufferedReader,
                                                       BlockingQueue<String> blockingQueue,
-                                                      CyclicBarrier cyclicBarrier) {
+                                                      CyclicBarrier cyclicBarrier,
+                                                      String endOfStreamIndicator) {
 
             this.identifier = identifier;
             this.bufferedReader = bufferedReader;
             this.blockingQueue = blockingQueue;
             this.cyclicBarrier = cyclicBarrier;
-
+            this.endOfStreamIndicator = endOfStreamIndicator;
         }
 
         @Override
