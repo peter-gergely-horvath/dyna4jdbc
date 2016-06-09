@@ -28,6 +28,10 @@ public final class ProcessRunner {
 
     private final String endOfStreamIndicator = UUID.randomUUID().toString();
 
+    private boolean standardOutReachedEnd = false;
+    private boolean standardErrorReachedEnd = false;
+
+
     static ProcessRunner start(String command, Configuration configuration) throws ProcessExecutionException {
 
         try {
@@ -39,8 +43,8 @@ public final class ProcessRunner {
             /*
             CyclicBarrier should wait for three parties:
                 1.) Current thread
-                2.) Process standard output reader thread
-                3.) Process standard error reader thread
+                2.) stdOutReader thread
+                3.) stdErrReader thread
              */
             CyclicBarrier cyclicBarrier = new CyclicBarrier(partiesToWait);
 
@@ -71,6 +75,7 @@ public final class ProcessRunner {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ProcessExecutionException(e);
+
         } catch (BrokenBarrierException | TimeoutException | IOException e) {
             throw new ProcessExecutionException(e);
         }
@@ -115,29 +120,43 @@ public final class ProcessRunner {
         processReference = null;
     }
 
+    boolean isStandardOutReachedEnd() {
+        return standardOutReachedEnd;
+    }
+
     String pollStandardOutput(long timeout, TimeUnit unit) throws IOException {
 
         checkProcessState();
 
-        return pollQueue(standardOutputStreamContentQueue, endOfStreamIndicator, timeout, unit);
+        try {
+            String result = standardOutputStreamContentQueue.poll(timeout, unit);
+
+            if (endOfStreamIndicator.equals(result)) {
+                this.standardOutReachedEnd = true;
+                result = null;
+            }
+
+            return result;
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException(e);
+        }
+    }
+
+    boolean isStandardErrorReachedEnd() {
+        return standardErrorReachedEnd;
     }
 
     String pollStandardError(long timeout, TimeUnit unit) throws IOException {
 
         checkProcessState();
 
-        return pollQueue(errorStreamContentQueue, endOfStreamIndicator, timeout, unit);
-    }
-
-    private static String pollQueue(
-            BlockingQueue<String> queue,
-            String endOfStreamIndicator,
-            long timeout, TimeUnit unit) throws IOException {
-
         try {
-            String result = queue.poll(timeout, unit);
+            String result = errorStreamContentQueue.poll(timeout, unit);
 
             if (endOfStreamIndicator.equals(result)) {
+                this.standardErrorReachedEnd = true;
                 result = null;
             }
 

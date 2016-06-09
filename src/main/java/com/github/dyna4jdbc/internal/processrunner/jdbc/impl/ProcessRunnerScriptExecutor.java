@@ -84,11 +84,18 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
 
             boolean firstLine = true;
 
-            while (System.currentTimeMillis()  < expirationTime) {
+            while (System.currentTimeMillis() < expirationTime) {
+
                 String outputCaptured = currentProcess.pollStandardOutput(
                         DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
 
-                if (outputCaptured != null) {
+                if (outputCaptured == null) {
+
+                    if (currentProcess.isStandardOutReachedEnd()) {
+                        break;
+                    }
+
+                } else {
 
                     expirationTime = System.currentTimeMillis() + expirationIntervalMs;
 
@@ -118,11 +125,19 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
 
             long expirationTime = System.currentTimeMillis() + expirationIntervalMs;
 
-            while (System.currentTimeMillis()  < expirationTime) {
+            while (System.currentTimeMillis() < expirationTime) {
+
                 String outputCaptured = currentProcess.pollStandardError(
                         DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
 
-                if (outputCaptured != null) {
+                if (outputCaptured == null) {
+
+                    if (currentProcess.isStandardErrorReachedEnd()) {
+                        break;
+                    }
+
+                } else {
+
                     expirationTime = System.currentTimeMillis() + expirationIntervalMs;
                     errorPrintWriter.println(outputCaptured);
                 }
