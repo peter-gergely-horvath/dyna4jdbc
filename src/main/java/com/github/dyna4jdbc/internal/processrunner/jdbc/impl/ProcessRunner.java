@@ -11,16 +11,16 @@ import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
-public final class ProcessRunner {
+final class ProcessRunner {
 
     private static final Logger LOGGER = Logger.getLogger(ProcessRunner.class.getName());
 
     private static final int DEFAULT_TIMEOUT_MILLI_SECONDS = 10_000;
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
-
     private Process processReference;
 
+    private final ExecutorService executorService;
+    
     private final PrintWriter processInputWriter;
 
     private final BlockingQueue<String> standardOutputStreamContentQueue;
@@ -32,12 +32,16 @@ public final class ProcessRunner {
     private boolean standardErrorReachedEnd = false;
 
 
-    static ProcessRunner start(String command, Configuration configuration) throws ProcessExecutionException {
+    static ProcessRunner start(
+            String command, 
+            Configuration configuration, 
+            ExecutorService executorService) 
+                    throws ProcessExecutionException {
 
         try {
             Process process = Runtime.getRuntime().exec(command);
 
-            ProcessRunner processRunner = new ProcessRunner(process, configuration);
+            ProcessRunner processRunner = new ProcessRunner(process, configuration, executorService);
 
             final int partiesToWait = 3;
             /*
@@ -81,17 +85,22 @@ public final class ProcessRunner {
         }
     }
 
-    private ProcessRunner(Process process, Configuration configuration) throws ProcessExecutionException {
+    private ProcessRunner(
+            Process process,
+            Configuration configuration,
+            ExecutorService executorService)
+                    throws ProcessExecutionException {
 
-        DefaultIOHandlerFactory ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
+            this.processReference = process;
 
-
-            processReference = process;
+            DefaultIOHandlerFactory ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
 
             processInputWriter = ioHandlerFactory.newPrintWriter(process.getOutputStream(), true);
 
             standardOutputStreamContentQueue = new LinkedBlockingQueue<>();
             errorStreamContentQueue = new LinkedBlockingQueue<>();
+
+            this.executorService = executorService;
     }
 
     private void checkProcessState() {

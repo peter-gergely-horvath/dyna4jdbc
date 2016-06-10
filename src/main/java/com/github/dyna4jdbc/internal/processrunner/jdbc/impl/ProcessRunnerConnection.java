@@ -3,6 +3,8 @@ package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
@@ -22,6 +24,7 @@ public final class ProcessRunnerConnection extends AbstractConnection {
     private final ColumnHandlerFactory columnHandlerFactory;
     private final Configuration configuration;
     private final ProcessRunnerScriptExecutor scriptExecutor;
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
 
     public ProcessRunnerConnection(
@@ -34,7 +37,7 @@ public final class ProcessRunnerConnection extends AbstractConnection {
 
         columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
 
-        this.scriptExecutor = new ProcessRunnerScriptExecutor(configuration);
+        this.scriptExecutor = new ProcessRunnerScriptExecutor(configuration, executorService);
     }
 
     @Override
@@ -56,7 +59,13 @@ public final class ProcessRunnerConnection extends AbstractConnection {
 
     @Override
     protected void closeInternal() throws SQLException {
-        scriptExecutor.close();
+        try {
+            scriptExecutor.close();
+        } finally {
+            executorService.shutdownNow();
+        }
+        
+        
     }
 
 }

@@ -11,13 +11,13 @@ import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor {
+final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor {
 
     private static final int DEFAULT_POLL_INTERVAL_MS = 500;
 
     private volatile ProcessRunner processRunner;
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService;
     
     private DefaultIOHandlerFactory ioHandlerFactory; 
     
@@ -27,12 +27,13 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
 
     private long expirationIntervalMs;
 
-    public ProcessRunnerScriptExecutor(Configuration configuration) {
+    ProcessRunnerScriptExecutor(Configuration configuration, ExecutorService executorService) {
         this.configuration = configuration;
         this.skipFirstLine = configuration.getSkipFirstLine();
         this.endOfDataPattern = configuration.getEndOfDataPattern();
         this.expirationIntervalMs = configuration.getExternalCallQuietPeriodThresholdMs();
-        ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
+        this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
+        this.executorService = executorService;
     }
 
     @Override
@@ -44,11 +45,13 @@ public final class ProcessRunnerScriptExecutor implements OutputCapturingScriptE
         try (PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true);
             PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true))  {
 
-            if (this.processRunner == null) {
-                this.processRunner = ProcessRunner.start(script, configuration);
-            } else if (this.processRunner != null && !this.processRunner.isProcessRunning()) {
+            if (this.processRunner != null && !this.processRunner.isProcessRunning()) {
                 this.processRunner.discard();
-                this.processRunner = ProcessRunner.start(script, configuration);
+                this.processRunner = null;
+            }
+            
+            if (this.processRunner == null) {
+                this.processRunner = ProcessRunner.start(script, configuration, executorService);
             } else {
                 this.processRunner.writeToStandardInput(script);
             }
