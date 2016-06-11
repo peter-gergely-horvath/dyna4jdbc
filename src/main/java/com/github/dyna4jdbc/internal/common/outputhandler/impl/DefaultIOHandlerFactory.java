@@ -78,4 +78,14 @@ public final class DefaultIOHandlerFactory implements IOHandlerFactory {
                     "Unsupported characterSetName: " + characterSetName);
         }
     }
+    
+    public BufferedReader newBufferedReader(InputStream inputStream) {
+        try {
+            return new BufferedReader(new InputStreamReader(inputStream, characterSetName));
+        } catch (UnsupportedEncodingException e) {
+            // should not happen: we check the validity of the characterSetName before!
+            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(e,
+                    "Unsupported characterSetName: " + characterSetName);
+        }
+    }
 }

@@ -7,39 +7,46 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.util.List;
 
+import com.github.dyna4jdbc.internal.AbortedError;
+import com.github.dyna4jdbc.internal.CancelException;
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.OutputDisabledError;
 import com.github.dyna4jdbc.internal.RuntimeDyna4JdbcException;
-import com.github.dyna4jdbc.internal.CancelException;
-import com.github.dyna4jdbc.internal.AbortedError;
-import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
-import com.github.dyna4jdbc.internal.common.outputhandler.*;
+import com.github.dyna4jdbc.internal.common.outputhandler.MultipleResultSetScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
+import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 
 public class OutputHandlingStatement<T extends java.sql.Connection> extends AbstractStatement<T> {
 
     private final ScriptOutputHandlerFactory scriptOutputHandlerFactory;
     private final OutputCapturingScriptExecutor outputCapturingScriptExecutor;
-
+    
     private final SQLWarningSink warningSink = new SQLWarningSink() {
         @Override
         public void onSQLWarning(SQLWarning warning) {
             addSQLWarning(warning);
         }
     };
-
+    
     public OutputHandlingStatement(
             T connection,
             ScriptOutputHandlerFactory scriptOutputHandlerFactory,
             OutputCapturingScriptExecutor outputCapturingScriptExecutor) {
 
         super(connection);
+        
         this.scriptOutputHandlerFactory = scriptOutputHandlerFactory;
         this.outputCapturingScriptExecutor = outputCapturingScriptExecutor;
     }
 
+   
     public final ResultSet executeQuery(String script) throws SQLException {
         checkNotClosed();
 
@@ -70,8 +77,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         }
     }
 
-    private ResultSet executeQueryInternal(String script)
-            throws ScriptExecutionException, IOException, SQLException {
+    private ResultSet executeQueryInternal(String script) throws ScriptExecutionException, IOException, SQLException {
 
         SingleResultSetScriptOutputHandler outputHandler =
                 scriptOutputHandlerFactory.newSingleResultSetQueryScriptOutputHandler(this, script, warningSink);
@@ -118,8 +124,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         }
     }
 
-    private int executeUpdateInternal(String script)
-            throws ScriptExecutionException, IOException {
+    private int executeUpdateInternal(String script) throws ScriptExecutionException, IOException {
 
         UpdateScriptOutputHandler outputHandler =
                 scriptOutputHandlerFactory.newUpdateScriptOutputHandler(this, script, warningSink);
@@ -128,6 +133,8 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 
         return ZERO_UPDATE_COUNT;
     }
+
+
 
     public final boolean execute(final String script) throws SQLException {
         checkNotClosed();
@@ -157,8 +164,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         }
     }
 
-    private boolean executeInternal(String script)
-            throws ScriptExecutionException, IOException, SQLException {
+    private boolean executeInternal(String script) throws ScriptExecutionException, IOException, SQLException {
 
         MultipleResultSetScriptOutputHandler outputHandler =
                 scriptOutputHandlerFactory.newUpdateOrQueryScriptOutputHandler(this, script, warningSink);
@@ -174,9 +180,9 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         return true;
     }
 
-
-    private void executeScriptUsingOutputHandler(
-            String script, ScriptOutputHandler scriptOutputHandler) throws ScriptExecutionException, IOException {
+    protected final void executeScriptUsingOutputHandler(
+            String script,
+            ScriptOutputHandler scriptOutputHandler) throws ScriptExecutionException, IOException {
 
         OutputStream outOutputStream = scriptOutputHandler.getOutOutputStream();
         OutputStream errorOutputStream = scriptOutputHandler.getErrorOutputStream();
@@ -208,4 +214,5 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
                     ex, ex.getMessage());
         }
     }
+
 }

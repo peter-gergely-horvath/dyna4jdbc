@@ -222,17 +222,20 @@ public class AbstractConnectionTest {
     }
     
     @Test
-    public void testPrepareStatementString() throws SQLException {
+    public void testPrepareStatement() throws SQLException {
 
-        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
-                () -> abstractConnection.prepareStatement("foobar"));
+        try (Statement statement = abstractConnection.createStatement()) {
+
+            assertNotNull(statement);
+        }
     }
     
     @Test
     public void testPrepareStatementStringIntInt() throws SQLException {
-
-        try (Statement statement = abstractConnection.createStatement(ResultSet.TYPE_FORWARD_ONLY,
-                ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT )) {
+        
+        try (Statement statement =  abstractConnection.prepareStatement(
+                "foobar",
+                ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
 
             assertNotNull(statement);
         }
@@ -241,11 +244,6 @@ public class AbstractConnectionTest {
                 () -> abstractConnection.prepareStatement(
                         "foobar",
                         ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE));
-        
-        assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
-                () -> abstractConnection.prepareStatement(
-                        "foobar",
-                        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY));
         
         assertThrowsSQLExceptionWithFunctionNotSupportedMessage(
                 () -> abstractConnection.prepareStatement(

@@ -5,7 +5,6 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.UUID;
 import java.util.concurrent.*;
@@ -52,22 +51,24 @@ final class ProcessRunner {
              */
             CyclicBarrier cyclicBarrier = new CyclicBarrier(partiesToWait);
 
-            BufferedReader stdOut = new BufferedReader(
-                    new InputStreamReader(processRunner.processReference.getInputStream(),
-                            configuration.getConversionCharset()));
-
-            BufferedReader stdErr = new BufferedReader(
-                    new InputStreamReader(processRunner.processReference.getErrorStream(),
-                            configuration.getConversionCharset()));
+            DefaultIOHandlerFactory ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
 
 
-            BufferedReaderToBlockingQueueRunnable stdOutReader = new BufferedReaderToBlockingQueueRunnable(
+            BufferedReader stdOut = ioHandlerFactory.newBufferedReader(
+                    processRunner.processReference.getInputStream());
+
+            BufferedReader stdErr = ioHandlerFactory.newBufferedReader(
+                    processRunner.processReference.getErrorStream());
+
+            Runnable stdOutReader = new BufferedReaderToBlockingQueueRunnable(
                     String.format("StdOut reader of '%s'", command), stdOut,
-                    processRunner.standardOutputStreamContentQueue, cyclicBarrier, processRunner.endOfStreamIndicator);
+                    processRunner.standardOutputStreamContentQueue, cyclicBarrier,
+                    processRunner.endOfStreamIndicator);
 
-            BufferedReaderToBlockingQueueRunnable stdErrReader = new BufferedReaderToBlockingQueueRunnable(
+            Runnable stdErrReader = new BufferedReaderToBlockingQueueRunnable(
                     String.format("StdErr reader of '%s'", command), stdErr,
-                    processRunner.errorStreamContentQueue, cyclicBarrier, processRunner.endOfStreamIndicator);
+                    processRunner.errorStreamContentQueue, cyclicBarrier,
+                    processRunner.endOfStreamIndicator);
 
             processRunner.executorService.execute(stdOutReader);
             processRunner.executorService.execute(stdErrReader);
@@ -78,7 +79,7 @@ final class ProcessRunner {
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ProcessExecutionException(e);
+            throw new ProcessExecutionException("Interrupted", e);
 
         } catch (BrokenBarrierException | TimeoutException | IOException e) {
             throw new ProcessExecutionException(e);

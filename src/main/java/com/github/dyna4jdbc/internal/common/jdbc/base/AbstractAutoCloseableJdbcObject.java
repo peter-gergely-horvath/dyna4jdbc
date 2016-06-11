@@ -212,7 +212,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * @param closableObject the object to register
      * @throws SQLException if {@code this} is closed already
      */
-    protected final void registerAsChild(AutoCloseable closableObject) throws SQLException {
+    public final void registerAsChild(AutoCloseable closableObject) throws SQLException {
         checkNotClosed();
 
         if (closableObject == null) {
@@ -230,7 +230,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * @param closableObjects a {@code Collection} of objects to register as children.
      * @throws SQLException if {@code this} is closed already
      */
-    protected final void registerAsChildren(Collection<? extends AutoCloseable> closableObjects) throws SQLException {
+    public final void registerAsChildren(Collection<? extends AutoCloseable> closableObjects) throws SQLException {
         for (AutoCloseable aClosableSQLObject : closableObjects) {
             registerAsChild(aClosableSQLObject);
         }

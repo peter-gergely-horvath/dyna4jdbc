@@ -92,6 +92,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
                 "Creating non-forward-only or non read-only statements");
     }
     
+       
     @Override
     public final Statement createStatement(
             int resultSetType,
@@ -123,10 +124,84 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     }
 
     @Override
-    public final PreparedStatement prepareStatement(String sql) throws SQLException {
+    public final PreparedStatement prepareStatement(String script) throws SQLException {
         checkNotClosed();
+        
+        /*
+        To ensure, that Statements created from within this Connection
+        are always registered, we introduced prepareStatementInternal()
+        internal template method: all concrete subclasses have to
+        implement that and can forget about registering the object
+        completely.
+
+        This method is final, hence it cannot be overridden accidentally.
+         */
+        AutoClosablePreparedStatement createdPreparedStatement = prepareStatementInternal(script);
+
+        registerAsChild(createdPreparedStatement);
+
+        return createdPreparedStatement;
+    }
+
+    protected abstract AutoClosablePreparedStatement prepareStatementInternal(String script) throws SQLException;
+
+    @Override
+    public final PreparedStatement prepareStatement(
+            String sql,
+            int resultSetType,
+            int resultSetConcurrency) throws SQLException {
+
+        checkNotClosed();
+
+        /*
+        A client application can specify the requested ResultSet type and
+        concurrency. We are prepared to handle cases, where the driver is
+        inquired about its capabilities and this method is called with the
+        supported type and concurrency combination: the call is delegated
+        to the standard prepareStatement() method.
+
+        Every other case is rejected as error JDBC_FUNCTION_NOT_SUPPORTED.
+        */
+
+        if (resultSetType == SUPPORTED_RESULT_SET_TYPE
+            && resultSetConcurrency == SUPPORTED_RESULT_SET_CONCURRENCY) {
+
+            return prepareStatement(sql);
+        }
+
         throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-                "This method is not supported");
+                "Creating non-forward-only or non read-only prepareStatement");
+    }
+
+    @Override
+    public final PreparedStatement prepareStatement(
+            String sql,
+            int resultSetType,
+            int resultSetConcurrency,
+            int resultSetHoldability) throws SQLException {
+
+        checkNotClosed();
+
+        /*
+        A client application can specify the requested ResultSet type,
+        concurrency and holdability. We are prepared to handle cases,
+        where the driver is inquired about its capabilities and this
+        method is called with the supported type, concurrency
+        holdability combination: the call is delegated to the standard
+        prepareStatement() method.
+
+        Every other case is rejected as error JDBC_FUNCTION_NOT_SUPPORTED.
+        */
+
+        if (resultSetType == SUPPORTED_RESULT_SET_TYPE
+                && resultSetConcurrency == SUPPORTED_RESULT_SET_CONCURRENCY
+                && resultSetHoldability == SUPPORTED_HOLDABILITY) {
+
+                return prepareStatement(sql);
+            }
+
+        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+                "Creating non-forward-only, non read-only or not over-commit held prepareStatement");
     }
 
     @Override
@@ -259,16 +334,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
         this.sqlWarning = SQLWarningUtils.chainSQLWarning(this.sqlWarning, warning);
     }
 
-    @Override
-    public final PreparedStatement prepareStatement(
-            String sql,
-            int resultSetType,
-            int resultSetConcurrency) throws SQLException {
 
-        checkNotClosed();
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-                "This method is not supported");
-    }
 
     @Override
     public final CallableStatement prepareCall(
@@ -315,20 +381,6 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
         checkNotClosed();
 
         return SUPPORTED_HOLDABILITY;
-    }
-
-
-
-    @Override
-    public final PreparedStatement prepareStatement(
-            String sql,
-            int resultSetType,
-            int resultSetConcurrency,
-            int resultSetHoldability) throws SQLException {
-
-        checkNotClosed();
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
-                "This method is not supported");
     }
 
     @Override

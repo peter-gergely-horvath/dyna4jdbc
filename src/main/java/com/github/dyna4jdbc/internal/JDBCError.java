@@ -1,6 +1,7 @@
 package com.github.dyna4jdbc.internal;
 
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 
 import com.github.dyna4jdbc.internal.sqlstate.SQLState;
 
@@ -40,7 +41,7 @@ public enum JDBCError {
         @Override
         public SQLException raiseSQLException(Object... params) throws SQLException {
             String errorMessage = buildErrorMessage(params);
-            throw new UnsupportedOperationSQLException(errorMessage, getSqlStateAsString());
+            throw new SQLFeatureNotSupportedException(errorMessage, getSqlStateAsString());
         }
     },
     USING_STDOUT_FROM_UPDATE("Using standard output from an update call is not permitted",

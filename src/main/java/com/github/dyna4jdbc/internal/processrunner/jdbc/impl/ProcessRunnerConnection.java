@@ -8,7 +8,9 @@ import java.util.concurrent.Executors;
 
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
+import com.github.dyna4jdbc.internal.common.jdbc.base.AutoClosablePreparedStatement;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
+import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingPreparedStatement;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
@@ -55,6 +57,15 @@ public final class ProcessRunnerConnection extends AbstractConnection {
                 new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
 
         return new OutputHandlingStatement<>(this, outputHandlerFactory, scriptExecutor);
+    }
+    
+    @Override
+    protected AutoClosablePreparedStatement prepareStatementInternal(String script) throws SQLException {
+
+        ScriptOutputHandlerFactory outputHandlerFactory =
+                new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
+        
+        return new OutputHandlingPreparedStatement<>(script, this, outputHandlerFactory, scriptExecutor);
     }
 
     @Override

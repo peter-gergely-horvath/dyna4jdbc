@@ -1,12 +1,26 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.Properties;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
+import com.github.dyna4jdbc.internal.common.jdbc.base.AutoClosablePreparedStatement;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
+import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingPreparedStatement;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
@@ -20,17 +34,6 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.Properties;
 
 public class DefaultScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
@@ -106,11 +109,20 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
     @Override
     protected final AbstractStatement<?> createStatementInternal() throws SQLException {
-        checkNotClosed();
+
         ScriptOutputHandlerFactory outputHandlerFactory =
                 new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
 
         return new OutputHandlingStatement<>(this, outputHandlerFactory, this);
+    }
+    
+    @Override
+    protected final AutoClosablePreparedStatement prepareStatementInternal(String script) throws SQLException {
+
+        ScriptOutputHandlerFactory outputHandlerFactory =
+                new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
+        
+        return new OutputHandlingPreparedStatement<>(script, this, outputHandlerFactory, this);
     }
 
 
@@ -211,5 +223,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
 
     }
+
+
 }
 

@@ -39,7 +39,7 @@ public class CommonTestUtils {
     public static void assertThrowsSQLExceptionWithFunctionNotSupportedMessage(Callable<?> callable) {
         assertThrowsSQLExceptionAndMessageContains(JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.name(), callable);
     }
-
+    
     public static void assertThrowsSQLExceptionAndMessageContains(String expectedMessageContent, Callable<?> callable) {
 
         assertThrowsExceptionAndMessageContains(java.sql.SQLException.class, expectedMessageContent, callable);
