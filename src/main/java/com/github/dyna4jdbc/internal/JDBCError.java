@@ -83,9 +83,13 @@ public enum JDBCError {
     }
 
     protected String getSqlStateAsString() {
-        //CHECKSTYLE.OFF: AvoidInlineConditionals
-        return sqlState != null ? sqlState.code : null;
-        //CHECKSTYLE.ON: AvoidInlineConditionals
+        String returnValue;
+        if(sqlState != null) {
+            returnValue = sqlState.code;
+        } else {
+            returnValue = null;
+        }
+        return returnValue;
     }
 
     public SQLException raiseSQLException(Throwable throwable, Object... params) throws SQLException {

@@ -1,20 +1,19 @@
 package com.github.dyna4jdbc;
 
-import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
-import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
-import com.github.dyna4jdbc.internal.config.MisconfigurationException;
-import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
-import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.RenjinScriptEngineConnection;
-import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScalaScriptEngineConnection;
-import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DefaultScriptEngineConnection;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Properties;
+
+import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
+import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
+import com.github.dyna4jdbc.internal.config.MisconfigurationException;
+import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
+import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DefaultScriptEngineConnection;
+import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScalaScriptEngineConnection;
 
 class ConnectionFactory {
 
@@ -124,10 +123,6 @@ class ConnectionFactory {
         switch (lowerCaseScriptEngineName) {
             case "scala":
                 connectionClass = ScalaScriptEngineConnection.class;
-                break;
-
-            case "renjin":
-                connectionClass = RenjinScriptEngineConnection.class;
                 break;
 
             default:
