@@ -112,42 +112,76 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
         if (!isClosed()) {
             markClosedInternal();
 
-            SQLException internalCloseSQLException = null;
-            SQLException childrenCloseSQLException = null;
+            Throwable internalCloseThrowable = tryCloseInternal();
+            Throwable childrenCloseThowable = tryCloseChildren();
 
-            try {
-                closeInternal();
-            } catch (SQLException sqlEx) {
-                internalCloseSQLException = sqlEx;
-            }
-
-            try {
-                closeChildObjects();
-            } catch (SQLException sqlEx) {
-                childrenCloseSQLException = sqlEx;
-            }
-
-            if (internalCloseSQLException != null
-                    && childrenCloseSQLException != null) {
-
+            if (internalCloseThrowable != null
+                    && childrenCloseThowable != null) {
+                // We do NOT have a clear root cause as multiple Throwables are
+                // caught, hence we are dealing with multiple failures in this case:
+                // we use still specify the (multiple) causes as _suppressed_.
                 throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(
-                        Arrays.asList(internalCloseSQLException, childrenCloseSQLException),
+                        Arrays.asList(internalCloseThrowable, childrenCloseThowable),
                         this, "Multiple exceptions raised during close; see suppressed");
             }
 
-            if (internalCloseSQLException != null) {
-                throw internalCloseSQLException;
+            if (internalCloseThrowable != null) {
+                
+                if (internalCloseThrowable instanceof SQLException) {
+                    throw ((SQLException) internalCloseThrowable);
+                }
+                
+                throw JDBCError.CLOSE_FAILED.raiseSQLException(internalCloseThrowable,
+                        "Closing of this caused error, see root cause");
             }
 
-            if (childrenCloseSQLException != null) {
-                throw childrenCloseSQLException;
+            if (childrenCloseThowable != null) {
+                
+                if (childrenCloseThowable instanceof SQLException) {
+                    throw ((SQLException) childrenCloseThowable);
+                }
+
+                throw JDBCError.CLOSE_FAILED.raiseSQLException(childrenCloseThowable,
+                        "Closing of children caused error, see root cause");
             }
         }
     }
-    
+
+    private Throwable tryCloseInternal() {
+        Throwable internalCloseThrowable = null;
+        try {
+            closeInternal();
+        } catch (Throwable throwable) {
+            /* Normally, any Throwable caught here should be a
+             * SQLException, however, we catch all Throwables
+             * so as to handle offending implementations properly:
+             * if a RuntimeException or Error is thrown, we still
+             * catch it and wrap into a SQLException
+             */
+            internalCloseThrowable = throwable;
+        }
+        return internalCloseThrowable;
+    }
+
+    private Throwable tryCloseChildren() {
+        Throwable childrenCloseThowable = null;
+        try {
+            closeChildObjects();
+        } catch (Throwable throwable) {
+            /* Normally, any Throwable caught here should be a
+             * SQLException, however, we catch all Throwables
+             * so as to handle offending implementations properly:
+             * if a RuntimeException or Error is thrown, we still
+             * catch it and wrap into a SQLException
+             */
+            childrenCloseThowable = throwable;
+        }
+        return childrenCloseThowable;
+    }
+
     /**
      * Sets the closed flag, but does not perform any of the resource closure.
-     * Must not be used except the infrastructure code use to handle 
+     * Must not be used except the infrastructure code use to handle
      * closing and resources.
      */
     protected final void markClosedInternal() {
@@ -175,18 +209,24 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * @throws SQLException if one or more child objects throw exception one close method call
      */
     private void closeChildObjects() throws SQLException {
-        LinkedList<Exception> suppressedThrowables = new LinkedList<>();
+        LinkedList<Throwable> suppressedThrowables = new LinkedList<>();
 
         for (AutoCloseable closeableObject : children) {
 
             try {
                 closeableObject.close();
-            } catch (Exception closeException) {
-                suppressedThrowables.add(closeException);
+            } catch (Throwable closeThrowable) {
+                /* Normally, any Throwable caught here should be a
+                 * SQLException, however, we catch all Throwables
+                 * so as to handle offending implementations properly:
+                 * if a RuntimeException or Error is thrown, we still
+                 * catch it and wrap into a SQLException
+                 */
+                suppressedThrowables.add(closeThrowable);
             }
         }
 
-        children.clear();
+        children.clear(); // closing also includes discarding references
 
         if (!suppressedThrowables.isEmpty()) {
 

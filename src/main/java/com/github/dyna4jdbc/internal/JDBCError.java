@@ -84,7 +84,7 @@ public enum JDBCError {
 
     protected String getSqlStateAsString() {
         String returnValue;
-        if(sqlState != null) {
+        if (sqlState != null) {
             returnValue = sqlState.code;
         } else {
             returnValue = null;

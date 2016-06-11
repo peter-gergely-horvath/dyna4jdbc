@@ -128,11 +128,11 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
         checkNotClosed();
         
         /*
-        To ensure, that Statements created from within this Connection
-        are always registered, we introduced prepareStatementInternal()
-        internal template method: all concrete subclasses have to
-        implement that and can forget about registering the object
-        completely.
+        To ensure, that PreparedStatement created from within this
+        Connection are always registered, we introduced
+        prepareStatementInternal() internal template method:
+        all concrete subclasses have to implement that and can
+        forget about registering the object completely.
 
         This method is final, hence it cannot be overridden accidentally.
          */

@@ -17,7 +17,8 @@ public final class AbortableOutputStream extends OutputStream {
     /**
      * <p>
      * Requests this {@code AbortableOutputStream} to throw
-     * {@code AbortedError} on any kind of future operation.</p>
+     * {@code AbortedError} on any kind of future operation
+     * <b>EXCEPT</b> on {@code close()}.</p>
      *
      * <p>
      * This method is thread-safe: the effect of an {@code abort()}
@@ -64,7 +65,8 @@ public final class AbortableOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-
+        // NOTE: we do NOT "checkNotAborted();"
+        
         delegate.close();
     }
 
