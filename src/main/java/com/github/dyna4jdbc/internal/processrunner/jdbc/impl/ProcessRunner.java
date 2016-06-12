@@ -6,6 +6,9 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
@@ -33,12 +36,12 @@ final class ProcessRunner {
 
     static ProcessRunner start(
             String command, 
-            Configuration configuration, 
+            Map<String, Object> variables, Configuration configuration, 
             ExecutorService executorService) 
                     throws ProcessExecutionException {
 
         try {
-            Process process = Runtime.getRuntime().exec(command);
+            Process process = startProcessInternal(command, variables);
 
             ProcessRunner processRunner = new ProcessRunner(process, configuration, executorService);
 
@@ -84,6 +87,29 @@ final class ProcessRunner {
         } catch (BrokenBarrierException | TimeoutException | IOException e) {
             throw new ProcessExecutionException(e);
         }
+    }
+
+    private static Process startProcessInternal(String command,
+            Map<String, Object> variables) throws IOException {
+
+        if (variables == null) {
+            return Runtime.getRuntime().exec(command);
+        }
+
+        List<String> variableDeclarations = new LinkedList<>();
+        for (Map.Entry<String, Object> variable : variables.entrySet()) {
+
+            String key = variable.getKey();
+            String valueString = String.valueOf(variable.getValue());
+
+            String variableSetting = String.format("%s=%s", key, valueString);
+            variableDeclarations.add(variableSetting);
+        }
+
+        String[] variableParameters =
+                variableDeclarations.toArray(new String[variableDeclarations.size()]);
+
+        return Runtime.getRuntime().exec(command, variableParameters);
     }
 
     private ProcessRunner(

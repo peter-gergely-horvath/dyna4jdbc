@@ -1,18 +1,22 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
+import java.io.PrintStream;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.script.ScriptEngine;
+
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.impl.AbortableOutputStream;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.CloseSuppressingOutputStream;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
+
 import scala.Console;
 import scala.runtime.AbstractFunction0;
 import scala.tools.nsc.interpreter.IMain;
-
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.sql.SQLException;
-import java.util.Properties;
 
 public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnection {
 
@@ -24,16 +28,17 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
             throws SQLException, MisconfigurationException {
         super(parameters, properties);
 
-        if (!(this.getEngine() instanceof IMain)) {
+        ScriptEngine scriptEngine = this.getEngine();
+        if (!(scriptEngine instanceof IMain)) {
             JDBCError.INVALID_CONFIGURATION.raiseSQLException(
                     "Cannot configure Scala ScriptEngine of type: "
-                            + this.getEngine().getClass().getName()
+                            + scriptEngine.getClass().getName()
                             + ". Are you using a Scala version "
                             + "different from the one the driver was compiled for?");
         }
 
 
-        this.scalaInterpreterMain = ((IMain) this.getEngine());
+        this.scalaInterpreterMain = ((IMain) scriptEngine);
 
         this.scalaInterpreterMain.setContextClassLoader();
         this.scalaInterpreterMain.settings().processArgumentString(USEJAVACP_ARGUMENT);
@@ -52,16 +57,18 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
     }
 
     @Override
-    public void executeScriptUsingStreams(
-            String script, OutputStream stdOutputStream, OutputStream errorOutputStream)
+    public void executeScriptUsingAbortableStreams(
+            String script, 
+            Map<String, Object> variables,
+            AbortableOutputStream stdOutputStream, AbortableOutputStream errorOutputStream)
             throws ScriptExecutionException {
 
         IOHandlerFactory ioHandlerFactory = getIoHandlerFactory();
 
-        // TODO: abort handling??
-
-        try (PrintStream outPrintStream = ioHandlerFactory.newPrintStream(stdOutputStream);
-             PrintStream errorPrintStream = ioHandlerFactory.newPrintStream(errorOutputStream)) {
+        try (PrintStream outPrintStream = ioHandlerFactory.newPrintStream(
+                new CloseSuppressingOutputStream(stdOutputStream));
+             PrintStream errorPrintStream = ioHandlerFactory.newPrintStream(
+                     new CloseSuppressingOutputStream(errorOutputStream))) {
 
             Console.withOut(outPrintStream, new AbstractFunction0<Void>() {
                 @Override
@@ -72,7 +79,8 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
                         @Override
                         public Void apply() {
 
-                            doExecuteScriptUsingStreams(script, stdOutputStream, errorOutputStream);
+                            doExecuteScriptUsingAbortableStreams(
+                                    script, variables, stdOutputStream, errorOutputStream);
 
                             return null;
                         }
@@ -93,13 +101,19 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
 
     }
 
-    private void doExecuteScriptUsingStreams(
-            String script, OutputStream stdOutputStream, OutputStream errorOutputStream) {
+    private void doExecuteScriptUsingAbortableStreams(
+            String script, 
+            Map<String, Object> variables, 
+            AbortableOutputStream stdOutputStream, 
+            AbortableOutputStream errorOutputStream) {
+
         try {
 
-            super.executeScriptUsingStreams(script,
-                    new CloseSuppressingOutputStream(stdOutputStream),
-                    new CloseSuppressingOutputStream(errorOutputStream));
+            super.executeScriptUsingAbortableStreams(
+                    script,
+                    variables,
+                    stdOutputStream,
+                    errorOutputStream);
 
         } catch (ScriptExecutionException e) {
             throw new RuntimeException(e);

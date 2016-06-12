@@ -5,8 +5,10 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Properties;
 
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
@@ -127,23 +129,24 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
     }
 
 
-    //CHECKSTYLE.OFF: DesignForExtension
+    
     @Override
-    public void executeScriptUsingStreams(
+    public final void executeScriptUsingStreams(
             String script,
+            Map<String, Object> variables,
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
         executeScriptUsingAbortableStreams(script,
+                variables,
                 new AbortableOutputStream(stdOutputStream),
                 new AbortableOutputStream(errorOutputStream));
     }
-    //CHECKSTYLE.ON: DesignForExtension
 
-    private void executeScriptUsingAbortableStreams(
-            String script,
-            AbortableOutputStream stdOutputStream,
-            AbortableOutputStream errorOutputStream) throws ScriptExecutionException {
+    //CHECKSTYLE.OFF: DesignForExtension
+    protected void executeScriptUsingAbortableStreams(String script, Map<String, Object> variables,
+            AbortableOutputStream stdOutputStream, AbortableOutputStream errorOutputStream) 
+                    throws ScriptExecutionException {
 
         synchronized (lockObject) {
             /* We synchronize so that the execution of two concurrently commenced Statements cannot interfere
@@ -151,24 +154,26 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
              * By synchronizing here, we basically implement a mutual exclusion policy for the ScriptEngine.
              *
              * Note that we *write* the fields abortableOutputStreamForStandardOut and
-             * abortableOutputStreamForStandardError, while holding the monitor of object lockObject, while 
-             * they are *read*, WITHOUT the lock monitor being held in the method cancel(). For this to work 
+             * abortableOutputStreamForStandardError, while holding the monitor of object lockObject, while
+             * they are *read*, WITHOUT the lock monitor being held in the method cancel(). For this to work
              * correctly, both fields HAVE TO be _volatile_.
              */
 
             this.abortableOutputStreamForStandardOut = stdOutputStream;
             this.abortableOutputStreamForStandardError = errorOutputStream;
 
-            Writer originalWriter = engine.getContext().getWriter();
-            Writer originalErrorWriter = engine.getContext().getErrorWriter();
+            ScriptContext engineContext = engine.getContext();
+
+            Writer originalWriter = engineContext.getWriter();
+            Writer originalErrorWriter = engineContext.getErrorWriter();
 
             try (PrintWriter outputPrintWriter = getIoHandlerFactory().newPrintWriter(stdOutputStream, true);
                  PrintWriter errorPrintWriter = getIoHandlerFactory().newPrintWriter(errorOutputStream, true)) {
 
+                engineContext.setWriter(outputPrintWriter);
+                engineContext.setErrorWriter(errorPrintWriter);
 
-                engine.getContext().setWriter(outputPrintWriter);
-                engine.getContext().setErrorWriter(errorPrintWriter);
-
+                applyVariablesToEngineScope(variables, engineContext);
 
                 engine.eval(script);
 
@@ -178,15 +183,39 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
             } finally {
 
-                engine.getContext().setWriter(originalWriter);
-                engine.getContext().setErrorWriter(originalErrorWriter);
+                removeVariablesFromEngineScope(variables, engineContext);
+
+                engineContext.setWriter(originalWriter);
+                engineContext.setErrorWriter(originalErrorWriter);
 
                 this.abortableOutputStreamForStandardOut = null;
                 this.abortableOutputStreamForStandardError = null;
             }
         }
     }
+    //CHECKSTYLE.ON: DesignForExtension
 
+    private void applyVariablesToEngineScope(Map<String, Object> variables, ScriptContext engineContext) {
+        if (variables != null) {
+            for (Map.Entry<String, Object> entry : variables.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+
+                engineContext.setAttribute(
+                        key, value, ScriptContext.ENGINE_SCOPE);
+            }
+        }
+    }
+
+    private void removeVariablesFromEngineScope(Map<String, Object> variables, ScriptContext engineContext) {
+        if (variables != null) {
+            for (String key : variables.keySet()) {
+
+                engineContext.removeAttribute(
+                        key, ScriptContext.ENGINE_SCOPE);
+            }
+        }
+    }
 
     protected final ScriptEngine getEngine() {
         return engine;

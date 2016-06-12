@@ -2,6 +2,7 @@ package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.regex.Pattern;
 
@@ -39,6 +40,7 @@ final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor
     @Override
     public void executeScriptUsingStreams(
             String script,
+            Map<String, Object> variables,
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
@@ -51,7 +53,7 @@ final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor
             }
             
             if (this.processRunner == null) {
-                this.processRunner = ProcessRunner.start(script, configuration, executorService);
+                this.processRunner = ProcessRunner.start(script, variables, configuration, executorService);
             } else {
                 this.processRunner.writeToStandardInput(script);
             }

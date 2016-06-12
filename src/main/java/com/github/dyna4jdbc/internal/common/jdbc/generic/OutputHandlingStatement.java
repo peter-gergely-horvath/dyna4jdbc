@@ -46,6 +46,9 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         this.outputCapturingScriptExecutor = outputCapturingScriptExecutor;
     }
 
+    protected final OutputCapturingScriptExecutor getOutputCapturingScriptExecutor() {
+        return outputCapturingScriptExecutor;
+    }
    
     public final ResultSet executeQuery(String script) throws SQLException {
         checkNotClosed();
@@ -180,14 +183,14 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         return true;
     }
 
-    protected final void executeScriptUsingOutputHandler(
+    private void executeScriptUsingOutputHandler(
             String script,
             ScriptOutputHandler scriptOutputHandler) throws ScriptExecutionException, IOException {
 
         OutputStream outOutputStream = scriptOutputHandler.getOutOutputStream();
         OutputStream errorOutputStream = scriptOutputHandler.getErrorOutputStream();
 
-        outputCapturingScriptExecutor.executeScriptUsingStreams(script, outOutputStream, errorOutputStream);
+        outputCapturingScriptExecutor.executeScriptUsingStreams(script, null, outOutputStream, errorOutputStream);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.github.dyna4jdbc.internal.common.jdbc.generic;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -19,11 +21,14 @@ import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
+import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AutoClosablePreparedStatement;
+import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 
 public final class OutputHandlingPreparedStatement<T extends java.sql.Connection> extends OutputHandlingStatement<T>
@@ -31,7 +36,7 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
 
     private final String script;
 
-    private HashMap<String, Object> executionContext = new HashMap<>();
+    private final HashMap<String, Object> executionContext = new HashMap<>();
 
     public OutputHandlingPreparedStatement(String script, T connection,
             ScriptOutputHandlerFactory scriptOutputHandlerFactory,
@@ -43,19 +48,29 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
 
     @Override
     public ResultSet executeQuery() throws SQLException {
-
         return super.executeQuery(script);
     }
 
     @Override
     public int executeUpdate() throws SQLException {
-
         return super.executeUpdate(script);
     }
 
     @Override
     public boolean execute() throws SQLException {
         return super.execute(script);
+    }
+    
+    protected void executeScriptUsingOutputHandler(
+            String scriptToExecute,
+            ScriptOutputHandler scriptOutputHandler) throws ScriptExecutionException, IOException {
+
+        OutputStream outOutputStream = scriptOutputHandler.getOutOutputStream();
+        OutputStream errorOutputStream = scriptOutputHandler.getErrorOutputStream();
+
+        getOutputCapturingScriptExecutor().executeScriptUsingStreams(scriptToExecute, 
+                Collections.unmodifiableMap(executionContext), 
+                outOutputStream, errorOutputStream);
     }
 
     @Override
