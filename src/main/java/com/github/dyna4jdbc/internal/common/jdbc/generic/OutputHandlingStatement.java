@@ -183,7 +183,8 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         return true;
     }
 
-    private void executeScriptUsingOutputHandler(
+    //CHECKSTYLE.OFF: DesignForExtension: incorrectly detected: method is overridden is subclass
+    protected void executeScriptUsingOutputHandler(
             String script,
             ScriptOutputHandler scriptOutputHandler) throws ScriptExecutionException, IOException {
 
@@ -192,6 +193,7 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
 
         outputCapturingScriptExecutor.executeScriptUsingStreams(script, null, outOutputStream, errorOutputStream);
     }
+    //CHECKSTYLE.ON: DesignForExtension
 
     @Override
     public final void cancel() throws SQLException {

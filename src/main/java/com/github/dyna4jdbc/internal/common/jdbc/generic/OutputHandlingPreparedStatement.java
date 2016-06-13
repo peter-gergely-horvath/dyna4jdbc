@@ -60,7 +60,8 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
     public boolean execute() throws SQLException {
         return super.execute(script);
     }
-    
+
+    @Override
     protected void executeScriptUsingOutputHandler(
             String scriptToExecute,
             ScriptOutputHandler scriptOutputHandler) throws ScriptExecutionException, IOException {
