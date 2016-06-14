@@ -9,7 +9,7 @@ import java.util.List;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-public final class DataTableWriter extends CursorCellWriterOutputStream {
+final class DataTableWriter extends CursorCellWriterOutputStream {
 
     private LinkedList<DataTable> dataTableList = new LinkedList<>();
     private List<String> currentRow = new ArrayList<String>();
@@ -18,7 +18,7 @@ public final class DataTableWriter extends CursorCellWriterOutputStream {
     private final boolean skipFirstLine;
     private boolean preferMultipleResultSets;
 
-    public DataTableWriter(Configuration configuration) {
+    DataTableWriter(Configuration configuration) {
         super(configuration.getCellSeparator(), configuration.getConversionCharset());
 
         dataTableList.addLast(new DataTable());
@@ -27,7 +27,7 @@ public final class DataTableWriter extends CursorCellWriterOutputStream {
     }
 
 
-    public List<DataTable> getDataTableList() {
+    List<DataTable> getDataTableList() {
         return Collections.unmodifiableList(dataTableList);
     }
 

@@ -26,7 +26,7 @@ import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingPreparedS
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
-import com.github.dyna4jdbc.internal.common.outputhandler.impl.AbortableOutputStream;
+import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;

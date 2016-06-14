@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 
-public abstract class CursorCellWriterOutputStream extends OutputStream {
+abstract class CursorCellWriterOutputStream extends OutputStream {
 
     private static final int LF = 0xD;
     private static final int CR = 0xA;
@@ -22,7 +22,7 @@ public abstract class CursorCellWriterOutputStream extends OutputStream {
     private final String charsetName;
 
 
-    public CursorCellWriterOutputStream(char cellSeparator, String charsetName) {
+    CursorCellWriterOutputStream(char cellSeparator, String charsetName) {
         this.cellSeparator = cellSeparator;
         this.charsetName = charsetName;
     }

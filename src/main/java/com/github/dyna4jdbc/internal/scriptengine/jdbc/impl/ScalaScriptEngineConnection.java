@@ -10,8 +10,8 @@ import javax.script.ScriptEngine;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
-import com.github.dyna4jdbc.internal.common.outputhandler.impl.AbortableOutputStream;
-import com.github.dyna4jdbc.internal.common.outputhandler.impl.CloseSuppressingOutputStream;
+import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream;
+import com.github.dyna4jdbc.internal.common.util.io.CloseSuppressingOutputStream;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
 import scala.Console;

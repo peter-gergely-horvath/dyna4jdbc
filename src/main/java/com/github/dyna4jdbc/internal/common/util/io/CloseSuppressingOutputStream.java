@@ -1,4 +1,4 @@
-package com.github.dyna4jdbc.internal.common.outputhandler.impl;
+package com.github.dyna4jdbc.internal.common.util.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
