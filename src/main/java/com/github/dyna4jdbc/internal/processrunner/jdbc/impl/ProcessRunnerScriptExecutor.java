@@ -48,7 +48,6 @@ final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor
             PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true))  {
 
             if (this.processRunner != null && !this.processRunner.isProcessRunning()) {
-                this.processRunner.discard();
                 this.processRunner = null;
             }
             
@@ -162,10 +161,9 @@ final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor
     }
 
     private void abortProcessIfRunning() {
-        executorService.shutdownNow();
-
         ProcessRunner currentProcess = processRunner;
-        if (currentProcess != null) {
+        if (currentProcess != null
+                && currentProcess.isProcessRunning()) {
             currentProcess.terminateProcess();
             processRunner = null;
         }

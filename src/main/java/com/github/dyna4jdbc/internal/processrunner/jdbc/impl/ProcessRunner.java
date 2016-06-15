@@ -19,7 +19,7 @@ final class ProcessRunner {
 
     private static final int DEFAULT_TIMEOUT_MILLI_SECONDS = 10_000;
 
-    private Process processReference;
+    private final Process processReference;
 
     private final ExecutorService executorService;
     
@@ -132,28 +132,19 @@ final class ProcessRunner {
 
     private void checkProcessState() {
 
-        if (processReference == null) {
+        if (!isProcessRunning()) {
             throw new IllegalStateException("Process is not running");
         }
     }
 
     boolean isProcessRunning() {
-        Process process = processReference;
-        return process != null && process.isAlive();
+        return processReference.isAlive();
     }
 
     void terminateProcess() {
         checkProcessState();
 
-        executorService.shutdownNow();
         processReference.destroyForcibly();
-        processReference = null;
-    }
-
-    void discard() {
-
-        executorService.shutdownNow();
-        processReference = null;
     }
 
     boolean isStandardOutReachedEnd() {
@@ -161,8 +152,6 @@ final class ProcessRunner {
     }
 
     String pollStandardOutput(long timeout, TimeUnit unit) throws IOException {
-
-        checkProcessState();
 
         try {
             String result = standardOutputStreamContentQueue.poll(timeout, unit);
@@ -185,8 +174,6 @@ final class ProcessRunner {
     }
 
     String pollStandardError(long timeout, TimeUnit unit) throws IOException {
-
-        checkProcessState();
 
         try {
             String result = errorStreamContentQueue.poll(timeout, unit);
