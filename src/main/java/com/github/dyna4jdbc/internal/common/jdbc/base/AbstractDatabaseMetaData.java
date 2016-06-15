@@ -749,7 +749,8 @@ public abstract class AbstractDatabaseMetaData<T extends Connection>
     }
 
     public final int getSQLStateType() throws SQLException {
-        return 0; // TODO: implement method
+        /* Based on best of my knowledge, this should be right */
+        return DatabaseMetaData.sqlStateSQL99;
     }
 
     public final boolean locatorsUpdateCopy() throws SQLException {
