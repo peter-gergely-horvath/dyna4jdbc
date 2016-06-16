@@ -52,7 +52,7 @@ final class DefaultSingleResultSetScriptOutputHandler implements SingleResultSet
                 break;
 
             default:
-                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
+                throw JDBCError.RESULT_SET_MULTIPLE_EXPECTED_ONE.raiseSQLException(
                         "dataTableList has multiple entries, expected one: " + dataTableList.size());
         }
 

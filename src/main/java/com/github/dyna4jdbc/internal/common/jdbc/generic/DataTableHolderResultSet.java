@@ -125,6 +125,6 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
 
     @Override
     public String getCursorName() throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Retrieval of cursor name");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Retrieval of cursor name");
     }
 }

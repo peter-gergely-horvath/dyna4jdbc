@@ -4,7 +4,9 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Map;
 import java.util.Properties;
 
@@ -19,8 +21,6 @@ import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
-import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractStatement;
-import com.github.dyna4jdbc.internal.common.jdbc.base.AutoClosablePreparedStatement;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingPreparedStatement;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
@@ -111,7 +111,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
     }
 
     @Override
-    protected final AbstractStatement<?> createStatementInternal() throws SQLException {
+    protected final Statement createStatementInternal() throws SQLException {
 
         ScriptOutputHandlerFactory outputHandlerFactory =
                 new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
@@ -120,7 +120,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
     }
     
     @Override
-    protected final AutoClosablePreparedStatement prepareStatementInternal(String script) throws SQLException {
+    protected final PreparedStatement prepareStatementInternal(String script) throws SQLException {
 
         ScriptOutputHandlerFactory outputHandlerFactory =
                 new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);

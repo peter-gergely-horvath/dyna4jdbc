@@ -36,7 +36,7 @@ public enum JDBCError {
             SQLState.CLIENT_ERROR),
     CANCEL_FAILED("Failed to cancel the operation: %s",
             SQLState.SYSTEM_ERROR),
-    JDBC_FUNCTION_NOT_SUPPORTED("This JDBC API function is not supported: %s",
+    JDBC_FEATURE_NOT_SUPPORTED("This JDBC feature is not supported: %s",
             SQLState.FEATURE_NOT_SUPPORTED) {
         @Override
         public SQLException raiseSQLException(Object... params) throws SQLException {

@@ -27,12 +27,12 @@ import java.util.HashMap;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
-import com.github.dyna4jdbc.internal.common.jdbc.base.AutoClosablePreparedStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 
-public final class OutputHandlingPreparedStatement<T extends java.sql.Connection> extends OutputHandlingStatement<T>
-        implements AutoClosablePreparedStatement {
+public final class OutputHandlingPreparedStatement<T extends java.sql.Connection>
+        extends OutputHandlingStatement<T>
+        implements java.sql.PreparedStatement {
 
     private final String script;
 
@@ -81,7 +81,7 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.PreparedStatement.getMetaData()");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.PreparedStatement.getMetaData()");
     }
 
     private void setParameter(int parameterIndex, Object value) {
@@ -250,21 +250,21 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
 
     @Override
     public void addBatch() throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.PreparedStatement.addBatch()");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.PreparedStatement.addBatch()");
     }
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
         checkNotClosed();
 
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED
                 .raiseSQLException("java.sql.PreparedStatement.setCharacterStream(int, Reader, int)");
 
     }
 
     @Override
     public void setRef(int parameterIndex, Ref x) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.PreparedStatement.setRef(int, Ref)");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.PreparedStatement.setRef(int, Ref)");
     }
 
     @Override
@@ -349,7 +349,7 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
 
     @Override
     public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED
                 .raiseSQLException("java.sql.PreparedStatement.setNCharacterStream(int, Reader, length)");
 
     }
@@ -364,21 +364,21 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
 
     @Override
     public void setClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED
                 .raiseSQLException("java.sql.PreparedStatement.setClob(int, Reader, long)");
 
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream, long length) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED
                 .raiseSQLException("java.sql.PreparedStatement.setBlob(int, InputStream, long)");
 
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED
                 .raiseSQLException("java.sql.PreparedStatement.setNClob(int, Reader, long)");
 
     }
@@ -393,25 +393,25 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
 
     @Override
     public void setObject(int parameterIndex, Object x, int targetSqlType, int scaleOrLength) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED
                 .raiseSQLException("java.sql.PreparedStatement.setObject(int, Object, int, int)");
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, long length) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED
                 .raiseSQLException("java.sql.PreparedStatement.setAsciiStream(int, InputStream, long)");
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, long length) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED
                 .raiseSQLException("java.sql.PreparedStatement.setBinaryStream(int, InputStream, long)");
     }
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED
                 .raiseSQLException("java.sql.PreparedStatement.setCharacterStream(int, Reader, long)");
 
     }

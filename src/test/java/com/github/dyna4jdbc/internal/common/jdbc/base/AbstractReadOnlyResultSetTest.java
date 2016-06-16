@@ -19,7 +19,7 @@ import static org.testng.Assert.assertTrue;
 
 /**
  * A very simple unit test to prove that all methods of {@code AbstractReadOnlyResultSet}
- * throw {@code SQLException} with error code JDBC_FUNCTION_NOT_SUPPORTED.
+ * throw {@code SQLException} with error code JDBC_FEATURE_NOT_SUPPORTED.
  *
  * @author Peter Horvath
  */
@@ -130,7 +130,7 @@ public class AbstractReadOnlyResultSetTest {
 
             String message = realException.getMessage();
             
-            assertTrue(message.contains(JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.name()),
+            assertTrue(message.contains(JDBCError.JDBC_FEATURE_NOT_SUPPORTED.name()),
                     String.format("Invalid message: '%s'", message));
         }
     }

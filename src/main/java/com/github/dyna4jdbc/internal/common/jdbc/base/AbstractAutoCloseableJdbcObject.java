@@ -74,6 +74,23 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
     private final Set<AutoCloseable> children = Collections.synchronizedSet(createNewWeakHashSet());
 
     /**
+     * We maintain a reference to the parent object, so that we can
+     * un-register from the parent in case {@code this} object is closed.
+     */
+    private final AbstractAutoCloseableJdbcObject parent;
+
+    protected AbstractAutoCloseableJdbcObject(Object parent) {
+        //CHECKSTYLE.OFF: AvoidInlineConditionals : inline conditional is required in this case
+        this(parent instanceof AbstractAutoCloseableJdbcObject
+                ? (AbstractAutoCloseableJdbcObject) parent : null);
+        //CHECKSTYLE.ON
+    }
+
+    protected AbstractAutoCloseableJdbcObject(AbstractAutoCloseableJdbcObject parent) {
+        this.parent = parent;
+    }
+
+    /**
      * Throws {@code SQLException} if {@code this} is closed.
      * This method is thread-safe: it shall consistently report
      * an object closed from one thread as closed from all other
@@ -111,6 +128,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
     public final void close() throws SQLException {
         if (!isClosed()) {
             markClosedInternal();
+            unRegisterFromParent();
 
             Throwable internalCloseThrowable = tryCloseInternal();
             Throwable childrenCloseThowable = tryCloseChildren();
@@ -189,6 +207,17 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
     }
 
     /**
+     * Removes this object from the parent's children registry: once a child is closed,
+     * the parent will no longer maintain any reference to it or try to close it when
+     * the parent itself is closed.
+     */
+    private void unRegisterFromParent() {
+        if (parent != null) {
+            parent.children.remove(this);
+        }
+    }
+
+    /**
      * <p>
      * Executed when {@code this} object is closed. Concrete sub-classes might
      * override this method to provide their own resource disposal logic.</p>
@@ -252,7 +281,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * @param closableObject the object to register
      * @throws SQLException if {@code this} is closed already
      */
-    public final void registerAsChild(AutoCloseable closableObject) throws SQLException {
+    protected final void registerAsChild(AutoCloseable closableObject) throws SQLException {
         checkNotClosed();
 
         if (closableObject == null) {

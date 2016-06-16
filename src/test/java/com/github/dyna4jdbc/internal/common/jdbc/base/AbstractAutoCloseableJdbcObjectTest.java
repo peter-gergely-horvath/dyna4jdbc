@@ -48,6 +48,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
         private final Callable<Void> closeInternalCallable;
 
         AutoCloseableJdbcObject(Callable<Void> closeInternalCallable) {
+            super(null);
             this.closeInternalCallable = closeInternalCallable;
         }
 

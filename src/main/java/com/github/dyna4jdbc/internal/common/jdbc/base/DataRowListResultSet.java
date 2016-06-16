@@ -105,7 +105,7 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
     public final void refreshRow() throws SQLException {
         // We implement result set type TYPE_FORWARD_ONLY
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -130,39 +130,39 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
 
     @Override
     public final void beforeFirst() throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#beforeFirst()");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#beforeFirst()");
     }
 
     @Override
     public final void afterLast() throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#afterLast()");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#afterLast()");
     }
 
     @Override
     public final boolean first() throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#first()");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#first()");
     }
 
     @Override
     public final boolean last() throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#last()");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#last()");
     }
 
     @Override
     public final boolean absolute(int row) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                 "Moving cursor by absolute(int)");
     }
 
     @Override
     public final boolean relative(int rows) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                 "Moving cursor by relative(int)");
     }
 
     @Override
     public final boolean previous() throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                 "Moving cursor by previous()");
     }
 
@@ -177,7 +177,7 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
         }
 
         if (direction != ResultSet.FETCH_FORWARD) {
-            throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException(
+            throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                     "Only FETCH_FORWARD fetch direction is supported: " + direction);
         }
     }

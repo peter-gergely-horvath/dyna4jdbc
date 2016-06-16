@@ -22,6 +22,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     private int fetchSize;
 
     public AbstractResultSet(Statement statement) {
+        super(statement);
         this.statement = statement;
     }
 
@@ -79,7 +80,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final RowId getRowId(int columnIndex) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.RowId");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.RowId");
     }
 
     @Override
@@ -89,7 +90,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final Ref getRef(int columnIndex) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Ref");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.Ref");
     }
 
     @Override
@@ -99,17 +100,17 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final Blob getBlob(int columnIndex) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.Blob");
     }
 
     @Override
     public final Clob getClob(int columnIndex) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Clob");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.Clob");
     }
 
     @Override
     public final Array getArray(int columnIndex) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.Array");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.Array");
     }
 
     @Override
@@ -129,7 +130,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final NClob getNClob(int columnIndex) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.NClob");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.NClob");
     }
 
     @Override
@@ -139,7 +140,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final SQLXML getSQLXML(int columnIndex) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.SQLXML");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.SQLXML");
     }
 
     @Override
@@ -149,7 +150,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final String getNString(int columnIndex) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNString(int)");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNString(int)");
     }
 
     @Override
@@ -159,7 +160,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final Reader getNCharacterStream(int columnIndex) throws SQLException {
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNCharacterStream(int)");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#getNCharacterStream(int)");
     }
 
     @Override

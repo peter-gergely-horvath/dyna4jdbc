@@ -13,7 +13,7 @@ import com.github.dyna4jdbc.internal.JDBCError;
  * A superclass of the actual {@code ResultSet} implementation we
  * expose in the JDBC driver, which rejects all attempts to change
  * data by throwing an {@code SQLException} with the code
- * {@code JDBC_FUNCTION_NOT_SUPPORTED} in all of the methods
+ * {@code JDBC_FEATURE_NOT_SUPPORTED} in all of the methods
  * related to updating or changing data represented by the
  * {@code ResultSet}.</p>
  *
@@ -39,7 +39,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -48,7 +48,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -57,7 +57,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
 
@@ -67,7 +67,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -76,7 +76,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -85,7 +85,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -94,7 +94,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -103,7 +103,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -112,7 +112,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     // -- update*(...) methods --
@@ -122,7 +122,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -131,7 +131,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -140,7 +140,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -149,7 +149,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -158,7 +158,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -167,7 +167,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -176,7 +176,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -185,7 +185,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -194,7 +194,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -203,7 +203,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -212,7 +212,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -221,7 +221,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -230,7 +230,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -239,7 +239,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -248,7 +248,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -257,7 +257,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -266,7 +266,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -275,7 +275,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -284,7 +284,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -293,7 +293,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -302,7 +302,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -311,7 +311,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -320,7 +320,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -329,7 +329,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -338,7 +338,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -347,7 +347,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -356,7 +356,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -365,7 +365,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -374,7 +374,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -383,7 +383,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -392,7 +392,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -401,7 +401,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -410,7 +410,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -419,7 +419,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -428,7 +428,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -437,7 +437,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -446,7 +446,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -455,7 +455,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -464,7 +464,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -473,7 +473,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -482,7 +482,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -491,7 +491,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -500,7 +500,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -509,7 +509,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -518,7 +518,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -527,7 +527,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -536,7 +536,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -545,7 +545,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -554,7 +554,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -563,7 +563,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -572,7 +572,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -581,7 +581,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -590,7 +590,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -599,7 +599,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -608,7 +608,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -617,7 +617,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -626,7 +626,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -635,7 +635,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -644,7 +644,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -653,7 +653,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -662,7 +662,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -671,7 +671,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -680,7 +680,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -689,7 +689,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -698,7 +698,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -707,7 +707,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -716,7 +716,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -725,7 +725,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -734,7 +734,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -743,7 +743,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -752,7 +752,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -761,7 +761,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -770,7 +770,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -779,7 +779,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -788,7 +788,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -797,7 +797,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -806,7 +806,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -815,7 +815,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -824,7 +824,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -833,7 +833,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -842,7 +842,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -851,7 +851,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -860,7 +860,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -870,7 +870,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -880,7 +880,7 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 
     @Override
@@ -890,6 +890,6 @@ public abstract class AbstractReadOnlyResultSet<T> extends AbstractResultSet<T> 
 
         // We implement result set concurrency CONCUR_READ_ONLY,
         // where the support of this method is optional
-        throw JDBCError.JDBC_FUNCTION_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
     }
 }
