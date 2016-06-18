@@ -137,7 +137,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
                     && childrenCloseThowable != null) {
                 // We do NOT have a clear root cause as multiple Throwables are
                 // caught, hence we are dealing with multiple failures in this case:
-                // we use still specify the (multiple) causes as _suppressed_.
+                // we still specify the (multiple) causes as _suppressed_.
                 throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(
                         Arrays.asList(internalCloseThrowable, childrenCloseThowable),
                         this, "Multiple exceptions raised during close; see suppressed");
