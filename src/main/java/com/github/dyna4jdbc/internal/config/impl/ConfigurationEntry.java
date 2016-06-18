@@ -3,6 +3,9 @@ package com.github.dyna4jdbc.internal.config.impl;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.sql.DriverPropertyInfo;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -112,6 +115,20 @@ enum ConfigurationEntry {
 
             config.setConversionCharset(charset);
         }
+    },
+    CLASSPATH("classpath", "", "The classpath to use when loading the ScriptEngine. "
+            + "Default is empty (expect the application to provide the library).") {
+
+                @Override
+                void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
+                    List<String> classpathList;
+                    if (value == null || "".equals(value)) {
+                        classpathList = Collections.emptyList();
+                    } else {
+                        classpathList = Arrays.asList(value.split(";"));
+                    }
+                    config.setClasspath(classpathList);
+                }
     },
     ENF_OF_DATA_REGEX("endOfDataRegex", null,
                                 "The regular expression to detect end of data for interactive console applications.") {

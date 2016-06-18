@@ -2,8 +2,38 @@ package com.github.dyna4jdbc.internal.config.impl;
 
 import com.github.dyna4jdbc.internal.config.Configuration;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * <p>
+ * The implementation of {@link Configuration}, which allows settings the values in a 
+ * standard POJO-like fashion. </p>
+ * 
+ * <p>
+ * This class is intentionally made package-local: the world outside of this package
+ * should not be able to make any kind of adjustment to the {@code Configuration}
+ * object, but should use
+ * {@link com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory
+ * DefaultConfigurationFactory} to acquire a read-only instance (with no setter
+ * methods exposed)</p>
+ *  
+ * <p>
+ * Notices for the implementation: this class shall be a (technically) immutable
+ * data container, and nothing more:
+ * <ul>
+ * <li>This is a POJO class: no logic shall be implemented inside.</li>
+ * <li>Beware of mutable data (arrays, {@code List}s, {@code Date} etc):
+ *      create a defensive copy.</li>
+ * <li>Never expose a mutable data type (arrays, {@code List}s, {@code Date} etc)
+ *      directly: return a copy instead.</li>
+ * </ul> 
+ * </p>
+ *
+ * @author Peter G. Horvath
+ */
 class ConfigurationImpl implements Configuration {
 
     private char cellSeparator;
@@ -12,8 +42,10 @@ class ConfigurationImpl implements Configuration {
     private String conversionCharset;
     private Pattern endOfDataPattern;
     private long externalCallQuietPeriodThresholdMs;
+    private List<String> classpath;
 
 
+    // public getters
     @Override
     public char getCellSeparator() {
         return this.cellSeparator;
@@ -47,26 +79,40 @@ class ConfigurationImpl implements Configuration {
         return externalCallQuietPeriodThresholdMs;
     }
 
-
-
-    public void setConversionCharset(String conversionCharset) {
-        this.conversionCharset = conversionCharset;
-    }
-
+    @Override
     public String getConversionCharset() {
         return conversionCharset;
     }
 
-    public void setPreferMultipleResultSets(boolean preferMultipleResultSets) {
+    @Override
+    public List<String> getClasspath() {
+        /* The returned list is immutable ("unmodifiable") so client code
+         * cannot accidentally change the global configuration by changing
+         * the contents of the returned list */
+        return Collections.unmodifiableList(classpath);
+    }
+
+    // package-local setters
+    void setConversionCharset(String conversionCharset) {
+        this.conversionCharset = conversionCharset;
+    }
+
+    void setPreferMultipleResultSets(boolean preferMultipleResultSets) {
         this.preferMultipleResultSets = preferMultipleResultSets;
     }
 
-    public void setEndOfDataPattern(Pattern endOfDataPattern) {
+    void setEndOfDataPattern(Pattern endOfDataPattern) {
         this.endOfDataPattern = endOfDataPattern;
     }
 
-    public void setExternalCallQuietPeriodThresholdMs(long externalCallQuietPeriodThresholdMs) {
+    void setExternalCallQuietPeriodThresholdMs(long externalCallQuietPeriodThresholdMs) {
         this.externalCallQuietPeriodThresholdMs = externalCallQuietPeriodThresholdMs;
+    }
+
+    void setClasspath(List<String> classpath) {
+        // create a defensive copy of the *source* list so that
+        // unexpected changes to the original list cannot bite us later on
+        this.classpath = new ArrayList<>(classpath);
     }
 
 }
