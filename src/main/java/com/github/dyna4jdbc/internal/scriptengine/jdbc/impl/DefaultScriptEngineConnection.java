@@ -7,9 +7,12 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -27,13 +30,15 @@ import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingPreparedS
 import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
-import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream;
-import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream.AbortHandler;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultColumnHandlerFactory;
+import com.github.dyna4jdbc.internal.common.util.classpath.ClassLoaderFactory;
+import com.github.dyna4jdbc.internal.common.util.classpath.DefaultClassLoaderFactory;
 import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
+import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream;
+import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream.AbortHandler;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
@@ -41,6 +46,8 @@ import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
 public class DefaultScriptEngineConnection extends AbstractConnection implements OutputCapturingScriptExecutor {
 
+    private static final Logger LOGGER = Logger.getLogger(DefaultScriptEngineConnection.class.getName());
+    
     private final Object lockObject = new Object();
 
     private final ScriptEngine engine;
@@ -69,22 +76,43 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
                     "Scrip Engine Name is not specified");
         }
 
-        this.engine = loadEngineByName(engineName);
-
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
         this.configuration =
                 configurationFactory.newConfigurationFromParameters(configurationString, properties);
 
+        ClassLoaderFactory classloaderFactory = DefaultClassLoaderFactory.getInstance();
+        
+        this.engine = loadEngineByName(engineName, this.configuration, classloaderFactory);
+        
         this.columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
 
     }
 
-    private static ScriptEngine loadEngineByName(String engineName) throws SQLException {
-        ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+    private static ScriptEngine loadEngineByName(
+            String engineName,
+            Configuration configuration,
+            ClassLoaderFactory classloaderFactory) throws SQLException, MisconfigurationException {
+
+        List<String> classpath = configuration.getClasspath();
+
+        ClassLoader classLoader;
+        if (!classpath.isEmpty()) {
+            LOGGER.fine("classpath specified, creating a ClassLoader for handling ...");
+            classLoader = classloaderFactory.newClassLoaderFromClasspath(classpath);
+        } else {
+            classLoader = Thread.currentThread().getContextClassLoader();
+        }
+
+        ScriptEngineManager scriptEngineManager = new ScriptEngineManager(classLoader);
         ScriptEngine scriptEngine = scriptEngineManager.getEngineByName(engineName);
         if (scriptEngine == null) {
             throw JDBCError.LOADING_SCRIPTENGINE_FAILED.raiseSQLException(engineName);
+        }
+
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine(String.format("ScriptEngine '%s' loaded using class loader '%s'",
+                    engineName, classLoader));
         }
 
         return scriptEngine;
@@ -118,18 +146,17 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
         return new OutputHandlingStatement<>(this, outputHandlerFactory, this);
     }
-    
+
     @Override
     protected final PreparedStatement prepareStatementInternal(String script) throws SQLException {
 
         ScriptOutputHandlerFactory outputHandlerFactory =
                 new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
-        
+
         return new OutputHandlingPreparedStatement<>(script, this, outputHandlerFactory, this);
     }
 
 
-    
     @Override
     public final void executeScriptUsingStreams(
             String script,
