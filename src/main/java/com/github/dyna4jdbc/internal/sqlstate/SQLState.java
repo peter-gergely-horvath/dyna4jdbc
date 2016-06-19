@@ -19,7 +19,7 @@ public enum SQLState {
     FEATURE_NOT_SUPPORTED(Category.ERROR, "0A", "Feature not supported"),
 
     ERROR_DATA_EXCEPTION_CLASS(Category.ERROR, "22", "Data exception"),
-    ERROR_DATA_CONVERSION_FAILED(ERROR_DATA_EXCEPTION_CLASS, "018", "The conversion is not supported"),
+    ERROR_DATA_CONVERSION_FAILED(ERROR_DATA_EXCEPTION_CLASS, "018", "The conversion failed"),
     ERROR_DATA_CONVERSION_NOT_SUPPORTED(ERROR_DATA_EXCEPTION_CLASS, "021", "The conversion is not supported"),
 
     EXTERNAL_ROUTINE_INVOCATION_EXCEPTION(Category.ERROR, "39", "External routine invocation exception"),

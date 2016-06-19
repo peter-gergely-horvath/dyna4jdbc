@@ -17,7 +17,7 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
     public DataTableHolderResultSet(
             Statement statement, DataTable dataTable, ColumnHandlerFactory columnHandlerFactory) {
 
-        super(dataTable.getRows(), statement, initTypeHandlers(dataTable, columnHandlerFactory));
+        super(dataTable.getRows(), statement, initColumnHandlers(dataTable, columnHandlerFactory));
         this.dataTable = dataTable;
 
         if (checkFirstRowIsSkipped(getColumnHandlers())) {
@@ -25,7 +25,7 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
         }
     }
 
-    private static List<ColumnHandler> initTypeHandlers(DataTable dataTable,
+    private static List<ColumnHandler> initColumnHandlers(DataTable dataTable,
                                                         ColumnHandlerFactory columnHandlerFactory) {
 
         LinkedList<ColumnHandler> columnHandlerList = new LinkedList<>();
