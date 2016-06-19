@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -27,6 +28,7 @@ import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream;
+import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream.AbortHandler;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
@@ -46,10 +48,8 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
     private final ColumnHandlerFactory columnHandlerFactory;
     private final Configuration configuration;
-
-    // CAUTION: these fields HAVE TO BE volatile: see comments in method cancel()
-    private volatile AbortableOutputStream abortableOutputStreamForStandardOut;
-    private volatile AbortableOutputStream abortableOutputStreamForStandardError;
+    
+    private AtomicReference<AbortableOutputStream.AbortHandler> streamAbortHandlerRef = new AtomicReference<>();
 
     public DefaultScriptEngineConnection(String parameters, Properties properties)
             throws SQLException, MisconfigurationException {
@@ -137,31 +137,27 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
+        AbortHandler abortHandler = new AbortableOutputStream.AbortHandler();
+
         executeScriptUsingAbortableStreams(script,
                 variables,
-                new AbortableOutputStream(stdOutputStream),
-                new AbortableOutputStream(errorOutputStream));
+                new AbortableOutputStream(stdOutputStream, abortHandler),
+                new AbortableOutputStream(errorOutputStream, abortHandler),
+                abortHandler);
     }
 
     //CHECKSTYLE.OFF: DesignForExtension
     protected void executeScriptUsingAbortableStreams(String script, Map<String, Object> variables,
-            AbortableOutputStream stdOutputStream, AbortableOutputStream errorOutputStream) 
+            AbortableOutputStream stdOutputStream, AbortableOutputStream errorOutputStream, AbortHandler abortHandler)
                     throws ScriptExecutionException {
 
         synchronized (lockObject) {
+            streamAbortHandlerRef.set(abortHandler);
+
             /* We synchronize so that the execution of two concurrently commenced Statements cannot interfere
              * with each other: remember that ScriptEngines store state and hence are NOT thread-safe.
              * By synchronizing here, we basically implement a mutual exclusion policy for the ScriptEngine.
-             *
-             * Note that we *write* the fields abortableOutputStreamForStandardOut and
-             * abortableOutputStreamForStandardError, while holding the monitor of object lockObject, while
-             * they are *read*, WITHOUT the lock monitor being held in the method cancel(). For this to work
-             * correctly, both fields HAVE TO be _volatile_.
              */
-
-            this.abortableOutputStreamForStandardOut = stdOutputStream;
-            this.abortableOutputStreamForStandardError = errorOutputStream;
-
             ScriptContext engineContext = engine.getContext();
 
             Writer originalWriter = engineContext.getWriter();
@@ -188,10 +184,9 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
                 engineContext.setWriter(originalWriter);
                 engineContext.setErrorWriter(originalErrorWriter);
 
-                this.abortableOutputStreamForStandardOut = null;
-                this.abortableOutputStreamForStandardError = null;
+                streamAbortHandlerRef.set(null);
             }
-        }
+        } // end of synchronized (lockObject) block
     }
     //CHECKSTYLE.ON: DesignForExtension
 
@@ -227,41 +222,19 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
     @Override
     public final void cancel() throws CancelException {
-        /* NOTE: the fields abortableOutputStreamForStandardOut and abortableOutputStreamForStandardOut are
-         * *written* while the monitor of lockObject is held (synchronized (lockObject)). We read the fields
-         * here, without synchronizing on lockObject. This is required, as a thread requesting the execution
-         * of retains the monitor of lockObject, until the execution of the script is finished (either
-         * normally or abruptly). A ScriptEngine stuck on spinning by a broken user script retains the lock
-         * monitor and hence, the request to synchronize on lockObject would be blocked forever (DEADLOCK).
-         *
-         * To avoid such scenarios, we access fields abortableOutputStreamForStandardOut and
-         * abortableOutputStreamForStandardOut without synchronizing on lockObject. For this to work
-         * correctly, both fields HAVE TO be _volatile_.
-         */
         try {
-            if (abortableOutputStreamForStandardOut == null
-                    || abortableOutputStreamForStandardError == null) {
-
-                /* This is NOT redundant / the only source for IllegalStateException
-                 * in the catch block! This path is executed if cancel() is
-                 * called while the _finally_ block in method
-                 * executeScriptUsingAbortableStreams is being executed and has
-                 * just set the abortable streams to null. Remember: we are NOT
-                 * guarded by the lock monitor to prevent deadlocks.
-                 */
-                throw new IllegalStateException("Cancellation not possible: "
-                        + "either operation is finished, "
-                        + "or cancellation requested already");
+            /* We read this.streamAbortHandler without synchronizing on (lockObject)
+             * otherwise a ScriptEngine stuck on spinning a user script would prevent
+             * the cancel request acquiring the monitor, and hence ever reaching the
+             * AbortHandler.
+             */
+            AbortHandler abortHandler = this.streamAbortHandlerRef.get();
+            if (abortHandler == null) {
+                throw JDBCError.CANCEL_FAILED.raiseUncheckedException(
+                        "No running statement found.");
             }
 
-            /* TODO: what if the first one throws exception,
-             * but the script is actually spinning
-             * on something, which emits output to
-             * abortableOutputStreamForStandardError??
-             */
-            abortableOutputStreamForStandardOut.abort();
-            abortableOutputStreamForStandardError.abort();
-
+            abortHandler.abort();
         } catch (IllegalStateException ise) {
             throw JDBCError.CANCEL_REQUESTED_ALREADY.raiseUncheckedException(
                     ise, "Cancellation requested already.");

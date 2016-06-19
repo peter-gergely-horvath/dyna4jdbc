@@ -1,12 +1,14 @@
 package com.github.dyna4jdbc.integrationtests;
 
-import java.sql.*;
+import static org.testng.Assert.assertNotNull;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.testng.annotations.Test;
-
-import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.executeScriptForResultSetString;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
 
 public class JavaScriptScriptEngineTest extends AbstractScriptEngineIntegrationTest {
 

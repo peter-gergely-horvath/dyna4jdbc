@@ -12,6 +12,7 @@ import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream;
 import com.github.dyna4jdbc.internal.common.util.io.CloseSuppressingOutputStream;
+import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream.AbortHandler;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
 import scala.Console;
@@ -60,7 +61,8 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
     public void executeScriptUsingAbortableStreams(
             String script, 
             Map<String, Object> variables,
-            AbortableOutputStream stdOutputStream, AbortableOutputStream errorOutputStream)
+            AbortableOutputStream stdOutputStream, AbortableOutputStream errorOutputStream,
+            AbortHandler abortHandler)
             throws ScriptExecutionException {
 
         IOHandlerFactory ioHandlerFactory = getIoHandlerFactory();
@@ -80,7 +82,8 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
                         public Void apply() {
 
                             doExecuteScriptUsingAbortableStreams(
-                                    script, variables, stdOutputStream, errorOutputStream);
+                                    script, variables, stdOutputStream, errorOutputStream, 
+                                    abortHandler);
 
                             return null;
                         }
@@ -104,8 +107,9 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
     private void doExecuteScriptUsingAbortableStreams(
             String script, 
             Map<String, Object> variables, 
-            AbortableOutputStream stdOutputStream, 
-            AbortableOutputStream errorOutputStream) {
+            AbortableOutputStream stdOutputStream,
+            AbortableOutputStream errorOutputStream,
+            AbortHandler abortHandler) {
 
         try {
 
@@ -113,7 +117,8 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
                     script,
                     variables,
                     stdOutputStream,
-                    errorOutputStream);
+                    errorOutputStream,
+                    abortHandler);
 
         } catch (ScriptExecutionException e) {
             throw new RuntimeException(e);
