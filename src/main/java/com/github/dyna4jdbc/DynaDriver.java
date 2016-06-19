@@ -26,7 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.github.dyna4jdbc.internal.DriverInfo;
-import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.config.impl.DriverPropertyInfoFactory;
 
 
@@ -60,9 +59,13 @@ public final class DynaDriver implements java.sql.Driver {
     public Connection connect(String url, Properties info) throws SQLException {
 
         if (!acceptsURL(url)) {
-            JDBCError.CONNECT_FAILED_INVALID_URL.raiseSQLException(url);
+            /* From the JavaDoc of java.sql.Driver.connect(String, Properties): 
+             * 
+             * The driver should return "null" if it realizes it is the wrong 
+             * kind of driver to connect to the given URL.
+             */
+            return null;
         }
-
 
         /* strip JDBC URL prefix from connection string and
          * delegate the remaining section to the connection factory */
