@@ -17,7 +17,6 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -130,71 +129,8 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
             markClosedInternal();
             unRegisterFromParent();
 
-            Throwable internalCloseThrowable = tryCloseInternal();
-            Throwable childrenCloseThowable = tryCloseChildren();
-
-            if (internalCloseThrowable != null
-                    && childrenCloseThowable != null) {
-                // We do NOT have a clear root cause as multiple Throwables are
-                // caught, hence we are dealing with multiple failures in this case:
-                // we still specify the (multiple) causes as _suppressed_.
-                throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(
-                        Arrays.asList(internalCloseThrowable, childrenCloseThowable),
-                        this, "Multiple exceptions raised during close; see suppressed");
-            }
-
-            if (internalCloseThrowable != null) {
-                
-                if (internalCloseThrowable instanceof SQLException) {
-                    throw ((SQLException) internalCloseThrowable);
-                }
-                
-                throw JDBCError.CLOSE_FAILED.raiseSQLException(internalCloseThrowable,
-                        "Closing of this caused error, see root cause");
-            }
-
-            if (childrenCloseThowable != null) {
-                
-                if (childrenCloseThowable instanceof SQLException) {
-                    throw ((SQLException) childrenCloseThowable);
-                }
-
-                throw JDBCError.CLOSE_FAILED.raiseSQLException(childrenCloseThowable,
-                        "Closing of children caused error, see root cause");
-            }
-        }
-    }
-
-    private Throwable tryCloseInternal() {
-        Throwable internalCloseThrowable = null;
-        try {
-            closeInternal();
-        } catch (Throwable throwable) {
-            /* Normally, any Throwable caught here should be a
-             * SQLException, however, we catch all Throwables
-             * so as to handle offending implementations properly:
-             * if a RuntimeException or Error is thrown, we still
-             * catch it and wrap into a SQLException
-             */
-            internalCloseThrowable = throwable;
-        }
-        return internalCloseThrowable;
-    }
-
-    private Throwable tryCloseChildren() {
-        Throwable childrenCloseThowable = null;
-        try {
             closeChildObjects();
-        } catch (Throwable throwable) {
-            /* Normally, any Throwable caught here should be a
-             * SQLException, however, we catch all Throwables
-             * so as to handle offending implementations properly:
-             * if a RuntimeException or Error is thrown, we still
-             * catch it and wrap into a SQLException
-             */
-            childrenCloseThowable = throwable;
         }
-        return childrenCloseThowable;
     }
 
     /**
@@ -218,27 +154,14 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
     }
 
     /**
-     * <p>
-     * Executed when {@code this} object is closed. Concrete sub-classes might
-     * override this method to provide their own resource disposal logic.</p>
-     * <p>
-     * <b>NOTE: the implementation of this method MUST BE THREAD-SAFE!</b>
+     * Closes all child objects, even if some of them throw {@code Throwable} when
+     * the close method is called on them. Any {@code Throwable}s thrown by the
+     * child objects are later re-thrown, once closing of every child is completed.
      *
-     * @throws SQLException in case closing the resource fails
-     */
-    protected void closeInternal() throws SQLException {
-        // template method for subclasses to hook into close
-    }
-
-    /**
-     * Closes all child objects, even if some of them throw {@code Exception} when
-     * the close method is called on them. Any exceptions thrown by the child objects
-     * are later re-thrown, once closing of every child is completed.
-     *
-     * @throws SQLException if one or more child objects throw exception one close method call
+     * @throws SQLException if one or more child objects throw {@code Throwable} on close method call
      */
     private void closeChildObjects() throws SQLException {
-        LinkedList<Throwable> suppressedThrowables = new LinkedList<>();
+        LinkedList<Throwable> caughtThrowables = new LinkedList<>();
 
         for (AutoCloseable closeableObject : children) {
 
@@ -251,24 +174,26 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
                  * if a RuntimeException or Error is thrown, we still
                  * catch it and wrap into a SQLException
                  */
-                suppressedThrowables.add(closeThrowable);
+                caughtThrowables.add(closeThrowable);
             }
         }
 
         children.clear(); // closing also includes discarding references
 
-        if (!suppressedThrowables.isEmpty()) {
+        switch (caughtThrowables.size()) {
+            case 0:
+                return; // no Throwable caught: normal completion
 
-            if (suppressedThrowables.size() == 1) {
+            case 1:
                 // closure of a single child has failed: propagate the root cause as cause
-                throw JDBCError.CLOSE_FAILED.raiseSQLException(suppressedThrowables.getFirst(),
+                throw JDBCError.CLOSE_FAILED.raiseSQLException(caughtThrowables.getFirst(),
                         this, "Closing of child object caused exception");
 
-            } else {
+            default:
                 // closure of multiple children has failed: propagate them as suppressed
-                throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(suppressedThrowables,
+                throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(caughtThrowables,
                         this, "Closing of child objects caused exceptions; see supressed");
-            }
+
         }
     }
 
@@ -279,13 +204,17 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * closed.
      *
      * @param closableObject the object to register
-     * @throws SQLException if {@code this} is closed already
+     * @throws RuntimeException if {@code this} is closed already
      */
-    protected final void registerAsChild(AutoCloseable closableObject) throws SQLException {
-        checkNotClosed();
+    protected final void registerAsChild(AutoCloseable closableObject) {
+        if (isClosed()) {
+            JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+                    "Attempt to register a child to a closed object");
+        }
 
         if (closableObject == null) {
-            JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("closableObject to register cannot be null");
+            JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+                    "closableObject to register cannot be null");
         }
 
         children.add(closableObject);

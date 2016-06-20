@@ -43,18 +43,9 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
 
         this.scalaInterpreterMain.setContextClassLoader();
         this.scalaInterpreterMain.settings().processArgumentString(USEJAVACP_ARGUMENT);
-    }
 
-    @Override
-    protected void closeInternal() throws SQLException {
-
-        try {
-            this.scalaInterpreterMain.close();
-        } catch (Throwable e) {
-            JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(e, "Closing Scala ScriptEngine failed");
-        }
-
-        super.closeInternal();
+        registerAsChild(() ->
+                ScalaScriptEngineConnection.this.scalaInterpreterMain.close());
     }
 
     @Override

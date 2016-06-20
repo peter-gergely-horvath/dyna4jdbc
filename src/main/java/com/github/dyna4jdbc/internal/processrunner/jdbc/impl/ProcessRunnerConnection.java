@@ -40,6 +40,14 @@ public final class ProcessRunnerConnection extends AbstractConnection {
         columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
 
         this.scriptExecutor = new ProcessRunnerScriptExecutor(configuration, executorService);
+
+        registerAsChild(() -> {
+            try {
+                scriptExecutor.close();
+            } finally {
+                executorService.shutdownNow();
+            }
+        });
     }
 
     @Override
@@ -67,16 +75,4 @@ public final class ProcessRunnerConnection extends AbstractConnection {
         
         return new OutputHandlingPreparedStatement<>(script, this, outputHandlerFactory, scriptExecutor);
     }
-
-    @Override
-    protected void closeInternal() throws SQLException {
-        try {
-            scriptExecutor.close();
-        } finally {
-            executorService.shutdownNow();
-        }
-        
-        
-    }
-
 }

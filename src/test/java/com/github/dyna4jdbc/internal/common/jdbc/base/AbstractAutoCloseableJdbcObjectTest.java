@@ -19,6 +19,7 @@ package com.github.dyna4jdbc.internal.common.jdbc.base;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.RuntimeDyna4JdbcException;
 
+import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -40,27 +41,16 @@ public class AbstractAutoCloseableJdbcObjectTest {
 
     /**
      * A minimalistic implementation of {@code AbstractAutoCloseableJdbcObject},
-     * which allows us to detect if method {@code closeInternal()} is called:
+     * which allows us to detect if the an adaopted resource is closed properly:
      * the {@code Callable} supplied as constructor argument can be a mock.
      */
     private class AutoCloseableJdbcObject extends AbstractAutoCloseableJdbcObject {
 
-        private final Callable<Void> closeInternalCallable;
-
-        AutoCloseableJdbcObject(Callable<Void> closeInternalCallable) {
+        AutoCloseableJdbcObject(Callable<Void> closeInternalCallable) throws SQLException {
             super(null);
-            this.closeInternalCallable = closeInternalCallable;
-        }
 
-        @Override
-        protected void closeInternal() throws SQLException {
-            try {
-                closeInternalCallable.call();
-            } catch (SQLException sqlEx) {
-                throw sqlEx;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            registerAsChild(() ->
+                    closeInternalCallable.call() );
         }
     }
 
@@ -84,12 +74,12 @@ public class AbstractAutoCloseableJdbcObjectTest {
         verify(closeMock);
     }
 
-    private void expectCloseInternalIsCalled() throws Exception {
+    private void expectAdoptedResourceCloseIsCalled() throws Exception {
         expect(closeMock.call()).andReturn(null).once();
         replay(closeMock);
     }
 
-    private void expectCloseInternalIsCalledAndThrow(Throwable throwable) throws Exception {
+    private void expectAdoptedResourceCloseIsCalledAndThrow(Throwable throwable) throws Exception {
         expect(closeMock.call()).andThrow(throwable).once();
         replay(closeMock);
     }
@@ -97,15 +87,15 @@ public class AbstractAutoCloseableJdbcObjectTest {
     @Test
     public void testCloseCallsCloseInternal() throws Exception {
 
-        expectCloseInternalIsCalled();
+        expectAdoptedResourceCloseIsCalled();
 
         closeableJdbcObject.close();
     }
 
     @Test
-    public void testCloseInternalCalledOnceIfCloseIsCalledMultipleTimes() throws Exception {
+    public void testAdoptedResourceCloseIsCalledOnceIfCloseIsCalledMultipleTimes() throws Exception {
 
-        expectCloseInternalIsCalled();
+        expectAdoptedResourceCloseIsCalled();
 
         closeableJdbcObject.close();
         closeableJdbcObject.close();
@@ -120,16 +110,15 @@ public class AbstractAutoCloseableJdbcObjectTest {
                 JDBCError.DRIVER_BUG_UNEXPECTED_STATE.name().toString(), 
                 () -> closeableJdbcObject.registerAsChild(null));
         
-        expectCloseInternalIsCalled();
+        expectAdoptedResourceCloseIsCalled();
 
         closeableJdbcObject.close();
-        
     }
 
     @Test
     public void testRegisteringChildOnClosedObjectThrowsException() throws Exception {
 
-        expectCloseInternalIsCalled();
+        expectAdoptedResourceCloseIsCalled();
 
         AutoCloseable childObject = createStrictMock(AutoCloseable.class);
         replay(childObject);
@@ -142,11 +131,11 @@ public class AbstractAutoCloseableJdbcObjectTest {
 
             fail("Should have thrown an exception");
 
-        } catch (SQLException sqlEx) {
+        } catch (RuntimeException ex) {
 
-            String message = sqlEx.getMessage();
+            String message = ex.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.OBJECT_CLOSED.name().toString()));
+            assertTrue(message.contains(JDBCError.DRIVER_BUG_UNEXPECTED_STATE.name().toString()));
         }
 
         verify(childObject);
@@ -156,7 +145,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
     @Test
     public void testChildrenAreClosedOnceIfCloseIsCalledMultipleTimes() throws Exception {
 
-        expectCloseInternalIsCalled();
+        expectAdoptedResourceCloseIsCalled();
 
 
         AutoCloseable childOne = createStrictMock(AutoCloseable.class);
@@ -188,9 +177,9 @@ public class AbstractAutoCloseableJdbcObjectTest {
     }
 
     @Test
-    public void testCloseInternalExceptionIsNotSwallowed() throws Exception {
+    public void testAdoptedResourceCloseExceptionIsNotSwallowed() throws Exception {
 
-        expectCloseInternalIsCalledAndThrow(new SQLException("Message from closeInternal()"));
+        expectAdoptedResourceCloseIsCalledAndThrow(new SQLException("Message from adopted resource"));
 
         try {
 
@@ -199,15 +188,16 @@ public class AbstractAutoCloseableJdbcObjectTest {
             fail("Should have thrown an exception");
 
         } catch (SQLException sqlEx) {
-            assertEquals(sqlEx.getMessage(), "Message from closeInternal()");
+            String rootCauseMessage = ExceptionUtils.getRootCauseMessage(sqlEx);
+            assertEquals(rootCauseMessage, "Message from adopted resource");
         }
 
     }
 
     @Test
-    public void testChildrenAreClosedIfCloseInternalThrowsException() throws Exception {
+    public void testChildrenAreClosedIfAdoptedResourceThrowsException() throws Exception {
 
-        expectCloseInternalIsCalledAndThrow(new SQLException("CloseInternal throws exception"));
+        expectAdoptedResourceCloseIsCalledAndThrow(new SQLException("Adapted resource close throws exception"));
 
 
         AutoCloseable childOne = createStrictMock(AutoCloseable.class);
@@ -235,7 +225,8 @@ public class AbstractAutoCloseableJdbcObjectTest {
             fail("Should have thrown an exception");
 
         } catch (SQLException sqlEx) {
-            assertEquals(sqlEx.getMessage(), "CloseInternal throws exception");
+            String rootCauseMessage = ExceptionUtils.getRootCauseMessage(sqlEx);
+            assertEquals(rootCauseMessage, "Adapted resource close throws exception");
         }
 
         verify(childOne, childTwo, childThree);
@@ -243,9 +234,9 @@ public class AbstractAutoCloseableJdbcObjectTest {
     }
 
     @Test
-    public void testChildrenAreClosedIfCloseInternalAndAChildThrowsException() throws Exception {
+    public void testChildrenAreClosedIfAdoptedResourceCloseAndAChildThrowsException() throws Exception {
 
-        expectCloseInternalIsCalledAndThrow(new SQLException("CloseInternal throws exception"));
+        expectAdoptedResourceCloseIsCalledAndThrow(new SQLException("Adopted resource close() throws exception"));
 
 
         AutoCloseable childOne = createStrictMock(AutoCloseable.class);
@@ -278,7 +269,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
             assertNotNull(message);
             assertTrue(message.contains(JDBCError.CLOSE_FAILED.name().toString()));
 
-            assertStrackTraceContainsString(sqlEx, "CloseInternal throws exception");
+            assertStrackTraceContainsString(sqlEx, "Adopted resource close() throws exception");
             assertStrackTraceContainsString(sqlEx, "childTwo.close() throws exception");
         }
 
@@ -287,9 +278,9 @@ public class AbstractAutoCloseableJdbcObjectTest {
     }
 
     @Test
-    public void testChildrenAreClosedIfCloseInternalAndMultipleChildrenThrowException() throws Exception {
+    public void testChildrenAreClosedIfAdoptedResourceCloseAndMultipleChildrenThrowException() throws Exception {
 
-        expectCloseInternalIsCalledAndThrow(new SQLException("CloseInternal throws exception"));
+        expectAdoptedResourceCloseIsCalledAndThrow(new SQLException("Adopted resource close() throws exception"));
 
 
         AutoCloseable childOne = createStrictMock(AutoCloseable.class);
@@ -322,7 +313,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
             assertNotNull(message);
             assertTrue(message.contains(JDBCError.CLOSE_FAILED.name().toString()));
 
-            assertStrackTraceContainsString(sqlEx, "CloseInternal throws exception");
+            assertStrackTraceContainsString(sqlEx, "Adopted resource close() throws exception");
             assertStrackTraceContainsString(sqlEx, "childOne.close() throws exception");
             assertStrackTraceContainsString(sqlEx, "childTwo.close() throws exception");
             assertStrackTraceContainsString(sqlEx, "childThree.close() throws exception");
@@ -335,7 +326,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
     @Test
     public void testChildrenAreClosedIfAChildThrowsException() throws Exception {
 
-        expectCloseInternalIsCalled();
+        expectAdoptedResourceCloseIsCalled();
 
 
         AutoCloseable childOne = createStrictMock(AutoCloseable.class);

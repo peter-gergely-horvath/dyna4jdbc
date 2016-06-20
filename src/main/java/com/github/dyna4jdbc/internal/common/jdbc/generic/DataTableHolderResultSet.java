@@ -23,6 +23,8 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
         if (checkFirstRowIsSkipped(getColumnHandlers())) {
             super.skipNextRowIfPresent();
         }
+
+        registerAsChild(() -> dataTable.clear());
     }
 
     private static List<ColumnHandler> initColumnHandlers(DataTable dataTable,
@@ -80,11 +82,6 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
         }
 
         return shouldTakeFirstRowValue;
-    }
-
-    @Override
-    protected void closeInternal() throws SQLException {
-        dataTable.clear();
     }
 
     protected String getRawCellValueBySqlColumnIndex(int sqlColumnIndex) throws SQLException {
