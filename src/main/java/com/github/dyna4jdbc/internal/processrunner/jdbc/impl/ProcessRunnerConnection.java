@@ -27,6 +27,7 @@ public final class ProcessRunnerConnection extends AbstractConnection {
     private final Configuration configuration;
     private final ProcessRunnerScriptExecutor scriptExecutor;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final AutoCloseable onCloseCallback;
 
 
     public ProcessRunnerConnection(
@@ -41,13 +42,18 @@ public final class ProcessRunnerConnection extends AbstractConnection {
 
         this.scriptExecutor = new ProcessRunnerScriptExecutor(configuration, executorService);
 
-        registerAsChild(() -> {
-            try {
-                scriptExecutor.close();
-            } finally {
-                executorService.shutdownNow();
-            }
-        });
+        // store the onCloseCallback callback as hard-reference,
+        // since registerAsChild() uses weak references!
+        this.onCloseCallback = () -> onClose();
+        registerAsChild(this.onCloseCallback);
+    }
+
+    private void onClose() {
+        try {
+            scriptExecutor.close();
+        } finally {
+            executorService.shutdownNow();
+        }
     }
 
     @Override

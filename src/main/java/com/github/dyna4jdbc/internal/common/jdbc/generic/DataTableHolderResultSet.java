@@ -13,6 +13,7 @@ import java.util.*;
 public final class DataTableHolderResultSet extends DataRowListResultSet<List<String>> {
 
     private final DataTable dataTable;
+    private final AutoCloseable onCloseCallback;
 
     public DataTableHolderResultSet(
             Statement statement, DataTable dataTable, ColumnHandlerFactory columnHandlerFactory) {
@@ -24,7 +25,14 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
             super.skipNextRowIfPresent();
         }
 
-        registerAsChild(() -> dataTable.clear());
+        // store the onCloseCallback callback as hard-reference,
+        // since registerAsChild() uses weak references!
+        this.onCloseCallback = () -> onClose();
+        registerAsChild(onCloseCallback);
+    }
+
+    private void onClose() {
+        this.dataTable.clear();
     }
 
     private static List<ColumnHandler> initColumnHandlers(DataTable dataTable,
