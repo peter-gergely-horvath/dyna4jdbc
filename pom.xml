@@ -286,6 +286,7 @@
                                 <dir>${project.build.directory}/findbugs</dir>
                                 <excludes>
                                     <exclude>findbugs-exclude.xml</exclude>
+									<exclude>findbugsXml.html</exclude>
                                 </excludes>
 
 
