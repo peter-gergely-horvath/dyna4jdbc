@@ -11,3 +11,9 @@ This approach combines the power of dynamic languages with the rich ecosystem of
 For further information, please check out the [official project home page] (http://dyna4jdbc.org/) and the documentation at the [project Wiki Page](https://github.com/peter-gergely-horvath/dyna4jdbc/wiki)
 
 Visit the [release download section](https://github.com/peter-gergely-horvath/dyna4jdbc/releases) to download the binary version of dyna4jdbc JDBC driver. 
+
+## Build Status
+
+[![Build Status](https://travis-ci.org/peter-gergely-horvath/dyna4jdbc.svg?branch=master)](https://travis-ci.org/peter-gergely-horvath/dyna4jdbc)
+
+Continuous integration platform is provided by [Travis CI](https://travis-ci.org/)
