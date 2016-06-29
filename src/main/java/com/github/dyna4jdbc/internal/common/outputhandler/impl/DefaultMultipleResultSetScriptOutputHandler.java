@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
  */
 final class DefaultMultipleResultSetScriptOutputHandler implements MultipleResultSetScriptOutputHandler {
 
+    private static final int NO_BOUNDS_MAX_ROWS = 0;
+
     private final Statement statement;
     private final DataTableWriter stdOut;
     private final OutputStream stdErr;
@@ -25,12 +27,20 @@ final class DefaultMultipleResultSetScriptOutputHandler implements MultipleResul
     DefaultMultipleResultSetScriptOutputHandler(
             Statement statement,
             ColumnHandlerFactory columnHandlerFactory,
-            Configuration configuration, SQLWarningSink warningSink) {
+            Configuration configuration, SQLWarningSink warningSink, int maxRows) {
 
         this.statement = statement;
         this.columnHandlerFactory = columnHandlerFactory;
 
-        this.stdOut = new DataTableWriter(configuration);
+        if (maxRows != NO_BOUNDS_MAX_ROWS) {
+
+            final int maxRowsIncludingHeaders = maxRows + 1;
+
+            this.stdOut = new BoundedDataTableWriter(configuration, maxRowsIncludingHeaders);
+        } else {
+            this.stdOut = new DataTableWriter(configuration);
+        }
+
         this.stdErr = new SQLWarningSinkOutputStream(configuration, warningSink);
     }
 

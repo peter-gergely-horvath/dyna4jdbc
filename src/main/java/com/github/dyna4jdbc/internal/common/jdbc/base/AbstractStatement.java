@@ -26,6 +26,8 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     private Iterator<ResultSet> resultSetIterator;
     private int currentUpdateCount = INVALID_UPDATE_COUNT;
 
+    private int maxRows = 0;
+
     public AbstractStatement(T connection) {
         super(connection);
         this.connection = connection;
@@ -176,12 +178,14 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final int getMaxRows() throws SQLException {
-        return 0; // no limit
+        checkNotClosed();
+        return this.maxRows;
     }
 
     @Override
     public final void setMaxRows(int max) throws SQLException {
-        // TODO: implement
+        checkNotClosed();
+        this.maxRows = max;
     }
 
     @Override

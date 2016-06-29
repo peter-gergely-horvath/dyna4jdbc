@@ -5,10 +5,12 @@ import java.sql.Statement;
 public interface ScriptOutputHandlerFactory {
 
     SingleResultSetScriptOutputHandler
-        newSingleResultSetQueryScriptOutputHandler(Statement statement, String script, SQLWarningSink warningSink);
+        newSingleResultSetQueryScriptOutputHandler(
+            Statement statement, String script, SQLWarningSink warningSink, int maxRows);
 
     MultipleResultSetScriptOutputHandler
-        newUpdateOrQueryScriptOutputHandler(Statement statement, String script, SQLWarningSink warningSink);
+        newUpdateOrQueryScriptOutputHandler(
+            Statement statement, String script, SQLWarningSink warningSink, int maxRows);
 
     UpdateScriptOutputHandler
         newUpdateScriptOutputHandler(Statement statement, String script, SQLWarningSink warningSink);

@@ -19,6 +19,8 @@ import java.util.List;
  */
 final class DefaultSingleResultSetScriptOutputHandler implements SingleResultSetScriptOutputHandler {
 
+    private static final int NO_BOUNDS_MAX_ROWS = 0; // TODO: constant is duplicated among multiple classes
+
     private final Statement statement;
     private final DataTableWriter stdOut;
     private final OutputStream stdErr;
@@ -27,12 +29,18 @@ final class DefaultSingleResultSetScriptOutputHandler implements SingleResultSet
     DefaultSingleResultSetScriptOutputHandler(
             Statement statement,
             ColumnHandlerFactory columnHandlerFactory,
-            Configuration configuration, SQLWarningSink warningSink) {
+            Configuration configuration, SQLWarningSink warningSink, int maxRows) {
 
         this.statement = statement;
         this.columnHandlerFactory = columnHandlerFactory;
 
-        this.stdOut = new DataTableWriter(configuration);
+        if (maxRows != NO_BOUNDS_MAX_ROWS) {
+            final int maxRowsIncludingHeaders = maxRows + 1;
+
+            this.stdOut = new BoundedDataTableWriter(configuration, maxRowsIncludingHeaders);
+        } else {
+            this.stdOut = new DataTableWriter(configuration);
+        }
         this.stdErr = new SQLWarningSinkOutputStream(configuration, warningSink);
     }
 
@@ -53,7 +61,7 @@ final class DefaultSingleResultSetScriptOutputHandler implements SingleResultSet
 
             default:
                 throw JDBCError.RESULT_SET_MULTIPLE_EXPECTED_ONE.raiseSQLException(
-                        "dataTableList has multiple entries, expected one: " + dataTableList.size());
+                        "Expected one ResultSet, script generated multiple: " + dataTableList.size());
         }
 
         return new DataTableHolderResultSet(statement, singleDataTable, columnHandlerFactory);

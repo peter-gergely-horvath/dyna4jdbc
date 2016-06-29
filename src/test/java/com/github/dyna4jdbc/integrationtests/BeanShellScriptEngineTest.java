@@ -41,7 +41,7 @@ public class BeanShellScriptEngineTest extends AbstractScriptEngineIntegrationTe
 
         String script = "print(\"A::\tB::\");\n print(\"First A\tFirst B\");\n print(\"Second A\tSecond B\");";
 
-        assertIfHeadersSpecifiedThenHeadersAreUsed(script);
+        assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
 }

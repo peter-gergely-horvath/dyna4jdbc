@@ -83,7 +83,8 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
     private ResultSet executeQueryInternal(String script) throws ScriptExecutionException, IOException, SQLException {
 
         SingleResultSetScriptOutputHandler outputHandler =
-                scriptOutputHandlerFactory.newSingleResultSetQueryScriptOutputHandler(this, script, warningSink);
+                scriptOutputHandlerFactory.newSingleResultSetQueryScriptOutputHandler(
+                        this, script, warningSink, getMaxRows());
 
         executeScriptUsingOutputHandler(script, outputHandler);
 
@@ -170,7 +171,8 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
     private boolean executeInternal(String script) throws ScriptExecutionException, IOException, SQLException {
 
         MultipleResultSetScriptOutputHandler outputHandler =
-                scriptOutputHandlerFactory.newUpdateOrQueryScriptOutputHandler(this, script, warningSink);
+                scriptOutputHandlerFactory.newUpdateOrQueryScriptOutputHandler(
+                        this, script, warningSink, getMaxRows());
 
         executeScriptUsingOutputHandler(script, outputHandler);
 

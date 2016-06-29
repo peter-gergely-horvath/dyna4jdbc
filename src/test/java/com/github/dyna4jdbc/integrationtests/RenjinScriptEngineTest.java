@@ -41,7 +41,7 @@ public class RenjinScriptEngineTest extends AbstractScriptEngineIntegrationTest 
 
         String script = "cat(\"A::\tB::\n\")\n cat(\"First A\tFirst B\n\")\n cat(\"Second A\tSecond B\")";
 
-        assertIfHeadersSpecifiedThenHeadersAreUsed(script);
+        assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
 }

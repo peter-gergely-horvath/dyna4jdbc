@@ -47,8 +47,40 @@ public class JavaScriptScriptEngineTest extends AbstractScriptEngineIntegrationT
 
         String script = "print(\"A::\tB::\");\n print(\"First A\tFirst B\");\n print(\"Second A\tSecond B\");";
 
-        assertIfHeadersSpecifiedThenHeadersAreUsed(script);
+        assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
+
+    @Test
+    public void testStatementMaxRowsHandlingWithHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("print(\"A::\tB::\");\n ")
+                .append("print(\"First A\tFirst B\");\n ")
+                .append("print(\"Second A\tSecond B\");")
+                .append("print(\"Third A\tThird B\");")
+                .append("print(\"Fourth A\tFourth B\");")
+                .append("print(\"Fifth A\tFifth B\");")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyWithHeaders(script);
+    }
+
+    @Test
+    public void testStatementMaxRowsHandlingNoHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("print(\"A:\tB:\");\n ")
+                .append("print(\"First A\tFirst B\");\n ")
+                .append("print(\"Second A\tSecond B\");")
+                .append("print(\"Third A\tThird B\");")
+                .append("print(\"Fourth A\tFourth B\");")
+                .append("print(\"Fifth A\tFifth B\");")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyNoHeaders(script);
+    }
+
+
 
     @Test
     public void testPreparedStatementBindsVariable() throws Exception {

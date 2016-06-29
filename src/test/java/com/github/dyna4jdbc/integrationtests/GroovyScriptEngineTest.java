@@ -41,7 +41,7 @@ public class GroovyScriptEngineTest extends AbstractScriptEngineIntegrationTest 
 
         String script = "println('A::\tB::'); println('First A\tFirst B'); println('Second A\tSecond B');";
 
-        assertIfHeadersSpecifiedThenHeadersAreUsed(script);
+        assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
 }

@@ -41,7 +41,7 @@ public class JRubyScriptEngineTest extends AbstractScriptEngineIntegrationTest {
 
         String script = "puts\"A::\tB::\"\n puts \"First A\tFirst B\"\n puts \"Second A\tSecond B\" ";
 
-        assertIfHeadersSpecifiedThenHeadersAreUsed(script);
+        assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
 }

@@ -21,20 +21,21 @@ public final class DefaultScriptOutputHandlerFactory implements ScriptOutputHand
     public SingleResultSetScriptOutputHandler newSingleResultSetQueryScriptOutputHandler(
             Statement statement,
             String script,
-            SQLWarningSink warningSink) {
+            SQLWarningSink warningSink, int maxRows) {
 
         return new DefaultSingleResultSetScriptOutputHandler(
-                statement, columnHandlerFactory, configuration, warningSink);
+                statement, columnHandlerFactory, configuration, warningSink, maxRows);
     }
 
     @Override
     public MultipleResultSetScriptOutputHandler newUpdateOrQueryScriptOutputHandler(
             Statement statement,
             String script,
-            SQLWarningSink warningSink) {
+            SQLWarningSink warningSink,
+            int maxRows) {
 
         return new DefaultMultipleResultSetScriptOutputHandler(
-                statement, columnHandlerFactory, configuration, warningSink);
+                statement, columnHandlerFactory, configuration, warningSink, maxRows);
     }
 
     @Override

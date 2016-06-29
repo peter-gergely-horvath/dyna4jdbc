@@ -41,7 +41,7 @@ public class ClojureScriptEngineTest extends AbstractScriptEngineIntegrationTest
 
         String script = "(println \"A::\tB::\")\n (println \"First A\tFirst B\")\n (println \"Second A\tSecond B\")\n";
 
-        assertIfHeadersSpecifiedThenHeadersAreUsed(script);
+        assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
 }

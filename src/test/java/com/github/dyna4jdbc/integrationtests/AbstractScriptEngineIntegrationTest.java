@@ -76,7 +76,7 @@ public class AbstractScriptEngineIntegrationTest {
         assertEquals(resultSetString, expectedOutput);
     }
 
-    protected void assertIfHeadersSpecifiedThenHeadersAreUsed(String script) throws SQLException {
+    protected void assertIfHeadersAreSpecifiedThenHeadersAreUsed(String script) throws SQLException {
         String expectedOutput = newLineSeparated(
                 "RESULT SET #1 ",
                 "       A |        B | ",
@@ -85,6 +85,52 @@ public class AbstractScriptEngineIntegrationTest {
                 "Second A | Second B | ");
 
         String resultSetString = executeScriptForResultSetString(jdbcUrl, script);
+
+        assertEquals(resultSetString, expectedOutput);
+    }
+
+    protected void assertYieldsFirstTwoRowsOnlyWithHeaders(String script) throws SQLException {
+        String expectedOutput = newLineSeparated(
+                "RESULT SET #1 ",
+                "       A |        B | ",
+                "---------|----------|-",
+                " First A |  First B | ",
+                "Second A | Second B | ");
+
+
+        String resultSetString;
+        try(Connection connection = DriverManager.getConnection(jdbcUrl)) {
+
+            try (Statement statement = connection.createStatement();) {
+
+                statement.setMaxRows(2);
+
+                resultSetString = executeScriptForResultSetString(script, statement);
+            }
+        }
+
+        assertEquals(resultSetString, expectedOutput);
+    }
+
+    protected void assertYieldsFirstTwoRowsOnlyNoHeaders(String script) throws SQLException {
+        String expectedOutput = newLineSeparated(
+                "RESULT SET #1 ",
+                "       1 |        2 | ",
+                "---------|----------|-",
+                "      A: |       B: | ",
+                " First A |  First B | ");
+
+
+        String resultSetString;
+        try(Connection connection = DriverManager.getConnection(jdbcUrl)) {
+
+            try (Statement statement = connection.createStatement();) {
+
+                statement.setMaxRows(2);
+
+                resultSetString = executeScriptForResultSetString(script, statement);
+            }
+        }
 
         assertEquals(resultSetString, expectedOutput);
     }

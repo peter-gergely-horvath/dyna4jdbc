@@ -2,6 +2,7 @@ package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandler;
+import com.github.dyna4jdbc.internal.common.util.collection.BoundedIterator;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,6 +18,8 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
     private static final int SQL_INDEX_OFFSET = 1;
     private static final int SQL_INDEX_FIRST_ROW = 1;
 
+    private static final int MAX_ROWS_NO_RESTRICTION = 0;
+
 
     private T currentRow = null;
     private int javaIndex = -1;
@@ -27,11 +30,35 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
     private final Iterator<T> rowIterator;
 
     public DataRowListResultSet(
-            List<T> dataRows, Statement statement, List<ColumnHandler> columnHandlers) {
+            List<T> dataRows, Statement statement, List<ColumnHandler> columnHandlers)  {
         super(statement, columnHandlers);
 
-        this.rowIterator = dataRows.iterator();
+        // TODO: clean up handling of maxRows: introduce a separate Cursor class for maintaining position reference
+        try {
+            int maxRows;
+
+            Statement theCurrentStatement = getStatement();
+            if (theCurrentStatement != null) {
+                maxRows = theCurrentStatement.getMaxRows();
+            } else {
+                maxRows = MAX_ROWS_NO_RESTRICTION;
+            }
+
+            if (maxRows != MAX_ROWS_NO_RESTRICTION) {
+                this.rowIterator = new BoundedIterator<>(dataRows.iterator(), maxRows);
+            } else {
+                this.rowIterator = dataRows.iterator();
+            }
+
+        } catch (SQLException e) {
+            // should not happen, since the statement is active when
+            // we create this object
+            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+                    e, "Caught SQLException");
+        }
     }
+
+
 
     @Override
     public final int getRow() throws SQLException {
@@ -96,8 +123,17 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
     }
 
     protected final void skipNextRowIfPresent() {
-        if (this.rowIterator.hasNext()) {
-            rowIterator.next();
+        Iterator<T> theActualRowIterator;
+
+        if ((this.rowIterator instanceof BoundedIterator)) {
+            theActualRowIterator = ((BoundedIterator) this.rowIterator).getDelegate();
+        } else {
+            theActualRowIterator = this.rowIterator;
+        }
+
+
+        if (theActualRowIterator.hasNext()) {
+            theActualRowIterator.next();
         }
     }
 

@@ -42,7 +42,7 @@ public class JythonScriptEngineTest extends AbstractScriptEngineIntegrationTest 
 
         String script = "print \"A::\tB::\" \nprint \"First A\tFirst B\" \nprint \"Second A\tSecond B\"";
 
-        assertIfHeadersSpecifiedThenHeadersAreUsed(script);
+        assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
 }
