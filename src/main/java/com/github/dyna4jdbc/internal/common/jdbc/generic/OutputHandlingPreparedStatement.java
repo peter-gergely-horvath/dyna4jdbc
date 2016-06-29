@@ -208,6 +208,7 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
 
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException {
         checkNotClosed();

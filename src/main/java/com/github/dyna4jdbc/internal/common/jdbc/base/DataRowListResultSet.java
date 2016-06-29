@@ -126,7 +126,7 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
         Iterator<T> theActualRowIterator;
 
         if ((this.rowIterator instanceof BoundedIterator)) {
-            theActualRowIterator = ((BoundedIterator) this.rowIterator).getDelegate();
+            theActualRowIterator = ((BoundedIterator<T>) this.rowIterator).getDelegate();
         } else {
             theActualRowIterator = this.rowIterator;
         }
