@@ -32,12 +32,12 @@ import java.util.*;
 /**
  * @author Peter Horvath
  */
-public abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
+abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     private final List<ColumnHandler> columnHandlers;
     private final Map<String, Integer> columnNameToColumnIndexMap;
 
-    public ColumnHandlerResultSet(Statement statement, List<ColumnHandler> columnHandlers) {
+    ColumnHandlerResultSet(Statement statement, List<ColumnHandler> columnHandlers) {
         super(statement);
         this.columnHandlers = columnHandlers;
         columnNameToColumnIndexMap = initColumnNameToColumnIndexMap(columnHandlers);
@@ -78,9 +78,7 @@ public abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSe
     private ColumnHandler getColumnHandlerBySqlIndex(int sqlIndex) throws SQLException {
         final int javaIndex = sqlIndex - 1;
 
-        ColumnHandler columnHandler = columnHandlers.get(javaIndex);
-
-        return columnHandler;
+        return columnHandlers.get(javaIndex);
     }
 
     @Override
@@ -127,7 +125,7 @@ public abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSe
             Boolean convertedValue = columnHandler.covertToBoolean(rawCellValue);
             Boolean returnValue = setWasNullBasedOnLastValue(convertedValue);
 
-            return returnValue != null ? returnValue.booleanValue() : false;
+            return returnValue != null ? returnValue : false;
 
         } catch (TypeConversionException tce) {
             throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
@@ -146,7 +144,7 @@ public abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSe
 
             Byte returnValue = setWasNullBasedOnLastValue(convertedValue);
 
-            return returnValue != null ? returnValue.byteValue() : 0x0;
+            return returnValue != null ? returnValue : 0x0;
 
         } catch (TypeConversionException tce) {
             throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
@@ -163,7 +161,7 @@ public abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSe
             Short convertedValue = columnHandler.covertToShort(rawCellValue);
             Short returnValue = setWasNullBasedOnLastValue(convertedValue);
 
-            return returnValue != null ? returnValue.shortValue() : 0;
+            return returnValue != null ? returnValue : 0;
 
         } catch (TypeConversionException tce) {
             throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
@@ -181,7 +179,7 @@ public abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSe
 
             Integer returnValue = setWasNullBasedOnLastValue(convertedValue);
 
-            return returnValue != null ? returnValue.intValue() : 0;
+            return returnValue != null ? returnValue : 0;
 
         } catch (TypeConversionException tce) {
             throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
@@ -199,7 +197,7 @@ public abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSe
 
             Long returnValue = setWasNullBasedOnLastValue(convertedValue);
 
-            return returnValue != null ? returnValue.longValue() : 0L;
+            return returnValue != null ? returnValue : 0L;
 
         } catch (TypeConversionException tce) {
             throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
@@ -217,7 +215,7 @@ public abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSe
 
             Float returnValue = setWasNullBasedOnLastValue(convertedValue);
 
-            return returnValue != null ? returnValue.floatValue() : 0.0f;
+            return returnValue != null ? returnValue : 0.0f;
 
         } catch (TypeConversionException tce) {
             throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
@@ -235,7 +233,7 @@ public abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSe
 
             Double returnValue = setWasNullBasedOnLastValue(convertedValue);
 
-            return returnValue != null ? returnValue.doubleValue() : 0.0d;
+            return returnValue != null ? returnValue : 0.0d;
 
         } catch (TypeConversionException tce) {
             throw JDBCError.DATA_CONVERSION_FAILED.raiseSQLException(
