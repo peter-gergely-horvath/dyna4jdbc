@@ -1,22 +1,21 @@
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
+import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
+import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
+import com.github.dyna4jdbc.internal.common.typeconverter.TypeConverter;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
-
-import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
-import com.github.dyna4jdbc.internal.common.typeconverter.TypeConverter;
 
 class DefaultColumnHandler extends AbstractColumnHandler {
 
@@ -159,16 +158,7 @@ class DefaultColumnHandler extends AbstractColumnHandler {
 
     @Override
     public URL covertToURL(String rawCellValue) throws TypeConversionException {
-
-        try {
-            if (rawCellValue == null) {
-                return null;
-            }
-
-            return new URL(rawCellValue);
-        } catch (MalformedURLException e) {
-            throw new TypeConversionException(e);
-        }
+        return TypeConverterRegistry.URL.convert(rawCellValue);
     }
 
     @Override
