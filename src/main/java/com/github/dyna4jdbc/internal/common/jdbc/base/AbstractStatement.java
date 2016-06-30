@@ -217,13 +217,13 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     public final void setMaxFieldSize(int max) throws SQLException {
         checkNotClosed();
 
-        if(max == 0) {
+        if (max == 0) {
             // call was made with zero (no limit), the only value we support currently
             // accept this setting by not doing anything
             return;
         }
 
-        if(max < 0) {
+        if (max < 0) {
             // signal illegal argument: we expect non-negative value
             throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "maxFieldSize cannot be set to negative value: " + max);
@@ -245,7 +245,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     public final void setMaxRows(int max) throws SQLException {
         checkNotClosed();
 
-        if(max < 0) {
+        if (max < 0) {
             // signal illegal argument: we expect non-negative value
             throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "maxRows cannot be set to negative value: " + max);
@@ -270,13 +270,13 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     public final void setQueryTimeout(int seconds) throws SQLException {
         checkNotClosed();
 
-        if(seconds == 0) {
+        if (seconds == 0) {
             // call was made with zero (no limit), the only value we support currently
             // accept this setting by not doing anything
             return;
         }
 
-        if(seconds < 0) {
+        if (seconds < 0) {
             // signal illegal argument: we expect non-negative value
             throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "seconds cannot be set to negative value: " + seconds);
@@ -289,7 +289,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     }
 
     @Override
-    public void setCursorName(String name) throws SQLException {
+    public final void setCursorName(String name) throws SQLException {
         checkNotClosed();
 
         // No-op: "If the database does not support positioned update/delete, this method is a noop"
