@@ -35,6 +35,8 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final T getConnection() throws SQLException {
+        checkNotClosed();
+
         return connection;
     }
 
@@ -44,11 +46,15 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final int getUpdateCount() throws SQLException {
+        checkNotClosed();
+
         return this.currentUpdateCount;
     }
 
     @Override
     public final SQLWarning getWarnings() throws SQLException {
+        checkNotClosed();
+
         return sqlWarning;
     }
 
@@ -60,11 +66,15 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final void clearWarnings() throws SQLException {
+        checkNotClosed();
+
         sqlWarning = null;
     }
 
     @Override
     public final boolean getMoreResults(int current) throws SQLException {
+        checkNotClosed();
+
         if (current != Statement.CLOSE_CURRENT_RESULT
                 && current != Statement.KEEP_CURRENT_RESULT
                 && current != Statement.CLOSE_ALL_RESULTS) {
@@ -84,6 +94,8 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final void setFetchDirection(int direction) throws SQLException {
+        checkNotClosed();
+
         if (direction != ResultSet.FETCH_FORWARD
                 && direction != ResultSet.FETCH_REVERSE
                 && direction != ResultSet.FETCH_UNKNOWN) {
@@ -98,13 +110,19 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final int getFetchDirection() throws SQLException {
+        checkNotClosed();
+
         return ResultSet.FETCH_FORWARD;
     }
 
     @Override
     public final void setFetchSize(int rows) throws SQLException {
+        checkNotClosed();
+
         if (rows < 0) {
-            throw new SQLException("Invalid fetchSize: " + rows);
+            // signal illegal argument: we expect non-negative value
+            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+                    "fetchSize cannot be set to negative value: " + rows);
         }
 
         if (rows > 0) {
@@ -115,6 +133,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final ResultSet getResultSet() throws SQLException {
+        checkNotClosed();
 
         ResultSet resultSetToReturn;
         if (resultSetIterator != null && resultSetIterator.hasNext()) {
@@ -132,48 +151,88 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final boolean getMoreResults() throws SQLException {
+        checkNotClosed();
+
         return resultSetIterator != null && resultSetIterator.hasNext();
     }
 
 
     @Override
     public final int getFetchSize() throws SQLException {
+        checkNotClosed();
+
         return 0;
     }
 
     @Override
     public final int getResultSetConcurrency() throws SQLException {
+        checkNotClosed();
+
         return ResultSet.CONCUR_READ_ONLY;
     }
 
     @Override
     public final int getResultSetType() throws SQLException {
+        checkNotClosed();
+
         return ResultSet.TYPE_FORWARD_ONLY;
     }
 
     @Override
     public final ResultSet getGeneratedKeys() throws SQLException {
+        checkNotClosed();
+
         return new EmptyResultSet();
     }
 
     @Override
     public final int getResultSetHoldability() throws SQLException {
+        checkNotClosed();
+
         return ResultSet.HOLD_CURSORS_OVER_COMMIT;
     }
 
     @Override
     public final void setPoolable(boolean poolable) throws SQLException {
+        checkNotClosed();
 
+        /*
+        Implementation is no-op: this is just a HINT!
+
+        From the JavaDoc: "the value specified is a hint to the statement pool
+        implementation indicating whether the application wants the statement
+        to be pooled. It is up to the statement pool manager as to whether
+        the hint is used."
+        */
     }
 
     @Override
     public final int getMaxFieldSize() throws SQLException {
+        checkNotClosed();
+        // "zero means there is no limit"
         return 0;
     }
 
     @Override
     public final void setMaxFieldSize(int max) throws SQLException {
-        // TODO: implement
+        checkNotClosed();
+
+        if(max == 0) {
+            // call was made with zero (no limit), the only value we support currently
+            // accept this setting by not doing anything
+            return;
+        }
+
+        if(max < 0) {
+            // signal illegal argument: we expect non-negative value
+            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+                    "maxFieldSize cannot be set to negative value: " + max);
+        }
+
+        // max is a positive value: this is not implemented yet.
+        // We clearly signal this to the caller by throwing an exception
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
+                "java.sql.Statement.setMaxFieldSize(int)");
     }
 
     @Override
@@ -185,6 +244,13 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     @Override
     public final void setMaxRows(int max) throws SQLException {
         checkNotClosed();
+
+        if(max < 0) {
+            // signal illegal argument: we expect non-negative value
+            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+                    "maxRows cannot be set to negative value: " + max);
+        }
+
         this.maxRows = max;
     }
 
@@ -195,35 +261,62 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final int getQueryTimeout() throws SQLException {
+        checkNotClosed();
+        // "the current query timeout limit in seconds; zero means there is no limit"
         return 0;
     }
 
     @Override
     public final void setQueryTimeout(int seconds) throws SQLException {
+        checkNotClosed();
 
+        if(seconds == 0) {
+            // call was made with zero (no limit), the only value we support currently
+            // accept this setting by not doing anything
+            return;
+        }
+
+        if(seconds < 0) {
+            // signal illegal argument: we expect non-negative value
+            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+                    "seconds cannot be set to negative value: " + seconds);
+        }
+
+        // max is a positive value: this is not implemented yet.
+        // We clearly signal this to the caller by throwing an exception
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
+                "java.sql.Statement.setQueryTimeout(int)");
     }
 
     @Override
     public void setCursorName(String name) throws SQLException {
+        checkNotClosed();
+
         // No-op: "If the database does not support positioned update/delete, this method is a noop"
     }
 
     @Override
     public final boolean isPoolable() throws SQLException {
+        checkNotClosed();
+
         return false;
     }
 
     @Override
-    public final void closeOnCompletion() throws SQLException {
-        // TODO: implement
-    }
-
-    @Override
     public final boolean isCloseOnCompletion() throws SQLException {
-        return false; // TODO: implement
+        checkNotClosed();
+
+        return false;
     }
 
     // -- unsupported JDBC operations
+    @Override
+    public final void closeOnCompletion() throws SQLException {
+        // Not implemented for now: we clearly signal this to the caller
+        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
+                "java.sql.Statement.closeOnCompletion()");
+    }
+
     public final void addBatch(String sql) throws SQLException {
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                 "java.sql.Statement.addBatch(String)");

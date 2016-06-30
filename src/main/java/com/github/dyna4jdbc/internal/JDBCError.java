@@ -7,8 +7,6 @@ import com.github.dyna4jdbc.internal.sqlstate.SQLState;
 
 public enum JDBCError {
 
-    CONNECT_FAILED_INVALID_URL("Invalid URL: %s",
-            SQLState.ERROR_CONNECTION_UNABLE_TO_ESTABILISH),
     CONNECT_FAILED_EXCEPTION("Failed to connect: %s (examine stack trace for details)",
             SQLState.ERROR_CONNECTION_UNABLE_TO_ESTABILISH),
     OBJECT_CLOSED("Object has already been closed: %s", null),
