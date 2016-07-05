@@ -256,7 +256,9 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     @Override
     public final void setEscapeProcessing(boolean enable) throws SQLException {
+        checkNotClosed();
 
+        // no-op
     }
 
     @Override

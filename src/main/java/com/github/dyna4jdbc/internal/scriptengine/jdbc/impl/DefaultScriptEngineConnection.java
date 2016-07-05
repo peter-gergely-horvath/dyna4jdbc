@@ -14,11 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 
 import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.JDBCError;
@@ -186,6 +182,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
              * By synchronizing here, we basically implement a mutual exclusion policy for the ScriptEngine.
              */
             ScriptContext engineContext = engine.getContext();
+            Bindings bindings = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
 
             Writer originalWriter = engineContext.getWriter();
             Writer originalErrorWriter = engineContext.getErrorWriter();
@@ -196,7 +193,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
                 engineContext.setWriter(outputPrintWriter);
                 engineContext.setErrorWriter(errorPrintWriter);
 
-                applyVariablesToEngineScope(variables, engineContext);
+                applyVariablesToEngineScope(variables, bindings);
 
                 engine.eval(script);
 
@@ -206,7 +203,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
             } finally {
 
-                removeVariablesFromEngineScope(variables, engineContext);
+                removeVariablesFromEngineScope(variables, bindings);
 
                 engineContext.setWriter(originalWriter);
                 engineContext.setErrorWriter(originalErrorWriter);
@@ -217,24 +214,24 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
     }
     //CHECKSTYLE.ON: DesignForExtension
 
-    private void applyVariablesToEngineScope(Map<String, Object> variables, ScriptContext engineContext) {
+    private void applyVariablesToEngineScope(Map<String, Object> variables, Bindings bindings) {
         if (variables != null) {
             for (Map.Entry<String, Object> entry : variables.entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue();
 
-                engineContext.setAttribute(
-                        key, value, ScriptContext.ENGINE_SCOPE);
+
+                bindings.put(key, value);
             }
         }
     }
 
-    private void removeVariablesFromEngineScope(Map<String, Object> variables, ScriptContext engineContext) {
+    private void removeVariablesFromEngineScope(Map<String, Object> variables, Bindings bindings) {
         if (variables != null) {
             for (String key : variables.keySet()) {
 
-                engineContext.removeAttribute(
-                        key, ScriptContext.ENGINE_SCOPE);
+
+                bindings.remove(key);
             }
         }
     }
