@@ -88,7 +88,7 @@ public class HeuristicsColumnMetadataFactoryTest {
                                     diff.getFieldName(), diff.getLeft(), diff.getRight() ) )
                             .collect(Collectors.toList()));
                 
-                fail(diffResultString);
+                fail(String.format("\n%s", diffResultString));
             }
         } catch (IllegalAccessException
                 | IntrospectionException

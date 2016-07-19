@@ -87,7 +87,7 @@ class ColumnMetadataFactoryTestHelper {
 
         metadata.setConsumesFirstRowValue(false);
         metadata.setNullability(nullability);
-        metadata.setSigned(true);
+        metadata.setSigned(false);
         metadata.setColumnDisplaySize(23);
         metadata.setColumnLabel(header);
         metadata.setColumnName(header);
