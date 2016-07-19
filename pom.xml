@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-    <name>DYNA4JDBC: Dynamic Languages For JDBC Driver</name>
+    <name>DYNA4JDBC</name>
 
 	<groupId>com.github.peter-gergely-horvath</groupId>
 	<artifactId>dyna4jdbc</artifactId>
@@ -91,8 +91,8 @@
 
 		The console output of the scripts/external programs is captured, parsed and
         presented to the caller application as a standard JDBC ResultSet, allowing it
-        to be processed further for various purposes like analyzation with other
-        tools or building complex reports using any business intelligence applications.
+        to be processed further for various purposes like analysis with other tools or
+        building complex reports using any JDBC-enabled business intelligence application.
 	</description>
 	<inceptionYear>2016</inceptionYear>
 
