@@ -14,7 +14,7 @@ public class CommonTestUtils {
     }
 
     @FunctionalInterface
-    public static interface VoidCallable {
+    public interface VoidCallable {
         void call() throws Exception;
     };
 

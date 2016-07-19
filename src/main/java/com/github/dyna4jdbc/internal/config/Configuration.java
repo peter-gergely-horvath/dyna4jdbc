@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  * 
  * @author Peter G. Horvath
  *
- * @see com.github.dyna4jdbc.DynaDriver#connect(String, Properties)
+ * @see com.github.dyna4jdbc.DynaDriver#connect(String, java.util.Properties)
  * @see com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory
  */
 public interface Configuration {

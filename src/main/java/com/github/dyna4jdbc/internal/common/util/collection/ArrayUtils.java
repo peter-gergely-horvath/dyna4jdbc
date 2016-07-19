@@ -6,7 +6,7 @@ package com.github.dyna4jdbc.internal.common.util.collection;
 public final class ArrayUtils {
 
     private ArrayUtils() {
-        // static utility class
+        throw new AssertionError("static utility class");
     }
 
     public static <T> T tryGetByIndex(T[] array, int index) {

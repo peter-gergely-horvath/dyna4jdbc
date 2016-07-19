@@ -69,8 +69,11 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
         OutputStream outOutputStream = scriptOutputHandler.getOutOutputStream();
         OutputStream errorOutputStream = scriptOutputHandler.getErrorOutputStream();
 
-        getOutputCapturingScriptExecutor().executeScriptUsingStreams(scriptToExecute, 
-                Collections.unmodifiableMap(executionContext), 
+        OutputCapturingScriptExecutor scriptExecutor = getOutputCapturingScriptExecutor();
+
+
+        scriptExecutor.executeScriptUsingStreams(scriptToExecute,
+                Collections.unmodifiableMap(executionContext),
                 outOutputStream, errorOutputStream);
     }
 

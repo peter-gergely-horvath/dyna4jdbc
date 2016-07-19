@@ -8,7 +8,7 @@ import java.sql.SQLWarning;
 public final class SQLWarningUtils {
 
     private SQLWarningUtils() {
-        // static utility class -- no instances allowed
+        throw new AssertionError("static utility class");
     }
 
     public static SQLWarning chainSQLWarning(

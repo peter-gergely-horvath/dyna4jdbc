@@ -1,66 +1,58 @@
 package com.github.dyna4jdbc.internal.common.jdbc.generic;
 
-import java.sql.ParameterMetaData;
 import java.sql.SQLException;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractWrapper;
 
-public final class EmptyParameterMetaData extends AbstractWrapper implements ParameterMetaData {
+final class EmptyParameterMetaData extends AbstractWrapper implements java.sql.ParameterMetaData {
 
-    private static final int NOT_APPLICABLE_OR_UNKNOWN = 0;
-    
+    private static final int ZERO_PARAMETER_COUNT = 0;
+    private static final String PARAMETER_METADATA_NOT_AVAILABLE = "Parameter meta data is not available";
+
     @Override
     public int getParameterCount() throws SQLException {
-        return NOT_APPLICABLE_OR_UNKNOWN;
+        return ZERO_PARAMETER_COUNT;
     }
 
     @Override
     public int isNullable(int param) throws SQLException {
-        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
-                "EmptyParameterMetaData set is empty!");
+        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(PARAMETER_METADATA_NOT_AVAILABLE);
     }
 
     @Override
     public boolean isSigned(int param) throws SQLException {
-        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
-                "EmptyParameterMetaData set is empty!");
+        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(PARAMETER_METADATA_NOT_AVAILABLE);
     }
 
     @Override
     public int getPrecision(int param) throws SQLException {
-        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
-                "EmptyParameterMetaData set is empty!");
+        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(PARAMETER_METADATA_NOT_AVAILABLE);
     }
 
     @Override
     public int getScale(int param) throws SQLException {
-        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
-                "EmptyParameterMetaData set is empty!");
+        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(PARAMETER_METADATA_NOT_AVAILABLE);
     }
 
     @Override
     public int getParameterType(int param) throws SQLException {
-        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
-                "EmptyParameterMetaData set is empty!");
+        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(PARAMETER_METADATA_NOT_AVAILABLE);
     }
 
     @Override
     public String getParameterTypeName(int param) throws SQLException {
-        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
-                "EmptyParameterMetaData set is empty!");
+        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(PARAMETER_METADATA_NOT_AVAILABLE);
     }
 
     @Override
     public String getParameterClassName(int param) throws SQLException {
-        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
-                "EmptyParameterMetaData set is empty!");
+        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(PARAMETER_METADATA_NOT_AVAILABLE);
     }
 
     @Override
     public int getParameterMode(int param) throws SQLException {
-        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
-                "EmptyParameterMetaData set is empty!");
+        throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(PARAMETER_METADATA_NOT_AVAILABLE);
     }
 
 }
