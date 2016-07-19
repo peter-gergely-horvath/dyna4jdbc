@@ -67,7 +67,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
             detectionContext.maxPrecision = 0;
         }
 
-        metaData.setConsumesFirstRowValue(false);
+        metaData.setConsumesFirstRow(false);
         metaData.setCurrency(detectionContext.currency);
         metaData.setNullability(detectionContext.nullability);
         metaData.setSigned(detectionContext.signed);
@@ -173,14 +173,15 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
             detected.columnType = SQLDataType.DOUBLE;
             detected.signed = true;
 
-            final int scale = detected.columnType.getScale(cellValue);
-            final int precision = detected.columnType.getPrecision(cellValue);
+            if (cellValue != null) {
+                final int scale = detected.columnType.getScale(cellValue);
+                final int precision = detected.columnType.getPrecision(cellValue);
 
-            detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, scale - precision);
-            detected.maxSize = Math.max(detected.maxSize, cellValue.length());
-            detected.maxPrecision = Math.max(detected.maxPrecision, precision);
-            detected.maxScale = Math.max(detected.maxScale, scale);
-
+                detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, scale - precision);
+                detected.maxSize = Math.max(detected.maxSize, cellValue.length());
+                detected.maxPrecision = Math.max(detected.maxPrecision, precision);
+                detected.maxScale = Math.max(detected.maxScale, scale);
+            }
         }
     }
 

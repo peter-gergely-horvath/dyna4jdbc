@@ -65,7 +65,7 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
             ColumnHandler columnHandler = columnHandlers.get(i);
 
             final boolean thisTypeHandlerTakesFirstRowValue =
-                    columnHandler.getColumnMetadata().isConsumesFirstRowValue();
+                    columnHandler.getColumnMetadata().isConsumesFirstRow();
 
             if (shouldTakeFirstRowValue == null) {
                 shouldTakeFirstRowValue = thisTypeHandlerTakesFirstRowValue;

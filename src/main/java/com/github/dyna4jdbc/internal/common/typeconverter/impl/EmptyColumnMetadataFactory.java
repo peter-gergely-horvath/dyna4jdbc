@@ -22,7 +22,7 @@ final class EmptyColumnMetadataFactory implements ColumnMetadataFactory {
     public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValues) {
         DefaultColumnMetadata metadata = new DefaultColumnMetadata();
 
-        metadata.setConsumesFirstRowValue(false);
+        metadata.setConsumesFirstRow(false);
         metadata.setCurrency(false);
         metadata.setNullability(Nullability.UNKNOWN);
         metadata.setSigned(false);

@@ -18,7 +18,7 @@ class ColumnMetadataFactoryTestHelper {
 
         DefaultColumnMetadata metadata = new DefaultColumnMetadata();
 
-        metadata.setConsumesFirstRowValue(false);
+        metadata.setConsumesFirstRow(false);
         metadata.setColumnDisplaySize(scale);
         metadata.setNullability(nullability);
         metadata.setSigned(false);
@@ -38,7 +38,7 @@ class ColumnMetadataFactoryTestHelper {
 
         DefaultColumnMetadata metadata = new DefaultColumnMetadata();
 
-        metadata.setConsumesFirstRowValue(false);
+        metadata.setConsumesFirstRow(false);
         metadata.setColumnDisplaySize(scale);
         metadata.setNullability(nullability);
         metadata.setSigned(true);
@@ -66,7 +66,7 @@ class ColumnMetadataFactoryTestHelper {
             expectedColumnDisplaySize =  scale + 1;
         }
 
-        metadata.setConsumesFirstRowValue(false);
+        metadata.setConsumesFirstRow(false);
         metadata.setNullability(nullability);
         metadata.setSigned(true);
         metadata.setColumnDisplaySize(expectedColumnDisplaySize);
@@ -85,7 +85,7 @@ class ColumnMetadataFactoryTestHelper {
 
         DefaultColumnMetadata metadata = new DefaultColumnMetadata();
 
-        metadata.setConsumesFirstRowValue(false);
+        metadata.setConsumesFirstRow(false);
         metadata.setNullability(nullability);
         metadata.setSigned(false);
         metadata.setColumnDisplaySize(23);

@@ -4,7 +4,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 
 class DefaultColumnMetadata implements ColumnMetadata {
 
-    private boolean consumesFirstRowValue;
+    private boolean consumesFirstRow;
     private boolean currency;
     private Nullability nullability;
     private boolean signed;
@@ -16,8 +16,8 @@ class DefaultColumnMetadata implements ColumnMetadata {
     private SQLDataType columnType;
     private String formatString;
 
-    public boolean isConsumesFirstRowValue() {
-        return consumesFirstRowValue;
+    public boolean isConsumesFirstRow() {
+        return consumesFirstRow;
     }
 
     @Override
@@ -70,8 +70,8 @@ class DefaultColumnMetadata implements ColumnMetadata {
         return formatString;
     }
 
-    public void setConsumesFirstRowValue(boolean consumesFirstRowValue) {
-        this.consumesFirstRowValue = consumesFirstRowValue;
+    public void setConsumesFirstRow(boolean consumesFirstRow) {
+        this.consumesFirstRow = consumesFirstRow;
 
     }
 
@@ -128,8 +128,8 @@ class DefaultColumnMetadata implements ColumnMetadata {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("DefaultColumnMetadata[");
-        sb.append("\nconsumesFirstRowValue=");
-        sb.append(consumesFirstRowValue);
+        sb.append("\nconsumesFirstRow=");
+        sb.append(consumesFirstRow);
         sb.append(",\ncurrency=");
         sb.append(currency);
         sb.append(",\nnullability=");
@@ -170,7 +170,7 @@ class DefaultColumnMetadata implements ColumnMetadata {
         result = prime * result + precision;
         result = prime * result + scale;
         result = prime * result + (signed ? 1231 : 1237);
-        result = prime * result + (consumesFirstRowValue ? 1231 : 1237);
+        result = prime * result + (consumesFirstRow ? 1231 : 1237);
         return result;
     }
     //CHECKSTYLE.ON: MagicNumber : generated hashCode
@@ -214,7 +214,7 @@ class DefaultColumnMetadata implements ColumnMetadata {
             return false;
         if (signed != other.signed)
             return false;
-        if (consumesFirstRowValue != other.consumesFirstRowValue)
+        if (consumesFirstRow != other.consumesFirstRow)
             return false;
         return true;
     }

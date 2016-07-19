@@ -64,7 +64,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
             configureAdditional(metaData, metaDataConfig, columnIndex);
         }
 
-        metaData.setConsumesFirstRowValue(true);
+        metaData.setConsumesFirstRow(true);
 
     }
 
