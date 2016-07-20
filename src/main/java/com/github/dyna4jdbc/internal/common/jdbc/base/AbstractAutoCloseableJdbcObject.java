@@ -17,11 +17,7 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.github.dyna4jdbc.internal.JDBCError;
@@ -56,21 +52,19 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * <p>
      * Closing a parent object should close all the derived resources: this
      * {@code Set} is used to maintain <b>live references</b> to objects created
-     * by the actual subclass. Under the hoods, we use a "weak" {@code Set}, which
-     * means objects registered here are not prevented from being garbage collected:
-     * any object discarded by the garbage collector will simply be removed from the
-     * set. As a result, close operation will only be cascaded to live child objects.
-     * We wrap the "weak" {@code Set} so that operations will be thread-safe.</p>
-     * <p>
-     * <p>
-     * The intention here is to know all live objects related to {@code this}, but
-     * do NOT prevent them from being garbage collected in case they are no longer
-     * in use. </p>
+     * by the actual subclass.</p>
      *
-     * @see #createNewWeakHashSet()
+     * <p>
+     * This {@code Set} only contains live children: child objects de-register
+     * themselves when they are closed.</p>
+     *
+     * <p>
+     * Note: We use wrap {@code HashSet} to {@code synchronizedSet} so that
+     * operations will be thread-safe.</p>
+     *
      * @see #close()
      */
-    private final Set<AutoCloseable> children = Collections.synchronizedSet(createNewWeakHashSet());
+    private final Set<AutoCloseable> children = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * We maintain a reference to the parent object, so that we can
@@ -90,10 +84,21 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
     }
 
     /**
+     * <p>
      * Throws {@code SQLException} if {@code this} is closed.
      * This method is thread-safe: it shall consistently report
      * an object closed from one thread as closed from all other
-     * threads as well, <i>without external synchronisation.</i>
+     * threads as well, <i>without external synchronisation.</i></p>
+     *
+     * <p>
+     * <b>NOTE:</b> no guarantee is made whether underlying resources
+     * have already been freed. The value returned simply indicate
+     * whether {@link #close()} method has been called or not, but
+     * does not state whether its execution is finished (the call
+     * has returned already or not). A thread might well see an
+     * object as closed while the one initiating the close operation
+     * is still waiting for the {@link #close()} to return after
+     * executing the cleanup operations.</p>
      *
      * @throws SQLException if {@code this} is closed.
      */
@@ -125,8 +130,8 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * @throws SQLException in case closing {@code this} object or any of the the child object fails
      */
     public final void close() throws SQLException {
-        if (!isClosed()) {
-            markClosedInternal();
+        final boolean closedFlagSet = markClosedInternal();
+        if (closedFlagSet) {
             unRegisterFromParent();
 
             closeChildObjects();
@@ -134,12 +139,16 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
     }
 
     /**
-     * Sets the closed flag, but does not perform any of the resource closure.
+     * Sets the closed flag, if it is not yet set and returns and indication,
+     * whether it was set already. It does not perform any actual resource closure.
      * Must not be used except the infrastructure code use to handle
      * closing and resources.
+     *
+     * @return {@code true} if {@code this} object was successfully marked as closed,
+     *          {@code false} if it was marked as closed previously.
      */
-    protected final void markClosedInternal() {
-        closed.set(true);
+    protected final boolean markClosedInternal() {
+        return closed.compareAndSet(false, true);
     }
 
     /**
@@ -185,7 +194,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
                 return; // no Throwable caught: normal completion
 
             case 1:
-                // closure of a single child has failed: propagate the root cause as cause
+                // closure of a single child has failed: propagate it as the root cause
                 throw JDBCError.CLOSE_FAILED.raiseSQLException(caughtThrowables.getFirst(),
                         this, "Closing of child object caused exception");
 
@@ -233,32 +242,4 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
             registerAsChild(aClosableSQLObject);
         }
     }
-
-    /**
-     * Construct a new "weak" {@code HashSet} according to the same specification
-     * as described for {@link WeakHashMap}.
-     *
-     * @return a new "Weak" {@code HashSet}
-     */
-    private static <T> Set<T> createNewWeakHashSet() {
-
-        /*
-         * From the JavaDoc: "An entry in a WeakHashMap will automatically be
-         * removed when its key is no longer in ordinary use"
-         */
-        WeakHashMap<T, Boolean> weakHashMap = new WeakHashMap<>();
-
-        /*
-         * java.util.Collections.newSetFromMap(Map) creates a set VIEW of the
-         * supplied Map's KEY SET ==> Technically, it is a "WeakHashSet":
-         *
-         * From the JavaDoc: "Each method invocation on the set returned by this
-         * method results in exactly one method invocation on the backing map or
-         * its keySet view, with one exception. The addAll method is implemented
-         * as a sequence of put invocations on the backing map."
-         */
-
-        return Collections.newSetFromMap(weakHashMap);
-    }
-
 }

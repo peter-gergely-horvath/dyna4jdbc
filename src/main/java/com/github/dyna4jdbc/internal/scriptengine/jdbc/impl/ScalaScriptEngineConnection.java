@@ -24,7 +24,6 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
     private static final String USEJAVACP_ARGUMENT = "-usejavacp";
 
     private final IMain scalaInterpreterMain;
-    private final AutoCloseable onCloseCallback;
 
     public ScalaScriptEngineConnection(String parameters, Properties properties)
             throws SQLException, MisconfigurationException {
@@ -45,14 +44,7 @@ public final class ScalaScriptEngineConnection extends DefaultScriptEngineConnec
         this.scalaInterpreterMain.setContextClassLoader();
         this.scalaInterpreterMain.settings().processArgumentString(USEJAVACP_ARGUMENT);
 
-        // store the onClose callback as hard-reference,
-        // since registerAsChild() uses weak references!
-        this.onCloseCallback = () -> onClose();
-        registerAsChild(this.onCloseCallback);
-    }
-
-    private void onClose() {
-        this.scalaInterpreterMain.close();
+        registerAsChild(() -> this.scalaInterpreterMain.close());
     }
 
     @Override
