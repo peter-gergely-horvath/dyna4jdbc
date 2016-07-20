@@ -18,7 +18,15 @@ public class SQLStateTest {
     public void testNoCodeIsNull() throws SQLException {
 
         Stream.of(SQLState.values()).forEach(sqlState ->
-                assertNotNull(sqlState.code, "Invalid code for: " + sqlState)
+                assertNotNull(sqlState.code, "Invalid code for: " + sqlState + ": " + sqlState.code)
+        );
+    }
+
+    @Test
+    public void testAllCodeIsOfLength5() throws SQLException {
+
+        Stream.of(SQLState.values()).forEach(sqlState ->
+                assertTrue(sqlState.code.length() == 5, "Invalid code for: " + sqlState + ": " + sqlState.code)
         );
     }
 
