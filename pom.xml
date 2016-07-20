@@ -284,12 +284,10 @@
                             <transformationSet>
                                 <!-- Configures the source directory of XML files. -->
                                 <dir>${project.build.directory}/findbugs</dir>
-                                <excludes>
-                                    <exclude>findbugs-exclude.xml</exclude>
-									<exclude>findbugsXml.html</exclude>
-                                </excludes>
-
-
+                                <includes>
+                                    <!-- only transform findbugsXml.xml to generate FindBugs HTML report -->
+									<include>findbugsXml.xml</include>
+								</includes>
 
                                 <!-- Configures the directory in which the FindBugs report is written.-->
                                 <outputDir>${project.build.directory}/findbugs</outputDir>
