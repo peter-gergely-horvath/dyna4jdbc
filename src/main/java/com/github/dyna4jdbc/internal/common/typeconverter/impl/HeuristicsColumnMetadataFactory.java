@@ -87,14 +87,16 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
         switch (detectionContext.columnType) {
             case OTHER:
-                if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)) {
-                    handleDoubleType(detectionContext, cellValue);
-                    break;
-                }
                 if (SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
                     handleInteger(detectionContext, cellValue);
                     break;
                 }
+
+                if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)) {
+                    handleDouble(detectionContext, cellValue);
+                    break;
+                }
+
                 if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
                     handleTimestamp(detectionContext, cellValue);
                     break;
@@ -117,7 +119,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
                 if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)
                         || SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
 
-                    handleDoubleType(detectionContext, cellValue);
+                    handleDouble(detectionContext, cellValue);
                     break;
                 }
 
@@ -154,9 +156,14 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         }
     }
 
-    private static void handleDoubleType(DetectionContext detected, String cellValue) {
+    private static void handleDouble(DetectionContext detected, String cellValue) {
 
-        if (detected.columnType == SQLDataType.DOUBLE) {
+        final SQLDataType previousColumnType = detected.columnType;
+
+        detected.columnType = SQLDataType.DOUBLE;
+        detected.signed = true;
+
+        if (previousColumnType == SQLDataType.DOUBLE) {
             if (cellValue != null) {
                 final int scale = detected.columnType.getScale(cellValue);
                 final int precision = detected.columnType.getPrecision(cellValue);
@@ -168,10 +175,8 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
                 detected.maxScale = Math.max(detected.maxScale, scale);
             }
-        } else {
 
-            detected.columnType = SQLDataType.DOUBLE;
-            detected.signed = true;
+        } else {
 
             if (cellValue != null) {
                 final int scale = detected.columnType.getScale(cellValue);
@@ -199,16 +204,32 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
     }
 
     private static void handleVarChar(DetectionContext detected, String cellValue) {
+
+        final SQLDataType previousColumnType = detected.columnType;
         detected.columnType = SQLDataType.VARCHAR;
+
+        if (previousColumnType == SQLDataType.INTEGER) {
+
+            if (cellValue != null) {
+                detected.maxSize = Math.max(detected.maxSize, cellValue.length());
+                detected.maxScale = Math.max(detected.maxScale, cellValue.length());
+
+                detected.maxBeforeDecimalPoint = detected.maxSize;
+            }
+
+        } else {
+
+            if (cellValue != null) {
+                detected.maxSize = Math.max(detected.maxSize, cellValue.length());
+                detected.maxScale = Math.max(detected.maxScale, detected.maxSize);
+                detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, detected.maxSize);
+            }
+        }
+
+
         detected.signed = false;
         detected.maxPrecision = 0;
-
-        if (cellValue != null) {
-            detected.maxSize = Math.max(detected.maxSize, cellValue.length());
-            detected.maxScale = Math.max(detected.maxScale, detected.maxSize);
-            detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, detected.maxSize);
-            detected.maxPrecision = 0;
-        }
+        detected.maxColumnDisplaySize = Math.max(detected.maxColumnDisplaySize, detected.maxSize);
     }
 
 }

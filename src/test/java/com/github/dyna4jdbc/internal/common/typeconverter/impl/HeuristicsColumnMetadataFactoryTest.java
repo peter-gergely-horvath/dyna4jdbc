@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Collections2;
 import org.apache.commons.lang3.builder.Diff;
 import org.apache.commons.lang3.builder.DiffBuilder;
 import org.apache.commons.lang3.builder.DiffResult;
@@ -48,16 +49,27 @@ public class HeuristicsColumnMetadataFactoryTest {
     public void testWithParameter(HeuristicsColumnMetadataFactoryTestParameters testParameters) {
 
         ColumnMetadata expectedColumnMetadata = testParameters.getExpectedColumnMetadata();
-        
-        ColumnMetadata actualColumnMetadata = 
-                heuristicsColumnMetadataFactory.getColumnMetadata(0, testParameters.getInputValues());
-        
-        
-        assertNoDifferences(expectedColumnMetadata, actualColumnMetadata);
+
+        Collections2.permutations(testParameters.getInputValues())
+                .stream()
+                .map(testValueList ->
+                    testValueList.stream()
+                            .map(value -> "<null>".equals(value) ? null : value)
+                            .collect(Collectors.toList())
+                )
+                .forEach(testValues -> {
+
+                    ColumnMetadata actualColumnMetadata =
+                            heuristicsColumnMetadataFactory.getColumnMetadata(0, testValues);
+
+                    assertNoDifferences(expectedColumnMetadata, actualColumnMetadata, testValues);
+                });
+
     }
 
 
-    private void assertNoDifferences(ColumnMetadata expectedColumnMetadata, ColumnMetadata actualColumnMetadata) {
+    private void assertNoDifferences(
+            ColumnMetadata expectedColumnMetadata, ColumnMetadata actualColumnMetadata, List<String> testValues) {
         
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(DefaultColumnMetadata.class);
@@ -84,11 +96,13 @@ public class HeuristicsColumnMetadataFactoryTest {
                 List<Diff<?>> diffs = diffResult.getDiffs();
                 
                 String diffResultString = String.join("\n", diffs.stream()
-                            .map(diff -> String.format("%s: expected: %s, actual: %s", 
+                            .map(diff -> String.format("\t%s: expected: %s, actual: %s",
                                     diff.getFieldName(), diff.getLeft(), diff.getRight() ) )
                             .collect(Collectors.toList()));
                 
-                fail(String.format("\n%s", diffResultString));
+                fail(String.format("For input values: %s\nThe following mismatches were detected:\n%s",
+                        String.join(", ", testValues),
+                        diffResultString));
             }
         } catch (IllegalAccessException
                 | IntrospectionException

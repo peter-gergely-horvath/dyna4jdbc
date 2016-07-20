@@ -18,7 +18,7 @@ enum HeuristicsColumnMetadataFactoryTestParameters {
 
     VARIABLE_LENGTH_STRINGS_AND_NULLS("Strings with variable length and nulls",
             varcharColumnMetadata(6, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
-            "Mary", "had", null, "a", "little", null, "lamb"),
+            "Mary", "had", "<null>", "a", "little", "<null>", "lamb"),
 
     VARIABLE_LENGTH_STRINGS_AND_EMPTY_STRINGS("Strings with variable length and empty strings",
             varcharColumnMetadata(6, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NOT_NULLABLE),
@@ -30,11 +30,12 @@ enum HeuristicsColumnMetadataFactoryTestParameters {
 
     INTEGERS_AND_NULLS("Integers and nulls",
             integerColumnMetadata(4, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
-            "13", "42", null, "123", "561", null, "1984"),
+            "13", "42", "<null>", "123", "561", "<null>", "1984"),
 
     INTEGERS_AND_STRINGS("Integers and strings",
-            varcharColumnMetadata(6, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
-            "13", "42", null, "123", "561", null, "1984", "Mary", "had", "a", "little", "lamb"),
+            varcharColumnMetadata(28, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
+            "13", "42", "<null>", "123", "561", "<null>", "1984",
+            "Mary had a little lamb", "His fleece was white as snow"),
 
     DOUBLES("Doubles",
             doubleColumnMetadata(13, 9, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NOT_NULLABLE),
@@ -50,7 +51,7 @@ enum HeuristicsColumnMetadataFactoryTestParameters {
 
     DOUBLES_INTEGERS_AND_NULLS("Doubles and integers and nulls",
             doubleColumnMetadata(18, 9, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
-            "0.123456789", "1.234", null, "12.34", "123.4", null, "123456789"),
+            "0.123456789", "1.234", "<null>", "12.34", "123.4", "<null>", "123456789"),
 
     TIMESTAMP("Timestamp",
             timestampColumnMetadata(TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NOT_NULLABLE),
