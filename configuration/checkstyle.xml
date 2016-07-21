@@ -153,7 +153,10 @@
         <module name="LineLength">
             <property name="max" value="120"/> <!-- increase max line Length to 120 -->
         </module>
-        <module name="MethodLength"/>
+        <module name="MethodLength">
+            <!-- Customisation: maximum method length is 50 lines -->
+            <property name="max" value="50"/>
+        </module>
         <module name="ParameterNumber"/>
 
         <!-- Checks for whitespace                               -->

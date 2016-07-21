@@ -12,6 +12,14 @@ import static com.github.dyna4jdbc.internal.common.typeconverter.impl.ColumnMeta
  */
 enum HeuristicsColumnMetadataFactoryTestParameters {
 
+    NULLS("Nulls",
+            varcharColumnMetadata(0, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
+            "<null>", "<null>", "<null>", "<null>"),
+
+    NULLS_AND_EMPTY_STRINGS("Nulls and empty strings",
+            varcharColumnMetadata(0, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
+            "<null>", "", "<null>", ""),
+
     VARIABLE_LENGTH_STRINGS("Strings with variable length",
             varcharColumnMetadata(6, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NOT_NULLABLE),
             "Mary", "had", "a", "little", "lamb"),
@@ -33,9 +41,8 @@ enum HeuristicsColumnMetadataFactoryTestParameters {
             "13", "42", "<null>", "123", "561", "<null>", "1984"),
 
     INTEGERS_AND_STRINGS("Integers and strings",
-            varcharColumnMetadata(28, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
-            "13", "42", "<null>", "123", "561", "<null>", "1984",
-            "Mary had a little lamb", "His fleece was white as snow"),
+            varcharColumnMetadata(4, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
+            "13", "42", "<null>", "123", "561", "<null>", "1984", "Foo", "Bar"),
 
     DOUBLES("Doubles",
             doubleColumnMetadata(13, 9, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NOT_NULLABLE),
@@ -55,7 +62,19 @@ enum HeuristicsColumnMetadataFactoryTestParameters {
 
     TIMESTAMP("Timestamp",
             timestampColumnMetadata(TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NOT_NULLABLE),
-            "2016-06-01 19:16:19.123", "2016-06-01 19:16:19");
+            "2016-06-01 19:16:19.123", "2016-06-01 19:16:19"),
+
+    TIMESTAMP_AND_NULLS("Timestamp",
+            timestampColumnMetadata(TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
+            "2016-06-01 19:16:19.123", "<null>", "2016-06-01 19:16:19", "<null>"),
+
+    TIMESTAMP_AND_INTEGERS_AND_NULLS("Timestamp, integers and nulls",
+            varcharColumnMetadata(23, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
+            "<null>", "2016-06-01 19:16:19.123", "2016-06-01 19:16:19", "13", "<null>", "42" ),
+
+    TIMESTAMP_AND_DOUBLES_AND_NULLS("Timestamp, doubles and nulls",
+            varcharColumnMetadata(23, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
+            "<null>", "2016-06-01 19:16:19.123", "2016-06-01 19:16:19", "1.234", "<null>", "123456789.0" );;
 
 
 

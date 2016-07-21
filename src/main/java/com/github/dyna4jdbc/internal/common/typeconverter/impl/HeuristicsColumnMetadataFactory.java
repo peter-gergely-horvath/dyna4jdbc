@@ -47,9 +47,16 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
         for (String cellValue : cellValues) {
 
+            if (cellValue == null) {
+                detectionContext.nullability = Nullability.NULLABLE;
+            }
+
             detectMetadataByInspectingCellValue(detectionContext, cellValue);
         }
 
+        if (detectionContext.columnType == SQLDataType.OTHER) {
+            detectionContext.columnType = SQLDataType.VARCHAR;
+        }
 
         if (detectionContext.maxPrecision == 0) {
             detectionContext.maxColumnDisplaySize = detectionContext.maxSize;
@@ -80,65 +87,87 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
     }
 
     private static void detectMetadataByInspectingCellValue(DetectionContext detectionContext, String cellValue) {
-
-        if (cellValue == null) {
-            detectionContext.nullability = Nullability.NULLABLE;
-        }
-
         switch (detectionContext.columnType) {
             case OTHER:
-                if (SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
-                    handleInteger(detectionContext, cellValue);
-                    break;
-                }
-
-                if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)) {
-                    handleDouble(detectionContext, cellValue);
-                    break;
-                }
-
-                if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
-                    handleTimestamp(detectionContext, cellValue);
-                    break;
-                }
-
-                if (SQLDataType.VARCHAR.isPlausibleConversion(cellValue)) {
-                    handleVarChar(detectionContext, cellValue);
-                    break;
-                }
-
+                inspectOther(detectionContext, cellValue);
                 break;
 
             case INTEGER:
-                if (SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
-                    handleInteger(detectionContext, cellValue);
+                if (inspectInteger(detectionContext, cellValue)) {
                     break;
                 }
 
             case DOUBLE:
-                if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)
-                        || SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
-
-                    handleDouble(detectionContext, cellValue);
+                if (inspectDouble(detectionContext, cellValue)) {
                     break;
                 }
 
             case TIMESTAMP:
-                if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
-                    handleTimestamp(detectionContext, cellValue);
+                if (inspectTimestamp(detectionContext, cellValue)) {
                     break;
                 }
 
             case VARCHAR:
-                handleVarChar(detectionContext, cellValue);
+                inspectVarChar(detectionContext, cellValue);
                 break;
 
             default:
                 throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
                         "Unexpected column type: " + detectionContext.columnType);
         }
+    }
 
+    private static void inspectVarChar(DetectionContext detectionContext, String cellValue) {
+        handleVarChar(detectionContext, cellValue);
+        return;
+    }
 
+    private static boolean inspectTimestamp(DetectionContext detectionContext, String cellValue) {
+        if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
+            handleTimestamp(detectionContext, cellValue);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean inspectDouble(DetectionContext detectionContext, String cellValue) {
+        if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)
+                || SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
+            handleDouble(detectionContext, cellValue);
+            return true;
+        }
+        return false;
+    }
+
+    private static void inspectOther(DetectionContext detectionContext, String cellValue) {
+
+        if (cellValue == null) {
+            return;
+        }
+        if (SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
+            handleInteger(detectionContext, cellValue);
+            return;
+        }
+        if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)) {
+            handleDouble(detectionContext, cellValue);
+            return;
+        }
+        if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
+            handleTimestamp(detectionContext, cellValue);
+            return;
+        }
+        if (SQLDataType.VARCHAR.isPlausibleConversion(cellValue)) {
+            handleVarChar(detectionContext, cellValue);
+            return;
+        }
+    }
+
+    private static boolean inspectInteger(DetectionContext detectionContext, String cellValue) {
+        if (SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
+            handleInteger(detectionContext, cellValue);
+            return true;
+        }
+        return false;
     }
 
 
@@ -191,15 +220,36 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
     }
 
     private static void handleTimestamp(DetectionContext detected, String cellValue) {
-        detected.columnType = SQLDataType.TIMESTAMP;
-        detected.maxScale = 0;
-        detected.signed = false;
 
-        if (cellValue != null) {
-            detected.maxSize = Math.max(detected.maxSize, cellValue.length());
-            detected.maxBeforeDecimalPoint = 0;
-            detected.maxScale = 0;
-            detected.maxPrecision = 0;
+        final SQLDataType previousColumnType = detected.columnType;
+        switch (previousColumnType) {
+            case OTHER:
+            case TIMESTAMP:
+
+                detected.columnType = SQLDataType.TIMESTAMP;
+                detected.maxScale = 0;
+                detected.signed = false;
+
+                if (cellValue != null) {
+                    detected.maxSize = Math.max(detected.maxSize, cellValue.length());
+                    detected.maxBeforeDecimalPoint = 0;
+                    detected.maxPrecision = 0;
+                }
+
+                break;
+
+            case INTEGER:
+            case DOUBLE:
+            case VARCHAR:
+                handleVarChar(detected, cellValue);
+
+                break;
+
+            default:
+                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+                        "Unexpected column type: " + previousColumnType);
+
+
         }
     }
 
