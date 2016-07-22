@@ -6,14 +6,17 @@ package com.github.dyna4jdbc.internal.sqlstate;
 enum SQLStateClass {
 
     SUCCESS(Category.SUCCESS, "00", "Completed successfully"),
-
     WARNING(Category.WARNING, "01", "Warning"),
-
     NOT_FOUND(Category.NO_DATA, "02", "No data"),
-
+    DYNAMIC_SQL_ERROR(Category.ERROR, "07", "Dynamic SQL error"),
     ERROR_CONNECTION(Category.ERROR, "08", "Connection error"),
+    FEATURE_NOT_SUPPORTED(Category.ERROR, "0A", "Feature not supported"),
+    ERROR_DATA_EXCEPTION(Category.ERROR, "22", "Data exception"),
+    EXTERNAL_ROUTINE_INVOCATION_EXCEPTION(Category.ERROR, "39", "External routine invocation exception"),
+    SYNTAX_OR_ACCESS_RULE_ERROR(Category.ERROR, "42", "Syntax error or access rule violation"),
+    CLIENT_ERROR(Category.ERROR, "56", "Client error"),
+    SYSTEM_ERROR(Category.ERROR, "57", "System error");
 
-    ERROR_DATA_EXCEPTION(Category.ERROR, "22", "Data exception");
 
     //CHECKSTYLE.OFF: VisibilityModifier
     final Category category;

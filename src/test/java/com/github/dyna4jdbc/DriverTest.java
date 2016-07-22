@@ -171,7 +171,7 @@ public class DriverTest {
                     String.format("Invalid message: '%s'", message) );
 
             String sqlState = sqlex.getSQLState();
-            assertEquals(sqlState, SQLState.SYSTEM_ERROR.code);
+            assertEquals(sqlState, SQLState.LOADING_SCRIPTENGINE_FAILED.code);
         }
     }
 }
