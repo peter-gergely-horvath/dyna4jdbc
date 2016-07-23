@@ -58,7 +58,7 @@
 		<easymock.version>3.4</easymock.version>
 		<commons-lang3.version>3.4</commons-lang3.version>
         <groovy.version>2.4.6</groovy.version>
-        <scala.version>2.12.0-M4</scala.version>
+        <scala.version>2.12.0-M5</scala.version>
         <jython-shaded.version>2.5.3</jython-shaded.version>
         <jruby.version>9.1.2.0</jruby.version>
         <beanshell.version>2.0b5</beanshell.version>

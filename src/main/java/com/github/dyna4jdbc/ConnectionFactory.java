@@ -13,7 +13,6 @@ import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DefaultScriptEngineConnection;
-import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScalaScriptEngineConnection;
 
 class ConnectionFactory {
 
@@ -74,7 +73,7 @@ class ConnectionFactory {
                 break;
 
             case "scriptengine":
-                connectionClass = getScriptEngineConnectionClassForConfiguration(connectionType, config);
+                connectionClass = DefaultScriptEngineConnection.class;
                 break;
 
             default:
@@ -98,38 +97,4 @@ class ConnectionFactory {
             }
         }
     }
-
-    private Class<? extends Connection> getScriptEngineConnectionClassForConfiguration(
-            String connectionType, String config) throws MisconfigurationException {
-
-        Class<? extends Connection> connectionClass;
-        if (config == null || config.matches("\\s+:")) {
-            throw MisconfigurationException.forMessage(
-                    "ScriptEngine name must be specified", connectionType);
-        }
-
-        String scriptEngineName = config.toLowerCase(Locale.ENGLISH).split(":")[0];
-        connectionClass = getScriptEngineConnectionClassForName(scriptEngineName);
-        return connectionClass;
-    }
-
-    private Class<? extends Connection> getScriptEngineConnectionClassForName(String lowerCaseScriptEngineName) {
-
-        /*
-         * Some of the ScriptEngines require special handling;
-         * hence we use special wrapper classes for them.
-         */
-        Class<? extends Connection> connectionClass;
-        switch (lowerCaseScriptEngineName) {
-            case "scala":
-                connectionClass = ScalaScriptEngineConnection.class;
-                break;
-
-            default:
-                connectionClass = DefaultScriptEngineConnection.class;
-        }
-        return connectionClass;
-    }
-
-
 }
