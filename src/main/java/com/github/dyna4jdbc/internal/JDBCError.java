@@ -70,8 +70,10 @@ public enum JDBCError {
             SQLStateClass.CLIENT_ERROR, "002"),
     CANNOT_UNWARP_OBJECT("The requested type (%s) cannot be unwrapped from this object (%s).",
             SQLStateClass.CLIENT_ERROR, "003"),
-    CANCEL_REQUESTED_ALREADY("Cancellation requested already: %s",
+    RESULT_SET_INDEX_ILLEGAL("Illegal index: %s",
             SQLStateClass.CLIENT_ERROR, "004"),
+    CANCEL_REQUESTED_ALREADY("Cancellation requested already: %s",
+            SQLStateClass.CLIENT_ERROR, "005"),
 
 
     // Error class SYSTEM_ERROR

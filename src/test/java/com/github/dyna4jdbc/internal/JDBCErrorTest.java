@@ -4,6 +4,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +33,19 @@ public class JDBCErrorTest {
             assertTrue(sqlState.length() == 5, "Invalid code for: " + jdbcError + ": " + sqlState);
         });
     }
+    
+    @Test
+    public void testCodesAreUniqueInGroup() throws SQLException {
+
+        HashSet<String> foundCodes = new HashSet<>();
+        
+        for(JDBCError jdbcError : JDBCError.values()) {
+            boolean notFoundInSet = foundCodes.add(jdbcError.getSqlStateAsString());
+            
+            assertTrue(notFoundInSet, "Duplicated SQL State: " + jdbcError);
+        }
+    }
+    
 
     @Test
     public void testSuccessCodesStartWith00() throws SQLException {

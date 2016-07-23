@@ -76,13 +76,20 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
     protected abstract String getRawCellValueBySqlColumnIndex(int sqlIndex) throws SQLException;
 
     private ColumnHandler getColumnHandlerBySqlIndex(int sqlIndex) throws SQLException {
-        final int javaIndex = sqlIndex - 1;
+        try {
+            final int javaIndex = sqlIndex - 1;
 
-        return columnHandlers.get(javaIndex);
+            return columnHandlers.get(javaIndex);
+        } catch (IndexOutOfBoundsException ex) {
+            // NOTE: we report the sqlIndex coming from the caller!
+            throw JDBCError.RESULT_SET_INDEX_ILLEGAL.raiseSQLException(sqlIndex);
+        }
     }
 
     @Override
     public final int findColumn(String columnLabel) throws SQLException {
+        checkNotClosed();
+
         if (!columnNameToColumnIndexMap.containsKey(columnLabel)) {
             throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("Invalid column label: " + columnLabel);
         }
@@ -97,11 +104,15 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final ResultSetMetaData getMetaData() throws SQLException {
+        checkNotClosed();
+        
         return new ColumnHandlerResultSetMetaData(columnHandlers);
     }
 
     @Override
     public final String getString(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -118,6 +129,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
     //CHECKSTYLE.OFF: AvoidInlineConditionals
     @Override
     public final boolean getBoolean(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -135,6 +148,7 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final byte getByte(int columnIndex) throws SQLException {
+        checkNotClosed();
 
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
@@ -154,6 +168,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final short getShort(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -171,6 +187,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final int getInt(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -189,6 +207,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final long getLong(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -207,6 +227,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final float getFloat(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -225,6 +247,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final double getDouble(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -244,6 +268,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
     @Override
     @SuppressWarnings("deprecation")
     public final BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -259,6 +285,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final byte[] getBytes(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -277,6 +305,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final Date getDate(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -292,6 +322,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final Time getTime(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -307,6 +339,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final Timestamp getTimestamp(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -322,6 +356,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final InputStream getAsciiStream(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -338,6 +374,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
     @Override
     @SuppressWarnings("deprecation")
     public final InputStream getUnicodeStream(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -353,6 +391,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final InputStream getBinaryStream(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -368,11 +408,15 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final Object getObject(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         return getObject(columnIndex, (Map<String, Class<?>>) null);
     }
 
     @Override
     public final Reader getCharacterStream(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -388,6 +432,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final BigDecimal getBigDecimal(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -403,6 +449,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -418,6 +466,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final Date getDate(int columnIndex, Calendar cal) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -433,6 +483,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final Time getTime(int columnIndex, Calendar cal) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -448,6 +500,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -463,6 +517,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final URL getURL(int columnIndex) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
@@ -478,6 +534,8 @@ abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 
     @Override
     public final <R> R getObject(int columnIndex, Class<R> type) throws SQLException {
+        checkNotClosed();
+
         String rawCellValue = getRawCellValueBySqlColumnIndex(columnIndex);
 
         try {
