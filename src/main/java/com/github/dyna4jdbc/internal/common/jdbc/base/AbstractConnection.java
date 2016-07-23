@@ -546,9 +546,6 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
             try {
                 executor.execute(new CloseConnectionForAbortRunnable());
             } catch (RejectedExecutionException ree) {
-                // Best effort handling of unexpected failures:
-                // still mark this as closed.
-                markClosedInternal();
                 JDBCError.CLOSE_FAILED.raiseSQLException(ree,
                         this, "The close task has been rejected");
             }

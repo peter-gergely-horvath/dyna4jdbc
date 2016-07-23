@@ -658,7 +658,7 @@ public class AbstractConnectionTest {
         assertThrowsSQLExceptionWithJDBCError(JDBCError.CLOSE_FAILED, () -> 
             abstractConnection.abort(rejectAll) );
         
-        assertTrue(abstractConnection.isClosed());
+        assertFalse(abstractConnection.isClosed());
     }
 }
 

@@ -153,7 +153,13 @@ public enum JDBCError {
             String formatString = getMessageTemplate();
             return String.format(formatString, params);
         } catch (java.util.IllegalFormatException formatException) {
-             return String.format(
+            /* 
+             * we should have a sensible handling for the unlikely
+             * case when the error message cannot be constructed
+             * due to a bug in the arguments passed to from the
+             * error handler routine
+             */
+            return String.format(
                      "Format string for %s is illegal! Failed to format from %s",
                      this, Arrays.toString(params));
         }

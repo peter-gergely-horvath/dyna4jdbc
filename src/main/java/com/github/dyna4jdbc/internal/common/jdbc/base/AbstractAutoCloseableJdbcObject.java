@@ -147,7 +147,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * @return {@code true} if {@code this} object was successfully marked as closed,
      *          {@code false} if it was marked as closed previously.
      */
-    protected final boolean markClosedInternal() {
+    private boolean markClosedInternal() {
         return closed.compareAndSet(false, true);
     }
 
