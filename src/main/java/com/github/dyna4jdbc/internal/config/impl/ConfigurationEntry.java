@@ -14,6 +14,17 @@ import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
 enum ConfigurationEntry {
 
+    INIT_SCRIPT("initScript", "", 
+            "Path of an initialization script, which will be executed "
+            + "when the connection is estabilished. Default is empty ") {
+        @Override
+        void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
+            if (value != null && value.trim().length() != 0) {
+                
+                config.setinitScriptPath(value);
+            }
+        }
+    },
     CELL_SEPARATOR("cellSeparator", "\t", "The character used as separator character. Default is TAB (\\t).") {
         @Override
         void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {

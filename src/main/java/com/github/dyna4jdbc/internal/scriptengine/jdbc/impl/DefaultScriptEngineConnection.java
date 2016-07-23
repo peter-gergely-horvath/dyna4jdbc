@@ -1,8 +1,11 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -14,7 +17,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.*;
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.JDBCError;
@@ -35,6 +43,7 @@ import com.github.dyna4jdbc.internal.common.util.classpath.DefaultClassLoaderFac
 import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
 import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream;
 import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream.AbortHandler;
+import com.github.dyna4jdbc.internal.common.util.io.DisallowAllWritesOutputStream;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
@@ -77,12 +86,16 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
                 configurationFactory.newConfigurationFromParameters(configurationString, properties);
 
         ClassLoaderFactory classloaderFactory = DefaultClassLoaderFactory.getInstance();
-        
+
         this.engine = loadEngineByName(engineName, this.configuration, classloaderFactory);
-        
+
         this.columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
 
+        String initScriptPath = this.configuration.getInitScriptPath();
+        if (initScriptPath != null) {
+            executeInitScript(initScriptPath);
+        }
     }
 
     private static ScriptEngine loadEngineByName(
@@ -113,6 +126,31 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
         return scriptEngine;
     }
+    
+    private void executeInitScript(String initScriptPath) throws SQLException, MisconfigurationException {
+        File initScript = new File(initScriptPath);
+        if (!initScript.exists()) {
+            throw MisconfigurationException.forMessage("InitScript not found: %s", initScriptPath);
+        }
+        
+        try {
+            byte[] bytesRead = Files.readAllBytes(initScript.toPath());
+            String initScriptText = new String(bytesRead, this.configuration.getConversionCharset());
+
+            executeScriptUsingStreams(
+                    initScriptText,
+                    null,
+                    new DisallowAllWritesOutputStream("An init script cannot generate output"),
+                    new DisallowAllWritesOutputStream("An init script cannot generate output"));
+
+
+        } catch (IOException e) {
+            throw JDBCError.INITSCRIPT_READ_IO_ERROR.raiseSQLException(initScriptPath);
+        } catch (ScriptExecutionException e) {
+            throw JDBCError.INITSCRIPT_EXECUTION_EXCEPTION.raiseSQLException(e, initScriptPath);
+        }
+    }
+
 
     @Override
     public final DatabaseMetaData getMetaData() throws SQLException {

@@ -1,6 +1,7 @@
 package com.github.dyna4jdbc.internal;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Arrays;
 
 import com.github.dyna4jdbc.internal.sqlstate.SQLStateClass;
 
@@ -33,6 +34,10 @@ public enum JDBCError {
     // Error class ERROR_CONNECTION:
     CONNECT_FAILED_EXCEPTION("Failed to connect: %s (examine stack trace for details)",
             SQLStateClass.ERROR_CONNECTION, "001"),
+    INITSCRIPT_READ_IO_ERROR("I/O error reading init script: %s",
+            SQLStateClass.ERROR_CONNECTION, "100"),
+    INITSCRIPT_EXECUTION_EXCEPTION("Exception executing init script: %s (examine stack trace for details)",
+            SQLStateClass.ERROR_CONNECTION, "101"),
 
 
     // Error class FEATURE_NOT_SUPPORTED
@@ -142,7 +147,14 @@ public enum JDBCError {
     }
 
     protected String buildErrorMessage(Object[] params) {
-        String formatString = getMessageTemplate();
-        return String.format(formatString, params);
+        try {
+            String formatString = getMessageTemplate();
+            return String.format(formatString, params);
+         } catch(java.util.IllegalFormatException formatException) {
+             return String.format(
+                     "Format string for %s is illegal! Failed to format from %s",
+                     this, Arrays.toString(params));
+         }
+
     }
 }

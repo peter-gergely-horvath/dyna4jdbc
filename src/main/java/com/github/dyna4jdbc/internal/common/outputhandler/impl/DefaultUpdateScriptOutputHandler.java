@@ -2,6 +2,7 @@ package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
 import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
+import com.github.dyna4jdbc.internal.common.util.io.DisallowAllWritesOutputStream;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 import java.io.OutputStream;

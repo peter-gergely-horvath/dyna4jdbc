@@ -43,7 +43,7 @@ class ConfigurationImpl implements Configuration {
     private Pattern endOfDataPattern;
     private long externalCallQuietPeriodThresholdMs;
     private List<String> classpath;
-
+    private String initScriptPath;
 
     // public getters
     @Override
@@ -92,6 +92,11 @@ class ConfigurationImpl implements Configuration {
         return Collections.unmodifiableList(classpath);
     }
 
+    @Override
+    public String getInitScriptPath() {
+        return initScriptPath;
+    }
+
     // package-local setters
     void setConversionCharset(String conversionCharset) {
         this.conversionCharset = conversionCharset;
@@ -113,6 +118,10 @@ class ConfigurationImpl implements Configuration {
         // create a defensive copy of the *source* list so that
         // unexpected changes to the original list cannot bite us later on
         this.classpath = new ArrayList<>(classpath);
+    }
+
+    public void setinitScriptPath(String initScript) {
+        this.initScriptPath = initScript;
     }
 
 }

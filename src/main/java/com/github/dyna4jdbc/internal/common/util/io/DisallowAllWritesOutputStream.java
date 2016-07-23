@@ -1,4 +1,4 @@
-package com.github.dyna4jdbc.internal.common.outputhandler.impl;
+package com.github.dyna4jdbc.internal.common.util.io;
 
 import com.github.dyna4jdbc.internal.OutputDisabledError;
 
@@ -8,14 +8,13 @@ import java.io.OutputStream;
 /**
  * @author Peter Horvath
  */
-final class DisallowAllWritesOutputStream extends OutputStream {
+public final class DisallowAllWritesOutputStream extends OutputStream {
 
     private final String message;
 
-    DisallowAllWritesOutputStream(String message) {
+    public DisallowAllWritesOutputStream(String message) {
         this.message = message;
     }
-
 
     @Override
     public void write(int b) throws IOException {

@@ -40,4 +40,5 @@ public interface Configuration {
     Pattern getEndOfDataPattern();
     long getExternalCallQuietPeriodThresholdMs();
     List<String> getClasspath();
+    String getInitScriptPath();
 }
