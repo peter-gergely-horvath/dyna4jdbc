@@ -150,11 +150,10 @@ public enum JDBCError {
         try {
             String formatString = getMessageTemplate();
             return String.format(formatString, params);
-         } catch(java.util.IllegalFormatException formatException) {
+        } catch (java.util.IllegalFormatException formatException) {
              return String.format(
                      "Format string for %s is illegal! Failed to format from %s",
                      this, Arrays.toString(params));
-         }
-
+        }
     }
 }
