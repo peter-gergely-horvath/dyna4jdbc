@@ -114,12 +114,20 @@ class DefaultColumnHandler extends AbstractColumnHandler {
             throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("columnType is null");
         }
 
-        Class<?> targetClass = map.get(columnType.name);
-        if (targetClass == null) {
-            throw TypeConversionException.forMessage(
-                    "Mapping to %s is not supported.", columnType.name);
+        Class<?> targetClass = null;
+        
+        if (map != null) {
+            targetClass = map.get(columnType.name);
+            if (targetClass == null) {
+                throw TypeConversionException.forMessage(
+                        "Mapping to %s is not supported.", columnType.name);
+            }
         }
-
+        
+        if (targetClass == null) {
+            targetClass = columnType.mappingClass;
+        }
+        
         return covertToObject(rawCellValue, targetClass);
     }
 
