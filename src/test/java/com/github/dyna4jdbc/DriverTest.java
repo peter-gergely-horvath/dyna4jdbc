@@ -1,7 +1,6 @@
 package com.github.dyna4jdbc;
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.sqlstate.SQLState;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -171,7 +170,7 @@ public class DriverTest {
                     String.format("Invalid message: '%s'", message) );
 
             String sqlState = sqlex.getSQLState();
-            assertEquals(sqlState, SQLState.LOADING_SCRIPTENGINE_FAILED.code);
+            assertEquals(sqlState, JDBCError.LOADING_SCRIPTENGINE_FAILED.getSqlStateAsString());
         }
     }
 }

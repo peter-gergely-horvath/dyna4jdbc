@@ -1,76 +1,101 @@
 package com.github.dyna4jdbc.internal;
-
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 
-import com.github.dyna4jdbc.internal.sqlstate.SQLState;
+import com.github.dyna4jdbc.internal.sqlstate.SQLStateClass;
+
 
 public enum JDBCError {
 
-    CONNECT_FAILED_EXCEPTION("Failed to connect: %s (examine stack trace for details)",
-            SQLState.ERROR_CONNECTION_UNABLE_TO_ESTABILISH),
-    OBJECT_CLOSED("Object has already been closed: %s", null),
-    CLOSE_FAILED("Closing of '%s' caused error: %s",
-            SQLState.CLOSE_FAILED),
+    // Warning class
     EXECUTION_ABORTED_AT_CLIENT_REQUEST("Execution aborted at client request",
-            SQLState.CLIENT_ABORT),
+            SQLStateClass.WARNING, "001"),
+
+    // Error class DYNAMIC_SQL_ERROR
     SCRIPT_EXECUTION_EXCEPTION("Execution of script raised exception: %s",
-            SQLState.SCRIPT_EXECUTION_ERROR),
-    CANNOT_UNWARP_OBJECT("The requested type (%s) cannot be unwrapped from this object (%s).",
-            SQLState.CLIENT_API_CALLER_ERROR),
-    UNEXPECTED_THROWABLE("Processing failed; caught unexpected exception: %s",
-            SQLState.UNEXPECTED_THROWABLE),
-    RESULT_SET_MULTIPLE_EXPECTED_ONE("Expected one result set, but script produced %s result sets.",
-            SQLState.RESULT_SET_MULTIPLE_EXPECTED_ONE),
+            SQLStateClass.DYNAMIC_SQL_ERROR, "001"),
+    LOADING_SCRIPTENGINE_FAILED("Could not load ScriptEngine '%s'",
+            SQLStateClass.DYNAMIC_SQL_ERROR, "002"),
     INCONSISTENT_HEADER_SPECIFICATION("Inconsistent header specification: %s",
-            SQLState.INCONSISTENT_HEADER_SPECIFICATION),
+            SQLStateClass.DYNAMIC_SQL_ERROR, "003"),
     DUPLICATED_HEADER_NAME("Duplicated header name encountered: %s",
-            SQLState.SYNTAX_ERROR),
+            SQLStateClass.DYNAMIC_SQL_ERROR, "004"),
     FORMAT_STRING_UNEXPECTED_FOR_COLUMN_TYPE("Format string '%s' unexpected for column type: %s",
-            SQLState.SYNTAX_ERROR),
+            SQLStateClass.DYNAMIC_SQL_ERROR, "005"),
     FORMAT_STRING_INVALID("Format string '%s' is illegal: %s",
-            SQLState.SYNTAX_ERROR),
-    CANCEL_REQUESTED_ALREADY("Cancellation requested already: %s",
-            SQLState.CLIENT_API_CALLER_ERROR),
-    CANCEL_FAILED("Failed to cancel the operation: %s",
-            SQLState.CANCEL_FAILED),
+            SQLStateClass.DYNAMIC_SQL_ERROR, "006"),
+    INVALID_FORMATTING_HEADER("Invalid formatting header detected in column %s: Value '%s' is invalid: %s",
+            SQLStateClass.DYNAMIC_SQL_ERROR, "007"),
+    RESULT_SET_MULTIPLE_EXPECTED_ONE("Expected one result set, but script produced %s result sets.",
+            SQLStateClass.DYNAMIC_SQL_ERROR, "008"),
+
+
+    // Error class ERROR_CONNECTION:
+    CONNECT_FAILED_EXCEPTION("Failed to connect: %s (examine stack trace for details)",
+            SQLStateClass.ERROR_CONNECTION, "001"),
+
+
+    // Error class FEATURE_NOT_SUPPORTED
     JDBC_FEATURE_NOT_SUPPORTED("This JDBC feature is not supported: %s",
-            SQLState.FEATURE_NOT_SUPPORTED) {
+            SQLStateClass.FEATURE_NOT_SUPPORTED, "001") {
         @Override
         public SQLException raiseSQLException(Object... params) throws SQLException {
             String errorMessage = buildErrorMessage(params);
             throw new SQLFeatureNotSupportedException(errorMessage, getSqlStateAsString());
         }
     },
-    USING_STDOUT_FROM_UPDATE("Using standard output from an update call is not permitted",
-            SQLState.ERROR_USING_STDOUT_FROM_UPDATE),
+    
+
+    // Error class ERROR_DATA_EXCEPTION
     UNSUPPORTED_CONVERSION("Conversion of value '%s' to the requeste type is not possible %s",
-            SQLState.ERROR_DATA_CONVERSION_NOT_SUPPORTED),
-    DATA_CONVERSION_FAILED(
-            "Data conversion failed in row %1$s, column %2$s. Value '%3$s' could not be converted to %4$s.",
-            SQLState.ERROR_DATA_CONVERSION_FAILED),
-    INVALID_FORMATTING_HEADER("Invalid formatting header detected in column %s: Value '%s' is invalid: %s",
-            SQLState.INVALID_FORMATTING_HEADER),
-    JDBC_API_USAGE_CALLER_ERROR("Illegal JDBC API call: %s",
-            SQLState.CLIENT_API_CALLER_ERROR),
-    LOADING_SCRIPTENGINE_FAILED("Could not load ScriptEngine '%s'",
-            SQLState.LOADING_SCRIPTENGINE_FAILED),
+            SQLStateClass.ERROR_DATA_EXCEPTION, "001"),
+    DATA_CONVERSION_FAILED("Data conversion failed in row %s, column %s. Value '%s' could not be converted to %s.",
+            SQLStateClass.ERROR_DATA_EXCEPTION, "002"),
+
+
+    // Error class SYNTAX_OR_ACCESS_RULE_ERROR
+    USING_STDOUT_FROM_UPDATE("Using standard output from an update call is not permitted",
+            SQLStateClass.SYNTAX_OR_ACCESS_RULE_ERROR, "001"),
+
+
+    // Error class CLIENT_ERROR
     INVALID_CONFIGURATION("Configuration error: %s",
-            SQLState.CLIENT_API_CONFIGURATION_ERROR),
+            SQLStateClass.CLIENT_ERROR, "001"),
+    JDBC_API_USAGE_CALLER_ERROR("Illegal JDBC API call: %s",
+            SQLStateClass.CLIENT_ERROR, "002"),
+    CANNOT_UNWARP_OBJECT("The requested type (%s) cannot be unwrapped from this object (%s).",
+            SQLStateClass.CLIENT_ERROR, "003"),
+    CANCEL_REQUESTED_ALREADY("Cancellation requested already: %s",
+            SQLStateClass.CLIENT_ERROR, "004"),
+
+
+    // Error class SYSTEM_ERROR
+    CLOSE_FAILED("Closing of '%s' caused error: %s",
+            SQLStateClass.SYSTEM_ERROR, "001"),
+    OBJECT_CLOSED("Object has already been closed: %s",
+            SQLStateClass.SYSTEM_ERROR, "002"),
+    CANCEL_FAILED("Failed to cancel the operation: %s",
+            SQLStateClass.SYSTEM_ERROR, "003"),
+    UNEXPECTED_THROWABLE("Processing failed; caught unexpected exception: %s",
+            SQLStateClass.SYSTEM_ERROR, "900"),
     DRIVER_BUG_UNEXPECTED_STATE("An unexpected state has been reached: %s",
-            SQLState.UNEXPECTED_STATE_REACHED);
+            SQLStateClass.SYSTEM_ERROR, "999");
 
 
     private static final int VENDOR_CODE_COMPLETION_FAILURE = 2;
-
     private final String message;
-    private final SQLState sqlState;
+    private final String sqlStateCode;
 
-    JDBCError(String message, SQLState sqlState) {
+    //CHECKSTYLE.OFF: VisibilityModifier
+    final SQLStateClass sqlStateClass;
+    //CHECKSTYLE.ON: VisibilityModifier
+    
+    JDBCError(String message, SQLStateClass sqlStateClass, String code) {
         this.message = message;
-        this.sqlState = sqlState;
+        this.sqlStateClass = sqlStateClass;
+        this.sqlStateCode = String.format("%s%s", sqlStateClass.classCode, code);
     }
-
+    
     @Override
     public String toString() {
         return String.format("JDBC Error [%s]", this.name());
@@ -80,14 +105,8 @@ public enum JDBCError {
         return String.format("[%s]: %s", this.name(), this.message);
     }
 
-    protected String getSqlStateAsString() {
-        String returnValue;
-        if (sqlState != null) {
-            returnValue = sqlState.code;
-        } else {
-            returnValue = null;
-        }
-        return returnValue;
+    public String getSqlStateAsString() {
+        return sqlStateCode;
     }
 
     public SQLException raiseSQLException(Throwable throwable, Object... params) throws SQLException {
@@ -98,10 +117,8 @@ public enum JDBCError {
     public SQLException raiseSQLExceptionWithSupressed(
             Iterable<? extends Throwable> supressedThrowables,
             Object... params) throws SQLException {
-
         String errorMessage = buildErrorMessage(params);
         SQLException sqlException = new SQLException(errorMessage, getSqlStateAsString());
-
         for (Throwable supressed : supressedThrowables) {
             sqlException.addSuppressed(supressed);
         }
@@ -115,7 +132,6 @@ public enum JDBCError {
 
     public RuntimeDyna4JdbcException raiseUncheckedException(
             Throwable throwable, Object... params) throws RuntimeDyna4JdbcException {
-
         String errorMessage = buildErrorMessage(params);
         throw new RuntimeDyna4JdbcException(errorMessage, throwable, getSqlStateAsString());
     }
@@ -129,5 +145,4 @@ public enum JDBCError {
         String formatString = getMessageTemplate();
         return String.format(formatString, params);
     }
-
 }

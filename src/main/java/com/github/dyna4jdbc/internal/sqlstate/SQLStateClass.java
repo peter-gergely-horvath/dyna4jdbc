@@ -3,7 +3,7 @@ package com.github.dyna4jdbc.internal.sqlstate;
 /**
  * @author Peter Horvath
  */
-enum SQLStateClass {
+public enum SQLStateClass {
 
     SUCCESS(Category.SUCCESS, "00", "Completed successfully"),
     WARNING(Category.WARNING, "01", "Warning"),
@@ -19,9 +19,9 @@ enum SQLStateClass {
 
 
     //CHECKSTYLE.OFF: VisibilityModifier
-    final Category category;
+    public final Category category;
 
-    final String classCode;
+    public final String classCode;
     final String classText;
     //CHECKSTYLE.ON: VisibilityModifier
 
