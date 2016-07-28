@@ -44,4 +44,12 @@ public class JRubyScriptEngineTest extends AbstractScriptEngineIntegrationTest {
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
+    @Test
+    @Override
+    public void testPreparedStatementBindsVariable() throws Exception {
+
+        String script = "puts\"Message::\"\n puts $parameter1";
+
+         assertPreparedStatementQueryReturnsParameter(script);
+    }
 }

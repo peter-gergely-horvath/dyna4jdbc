@@ -17,12 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 
 import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.JDBCError;
@@ -126,13 +121,13 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
         return scriptEngine;
     }
-    
+
     private void executeInitScript(String initScriptPath) throws SQLException, MisconfigurationException {
         File initScript = new File(initScriptPath);
         if (!initScript.exists()) {
             throw MisconfigurationException.forMessage("InitScript not found: %s", initScriptPath);
         }
-        
+
         try {
             byte[] bytesRead = Files.readAllBytes(initScript.toPath());
             String initScriptText = new String(bytesRead, this.configuration.getConversionCharset());
@@ -250,9 +245,8 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
             }
         } // end of synchronized (lockObject) block
     }
-    //CHECKSTYLE.ON: DesignForExtension
 
-    private void applyVariablesToEngineScope(Map<String, Object> variables, Bindings bindings) {
+    protected void applyVariablesToEngineScope(Map<String, Object> variables, Bindings bindings) {
         if (variables != null) {
             for (Map.Entry<String, Object> entry : variables.entrySet()) {
                 String key = entry.getKey();
@@ -264,7 +258,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
         }
     }
 
-    private void removeVariablesFromEngineScope(Map<String, Object> variables, Bindings bindings) {
+    protected void removeVariablesFromEngineScope(Map<String, Object> variables, Bindings bindings) {
         if (variables != null) {
             for (String key : variables.keySet()) {
 
@@ -273,6 +267,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
             }
         }
     }
+    //CHECKSTYLE.ON: DesignForExtension
 
     protected final ScriptEngine getEngine() {
         return engine;

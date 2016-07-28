@@ -2,21 +2,19 @@ package com.github.dyna4jdbc.integrationtests;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.executeScriptForResultSetString;
 import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.newLineSeparated;
 import static org.testng.Assert.*;
 
 /**
- * @author Peter Horvath
+ * @author Peter Horvath, Balazs Toeroek
  */
-public class AbstractScriptEngineIntegrationTest {
+public abstract class AbstractScriptEngineIntegrationTest {
 
-    private final String jdbcUrl;
+    protected static final String PREPARED_STATEMENT_PARAMETER = "Hello World";
+    protected final String jdbcUrl;
 
     protected AbstractScriptEngineIntegrationTest(String jdbcUrl) {
         this.jdbcUrl = jdbcUrl;
@@ -134,4 +132,25 @@ public class AbstractScriptEngineIntegrationTest {
 
         assertEquals(resultSetString, expectedOutput);
     }
+
+    protected void assertPreparedStatementQueryReturnsParameter(String script) throws SQLException {
+
+        try (Connection connection = DriverManager.getConnection(jdbcUrl)) {
+
+            try (PreparedStatement statement = connection.prepareStatement(script)) {
+                // value will be bound to the name "parameter1"
+                // see OutputHandlingPreparedStatement.setParameter()
+                statement.setString(1, PREPARED_STATEMENT_PARAMETER);
+
+                ResultSet resultSet = statement.executeQuery();
+
+                while (resultSet.next()) {
+                    String result = resultSet.getString("Message");
+                    assertEquals(result, PREPARED_STATEMENT_PARAMETER);
+                }
+            }
+        }
+    }
+
+    public abstract void testPreparedStatementBindsVariable() throws Exception;
 }

@@ -44,4 +44,12 @@ public class ClojureScriptEngineTest extends AbstractScriptEngineIntegrationTest
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
+    @Test
+    @Override
+    public void testPreparedStatementBindsVariable() throws Exception {
+
+        String script = "(println \"Message::\")\n (print parameter1)";
+
+        assertPreparedStatementQueryReturnsParameter(script);
+    }
 }

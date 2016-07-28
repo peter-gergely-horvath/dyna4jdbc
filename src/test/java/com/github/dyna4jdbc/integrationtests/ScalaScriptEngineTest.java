@@ -1,8 +1,8 @@
 package com.github.dyna4jdbc.integrationtests;
 
-import java.sql.SQLException;
-
 import org.testng.annotations.Test;
+
+import java.sql.SQLException;
 
 public class ScalaScriptEngineTest extends AbstractScriptEngineIntegrationTest {
 
@@ -44,4 +44,12 @@ public class ScalaScriptEngineTest extends AbstractScriptEngineIntegrationTest {
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
+    @Test
+    @Override
+    public void testPreparedStatementBindsVariable() throws Exception {
+
+        String script = "println(\"Message::\") \n println(parameter1)";
+
+        assertPreparedStatementQueryReturnsParameter(script);
+    }
 }

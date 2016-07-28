@@ -44,4 +44,12 @@ public class GroovyScriptEngineTest extends AbstractScriptEngineIntegrationTest 
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
+    @Test
+    @Override
+    public void testPreparedStatementBindsVariable() throws Exception {
+
+        String script = "println('Message::'); println(parameter1)";
+
+        assertPreparedStatementQueryReturnsParameter(script);
+    }
 }
