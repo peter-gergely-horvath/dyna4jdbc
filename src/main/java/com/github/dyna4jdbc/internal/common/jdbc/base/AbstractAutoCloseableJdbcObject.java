@@ -17,10 +17,16 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.RuntimeDyna4JdbcException;
+import com.github.dyna4jdbc.internal.common.util.collection.RemoveLastItemCallbackSet;
 
 /**
  * {@code AbstractAutoCloseableJdbcObject} is a base class
@@ -64,7 +70,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      *
      * @see #close()
      */
-    private final Set<AutoCloseable> children = Collections.synchronizedSet(new HashSet<>());
+    private final Set<AutoCloseable> children = buildChildrenSet(() -> onLastChildRemoved());
 
     /**
      * We maintain a reference to the parent object, so that we can
@@ -81,6 +87,35 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
 
     protected AbstractAutoCloseableJdbcObject(AbstractAutoCloseableJdbcObject parent) {
         this.parent = parent;
+    }
+    
+    /**
+     * <p>
+     * Constructs a new {@code Set}, which notifies {@code this}
+     * {@code AbstractAutoCloseableJdbcObject} when the last element
+     * is removed. </p>
+     * 
+     * @param onLastElementRemoved the callback to call, when all children are closed
+     * 
+     * @return a {@code Set}, which notifies {@code this}, when the last element is removed from it
+     */
+    private Set<AutoCloseable> buildChildrenSet(Runnable onLastElementRemoved) {
+
+        Set<AutoCloseable> actualStoreSet = new HashSet<>();
+
+        RemoveLastItemCallbackSet<AutoCloseable> removeLastItemCallbackSet =
+                new RemoveLastItemCallbackSet<AutoCloseable>(actualStoreSet, onLastElementRemoved);
+        
+        /* We wrap the Set, which provides the callback to avoid
+         * race conditions: the wrapper synchronizedSet HOLDS the
+         * monitor while the callback is being executed, hence a
+         * new registration cannot occur during the remove calls.
+         */
+        return Collections.synchronizedSet(removeLastItemCallbackSet);
+    }
+
+    protected void onLastChildRemoved() {
+        // template method for sub-classes to override
     }
 
     /**
@@ -119,7 +154,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
     public final boolean isClosed() {
         return closed.get();
     }
-    
+
     /**
      * Closes {@code this} object and all live registered closable child objects.
      * This method is thread-safe: it shall consistently close
@@ -130,35 +165,22 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * @throws SQLException in case closing {@code this} object or any of the the child object fails
      */
     public final void close() throws SQLException {
-        final boolean closedFlagSet = markClosedInternal();
+        final boolean closedFlagSet = closed.compareAndSet(false, true);
         if (closedFlagSet) {
-            unRegisterFromParent();
 
-            closeChildObjects();
-        }
-    }
+            Throwable parentCloseThrowable = null;
 
-    /**
-     * Sets the closed flag, if it is not yet set and returns and indication,
-     * whether it was set already. It does not perform any actual resource closure.
-     * Must not be used except the infrastructure code use to handle
-     * closing and resources.
-     *
-     * @return {@code true} if {@code this} object was successfully marked as closed,
-     *          {@code false} if it was marked as closed previously.
-     */
-    private boolean markClosedInternal() {
-        return closed.compareAndSet(false, true);
-    }
+            if (parent != null) {
+                try {
+                    parent.children.remove(this);
+                } catch (RuntimeDyna4JdbcException ex) {
+                    // Unwrap actual exception thrown from
+                    // AbstractStatement#onLastChildRemoved()
+                    parentCloseThrowable = ex.getCause();
+                }
+            }
 
-    /**
-     * Removes this object from the parent's children registry: once a child is closed,
-     * the parent will no longer maintain any reference to it or try to close it when
-     * the parent itself is closed.
-     */
-    private void unRegisterFromParent() {
-        if (parent != null) {
-            parent.children.remove(this);
+            closeChildObjects(parentCloseThrowable);
         }
     }
 
@@ -167,9 +189,11 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * the close method is called on them. Any {@code Throwable}s thrown by the
      * child objects are later re-thrown, once closing of every child is completed.
      *
+     * @param parentCloseException exception thrown from parent closure (might be {@code null})
+     *
      * @throws SQLException if one or more child objects throw {@code Throwable} on close method call
      */
-    private void closeChildObjects() throws SQLException {
+    private void closeChildObjects(Throwable parentCloseException) throws SQLException {
         LinkedList<Throwable> caughtThrowables = new LinkedList<>();
 
         for (AutoCloseable closeableObject : children) {
@@ -189,6 +213,10 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
 
         children.clear(); // closing also includes discarding references
 
+        if (parentCloseException != null) {
+            caughtThrowables.add(parentCloseException);
+        }
+
         switch (caughtThrowables.size()) {
             case 0:
                 return; // no Throwable caught: normal completion
@@ -196,12 +224,12 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
             case 1:
                 // closure of a single child has failed: propagate it as the root cause
                 throw JDBCError.CLOSE_FAILED.raiseSQLException(caughtThrowables.getFirst(),
-                        this, "Closing of child object caused exception");
+                        this, "Closing of dependent object caused exception");
 
             default:
                 // closure of multiple children has failed: propagate them as suppressed
                 throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(caughtThrowables,
-                        this, "Closing of child objects caused exceptions; see supressed");
+                        this, "Closing of dependent objects caused exceptions; see supressed");
 
         }
     }

@@ -7,6 +7,7 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
@@ -21,7 +22,8 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     private final T connection;
 
-
+    private final AtomicBoolean closeOnCompletion = new AtomicBoolean(false);
+    
     private SQLWarning sqlWarning;
     private Iterator<ResultSet> resultSetIterator;
     private int currentUpdateCount = INVALID_UPDATE_COUNT;
@@ -308,17 +310,29 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     public final boolean isCloseOnCompletion() throws SQLException {
         checkNotClosed();
 
-        return false;
+        return closeOnCompletion.get();
+    }
+    
+    @Override
+    public final void closeOnCompletion() throws SQLException {
+        checkNotClosed();
+        
+        closeOnCompletion.set(true);
+    }
+    
+    @Override
+    protected final void onLastChildRemoved() {
+        try {
+            if (closeOnCompletion.get()) {
+                this.close();
+            }
+        } catch (SQLException ex) {
+            throw JDBCError.PARENT_CLOSE_TRIGGERED_FROM_CHILD_THREW_EXCEPTION
+                        .raiseUncheckedException(ex, ex.getMessage());
+        }
     }
 
     // -- unsupported JDBC operations
-    @Override
-    public final void closeOnCompletion() throws SQLException {
-        // Not implemented for now: we clearly signal this to the caller
-        throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
-                "java.sql.Statement.closeOnCompletion()");
-    }
-
     public final void addBatch(String sql) throws SQLException {
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                 "java.sql.Statement.addBatch(String)");

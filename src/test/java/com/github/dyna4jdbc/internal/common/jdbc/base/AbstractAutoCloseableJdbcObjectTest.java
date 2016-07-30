@@ -41,7 +41,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
 
     /**
      * A minimalistic implementation of {@code AbstractAutoCloseableJdbcObject},
-     * which allows us to detect if the an adaopted resource is closed properly:
+     * which allows us to detect if the an adapted resource is closed properly:
      * the {@code Callable} supplied as constructor argument can be a mock.
      */
     private class AutoCloseableJdbcObject extends AbstractAutoCloseableJdbcObject {
@@ -101,7 +101,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
         closeableJdbcObject.close();
         closeableJdbcObject.close();
     }
-    
+
     @Test
     public void testRegisteringNullChildThrowsException() throws Exception {
 

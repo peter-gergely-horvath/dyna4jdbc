@@ -86,12 +86,15 @@ public enum JDBCError {
             SQLStateClass.SYSTEM_ERROR, "002"),
     CANCEL_FAILED("Failed to cancel the operation: %s",
             SQLStateClass.SYSTEM_ERROR, "003"),
+    PARENT_CLOSE_TRIGGERED_FROM_CHILD_THREW_EXCEPTION("Closure of parent failed: %s",
+            SQLStateClass.SYSTEM_ERROR, "004"),
+    
+    
     UNEXPECTED_THROWABLE("Processing failed; caught unexpected exception: %s",
             SQLStateClass.SYSTEM_ERROR, "900"),
     DRIVER_BUG_UNEXPECTED_STATE("An unexpected state has been reached: %s",
             SQLStateClass.SYSTEM_ERROR, "999");
 
-    
     
 
     private static final int VENDOR_CODE_COMPLETION_FAILURE = 2;
@@ -101,7 +104,7 @@ public enum JDBCError {
     //CHECKSTYLE.OFF: VisibilityModifier
     final SQLStateClass sqlStateClass;
     //CHECKSTYLE.ON: VisibilityModifier
-    
+
     JDBCError(String message, SQLStateClass sqlStateClass, String code) {
         this.message = message;
         this.sqlStateClass = sqlStateClass;
