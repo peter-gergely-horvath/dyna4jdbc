@@ -1,6 +1,7 @@
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConverter;
@@ -17,11 +18,17 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
 
-class DefaultColumnHandler extends AbstractColumnHandler {
+class DefaultColumnHandler implements ColumnHandler {
 
+    private final ColumnMetadata columnMetadata;
 
     DefaultColumnHandler(ColumnMetadata columnMetadata) {
-        super(columnMetadata);
+        this.columnMetadata = columnMetadata;
+    }
+    
+    @Override
+    public final ColumnMetadata getColumnMetadata() {
+        return columnMetadata;
     }
 
     @Override

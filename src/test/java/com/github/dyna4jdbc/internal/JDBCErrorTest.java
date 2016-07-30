@@ -35,7 +35,7 @@ public class JDBCErrorTest {
     }
     
     @Test
-    public void testCodesAreUniqueInGroup() throws SQLException {
+    public void testCodesAreUnique() throws SQLException {
 
         HashSet<String> foundCodes = new HashSet<>();
         

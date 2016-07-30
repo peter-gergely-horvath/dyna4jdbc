@@ -49,7 +49,9 @@ public class RenjinScriptEngineTest extends AbstractScriptEngineIntegrationTest 
     public void testPreparedStatementBindsVariable() throws Exception {
 
         String script = "cat(\"Message::\n\") \n cat(parameter1) ";
-        // todo balazs: fix the issue with getBindings(), because it returns null from RenjinScriptContext
-        // assertPreparedStatementQueryReturnsParameter(script);
+        
+        assertPreparedStatementQueryReturnsParameter(script);
+        
+        assertPreparedStatementQueryReturnsParameter(script);
     }
 }

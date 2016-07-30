@@ -57,6 +57,9 @@ public enum JDBCError {
     DATA_CONVERSION_FAILED("Data conversion failed in row %s, column %s. Value '%s' could not be converted to %s.",
             SQLStateClass.ERROR_DATA_EXCEPTION, "002"),
 
+    // Error class EXTERNAL_ROUTINE_INVOCATION_EXCEPTION
+    NON_STANDARD_COMPLIANT_SCRIPTENGINE("Non standard compliant ScriptEngine implementation: %s",
+            SQLStateClass.EXTERNAL_ROUTINE_INVOCATION_EXCEPTION, "001"),
 
     // Error class SYNTAX_OR_ACCESS_RULE_ERROR
     USING_STDOUT_FROM_UPDATE("Using standard output from an update call is not permitted",
@@ -88,6 +91,8 @@ public enum JDBCError {
     DRIVER_BUG_UNEXPECTED_STATE("An unexpected state has been reached: %s",
             SQLStateClass.SYSTEM_ERROR, "999");
 
+    
+    
 
     private static final int VENDOR_CODE_COMPLETION_FAILURE = 2;
     private final String message;
@@ -102,7 +107,7 @@ public enum JDBCError {
         this.sqlStateClass = sqlStateClass;
         this.sqlStateCode = String.format("%s%s", sqlStateClass.classCode, code);
     }
-    
+
     @Override
     public String toString() {
         return String.format("JDBC Error [%s]", this.name());
@@ -153,7 +158,7 @@ public enum JDBCError {
             String formatString = getMessageTemplate();
             return String.format(formatString, params);
         } catch (java.util.IllegalFormatException formatException) {
-            /* 
+            /*
              * we should have a sensible handling for the unlikely
              * case when the error message cannot be constructed
              * due to a bug in the arguments passed to from the

@@ -121,6 +121,11 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
         return scriptEngine;
     }
+    
+    protected final AtomicReference<AbortableOutputStream.AbortHandler> getStreamAbortHandlerRef() {
+        // TODO: remove this method, once Renjin ScriptEngine is fixed
+        return streamAbortHandlerRef;
+    }
 
     private void executeInitScript(String initScriptPath) throws SQLException, MisconfigurationException {
         File initScript = new File(initScriptPath);
@@ -215,7 +220,16 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
              * By synchronizing here, we basically implement a mutual exclusion policy for the ScriptEngine.
              */
             ScriptContext engineContext = engine.getContext();
+            if (engineContext == null) {
+                throw JDBCError.NON_STANDARD_COMPLIANT_SCRIPTENGINE.raiseUncheckedException(
+                        "javax.script.ScriptEngine.getContext() returned null");
+            }
+            
             Bindings bindings = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
+            if (bindings == null) {
+                throw JDBCError.NON_STANDARD_COMPLIANT_SCRIPTENGINE.raiseUncheckedException(
+                        "javax.script.ScriptContext.getBindings(ScriptContext.ENGINE_SCOPE) returned null");
+            }
 
             Writer originalWriter = engineContext.getWriter();
             Writer originalErrorWriter = engineContext.getErrorWriter();
