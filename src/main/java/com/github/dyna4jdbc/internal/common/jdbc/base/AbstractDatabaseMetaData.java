@@ -1,13 +1,9 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.RowIdLifetime;
-import java.sql.SQLException;
-
 import com.github.dyna4jdbc.internal.DriverInfo;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
+
+import java.sql.*;
 
 public abstract class AbstractDatabaseMetaData<T extends Connection>
         extends AbstractWrapper implements DatabaseMetaData {
@@ -119,7 +115,10 @@ public abstract class AbstractDatabaseMetaData<T extends Connection>
     }
 
     public final String getIdentifierQuoteString() throws SQLException {
-        return " ";
+        // From JavaDoc:
+        // Retrieves the string used to quote SQL identifiers.
+        // This method returns a space " " if identifier quoting is not supported.
+        return " "; // identifier quoting is not supported
     }
 
     public final String getSQLKeywords() throws SQLException {
@@ -628,7 +627,7 @@ public abstract class AbstractDatabaseMetaData<T extends Connection>
     public final boolean supportsResultSetConcurrency(
             int type, int concurrency) throws SQLException {
 
-        return type == ResultSet.TYPE_SCROLL_INSENSITIVE
+        return type == ResultSet.TYPE_FORWARD_ONLY
                 && concurrency == ResultSet.CONCUR_READ_ONLY;
     }
 
@@ -669,7 +668,7 @@ public abstract class AbstractDatabaseMetaData<T extends Connection>
     }
 
     public final boolean supportsBatchUpdates() throws SQLException {
-        return true;
+        return false;
     }
 
     public final ResultSet getUDTs(
@@ -725,7 +724,7 @@ public abstract class AbstractDatabaseMetaData<T extends Connection>
     public final boolean supportsResultSetHoldability(int holdability)
             throws SQLException {
 
-        return false;
+        return holdability == ResultSet.HOLD_CURSORS_OVER_COMMIT;
     }
 
     public final int getResultSetHoldability() throws SQLException {

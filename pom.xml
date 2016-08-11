@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-    <name>DYNA4JDBC</name>
+    <name>dyna4JDBC</name>
 
 	<groupId>com.github.peter-gergely-horvath</groupId>
 	<artifactId>dyna4jdbc</artifactId>
@@ -345,6 +345,8 @@
                         <version>${clover.version}</version>
                         <configuration>
                             <licenseLocation>configuration/clover/dyna4jdbc_clover.license</licenseLocation>
+							<!-- targetPercentage should gradually reach 75-80% -->
+							<targetPercentage>60%</targetPercentage>
                         </configuration>
                         <executions>
                             <execution>
