@@ -631,16 +631,22 @@ public class AbstractConnectionTest {
         
         connectionWarningSink.onSQLWarning(new SQLWarning("foo"));
         connectionWarningSink.onSQLWarning(new SQLWarning("bar"));
-        
+        connectionWarningSink.onSQLWarning(new SQLWarning("baz"));
         
         warnings = abstractConnection.getWarnings();
         
         assertNotNull(warnings);
         assertEquals(warnings.getMessage(), "foo");
         
-        assertNotNull(warnings.getNextWarning());
+        warnings = warnings.getNextWarning();
+        assertNotNull(warnings);
+        assertEquals(warnings.getMessage(), "bar");
         
-        assertNotNull(warnings.getNextWarning().getMessage(), "bar");
+        warnings = warnings.getNextWarning();
+        assertNotNull(warnings);
+        assertEquals(warnings.getMessage(), "baz");
+        
+        assertNull(warnings.getNextWarning());
     }
     
     

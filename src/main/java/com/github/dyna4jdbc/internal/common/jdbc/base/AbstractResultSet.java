@@ -1,15 +1,28 @@
 package com.github.dyna4jdbc.internal.common.jdbc.base;
 
-import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningUtils;
-
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.*;
+import java.sql.Array;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Date;
+import java.sql.NClob;
+import java.sql.Ref;
+import java.sql.ResultSet;
+import java.sql.RowId;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.SQLXML;
+import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
+
+import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningContainer;
 
 public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObject implements ResultSet {
 
@@ -17,7 +30,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     private boolean wasNull = false;
 
-    private SQLWarning sqlWarning;
+    private final SQLWarningContainer warningContainer = new SQLWarningContainer();
 
     private int fetchSize;
 
@@ -37,17 +50,17 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final SQLWarning getWarnings() throws SQLException {
-        return this.sqlWarning;
+        return this.warningContainer.getWarnings();
     }
 
     @Override
     public final void clearWarnings() throws SQLException {
-        this.sqlWarning = null;
+        this.warningContainer.clearWarnings();
     }
 
     protected final void addSQLWarning(SQLWarning warning) {
 
-        this.sqlWarning = SQLWarningUtils.chainSQLWarning(this.sqlWarning, warning);
+        this.warningContainer.addSQLWarning(warning);
     }
 
 

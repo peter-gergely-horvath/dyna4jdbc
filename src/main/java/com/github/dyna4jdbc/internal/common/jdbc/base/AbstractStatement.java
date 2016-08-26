@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.EmptyResultSet;
-import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningUtils;
+import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningContainer;
 
 public abstract class AbstractStatement<T extends java.sql.Connection>
         extends AbstractAutoCloseableJdbcObject implements java.sql.Statement {
@@ -24,7 +24,8 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
     private final AtomicBoolean closeOnCompletion = new AtomicBoolean(false);
     
-    private SQLWarning sqlWarning;
+    private final SQLWarningContainer warningContainer = new SQLWarningContainer();
+    
     private Iterator<ResultSet> resultSetIterator;
     private int currentUpdateCount = INVALID_UPDATE_COUNT;
 
@@ -57,12 +58,12 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     public final SQLWarning getWarnings() throws SQLException {
         checkNotClosed();
 
-        return sqlWarning;
+        return warningContainer.getWarnings();
     }
 
     protected final void addSQLWarning(SQLWarning warning) {
 
-        this.sqlWarning = SQLWarningUtils.chainSQLWarning(this.sqlWarning, warning);
+        this.warningContainer.addSQLWarning(warning);
     }
 
 
@@ -70,7 +71,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     public final void clearWarnings() throws SQLException {
         checkNotClosed();
 
-        sqlWarning = null;
+        warningContainer.clearWarnings();
     }
 
     @Override

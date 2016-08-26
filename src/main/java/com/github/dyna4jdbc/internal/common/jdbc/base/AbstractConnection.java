@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningUtils;
+import com.github.dyna4jdbc.internal.common.util.sqlwarning.SQLWarningContainer;
 
 
 public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject implements java.sql.Connection {
@@ -40,7 +40,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     private LinkedHashMap<String, Class<?>> typeMap = new LinkedHashMap<String, Class<?>>();
     private Properties clientInfo = new Properties();
 
-    private SQLWarning sqlWarning;
+    private final SQLWarningContainer warningContainer = new SQLWarningContainer();
 
     public AbstractConnection() {
         super(null);
@@ -324,18 +324,18 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     @Override
     public final SQLWarning getWarnings() throws SQLException {
         checkNotClosed();
-        return this.sqlWarning;
+        return this.warningContainer.getWarnings();
     }
 
     @Override
     public final void clearWarnings() throws SQLException {
         checkNotClosed();
-        this.sqlWarning = null;
+        this.warningContainer.clearWarnings();
     }
 
     protected final void addSQLWarning(SQLWarning warning) {
 
-        this.sqlWarning = SQLWarningUtils.chainSQLWarning(this.sqlWarning, warning);
+        this.warningContainer.addSQLWarning(warning);
     }
 
 
