@@ -1,18 +1,27 @@
 package com.github.dyna4jdbc.internal.common.jdbc.generic;
 
-import com.github.dyna4jdbc.internal.DriverInfo;
-import com.google.common.base.Strings;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.JDBCType;
+import java.sql.ResultSet;
+import java.sql.RowIdLifetime;
+import java.sql.SQLException;
+
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.sql.Connection;
-import java.sql.JDBCType;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import static org.easymock.EasyMock.*;
-import static org.testng.Assert.*;
+import com.github.dyna4jdbc.internal.DriverInfo;
+import com.google.common.base.Strings;
 
 public class GenericDatabaseMetaDataTest {
 
@@ -833,6 +842,42 @@ public class GenericDatabaseMetaDataTest {
 
         assertFalse(genericDatabaseMetaData.getVersionColumns(null, null, null).next());
     }
+    
+    @Test
+    public void testGetPrimaryKeys() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getPrimaryKeys(null, null, null).next());
+    }
+    
+    @Test
+    public void testGetImportedKeys() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getImportedKeys(null, null, null).next());
+    }
+    
+    @Test
+    public void testGetExportedKeys() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getExportedKeys(null, null, null).next());
+    }
+    
+    @Test
+    public void testGetCrossReference() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getCrossReference(null, null, null, null, null, null).next());
+    }
+    
+    @Test
+    public void testGetTypeInfo() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getTypeInfo().next());
+    }
+    
+    @Test
+    public void teszGetIndexInfo() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getIndexInfo(null, null, null, false, false).next());
+    }
 
     @Test
     public void testSupportsResultSetType() throws SQLException {
@@ -941,6 +986,12 @@ public class GenericDatabaseMetaDataTest {
 
         assertFalse(genericDatabaseMetaData.supportsBatchUpdates());
     }
+    
+    @Test
+    public void testGetUDTs() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getUDTs(null, null, null, null).next());
+    }
 
     @Test
     public void testSupportsSavepoints() throws SQLException {
@@ -965,6 +1016,24 @@ public class GenericDatabaseMetaDataTest {
 
         assertFalse(genericDatabaseMetaData.supportsGetGeneratedKeys());
     }
+    
+    @Test
+    public void testGetSuperTypes() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getSuperTypes(null, null, null).next());
+    }
+    
+    @Test
+    public void testGetSuperTables() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getSuperTables(null, null, null).next());
+    }
+    
+    @Test
+    public void testGetAttributes() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getAttributes(null, null, null, null).next());
+    }
 
     @Test
     public void testSupportsResultSetHoldability() throws SQLException {
@@ -972,6 +1041,44 @@ public class GenericDatabaseMetaDataTest {
         assertTrue(genericDatabaseMetaData.supportsResultSetHoldability(ResultSet.HOLD_CURSORS_OVER_COMMIT));
         assertFalse(genericDatabaseMetaData.supportsResultSetHoldability(ResultSet.CLOSE_CURSORS_AT_COMMIT));
     }
+    
+    @Test
+    public void testGetResultSetHoldability() throws SQLException {
+
+        assertEquals(genericDatabaseMetaData.getResultSetHoldability(), ResultSet.HOLD_CURSORS_OVER_COMMIT);
+    }
+    
+    
+    @Test
+    public void testGetDatabaseMajorVersion() throws SQLException {
+
+        assertEquals(genericDatabaseMetaData.getDatabaseMajorVersion(), DriverInfo.DRIVER_VERSION_MAJOR);
+    }
+    
+    @Test
+    public void testGetDatabaseMinorVersion() throws SQLException {
+
+        assertEquals(genericDatabaseMetaData.getDatabaseMinorVersion(), DriverInfo.DRIVER_VERSION_MINOR);
+    }
+    
+    @Test
+    public void testGetJDBCMajorVersion() throws SQLException {
+
+        assertEquals(genericDatabaseMetaData.getJDBCMajorVersion(), 0);
+    }
+    
+    @Test
+    public void testGetJDBCMinorVersion() throws SQLException {
+
+        assertEquals(genericDatabaseMetaData.getJDBCMinorVersion(), 1);
+    }
+    
+    @Test
+    public void testGetSQLStateType() throws SQLException {
+
+        assertEquals(genericDatabaseMetaData.getSQLStateType(), DatabaseMetaData.sqlStateSQL99);
+    }
+    
 
     @Test
     public void testLocatorsUpdateCopy() throws SQLException {
@@ -984,6 +1091,18 @@ public class GenericDatabaseMetaDataTest {
 
         assertFalse(genericDatabaseMetaData.supportsStatementPooling());
     }
+    
+    @Test
+    public void testGetRowIdLifetime() throws SQLException {
+
+        assertEquals(genericDatabaseMetaData.getRowIdLifetime(), RowIdLifetime.ROWID_UNSUPPORTED);
+    }
+    
+    @Test
+    public void testGetSchemasStringString() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getSchemas(null, null).next());
+    }
 
     @Test
     public void testSupportsStoredFunctionsUsingCallSyntax() throws SQLException {
@@ -995,6 +1114,30 @@ public class GenericDatabaseMetaDataTest {
     public void testAutoCommitFailureClosesAllResultSets() throws SQLException {
 
         assertFalse(genericDatabaseMetaData.autoCommitFailureClosesAllResultSets());
+    }
+    
+    @Test
+    public void testGetClientInfoProperties() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getClientInfoProperties().next());
+    }
+    
+    @Test
+    public void testGetFunctions() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getFunctions(null, null, null).next());
+    }
+    
+    @Test
+    public void testGetFunctionColumns() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getFunctionColumns(null, null, null, null).next());
+    }
+    
+    @Test
+    public void getPseudoColumns() throws SQLException {
+
+        assertFalse(genericDatabaseMetaData.getPseudoColumns(null, null, null, null).next());
     }
 
     @Test

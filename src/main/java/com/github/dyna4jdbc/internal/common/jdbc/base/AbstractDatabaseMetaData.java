@@ -8,6 +8,10 @@ import java.sql.*;
 public abstract class AbstractDatabaseMetaData<T extends Connection>
         extends AbstractWrapper implements DatabaseMetaData {
 
+    // TODO: check which JDBC version we should report.
+    private static final int JDBC_MAJOR_VERSION = 0;
+    private static final int JDBC_MINOR_VERSION = 1;
+    
     private final T connection;
 
     public AbstractDatabaseMetaData(T connection) {
@@ -728,7 +732,7 @@ public abstract class AbstractDatabaseMetaData<T extends Connection>
     }
 
     public final int getResultSetHoldability() throws SQLException {
-        return ResultSet.CLOSE_CURSORS_AT_COMMIT;
+        return ResultSet.HOLD_CURSORS_OVER_COMMIT;
     }
 
     public final int getDatabaseMajorVersion() throws SQLException {
@@ -740,11 +744,11 @@ public abstract class AbstractDatabaseMetaData<T extends Connection>
     }
 
     public final int getJDBCMajorVersion() throws SQLException {
-        return 0;
+        return JDBC_MAJOR_VERSION;
     }
 
     public final int getJDBCMinorVersion() throws SQLException {
-        return 1;
+        return JDBC_MINOR_VERSION;
     }
 
     public final int getSQLStateType() throws SQLException {

@@ -78,7 +78,7 @@ public class AbstractReadOnlyResultSetTest {
 
     private static Predicate<Method> filterMethods() {
 
-        Set methodNames = new HashSet<>(Arrays.asList(
+        Set<String> methodNames = new HashSet<>(Arrays.asList(
                 "deleteRow", "cancelRowUpdates", "moveToInsertRow", "moveToCurrentRow",
                 "rowUpdated", "rowInserted", "rowDeleted", "insertRow" ));
 
