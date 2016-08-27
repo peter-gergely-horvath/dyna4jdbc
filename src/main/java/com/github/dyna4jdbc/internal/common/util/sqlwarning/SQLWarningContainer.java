@@ -36,7 +36,7 @@ public final class SQLWarningContainer {
     public void clearWarnings() {
         this.currentSQLWarning = null;
     }
-    
+
     public SQLWarning getWarnings() {
         return this.currentSQLWarning;
     }

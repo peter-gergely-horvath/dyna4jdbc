@@ -320,7 +320,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
         
         closeOnCompletion.set(true);
     }
-    
+
     @Override
     protected final void onLastChildRemoved() {
         try {
