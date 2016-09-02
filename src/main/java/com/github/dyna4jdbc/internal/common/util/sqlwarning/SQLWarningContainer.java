@@ -2,6 +2,8 @@ package com.github.dyna4jdbc.internal.common.util.sqlwarning;
 
 import java.sql.SQLWarning;
 
+import com.github.dyna4jdbc.internal.JDBCError;
+
 /**
  * @author Peter Horvath
  */
@@ -11,6 +13,10 @@ public final class SQLWarningContainer {
     
     public void addSQLWarning(SQLWarning newSQLWarning) {
 
+        if(newSQLWarning == null) {
+            JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("newSQLWarning is null");
+        }
+        
         if (currentSQLWarning == null) {
             currentSQLWarning = newSQLWarning;
             
