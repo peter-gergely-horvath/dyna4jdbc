@@ -122,11 +122,6 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
         return scriptEngine;
     }
     
-    protected final AtomicReference<AbortableOutputStream.AbortHandler> getStreamAbortHandlerRef() {
-        // TODO: remove this method, once Renjin ScriptEngine is fixed
-        return streamAbortHandlerRef;
-    }
-
     private void executeInitScript(String initScriptPath) throws SQLException, MisconfigurationException {
         File initScript = new File(initScriptPath);
         if (!initScript.exists()) {
@@ -225,11 +220,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
                         "javax.script.ScriptEngine.getContext() returned null");
             }
             
-            Bindings bindings = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
-            if (bindings == null) {
-                throw JDBCError.NON_STANDARD_COMPLIANT_SCRIPTENGINE.raiseUncheckedException(
-                        "javax.script.ScriptContext.getBindings(ScriptContext.ENGINE_SCOPE) returned null");
-            }
+            Bindings bindings = getBindings(engineContext);
 
             Writer originalWriter = engineContext.getWriter();
             Writer originalErrorWriter = engineContext.getErrorWriter();
@@ -258,6 +249,15 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
                 streamAbortHandlerRef.set(null);
             }
         } // end of synchronized (lockObject) block
+    }
+
+    protected Bindings getBindings(ScriptContext engineContext) {
+        Bindings bindings = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
+        if (bindings == null) {
+            throw JDBCError.NON_STANDARD_COMPLIANT_SCRIPTENGINE.raiseUncheckedException(
+                    "javax.script.ScriptContext.getBindings(ScriptContext.ENGINE_SCOPE) returned null");
+        }
+        return bindings;
     }
 
     protected void applyVariablesToEngineScope(Map<String, Object> variables, Bindings bindings) {
