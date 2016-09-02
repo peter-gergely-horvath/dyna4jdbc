@@ -181,7 +181,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         detected.signed = true;
 
         if (cellValue != null) {
-            final int scale = detected.columnType.getScale(cellValue);
+            final int scale = SQLDataType.INTEGER.getScale(cellValue);
 
             detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, scale);
             detected.maxSize = Math.max(detected.maxSize, scale);
@@ -196,8 +196,8 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         detected.signed = true;
 
         if (cellValue != null) {
-            final int scale = detected.columnType.getScale(cellValue);
-            final int precision = detected.columnType.getPrecision(cellValue);
+            final int scale = SQLDataType.DOUBLE.getScale(cellValue);
+            final int precision = SQLDataType.DOUBLE.getPrecision(cellValue);
 
             detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, scale - precision);
             detected.maxPrecision = Math.max(detected.maxPrecision, precision);
