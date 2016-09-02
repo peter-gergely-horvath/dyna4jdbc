@@ -47,10 +47,6 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
         for (String cellValue : cellValues) {
 
-            if (cellValue == null) {
-                detectionContext.nullability = Nullability.NULLABLE;
-            }
-
             detectMetadataByInspectingCellValue(detectionContext, cellValue);
         }
 
@@ -87,9 +83,14 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
     }
 
     private static void detectMetadataByInspectingCellValue(DetectionContext detectionContext, String cellValue) {
+        
+        if (cellValue == null) {
+            detectionContext.nullability = Nullability.NULLABLE;
+        }
+        
         switch (detectionContext.columnType) {
             case OTHER:
-                inspectOther(detectionContext, cellValue);
+                leaveOther(detectionContext, cellValue);
                 break;
 
             case INTEGER:
@@ -98,17 +99,15 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
                 }
 
             case DOUBLE:
-                if (inspectDouble(detectionContext, cellValue)) {
-                    break;
-                }
+                inspectDouble(detectionContext, cellValue);
+                break;
 
             case TIMESTAMP:
-                if (inspectTimestamp(detectionContext, cellValue)) {
-                    break;
-                }
+                leaveTimestamp(detectionContext, cellValue);
+                break;
 
             case VARCHAR:
-                inspectVarChar(detectionContext, cellValue);
+                leaveVarChar(detectionContext, cellValue);
                 break;
 
             default:
@@ -117,61 +116,64 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         }
     }
 
-    private static void inspectVarChar(DetectionContext detectionContext, String cellValue) {
-        handleVarChar(detectionContext, cellValue);
-        return;
+    private static void leaveVarChar(DetectionContext detectionContext, String cellValue) {
+        enterVarChar(detectionContext, cellValue);
     }
 
-    private static boolean inspectTimestamp(DetectionContext detectionContext, String cellValue) {
+    private static void leaveTimestamp(DetectionContext detectionContext, String cellValue) {
         if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
-            handleTimestamp(detectionContext, cellValue);
-            return true;
+            
+            // transition Timestamp --> Timestamp
+            enterTimestamp(detectionContext, cellValue);
+            
+        } else {
+
+            // transition Timestamp --> VarChar
+            enterVarChar(detectionContext, cellValue);
+
         }
-        return false;
     }
 
-    private static boolean inspectDouble(DetectionContext detectionContext, String cellValue) {
+    private static void inspectDouble(DetectionContext detectionContext, String cellValue) {
         if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)
                 || SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
-            handleDouble(detectionContext, cellValue);
-            return true;
+
+            // transition Double --> Double
+            enterDouble(detectionContext, cellValue);
+        } else {
+
+            // transition Double --> VarChar
+            enterVarChar(detectionContext, cellValue);
         }
-        return false;
     }
 
-    private static void inspectOther(DetectionContext detectionContext, String cellValue) {
+    private static void leaveOther(DetectionContext detectionContext, String cellValue) {
 
         if (cellValue == null) {
-            return;
-        }
-        if (SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
-            handleInteger(detectionContext, cellValue);
-            return;
-        }
-        if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)) {
-            handleDouble(detectionContext, cellValue);
-            return;
-        }
-        if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
-            handleTimestamp(detectionContext, cellValue);
-            return;
-        }
-        if (SQLDataType.VARCHAR.isPlausibleConversion(cellValue)) {
-            handleVarChar(detectionContext, cellValue);
-            return;
+            return; // NO-OP: transition Other --> Other
+        } else if (SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
+            enterInteger(detectionContext, cellValue);
+        } else if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)) {
+            enterDouble(detectionContext, cellValue);
+        } else if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
+            enterTimestamp(detectionContext, cellValue);
+        } else if (SQLDataType.VARCHAR.isPlausibleConversion(cellValue)) {
+            enterVarChar(detectionContext, cellValue);
+        } else {
+            JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("no matching type for value: " + cellValue);
         }
     }
 
     private static boolean inspectInteger(DetectionContext detectionContext, String cellValue) {
         if (SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
-            handleInteger(detectionContext, cellValue);
+            enterInteger(detectionContext, cellValue);
             return true;
         }
         return false;
     }
 
 
-    private static void handleInteger(DetectionContext detected, String cellValue) {
+    private static void enterInteger(DetectionContext detected, String cellValue) {
         detected.columnType = SQLDataType.INTEGER;
         detected.signed = true;
 
@@ -185,41 +187,25 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         }
     }
 
-    private static void handleDouble(DetectionContext detected, String cellValue) {
-
-        final SQLDataType previousColumnType = detected.columnType;
+    private static void enterDouble(DetectionContext detected, String cellValue) {
 
         detected.columnType = SQLDataType.DOUBLE;
         detected.signed = true;
 
-        if (previousColumnType == SQLDataType.DOUBLE) {
-            if (cellValue != null) {
-                final int scale = detected.columnType.getScale(cellValue);
-                final int precision = detected.columnType.getPrecision(cellValue);
+        if (cellValue != null) {
+            final int scale = detected.columnType.getScale(cellValue);
+            final int precision = detected.columnType.getPrecision(cellValue);
 
-                detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, scale - precision);
-                detected.maxPrecision = Math.max(detected.maxPrecision, precision);
+            detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, scale - precision);
+            detected.maxPrecision = Math.max(detected.maxPrecision, precision);
 
-                detected.maxSize = Math.max(detected.maxSize, cellValue.length());
+            detected.maxSize = Math.max(detected.maxSize, cellValue.length());
 
-                detected.maxScale = Math.max(detected.maxScale, scale);
-            }
-
-        } else {
-
-            if (cellValue != null) {
-                final int scale = detected.columnType.getScale(cellValue);
-                final int precision = detected.columnType.getPrecision(cellValue);
-
-                detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, scale - precision);
-                detected.maxSize = Math.max(detected.maxSize, cellValue.length());
-                detected.maxPrecision = Math.max(detected.maxPrecision, precision);
-                detected.maxScale = Math.max(detected.maxScale, scale);
-            }
+            detected.maxScale = Math.max(detected.maxScale, scale);
         }
     }
 
-    private static void handleTimestamp(DetectionContext detected, String cellValue) {
+    private static void enterTimestamp(DetectionContext detected, String cellValue) {
 
         final SQLDataType previousColumnType = detected.columnType;
         switch (previousColumnType) {
@@ -241,7 +227,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
             case INTEGER:
             case DOUBLE:
             case VARCHAR:
-                handleVarChar(detected, cellValue);
+                enterVarChar(detected, cellValue);
 
                 break;
 
@@ -253,7 +239,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         }
     }
 
-    private static void handleVarChar(DetectionContext detected, String cellValue) {
+    private static void enterVarChar(DetectionContext detected, String cellValue) {
 
         final SQLDataType previousColumnType = detected.columnType;
         detected.columnType = SQLDataType.VARCHAR;

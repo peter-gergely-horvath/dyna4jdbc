@@ -7,27 +7,11 @@ public enum SQLDataType {
 
     // TODO: extract methods
     BIT(java.sql.Types.BIT,
-            "BIT", java.lang.Boolean.class, false, "^([01])$") {
-        @Override
-        int getPrecision(String value) {
-            return 0;
-        }
-    },
-
+            "BIT", java.lang.Boolean.class, false, "^([01])$"),
     TINYINT(java.sql.Types.TINYINT,
-            "TINYINT", java.lang.Short.class, false, "^[+-]?((\\d+))$") {
-        @Override
-        int getPrecision(String value) {
-            return 0;
-        }
-    },
+            "TINYINT", java.lang.Short.class, false, "^[+-]?((\\d+))$"),
     SMALLINT(java.sql.Types.SMALLINT,
-            "SMALLINT", java.lang.Short.class, false, "^[+-]?(\\d+)$") {
-        @Override
-        int getPrecision(String value) {
-            return 0;
-        }
-    },
+            "SMALLINT", java.lang.Short.class, false, "^[+-]?(\\d+)$"),
     INTEGER(java.sql.Types.INTEGER,
             "INTEGER", java.lang.Integer.class, false, "^[+-]?(\\d+)$") {
         @Override
@@ -36,12 +20,7 @@ public enum SQLDataType {
         }
     },
     BIGINT(java.sql.Types.BIGINT,
-            "BIGINT", java.lang.Long.class, false, "^[+-]?(\\d+)$") {
-        @Override
-        int getPrecision(String value) {
-            return 0;
-        }
-    },
+            "BIGINT", java.lang.Long.class, false, "^[+-]?(\\d+)$"),
     FLOAT(java.sql.Types.FLOAT,
             "FLOAT", java.lang.Float.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
     REAL(java.sql.Types.REAL,
@@ -53,12 +32,7 @@ public enum SQLDataType {
     DECIMAL(java.sql.Types.DECIMAL,
             "DECIMAL", java.math.BigDecimal.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
     CHAR(java.sql.Types.CHAR,
-            "CHAR", java.lang.String.class) {
-        @Override
-        boolean isPlausibleConversion(String value) {
-            return true;
-        }
-    },
+            "CHAR", java.lang.String.class),
     VARCHAR(java.sql.Types.VARCHAR,
             "VARCHAR", java.lang.String.class) {
         @Override
@@ -67,12 +41,7 @@ public enum SQLDataType {
         }
     },
     LONGVARCHAR(java.sql.Types.LONGVARCHAR,
-            "LONGVARCHAR", java.lang.String.class) {
-        @Override
-        boolean isPlausibleConversion(String value) {
-            return true;
-        }
-    },
+            "LONGVARCHAR", java.lang.String.class),
     DATE(java.sql.Types.DATE,
             "DATE", java.sql.Date.class),
     TIME(java.sql.Types.TIME,
