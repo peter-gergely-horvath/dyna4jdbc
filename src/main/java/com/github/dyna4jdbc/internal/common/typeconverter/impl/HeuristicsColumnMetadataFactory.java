@@ -54,20 +54,16 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
             detected.columnType = SQLDataType.VARCHAR;
         }
 
-        if (detected.maxPrecision > 0) {
+        if (detected.maxPrecision == 0) {
+            detected.maxColumnDisplaySize = detected.maxSize;
+        } else {
+            final int decimalPointLength = 1;
+
             detected.maxColumnDisplaySize =
-                    detected.maxBeforeDecimalPoint + 1 + detected.maxPrecision;
+                    detected.maxBeforeDecimalPoint + decimalPointLength + detected.maxPrecision;
 
             detected.maxScale = Math.max(detected.maxScale,
                     detected.maxBeforeDecimalPoint + detected.maxPrecision);
-        } else {
-            detected.maxColumnDisplaySize = detected.maxSize;
-        }
-
-        if (detected.maxPrecision > 0 && detected.columnType == SQLDataType.VARCHAR) {
-            detected.maxScale = detected.maxSize;
-            detected.maxColumnDisplaySize = detected.maxSize;
-            detected.maxPrecision = 0;
         }
 
         metaData.setConsumesFirstRow(false);
@@ -149,14 +145,28 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
     private static void leaveOther(DetectionContext detectionContext, String cellValue) {
 
         if (cellValue == null) {
-            return; // NO-OP: transition Other --> Other
+
+            // NO-OP: transition Other --> Other
+            return;
+
         } else if (SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
+
+            // transition Other --> Integer
             enterInteger(detectionContext, cellValue);
+
         } else if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)) {
+
+            // transition Other --> Double
             enterDouble(detectionContext, cellValue);
+
         } else if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
+
+            // transition Other --> Timestamp
             enterTimestamp(detectionContext, cellValue);
+
         } else {
+
+            // transition Other --> VarChar
             enterVarChar(detectionContext, cellValue);
         }
     }
@@ -226,24 +236,28 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         final SQLDataType previousColumnType = detected.columnType;
         detected.columnType = SQLDataType.VARCHAR;
 
-        if (previousColumnType == SQLDataType.INTEGER) {
-
-            if (cellValue != null) {
-                detected.maxSize = Math.max(detected.maxSize, cellValue.length());
-                detected.maxScale = Math.max(detected.maxScale, cellValue.length());
-
+        switch (previousColumnType) {
+            case INTEGER:
                 detected.maxBeforeDecimalPoint = detected.maxSize;
-            }
 
-        } else {
+                break;
 
-            if (cellValue != null) {
-                detected.maxSize = Math.max(detected.maxSize, cellValue.length());
-                detected.maxScale = Math.max(detected.maxScale, detected.maxSize);
-                detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, detected.maxSize);
-            }
+
+            case DOUBLE:
+                detected.maxScale = detected.maxSize;
+                detected.maxColumnDisplaySize = detected.maxSize;
+
+                break;
+
+            default:
+                break; // NO-OP for other previous types
         }
 
+        if (cellValue != null) {
+            detected.maxSize = Math.max(detected.maxSize, cellValue.length());
+            detected.maxScale = Math.max(detected.maxScale, detected.maxSize);
+            detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, detected.maxSize);
+        }
 
         detected.signed = false;
         detected.maxPrecision = 0;
