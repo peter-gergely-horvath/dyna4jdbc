@@ -13,7 +13,6 @@ import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DefaultScriptEngineConnection;
-import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.RenjinScriptEngineConnection;
 
 class ConnectionFactory {
 
@@ -116,19 +115,11 @@ class ConnectionFactory {
     private Class<? extends Connection> getScriptEngineConnectionClassForName(String lowerCaseScriptEngineName) {
 
         /*
-         * Some of the ScriptEngines require special handling;
-         * hence we use special wrapper classes for them.
+         * Some of the ScriptEngines require special handling: this is the place to implement selection.
+         *
+         * Currently, we do not have any special case; however this method is retained _for now_.
          */
-        Class<? extends Connection> connectionClass;
-        switch (lowerCaseScriptEngineName) {
-            case "renjin":
-                connectionClass = RenjinScriptEngineConnection.class;
-                break;
-
-            default:
-                connectionClass = DefaultScriptEngineConnection.class;
-        }
-        return connectionClass;
+        return DefaultScriptEngineConnection.class;
     }
 
 }

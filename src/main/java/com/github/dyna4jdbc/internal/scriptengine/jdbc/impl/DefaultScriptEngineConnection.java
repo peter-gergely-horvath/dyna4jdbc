@@ -203,7 +203,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
     }
 
     //CHECKSTYLE.OFF: DesignForExtension
-    protected void executeScriptUsingAbortableStreams(String script, Map<String, Object> variables,
+    private void executeScriptUsingAbortableStreams(String script, Map<String, Object> variables,
             AbortableOutputStream stdOutputStream, AbortableOutputStream errorOutputStream, AbortHandler abortHandler)
                     throws ScriptExecutionException {
 
@@ -225,8 +225,8 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
             Writer originalWriter = engineContext.getWriter();
             Writer originalErrorWriter = engineContext.getErrorWriter();
 
-            try (PrintWriter outputPrintWriter = getIoHandlerFactory().newPrintWriter(stdOutputStream, true);
-                 PrintWriter errorPrintWriter = getIoHandlerFactory().newPrintWriter(errorOutputStream, true)) {
+            try (PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true);
+                 PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true)) {
 
                 engineContext.setWriter(outputPrintWriter);
                 engineContext.setErrorWriter(errorPrintWriter);
@@ -251,16 +251,20 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
         } // end of synchronized (lockObject) block
     }
 
-    protected Bindings getBindings(ScriptContext engineContext) {
+    private Bindings getBindings(ScriptContext engineContext) {
         Bindings bindings = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
         if (bindings == null) {
-            throw JDBCError.NON_STANDARD_COMPLIANT_SCRIPTENGINE.raiseUncheckedException(
-                    "javax.script.ScriptContext.getBindings(ScriptContext.ENGINE_SCOPE) returned null");
+            // Work-around for Renjin ScriptEngine issue
+            bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
+            if (bindings == null) {
+                throw JDBCError.NON_STANDARD_COMPLIANT_SCRIPTENGINE.raiseUncheckedException(
+                        "Could not retrieve javax.script.Bindings from ScriptEngine");
+            }
         }
         return bindings;
     }
 
-    protected void applyVariablesToEngineScope(Map<String, Object> variables, Bindings bindings) {
+    private void applyVariablesToEngineScope(Map<String, Object> variables, Bindings bindings) {
         if (variables != null) {
             for (Map.Entry<String, Object> entry : variables.entrySet()) {
                 String key = entry.getKey();
@@ -272,7 +276,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
         }
     }
 
-    protected void removeVariablesFromEngineScope(Map<String, Object> variables, Bindings bindings) {
+    private void removeVariablesFromEngineScope(Map<String, Object> variables, Bindings bindings) {
         if (variables != null) {
             for (String key : variables.keySet()) {
 
@@ -282,14 +286,6 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
         }
     }
     //CHECKSTYLE.ON: DesignForExtension
-
-    protected final ScriptEngine getEngine() {
-        return engine;
-    }
-
-    protected final IOHandlerFactory getIoHandlerFactory() {
-        return ioHandlerFactory;
-    }
 
     @Override
     public final void cancel() throws CancelException {
