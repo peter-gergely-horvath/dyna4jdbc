@@ -25,7 +25,7 @@ import com.github.dyna4jdbc.internal.JDBCError;
  * interface. This implementation provides common, centralized handling of cases,
  * where unwrapping is not required. For any class, where unwrapping is required
  * for a specific interface, the subclass should implement a logic for the specific
- * type and delegate the call to the caller in case a different type is requested
+ * type and delegate the call to the super class in case a different type is requested
  * so as to trigger the default error handling logic.
  */
 public abstract class AbstractWrapper implements Wrapper {

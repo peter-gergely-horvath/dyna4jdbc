@@ -105,21 +105,6 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
         return cellValue;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        if (iface.isAssignableFrom(DataTable.class)) {
-            return (T) dataTable;
-        }
-
-        return super.unwrap(iface);
-    }
-
-    @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return iface.isAssignableFrom(DataTable.class) || super.isWrapperFor(iface);
-    }
-
     @Override
     public String getCursorName() throws SQLException {
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Retrieval of cursor name");

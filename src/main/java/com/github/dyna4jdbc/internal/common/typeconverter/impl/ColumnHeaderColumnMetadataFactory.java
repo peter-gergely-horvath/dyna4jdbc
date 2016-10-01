@@ -114,8 +114,12 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
     private void configureAdditional(DefaultColumnMetadata metaData, String metaDataConfig, int columnIndex) {
         try {
             Properties props = ConfigurationStringParser.getInstance().parseStringToProperties(metaDataConfig);
-            String formatString = props.getProperty("format"); // TODO: clean this up!
-            metaData.setFormatString(formatString);
+
+
+            for (AdditionalColumnConfiguration acc : AdditionalColumnConfiguration.values()) {
+                String property = props.getProperty(acc.getKey(), null);
+                acc.setConfiguration(metaData, property);
+            }
 
         } catch (MisconfigurationException ex) {
             final int jdbcColumnIndex = columnIndex + 1;

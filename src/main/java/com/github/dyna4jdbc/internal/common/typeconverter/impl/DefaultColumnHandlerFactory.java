@@ -27,13 +27,13 @@ public final class DefaultColumnHandlerFactory implements ColumnHandlerFactory {
 
         String formatString = columnMetadata.getFormatString();
         if (formatString != null) {
-            return createFormatStringBaseTypeHandler(columnMetadata, formatString);
+            return createFormatStringBasedTypeHandler(columnMetadata, formatString);
         }
 
         return new DefaultColumnHandler(columnMetadata);
     }
 
-    private static ColumnHandler createFormatStringBaseTypeHandler(
+    private static ColumnHandler createFormatStringBasedTypeHandler(
             ColumnMetadata columnMetadata, String formatString) {
 
         SQLDataType columnType = columnMetadata.getColumnType();
