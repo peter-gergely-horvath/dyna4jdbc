@@ -52,8 +52,8 @@ public final class ProcessRunnerConnection extends AbstractConnection {
     }
 
     @Override
-    public DatabaseMetaData getMetaData() throws SQLException {
-        checkNotClosed();
+    protected DatabaseMetaData getMetaDataInternal() throws SQLException {
+
         return new GenericDatabaseMetaData(this,
                 System.getProperty("os.name"),
                 System.getProperty("os.version"));

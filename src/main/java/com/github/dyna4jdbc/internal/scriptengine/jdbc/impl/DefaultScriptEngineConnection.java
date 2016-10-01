@@ -148,8 +148,7 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
 
 
     @Override
-    public final DatabaseMetaData getMetaData() throws SQLException {
-        checkNotClosed();
+    protected final DatabaseMetaData getMetaDataInternal() throws SQLException {
 
         ScriptEngineFactory factory = engine.getFactory();
 
@@ -297,14 +296,12 @@ public class DefaultScriptEngineConnection extends AbstractConnection implements
              */
             AbortHandler abortHandler = this.streamAbortHandlerRef.get();
             if (abortHandler == null) {
-                throw JDBCError.CANCEL_FAILED.raiseUncheckedException(
-                        "No running statement found.");
+                throw new CancelException("No running statement found to cancel.");
             }
 
             abortHandler.abort();
         } catch (IllegalStateException ise) {
-            throw JDBCError.CANCEL_REQUESTED_ALREADY.raiseUncheckedException(
-                    ise, "Cancellation requested already.");
+            throw new CancelException("Cancellation requested already.");
         }
     }
 }

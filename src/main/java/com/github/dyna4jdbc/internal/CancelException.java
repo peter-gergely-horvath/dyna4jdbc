@@ -4,6 +4,10 @@ public class CancelException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
+    public CancelException(String message) {
+        super(message);
+    }
+    
     public CancelException(Throwable cause) {
         super(cause);
     }

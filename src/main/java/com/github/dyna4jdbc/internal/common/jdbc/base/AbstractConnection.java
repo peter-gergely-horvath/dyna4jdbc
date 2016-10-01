@@ -5,6 +5,7 @@ import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -207,6 +208,22 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                 "Creating non-forward-only, non read-only or not over-commit held prepareStatement");
     }
+
+    @Override
+    public final DatabaseMetaData getMetaData() throws SQLException {
+        /*
+        To make retrieval of DatabaseMetaDatas created from within
+        this Connection consistent with createStatement and prepareStatement,
+        we introduced getMetaDataInternal()  internal template method: all
+        concrete subclasses have to implement and can forget about checking
+        the connection state completely.
+
+        This method is final, hence it cannot be overridden accidentally.
+         */
+        return getMetaDataInternal();
+    }
+
+    protected abstract DatabaseMetaData getMetaDataInternal() throws SQLException;
 
     @Override
     public final CallableStatement prepareCall(String sql) throws SQLException {
