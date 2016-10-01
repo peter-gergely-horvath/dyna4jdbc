@@ -19,8 +19,6 @@ import java.util.List;
  */
 final class DefaultSingleResultSetScriptOutputHandler implements SingleResultSetScriptOutputHandler {
 
-    private static final int NO_BOUNDS_MAX_ROWS = 0; // TODO: constant is duplicated among multiple classes
-
     private final Statement statement;
     private final DataTableWriter stdOut;
     private final OutputStream stdErr;
@@ -34,7 +32,7 @@ final class DefaultSingleResultSetScriptOutputHandler implements SingleResultSet
         this.statement = statement;
         this.columnHandlerFactory = columnHandlerFactory;
 
-        if (maxRows != NO_BOUNDS_MAX_ROWS) {
+        if (maxRows != ResultSetScriptOutputHandlerConstants.MAX_ROWS_NO_BOUNDS) {
             final int maxRowsIncludingHeaders = maxRows + 1;
 
             this.stdOut = new BoundedDataTableWriter(configuration, maxRowsIncludingHeaders);
