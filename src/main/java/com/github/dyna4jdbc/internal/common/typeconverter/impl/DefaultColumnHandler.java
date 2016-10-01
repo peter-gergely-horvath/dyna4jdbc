@@ -178,20 +178,28 @@ class DefaultColumnHandler implements ColumnHandler {
 
     @Override
     public Timestamp covertToTimestamp(String rawCellValue, Calendar cal) throws TypeConversionException {
-        // TODO: check usage of Calendar
+        /* We intentionally ignore the calendar passed as argument, since we
+         * simply rely on the string conversion implemented in
+         * java.sql.Timestamp.valueOf(String)
+         */
         return covertToTimestamp(rawCellValue);
-
     }
 
     @Override
     public Time covertToTime(String rawCellValue, Calendar cal) throws TypeConversionException {
-        // TODO: check usage of Calendar
+        /* We intentionally ignore the calendar passed as argument, since we
+         * simply rely on the string conversion implemented in
+         * java.sql.Time.valueOf(String)
+         */
         return covertToTime(rawCellValue);
     }
 
     @Override
     public Date covertToDate(String rawCellValue, Calendar cal) throws TypeConversionException {
-        // TODO: check usage of Calendar
+        /* We intentionally ignore the calendar passed as argument, since we
+         * simply rely on the string conversion implemented in
+         * java.sql.Date.valueOf(String)
+         */
         return covertToDate(rawCellValue);
     }
 

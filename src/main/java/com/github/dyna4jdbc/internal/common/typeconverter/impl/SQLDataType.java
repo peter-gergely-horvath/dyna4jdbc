@@ -125,9 +125,11 @@ public enum SQLDataType {
         this.name = name;
         this.mappingClass = mappingClass;
         this.isArray = isArray;
-        //CHECKSTYLE.OFF: AvoidInlineConditionals
-        this.acceptedPattern = acceptedPatternRegex != null ? Pattern.compile(acceptedPatternRegex) : null;
-        //CHECKSTYLE.ON: AvoidInlineConditionals
+        if (acceptedPatternRegex != null) {
+            this.acceptedPattern = Pattern.compile(acceptedPatternRegex);
+        } else {
+            this.acceptedPattern = null;
+        }
     }
 
     boolean isPlausibleConversion(String value) {
