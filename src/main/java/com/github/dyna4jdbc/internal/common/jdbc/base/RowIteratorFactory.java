@@ -21,7 +21,7 @@ final class RowIteratorFactory {
         return INSTANCE;
     }
     
-    
+
     <T> Iterator<T> getRowIterator(List<T> dataRows, Statement statement) {
         try {
             int maxRows;

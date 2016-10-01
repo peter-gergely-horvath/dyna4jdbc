@@ -1064,13 +1064,13 @@ public class GenericDatabaseMetaDataTest {
     @Test
     public void testGetJDBCMajorVersion() throws SQLException {
 
-        assertEquals(genericDatabaseMetaData.getJDBCMajorVersion(), 0);
+        assertEquals(genericDatabaseMetaData.getJDBCMajorVersion(), 4);
     }
     
     @Test
     public void testGetJDBCMinorVersion() throws SQLException {
 
-        assertEquals(genericDatabaseMetaData.getJDBCMinorVersion(), 1);
+        assertEquals(genericDatabaseMetaData.getJDBCMinorVersion(), 2);
     }
     
     @Test
