@@ -68,7 +68,7 @@ class ConnectionFactory {
         Class<? extends Connection> connectionClass;
 
         switch (connectionType) {
-            case "process-runner":
+            case "experimental-process-runner":
                 connectionClass = ProcessRunnerConnection.class;
                 break;
 

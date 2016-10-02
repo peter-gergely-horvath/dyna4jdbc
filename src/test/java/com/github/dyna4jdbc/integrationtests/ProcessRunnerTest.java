@@ -66,7 +66,7 @@ public class ProcessRunnerTest {
     @Test
     public void testContent() throws SQLException {
 
-        String resultSetString = executeScriptForResultSetString("jdbc:dyna4jdbc:process-runner", commandToExecute);
+        String resultSetString = executeScriptForResultSetString("jdbc:dyna4jdbc:experimental-process-runner", commandToExecute);
 
         assertNotNull(resultSetString);
 
