@@ -1,5 +1,7 @@
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
+import java.util.regex.Matcher;
+
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
@@ -18,7 +20,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
     @Override
     public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValues) {
         DefaultColumnMetadata columnMetaData = new DefaultColumnMetadata();
-        configureForValues(columnMetaData, columnIndex, columnValues);
+        configureFromColumnValues(columnMetaData, columnIndex, columnValues);
         return columnMetaData;
     }
 
@@ -37,7 +39,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
     }
 
-    protected void configureForValues(DefaultColumnMetadata metaData,
+    protected void configureFromColumnValues(DefaultColumnMetadata metaData,
                                       int columnIndex, Iterable<String> cellValues) {
 
         final int sqlColumnIndex = columnIndex + 1;
@@ -112,15 +114,17 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
     }
 
     private static void leaveVarChar(DetectionContext detectionContext, String cellValue) {
+        
+        // transition VarChar --> VarChar
         enterVarChar(detectionContext, cellValue);
     }
 
     private static void leaveTimestamp(DetectionContext detectionContext, String cellValue) {
-        if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
+        if (isPlausibleConversion(SQLDataType.TIMESTAMP, cellValue)) {
             
             // transition Timestamp --> Timestamp
             enterTimestamp(detectionContext, cellValue);
-            
+
         } else {
 
             // transition Timestamp --> VarChar
@@ -130,8 +134,8 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
     }
 
     private static void leaveDouble(DetectionContext detectionContext, String cellValue) {
-        if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)
-                || SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
+        if (isPlausibleConversion(SQLDataType.DOUBLE, cellValue)
+                || isPlausibleConversion(SQLDataType.INTEGER, cellValue)) {
 
             // transition Double --> Double
             enterDouble(detectionContext, cellValue);
@@ -149,17 +153,17 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
             // NO-OP: transition Other --> Other
             return;
 
-        } else if (SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
+        } else if (isPlausibleConversion(SQLDataType.INTEGER, cellValue)) {
 
             // transition Other --> Integer
             enterInteger(detectionContext, cellValue);
 
-        } else if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)) {
+        } else if (isPlausibleConversion(SQLDataType.DOUBLE, cellValue)) {
 
             // transition Other --> Double
             enterDouble(detectionContext, cellValue);
 
-        } else if (SQLDataType.TIMESTAMP.isPlausibleConversion(cellValue)) {
+        } else if (isPlausibleConversion(SQLDataType.TIMESTAMP, cellValue)) {
 
             // transition Other --> Timestamp
             enterTimestamp(detectionContext, cellValue);
@@ -172,15 +176,18 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
     }
 
     private static void leaveInteger(DetectionContext detectionContext, String cellValue) {
-        if (SQLDataType.INTEGER.isPlausibleConversion(cellValue)) {
+        if (isPlausibleConversion(SQLDataType.INTEGER, cellValue)) {
 
+            // transition Integer --> Integer
             enterInteger(detectionContext, cellValue);
 
-        } else if (SQLDataType.DOUBLE.isPlausibleConversion(cellValue)) {
+        } else if (isPlausibleConversion(SQLDataType.DOUBLE, cellValue)) {
 
+            // transition Integer --> Double
             enterDouble(detectionContext, cellValue);
         } else {
 
+            // transition Integer --> VarChar
             enterVarChar(detectionContext, cellValue);
         }
     }
@@ -191,7 +198,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         detected.signed = true;
 
         if (cellValue != null) {
-            final int scale = SQLDataType.INTEGER.getScale(cellValue);
+            final int scale = getScale(SQLDataType.INTEGER, cellValue);
 
             detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, scale);
             detected.maxSize = Math.max(detected.maxSize, scale);
@@ -206,8 +213,9 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         detected.signed = true;
 
         if (cellValue != null) {
-            final int scale = SQLDataType.DOUBLE.getScale(cellValue);
-            final int precision = SQLDataType.DOUBLE.getPrecision(cellValue);
+
+            final int scale = getScale(SQLDataType.DOUBLE, cellValue);
+            final int precision = getPrecision(SQLDataType.DOUBLE, cellValue);
 
             detected.maxBeforeDecimalPoint = Math.max(detected.maxBeforeDecimalPoint, scale - precision);
             detected.maxPrecision = Math.max(detected.maxPrecision, precision);
@@ -222,12 +230,12 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
 
         detected.columnType = SQLDataType.TIMESTAMP;
         detected.maxScale = 0;
+        detected.maxBeforeDecimalPoint = 0;
+        detected.maxPrecision = 0;
         detected.signed = false;
 
         if (cellValue != null) {
             detected.maxSize = Math.max(detected.maxSize, cellValue.length());
-            detected.maxBeforeDecimalPoint = 0;
-            detected.maxPrecision = 0;
         }
     }
 
@@ -262,6 +270,80 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
         detected.signed = false;
         detected.maxPrecision = 0;
         detected.maxColumnDisplaySize = Math.max(detected.maxColumnDisplaySize, detected.maxSize);
+    }
+
+    private static boolean isPlausibleConversion(SQLDataType dataType, String value) {
+        if (dataType == SQLDataType.VARCHAR) {
+            return true;
+        }
+
+        if (dataType.acceptedPattern == null) {
+            return false;
+        }
+
+        if (value == null) {
+            return true;
+        }
+
+        return dataType.acceptedPattern.matcher(value).matches();
+    }
+
+    private static int getScale(SQLDataType dataType, String value) {
+        if (value == null) {
+            return 0;
+        }
+
+        if (dataType.acceptedPattern == null) {
+            return value.length();
+        }
+
+        Matcher matcher = dataType.acceptedPattern.matcher(value);
+        if (matcher.matches()) {
+            final int groupCount = matcher.groupCount();
+            if (groupCount == 0) {
+                String fullMatchedString = matcher.group(0);
+                if (fullMatchedString != null) {
+                    return fullMatchedString.length();
+                } else {
+                    return 0;
+                }
+            } else {
+                int aggregatedLength = 0;
+                for (int i = 1; i <= groupCount; i++) {
+                    String group = matcher.group(i);
+                    if (group != null) {
+                        aggregatedLength += group.length();
+                    }
+                }
+                return aggregatedLength;
+            }
+        }
+
+        /*
+        TODO: Clean up: required for handling of edge cases like:
+        DOUBLE type is used to establish the scale of an integer
+        e.g. 1234 does not match double pattern, however can be
+        interpreted as a double value. */
+        return value.length();
+    }
+
+    private static int getPrecision(SQLDataType dataType, String value) {
+        if (value == null) {
+            return 0;
+        }
+
+        if (dataType.acceptedPattern == null) {
+            return 0;
+        }
+
+        Matcher matcher = dataType.acceptedPattern.matcher(value);
+        if (matcher.matches()) {
+            String precisionPart = matcher.group("precision");
+            if (precisionPart != null) {
+                return precisionPart.length();
+            }
+        }
+        return 0;
     }
 
 }

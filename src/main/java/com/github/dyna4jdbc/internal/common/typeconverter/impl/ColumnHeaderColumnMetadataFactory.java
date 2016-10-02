@@ -33,7 +33,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
         return new ColumnHeaderColumnMetadataFactory(configuration);
     }
 
-    protected void configureForValues(DefaultColumnMetadata metaData,
+    protected void configureFromColumnValues(DefaultColumnMetadata metaData,
                                       int columnIndex, Iterable<String> columnValuesIterable) {
 
 
@@ -51,7 +51,8 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
         String sqlTypeConfig = ArrayUtils.tryGetByIndex(configStringArray, 1);
         String metaDataConfig = ArrayUtils.tryGetByIndex(configStringArray, 2);
 
-        super.configureForValues(metaData, columnIndex, new AlwaysSkipFirstElementIterable<>(columnValuesIterable));
+        super.configureFromColumnValues(metaData, columnIndex, 
+                new AlwaysSkipFirstElementIterable<>(columnValuesIterable));
 
 
         if (header != null && !"".equals(header.trim())) {

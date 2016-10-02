@@ -20,6 +20,9 @@ final class EmptyColumnMetadataFactory implements ColumnMetadataFactory {
 
     @Override
     public ColumnMetadata getColumnMetadata(int columnIndex, Iterable<String> columnValues) {
+        
+        final int sqlColumnIndex = columnIndex + 1;
+        
         DefaultColumnMetadata metadata = new DefaultColumnMetadata();
 
         metadata.setConsumesFirstRow(false);
@@ -27,8 +30,8 @@ final class EmptyColumnMetadataFactory implements ColumnMetadataFactory {
         metadata.setNullability(Nullability.UNKNOWN);
         metadata.setSigned(false);
         metadata.setColumnDisplaySize(DEFAULT_COLUMN_DISPLAY_SIZE);
-        metadata.setColumnLabel("");
-        metadata.setColumnName("");
+        metadata.setColumnLabel(String.valueOf(sqlColumnIndex));
+        metadata.setColumnName(String.valueOf(sqlColumnIndex));
         metadata.setPrecision(0);
         metadata.setScale(0);
         metadata.setColumnType(SQLDataType.VARCHAR);
