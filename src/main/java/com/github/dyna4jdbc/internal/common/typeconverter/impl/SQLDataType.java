@@ -5,25 +5,35 @@ import java.util.regex.Pattern;
 public enum SQLDataType {
 
     BIT(java.sql.Types.BIT,
-            "BIT", java.lang.Boolean.class, false, "^([01])$"),
+            "BIT", java.lang.Boolean.class, false, 
+            TypeDetectionRegularExpressionPatterns.ONE_BIT),
     TINYINT(java.sql.Types.TINYINT,
-            "TINYINT", java.lang.Short.class, false, "^[+-]?((\\d+))$"),
+            "TINYINT", java.lang.Short.class, false, 
+            TypeDetectionRegularExpressionPatterns.NUMBER_INTEGER),
     SMALLINT(java.sql.Types.SMALLINT,
-            "SMALLINT", java.lang.Short.class, false, "^[+-]?(\\d+)$"),
+            "SMALLINT", java.lang.Short.class, false, 
+            TypeDetectionRegularExpressionPatterns.NUMBER_INTEGER),
     INTEGER(java.sql.Types.INTEGER,
-            "INTEGER", java.lang.Integer.class, false, "^[+-]?(\\d+)$"),
+            "INTEGER", java.lang.Integer.class, false, 
+            TypeDetectionRegularExpressionPatterns.NUMBER_INTEGER),
     BIGINT(java.sql.Types.BIGINT,
-            "BIGINT", java.lang.Long.class, false, "^[+-]?(\\d+)$"),
+            "BIGINT", java.lang.Long.class, false,
+            TypeDetectionRegularExpressionPatterns.NUMBER_INTEGER),
     FLOAT(java.sql.Types.FLOAT,
-            "FLOAT", java.lang.Float.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
+            "FLOAT", java.lang.Float.class, false,
+            TypeDetectionRegularExpressionPatterns.NUMBER_DECIMAL),
     REAL(java.sql.Types.REAL,
-            "REAL", java.lang.Float.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
+            "REAL", java.lang.Float.class, false,
+            TypeDetectionRegularExpressionPatterns.NUMBER_DECIMAL),
     DOUBLE(java.sql.Types.DOUBLE,
-            "DOUBLE", java.lang.Double.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
+            "DOUBLE", java.lang.Double.class, false,
+            TypeDetectionRegularExpressionPatterns.NUMBER_DECIMAL),
     NUMERIC(java.sql.Types.NUMERIC,
-            "NUMERIC", java.lang.Double.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
+            "NUMERIC", java.lang.Double.class, false,
+            TypeDetectionRegularExpressionPatterns.NUMBER_DECIMAL),
     DECIMAL(java.sql.Types.DECIMAL,
-            "DECIMAL", java.math.BigDecimal.class, false, "^[+-]?(\\d+)\\.(?<precision>\\d+)$"),
+            "DECIMAL", java.math.BigDecimal.class, false,
+            TypeDetectionRegularExpressionPatterns.NUMBER_DECIMAL),
     CHAR(java.sql.Types.CHAR,
             "CHAR", java.lang.String.class),
     VARCHAR(java.sql.Types.VARCHAR,
@@ -36,7 +46,7 @@ public enum SQLDataType {
             "TIME", java.sql.Time.class),
     TIMESTAMP(java.sql.Types.TIMESTAMP,
             "TIMESTAMP", java.sql.Timestamp.class, false,
-            "\\d{4}-\\d{1,2}-\\d{1,2} \\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?"),
+            TypeDetectionRegularExpressionPatterns.TIMESTAMP),
     BINARY(java.sql.Types.BINARY,
             "BINARY", java.lang.Byte.class, true),
     VARBINARY(java.sql.Types.VARBINARY,
@@ -101,15 +111,11 @@ public enum SQLDataType {
         this(javaSqlTypesInt, name, mappingClass, false, null);
     }
 
-    SQLDataType(int javaSqlTypesInt, String name, Class<?> mappingClass, boolean isArray, String acceptedPatternRegex) {
+    SQLDataType(int javaSqlTypesInt, String name, Class<?> mappingClass, boolean isArray, Pattern acceptedPattern) {
         this.javaSqlTypesInt = javaSqlTypesInt;
         this.name = name;
         this.mappingClass = mappingClass;
         this.isArray = isArray;
-        if (acceptedPatternRegex != null) {
-            this.acceptedPattern = Pattern.compile(acceptedPatternRegex);
-        } else {
-            this.acceptedPattern = null;
-        }
+        this.acceptedPattern = acceptedPattern;
     }
 }

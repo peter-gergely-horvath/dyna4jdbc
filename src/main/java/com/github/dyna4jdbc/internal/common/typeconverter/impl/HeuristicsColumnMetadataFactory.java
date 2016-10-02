@@ -319,12 +319,7 @@ class HeuristicsColumnMetadataFactory implements ColumnMetadataFactory {
             }
         }
 
-        /*
-        TODO: Clean up: required for handling of edge cases like:
-        DOUBLE type is used to establish the scale of an integer
-        e.g. 1234 does not match double pattern, however can be
-        interpreted as a double value. */
-        return value.length();
+        return 0;
     }
 
     private static int getPrecision(SQLDataType dataType, String value) {
