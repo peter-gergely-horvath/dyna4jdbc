@@ -3,25 +3,31 @@ package com.github.dyna4jdbc.internal.common.jdbc.base;
 import com.github.dyna4jdbc.internal.JDBCError;
 
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 
 class GuardedResultSetState {
 
     enum State {
-        AFTER_LAST,
-        ITERATING_OVER_RESULTS(AFTER_LAST),
-        BEFORE_FIRST(ITERATING_OVER_RESULTS, AFTER_LAST);
+        AFTER_LAST {
+            @Override
+            protected boolean canTransitionTo(State newState) {
+                return false;
+            }
+        },
+        ITERATING_OVER_RESULTS {
+            @Override
+            protected boolean canTransitionTo(State newState) {
+                return newState == AFTER_LAST;
+            }
+        },
+        BEFORE_FIRST {
+            @Override
+            protected boolean canTransitionTo(State newState) {
+                return newState == ITERATING_OVER_RESULTS || newState == AFTER_LAST;
+            }
+        };
 
-        private final Set<State> validTransitions;
-
-        State(State... validTransitions) {
-            this.validTransitions = Collections.unmodifiableSet(
-                    new HashSet<>(Arrays.asList(validTransitions)));
-        }
+        protected abstract boolean canTransitionTo(State newState);
     }
 
     private State currentState;
@@ -39,7 +45,7 @@ class GuardedResultSetState {
     }
 
     void transitionTo(State newState) throws SQLException {
-        if (!currentState.validTransitions.contains(newState)) {
+        if (!currentState.canTransitionTo(newState)) {
             throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseSQLException(
                     "Transitioning from " + currentState + " to " + newState + " is illegal");
         }
