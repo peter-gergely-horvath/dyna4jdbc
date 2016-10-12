@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
@@ -36,7 +37,21 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
 
     private final String script;
 
-    private final HashMap<String, Object> executionContext = new HashMap<>();
+    /**
+     * Parameters bound to the execution of the script via the setXXX(...) methods.
+     *
+     * It is a synchronizedMap since the JDBC specification does not seem to clearly
+     * define if a {@code PreparedStatement} can be shared across multiple threads.
+     *
+     * If one thread sets parameters, while another one executes the call, then
+     * this construct will ensure that changes (writes to the parameters) are
+     * actually *VISIBLE* to the second thread (but does NOT prevent invalid
+     * concurrent modifications made to the parameters).
+     *
+     * In other words: setting a parameter _happens-before_ it retrieval from
+     * the {@code Map}.
+     */
+    private final Map<String, Object> executionContext = Collections.synchronizedMap(new HashMap<>());
 
     public OutputHandlingPreparedStatement(String script, T connection,
             ScriptOutputHandlerFactory scriptOutputHandlerFactory,
@@ -259,8 +274,6 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
-        checkNotClosed();
-
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED
                 .raiseSQLException("java.sql.PreparedStatement.setCharacterStream(int, Reader, int)");
 
