@@ -48,7 +48,7 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
      * actually *VISIBLE* to the second thread (but does NOT prevent invalid
      * concurrent modifications made to the parameters).
      *
-     * In other words: setting a parameter _happens-before_ it retrieval from
+     * In other words: setting a parameter _happens-before_ its retrieval from
      * the {@code Map}.
      */
     private final Map<String, Object> executionContext = Collections.synchronizedMap(new HashMap<>());
