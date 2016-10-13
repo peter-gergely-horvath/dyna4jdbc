@@ -1,0 +1,26 @@
+
+This project contains a licence for Atlassian Clover code coverage tool.
+This licence was granted by Atlassian Corporation free of charge as
+part of their open source project scheme to the open source project
+called DYNA4JDBC, originally hosted on GitHub, under the following URL:
+
+https://github.com/peter-gergely-horvath/dyna4jdbc/
+
+The Atlassian Clover licence is not (cannot be) in scope of the
+project's open source licence terms. As a result, the usage of
+Atlassian Clover licence found in the build configuration is strictly
+bound to the original DYNA4JDBC project.
+
+
+COPYING AND/OR USING THE ATLASSIAN CLOVER LICENCE ISSUED FOR THIS
+PROJECT ANYWHERE ELSE IS PROHIBITED AND IS A VIOLATION OF COPYRIGHT
+LAWS.
+
+Should you decide to fork the project or otherwise create a derivative
+work, your are LEGALLY REQUIRED to properly acquire and use your own
+Atlassian Clover licence or remove both the Atlassian Clover licence
+and Atlassian Clover from the forked or derived project completely.
+
+By using, forking or otherwise creating a derivative work of this
+project, you accept these terms and take full responsibility for
+the appropriate handling of Atlassian Clover licences.
