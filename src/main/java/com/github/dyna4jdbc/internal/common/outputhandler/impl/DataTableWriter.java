@@ -70,14 +70,12 @@ class DataTableWriter extends CursorCellWriterOutputStream {
     private void appendRow() {
         DataTable currentTable = dataTableList.getLast();
 
-        if (preferMultipleResultSets) {
-            if (!currentTable.isEmpty()) {
+        if (preferMultipleResultSets && !currentTable.isEmpty()) {
 
-                List<String> lastRow = currentTable.getLastRow();
-                if (lastRow.size() != currentRow.size()) {
-                    currentTable = new DataTable();
-                    dataTableList.addLast(currentTable);
-                }
+            List<String> lastRow = currentTable.getLastRow();
+            if (lastRow.size() != currentRow.size()) {
+                currentTable = new DataTable();
+                dataTableList.addLast(currentTable);
             }
         }
 

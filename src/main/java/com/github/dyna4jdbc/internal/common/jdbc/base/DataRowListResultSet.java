@@ -98,7 +98,7 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
     protected final void skipNextRowIfPresent() {
         Iterator<T> theActualRowIterator;
 
-        if ((this.rowIterator instanceof BoundedIterator)) {
+        if (this.rowIterator instanceof BoundedIterator) {
             theActualRowIterator = ((BoundedIterator<T>) this.rowIterator).getDelegate();
         } else {
             theActualRowIterator = this.rowIterator;

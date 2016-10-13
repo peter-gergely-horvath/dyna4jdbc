@@ -107,19 +107,8 @@ class ConnectionFactory {
                     "ScriptEngine name must be specified", connectionType);
         }
 
-        String scriptEngineName = config.toLowerCase(Locale.ENGLISH).split(":")[0];
-        connectionClass = getScriptEngineConnectionClassForName(scriptEngineName);
+        connectionClass = DefaultScriptEngineConnection.class;
         return connectionClass;
-    }
-
-    private Class<? extends Connection> getScriptEngineConnectionClassForName(String lowerCaseScriptEngineName) {
-
-        /*
-         * Some of the ScriptEngines require special handling: this is the place to implement selection.
-         *
-         * Currently, we do not have any special case; however this method is retained _for now_.
-         */
-        return DefaultScriptEngineConnection.class;
     }
 
 }

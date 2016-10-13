@@ -4,7 +4,6 @@ package com.github.dyna4jdbc.internal.common.jdbc.base;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
-import java.sql.Statement;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -100,15 +99,15 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     public final boolean getMoreResults(int current) throws SQLException {
         checkNotClosed();
 
-        if (current != Statement.CLOSE_CURRENT_RESULT
-                && current != Statement.KEEP_CURRENT_RESULT
-                && current != Statement.CLOSE_ALL_RESULTS) {
+        if (current != java.sql.Statement.CLOSE_CURRENT_RESULT
+                && current != java.sql.Statement.KEEP_CURRENT_RESULT
+                && current != java.sql.Statement.CLOSE_ALL_RESULTS) {
 
             throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "Invalid value for current: " + current);
         }
 
-        if (current != Statement.CLOSE_CURRENT_RESULT) {
+        if (current != java.sql.Statement.CLOSE_CURRENT_RESULT) {
 
             throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                     "Only Statement.CLOSE_CURRENT_RESULT is supported: " + current);

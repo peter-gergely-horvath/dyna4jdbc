@@ -4,7 +4,6 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Clob;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
@@ -38,12 +37,12 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     private static final int SUPPORTED_HOLDABILITY = ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
     // --- properties used only to provide a sensible default JDBC interface implementation ---
-    private LinkedHashMap<String, Class<?>> typeMap = new LinkedHashMap<String, Class<?>>();
+    private LinkedHashMap<String, Class<?>> typeMap = new LinkedHashMap<>();
     private Properties clientInfo = new Properties();
 
     private final SQLWarningContainer warningContainer = new SQLWarningContainer();
 
-    public AbstractConnection() {
+    protected AbstractConnection() {
         super(null);
     }
     // ----------------------------------------------------------------------------------------
@@ -326,7 +325,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     public final void setTransactionIsolation(int level) throws SQLException {
         checkNotClosed();
         // we only accept if isolation level TRANSACTION_NONE is requested
-        if (level != Connection.TRANSACTION_NONE) {
+        if (level != java.sql.Connection.TRANSACTION_NONE) {
             throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                     "This driver does not support transaction isolation");
         }
@@ -335,7 +334,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     @Override
     public final int getTransactionIsolation() throws SQLException {
         checkNotClosed();
-        return Connection.TRANSACTION_NONE;
+        return java.sql.Connection.TRANSACTION_NONE;
     }
 
     @Override
@@ -563,7 +562,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
             try {
                 executor.execute(new CloseConnectionForAbortRunnable());
             } catch (RejectedExecutionException ree) {
-                JDBCError.CLOSE_FAILED.raiseSQLException(ree,
+                throw JDBCError.CLOSE_FAILED.raiseSQLException(ree,
                         this, "The close task has been rejected");
             }
         }
@@ -576,7 +575,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
                 close();
             } catch (SQLException ex) {
                 LOGGER.log(Level.SEVERE, "Async close failed: " + ex.getMessage(), ex);
-                JDBCError.CLOSE_FAILED.raiseUncheckedException(ex,
+                throw JDBCError.CLOSE_FAILED.raiseUncheckedException(ex,
                         AbstractConnection.this,
                         "Async close failed, examine exception "
                                 + "stack trace for root cause");

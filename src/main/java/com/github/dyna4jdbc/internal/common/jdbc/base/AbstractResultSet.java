@@ -67,7 +67,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     @Override
     public final void setFetchSize(int rows) throws SQLException {
         if (rows < 0) {
-            JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
+            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "Negative fetch size: " + rows);
         }
         this.fetchSize = rows;
@@ -305,7 +305,7 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
     }
 
     protected final <R> R setWasNullBasedOnLastValue(R convertedValue) {
-        wasNull = (convertedValue == null);
+        wasNull = convertedValue == null;
         return convertedValue;
     }
 

@@ -24,13 +24,15 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
     private static final int MATCHER_GROUP_SCALE_PART = 2;
     private static final int MATCHER_GROUP_PRECISION_PART = 3;
 
+    private static final ColumnHeaderColumnMetadataFactory INSTANCE = new ColumnHeaderColumnMetadataFactory();
 
-    ColumnHeaderColumnMetadataFactory(Configuration configuration) {
+
+    private ColumnHeaderColumnMetadataFactory() {
 
     }
 
     static ColumnHeaderColumnMetadataFactory getInstance(Configuration configuration) {
-        return new ColumnHeaderColumnMetadataFactory(configuration);
+        return INSTANCE;
     }
 
     protected void configureFromColumnValues(DefaultColumnMetadata metaData,
