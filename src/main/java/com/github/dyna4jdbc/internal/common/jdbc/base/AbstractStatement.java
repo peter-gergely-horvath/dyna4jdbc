@@ -22,30 +22,9 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     private final T connection;
 
     private final AtomicBoolean closeOnCompletion = new AtomicBoolean(false);
-    
+
     private final SQLWarningContainer warningContainer = new SQLWarningContainer();
 
-
-    /**
-     * A lock object used to synchronize on, when accessing resultSetIterator.
-     *
-     * The JDBC specification does not seem to clearly define if a
-     * {@code Statement} can be shared across multiple threads.
-     *
-     * If one thread executes a query, which yields multiple {@code ResultSet}s,
-     * and another one is used to process the {@code ResultSet}s, then this
-     * construct will ensure that the state (the state of the resultSetIterator)
-     * will be is *VISIBLE* to the second thread (but does NOT prevent invalid
-     * concurrent modifications made to the list of {@code ResultSet}s; by e.g.
-     * starting a new query while another thread is still processing
-     * {@code ResultSet}s yielded for the previous query).
-     *
-     * In other words: setting a resultSetIterator _happens-before_ accessing
-     * its elements.
-     */
-    private final Object resultSetIteratorLockObject = new Object();
-
-    // Guarded by resultSetIteratorLockObject
     private Iterator<ResultSet> resultSetIterator;
 
     private int currentUpdateCount = INVALID_UPDATE_COUNT;
@@ -159,31 +138,25 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     public final ResultSet getResultSet() throws SQLException {
         checkNotClosed();
 
-        synchronized (resultSetIteratorLockObject) {
-            ResultSet resultSetToReturn;
-            if (resultSetIterator != null && resultSetIterator.hasNext()) {
-                resultSetToReturn = resultSetIterator.next();
-            } else {
-                resultSetToReturn = null;
-            }
-
-            return resultSetToReturn;
+        ResultSet resultSetToReturn;
+        if (resultSetIterator != null && resultSetIterator.hasNext()) {
+            resultSetToReturn = resultSetIterator.next();
+        } else {
+            resultSetToReturn = null;
         }
+
+        return resultSetToReturn;
     }
 
     protected final void setCurrentResultSetList(List<ResultSet> currentResultSetList) {
-        synchronized (resultSetIteratorLockObject) {
-            resultSetIterator = currentResultSetList.iterator();
-        }
+        resultSetIterator = currentResultSetList.iterator();
     }
 
     @Override
     public final boolean getMoreResults() throws SQLException {
         checkNotClosed();
 
-        synchronized (resultSetIteratorLockObject) {
-            return resultSetIterator != null && resultSetIterator.hasNext();
-        }
+        return resultSetIterator != null && resultSetIterator.hasNext();
     }
 
 
@@ -340,11 +313,11 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
 
         return closeOnCompletion.get();
     }
-    
+
     @Override
     public final void closeOnCompletion() throws SQLException {
         checkNotClosed();
-        
+
         closeOnCompletion.set(true);
     }
 
@@ -356,7 +329,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
             }
         } catch (SQLException ex) {
             throw JDBCError.PARENT_CLOSE_TRIGGERED_FROM_CHILD_THREW_EXCEPTION
-                        .raiseSQLException(ex, ex.getMessage());
+                    .raiseSQLException(ex, ex.getMessage());
         }
     }
 

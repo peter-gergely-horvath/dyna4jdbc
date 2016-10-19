@@ -13,7 +13,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionExceptio
 class TimestampFormatStringColumnHandler extends DefaultColumnHandler {
 
     private final String formatString;
-    private DateFormat formatter;
+    private final DateFormat formatter;
 
     TimestampFormatStringColumnHandler(ColumnMetadata columnMetadata, String formatString) {
         super(columnMetadata);

@@ -37,21 +37,7 @@ public final class OutputHandlingPreparedStatement<T extends java.sql.Connection
 
     private final String script;
 
-    /**
-     * Parameters bound to the execution of the script via the setXXX(...) methods.
-     *
-     * It is a synchronizedMap since the JDBC specification does not seem to clearly
-     * define if a {@code PreparedStatement} can be shared across multiple threads.
-     *
-     * If one thread sets parameters, while another one executes the call, then
-     * this construct will ensure that changes (writes to the parameters) are
-     * actually *VISIBLE* to the second thread (but does NOT prevent invalid
-     * concurrent modifications made to the parameters).
-     *
-     * In other words: setting a parameter _happens-before_ its retrieval from
-     * the {@code Map}.
-     */
-    private final Map<String, Object> executionContext = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, Object> executionContext = new HashMap<>();
 
     public OutputHandlingPreparedStatement(String script, T connection,
             ScriptOutputHandlerFactory scriptOutputHandlerFactory,
