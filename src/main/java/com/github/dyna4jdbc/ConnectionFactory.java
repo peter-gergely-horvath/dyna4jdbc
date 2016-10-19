@@ -65,20 +65,20 @@ class ConnectionFactory {
 
         try {
 
-        Class<? extends Connection> connectionClass;
+            Class<? extends Connection> connectionClass;
 
-        switch (connectionType) {
-            case "experimental-process-runner":
-                connectionClass = ProcessRunnerConnection.class;
-                break;
+            switch (connectionType) {
+                case "experimental-process-runner":
+                    connectionClass = ProcessRunnerConnection.class;
+                    break;
 
-            case "scriptengine":
-                connectionClass = getScriptEngineConnectionClassForConfiguration(connectionType, config);
-                break;
+                case "scriptengine":
+                    connectionClass = getScriptEngineConnectionClassForConfiguration(connectionType, config);
+                    break;
 
-            default:
-                throw MisconfigurationException.forMessage("No such connection type: '%s'", connectionType);
-        }
+                default:
+                    throw MisconfigurationException.forMessage("No such connection type: '%s'", connectionType);
+            }
 
             Constructor<? extends Connection> connectionConstructor =
                     connectionClass.getConstructor(String.class, Properties.class);
