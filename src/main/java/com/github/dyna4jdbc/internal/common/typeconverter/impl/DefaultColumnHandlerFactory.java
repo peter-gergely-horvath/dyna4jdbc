@@ -45,7 +45,7 @@ public final class DefaultColumnHandlerFactory implements ColumnHandlerFactory {
         switch (columnType) {
         case TIMESTAMP:
         case TIMESTAMP_WITH_TIMEZONE:
-            return new TimestamptFormatStringColumnHandler(columnMetadata, formatString);
+            return new TimestampFormatStringColumnHandler(columnMetadata, formatString);
 
         default:
             throw JDBCError.FORMAT_STRING_UNEXPECTED_FOR_COLUMN_TYPE.raiseUncheckedException(

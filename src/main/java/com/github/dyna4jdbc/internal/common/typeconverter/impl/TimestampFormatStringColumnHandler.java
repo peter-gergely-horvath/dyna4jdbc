@@ -10,12 +10,12 @@ import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.TypeConversionException;
 
-class TimestamptFormatStringColumnHandler extends DefaultColumnHandler {
+class TimestampFormatStringColumnHandler extends DefaultColumnHandler {
 
     private final String formatString;
     private DateFormat formatter;
 
-    TimestamptFormatStringColumnHandler(ColumnMetadata columnMetadata, String formatString) {
+    TimestampFormatStringColumnHandler(ColumnMetadata columnMetadata, String formatString) {
         super(columnMetadata);
 
         try {
