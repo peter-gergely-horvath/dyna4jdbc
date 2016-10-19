@@ -31,10 +31,12 @@ import com.github.dyna4jdbc.internal.JDBCError;
  * the {@code close()} method defined by
  * {@code java.lang.AutoCloseable}.
  * <p>
- * This class provides support to register child objects
- * (which logically belong to this object) on creation,
- * and to cascade the close operation to live ones, when
- * this object is closed.
+ * This class provides support for
+ * <ul>
+ *     <li>registering child objects (which logically belong to this object) on creation, and</li>
+ *     <li>cascading the close operation to alive children, when this object is closed.</li>
+ * </ul>
+ *
  *
  * @author Peter G. Horvath
  */
@@ -172,7 +174,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
         synchronized (this.children) {
             LinkedList<Throwable> caughtThrowables = new LinkedList<>();
             
-            for (AutoCloseable closeableObject : this.children) {
+            for (AutoCloseable closeableObject : this.children) { // we have the monitor: synchronized (this.children)!
 
                 try {
                     closeableObject.close();
@@ -187,7 +189,8 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
                 }
             }
 
-            children.clear(); // closing also includes discarding references
+            // closing also includes discarding references
+            children.clear(); // we have the monitor: synchronized (this.children)!
 
             if (parentCloseException != null) {
                 caughtThrowables.add(parentCloseException);
@@ -224,7 +227,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
     protected final void registerAsChild(AutoCloseable closableObject) {
 
         if (closableObject == null) {
-            JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
                     "closableObject to register cannot be null");
         }
 
@@ -235,30 +238,31 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
          * once again, when the monitor is actually held.
          */
         if (isClosed()) {
-            JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
-                    "Attempt to register a child to a closed object");
+            throw JDBCError.OBJECT_CLOSED.raiseUncheckedException(this);
         }
 
         synchronized (this.children) {
+            /* Note that isClosed() MIGHT change to true while we are waiting
+             * for monitor of this.children, so we HAVE TO check it again!
+             */
 
             if (isClosed()) {
-                JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
-                        "Attempt to register a child to a closed object");
+                throw JDBCError.OBJECT_CLOSED.raiseUncheckedException(this);
             }
 
-            children.add(closableObject);
+            children.add(closableObject); // we have the monitor: synchronized (this.children)!
         } // end of synchronized(this.children) block
     }
 
     /**
-     * Registers all object supplied in the {@code Collection} as child objects,
+     * Registers all objects supplied in the {@code Collection} as child objects,
      * which logically belong to {@code this} object and hence, should also be closed
      * (if still alive), when this {@code this} objects is closed.
      *
      * @param closableObjects a {@code Collection} of objects to register as children.
      * @throws SQLException if {@code this} is closed already
      */
-    public final void registerAsChildren(Collection<? extends AutoCloseable> closableObjects) throws SQLException {
+    protected final void registerAsChildren(Collection<? extends AutoCloseable> closableObjects) throws SQLException {
         for (AutoCloseable aClosableSQLObject : closableObjects) {
             registerAsChild(aClosableSQLObject);
         }
@@ -278,7 +282,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
         synchronized (this.children) {
             boolean setContainedTheElement = this.children.remove(childObject);
             if (!setContainedTheElement) {
-                /* Added out of paranoia: should never happen.
+                /* Added out of paranoia: should NEVER happen.
                  * Something is fundamentally wrong, if this occurs: we are
                  * attempting to un-register a child, which was never ours?
                  * Fail fast by throwing an exception!

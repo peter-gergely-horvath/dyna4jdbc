@@ -21,7 +21,7 @@ final class DefaultUpdateScriptOutputHandler implements UpdateScriptOutputHandle
 
     @Override
     public OutputStream getOutOutputStream() {
-        return new DisallowAllWritesOutputStream("Writing to to stdout from update is not allowed");
+        return new DisallowAllWritesOutputStream("Writing to standard output from an UPDATE call is not allowed");
     }
 
     @Override

@@ -41,6 +41,8 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final Statement getStatement() throws SQLException {
+        checkNotClosed();
+
         return statement;
     }
 
@@ -50,11 +52,15 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final SQLWarning getWarnings() throws SQLException {
+        checkNotClosed();
+
         return this.warningContainer.getWarnings();
     }
 
     @Override
     public final void clearWarnings() throws SQLException {
+        checkNotClosed();
+
         this.warningContainer.clearWarnings();
     }
 
@@ -66,6 +72,8 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final void setFetchSize(int rows) throws SQLException {
+        checkNotClosed();
+
         if (rows < 0) {
             throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "Negative fetch size: " + rows);
@@ -76,6 +84,8 @@ public abstract class AbstractResultSet<T> extends AbstractAutoCloseableJdbcObje
 
     @Override
     public final int getFetchSize() throws SQLException {
+        checkNotClosed();
+
         return this.fetchSize;
     }
 

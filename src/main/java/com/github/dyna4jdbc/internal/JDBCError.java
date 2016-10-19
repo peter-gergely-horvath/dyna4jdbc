@@ -52,10 +52,8 @@ public enum JDBCError {
     
 
     // Error class ERROR_DATA_EXCEPTION
-    UNSUPPORTED_CONVERSION("Conversion of value '%s' to the requeste type is not possible %s",
-            SQLStateClass.ERROR_DATA_EXCEPTION, "001"),
     DATA_CONVERSION_FAILED("Data conversion failed in row %s, column %s. Value '%s' could not be converted to %s.",
-            SQLStateClass.ERROR_DATA_EXCEPTION, "002"),
+            SQLStateClass.ERROR_DATA_EXCEPTION, "001"),
 
     // Error class EXTERNAL_ROUTINE_INVOCATION_EXCEPTION
     NON_STANDARD_COMPLIANT_SCRIPTENGINE("Non standard compliant ScriptEngine implementation: %s",
