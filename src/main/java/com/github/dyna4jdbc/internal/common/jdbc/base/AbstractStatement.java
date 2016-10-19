@@ -45,7 +45,7 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
      */
     private final Object resultSetIteratorLockObject = new Object();
 
-    // Guared by resultSetIteratorLockObject
+    // Guarded by resultSetIteratorLockObject
     private Iterator<ResultSet> resultSetIterator;
 
     private int currentUpdateCount = INVALID_UPDATE_COUNT;
@@ -349,14 +349,14 @@ public abstract class AbstractStatement<T extends java.sql.Connection>
     }
 
     @Override
-    protected final void onLastChildRemoved() {
+    protected final void onLastChildRemoved() throws SQLException {
         try {
             if (closeOnCompletion.get()) {
                 this.close();
             }
         } catch (SQLException ex) {
             throw JDBCError.PARENT_CLOSE_TRIGGERED_FROM_CHILD_THREW_EXCEPTION
-                        .raiseUncheckedException(ex, ex.getMessage());
+                        .raiseSQLException(ex, ex.getMessage());
         }
     }
 
