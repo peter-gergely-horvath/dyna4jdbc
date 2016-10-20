@@ -26,7 +26,7 @@ import static org.testng.Assert.*;
 
 
 /**
- * @author Peter Horvath
+ * @author Peter G. Horvath
  */
 public class AbstractWrapperTest {
 

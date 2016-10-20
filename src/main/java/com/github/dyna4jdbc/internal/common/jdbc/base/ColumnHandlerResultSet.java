@@ -30,7 +30,7 @@ import java.sql.Date;
 import java.util.*;
 
 /**
- * @author Peter Horvath
+ * @author Peter G. Horvath
  */
 abstract class ColumnHandlerResultSet<T> extends AbstractReadOnlyResultSet<T> {
 

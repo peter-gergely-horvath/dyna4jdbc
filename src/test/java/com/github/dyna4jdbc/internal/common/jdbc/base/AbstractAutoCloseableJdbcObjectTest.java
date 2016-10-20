@@ -35,7 +35,7 @@ import static org.testng.Assert.*;
 import static com.github.dyna4jdbc.CommonTestUtils.*;
 
 /**
- * @author Peter Horvath
+ * @author Peter G. Horvath
  */
 public class AbstractAutoCloseableJdbcObjectTest {
 
@@ -135,7 +135,7 @@ public class AbstractAutoCloseableJdbcObjectTest {
 
             String message = ex.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.DRIVER_BUG_UNEXPECTED_STATE.name().toString()));
+            assertTrue(message.contains(JDBCError.OBJECT_CLOSED.name().toString()));
         }
 
         verify(childObject);

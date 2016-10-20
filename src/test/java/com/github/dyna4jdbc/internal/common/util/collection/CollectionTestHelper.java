@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import static org.testng.Assert.assertEquals;
 
 /**
- * @author Peter Horvath
+ * @author Peter G. Horvath
  */
 public class CollectionTestHelper {
 

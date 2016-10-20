@@ -26,7 +26,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 
 /**
- * @author Peter Horvath
+ * @author Peter G. Horvath
  */
 public class ListIndexIterableTest {
 
