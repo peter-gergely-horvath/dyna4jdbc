@@ -391,9 +391,9 @@
 		<profile>
 			<id>maven-repo-promotion</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
 				<property>
-					<name>!clover</name>
+					<name>maven-repo-promotion</name>
+        			<value>true</value>
 				</property>
 			</activation>
 
