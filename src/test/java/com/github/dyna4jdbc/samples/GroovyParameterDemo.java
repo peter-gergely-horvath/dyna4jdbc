@@ -19,6 +19,8 @@ package com.github.dyna4jdbc.samples;
 
 import java.sql.*;
 
+
+
 public class GroovyParameterDemo {
 
     private static final String GROOVY_SCRIPT = ""

@@ -14,49 +14,39 @@
  * limitations under the License.
  */
 
- 
+
 package com.github.dyna4jdbc.samples;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 
 
-public class GroovyDemo {
+public class EchoParameterDemo {
 
-    private static final String GROOVY_SCRIPT = ""
-            + "	import groovy.json.JsonSlurper														\n"
-            + "																						\n"
-            + " def printRow(String... values) { println values.join(\"\t\") }						\n"
-            + " def jsonData = new URL('http://www.google.com/finance/info?"
-                + "infotype=infoquoteall&q=NASDAQ:AAPL,IBM,MSFT,GOOG').text.replaceFirst('//', '')	\n"
-            + " def data = new JsonSlurper().parseText(jsonData)									\n"
-            + " printRow 'Ticker::', 'Name::', 'Open::', 'Close::', 'Change::'						\n"
-            + " data.each { printRow it['t'], it['name'], it['op'], it['l_cur'], it['c'] } 			\n";
+    private static final String JAVASCRIPT_SCRIPT = ""
+            + "	print('Message::');         \n"
+            + "	print(parameter1);          \n"
+            + "	print(parameter2);          \n";
+
 
     public static void main(String[] args) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(
+                "jdbc:dyna4jdbc:scriptengine:JavaScript")) {
 
-        try (Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:groovy")) {
+            try (PreparedStatement preparedStatement =
+                         connection.prepareStatement(JAVASCRIPT_SCRIPT)) {
 
-            try (Statement statement = connection.createStatement()) {
-                boolean results = statement.execute(GROOVY_SCRIPT);
-                while (results) {
-                    try (ResultSet rs = statement.getResultSet()) {
+                preparedStatement.setString(1, "Hello");
+                preparedStatement.setString(2, "World");
 
-                        printResultSetWithHeaders(rs);
-                    }
-
-                    results = statement.getMoreResults();
-                }
+                ResultSet resultSet = preparedStatement.executeQuery();
+                printResultSetWithHeaders(resultSet);
             }
         }
     }
 
-    private static void printResultSetWithHeaders(ResultSet rs) throws SQLException {
+    private static void printResultSetWithHeaders(ResultSet rs)
+            throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         final int columnCount = metaData.getColumnCount();
 
@@ -85,6 +75,4 @@ public class GroovyDemo {
             System.out.println();
         }
     }
-
 }
-
