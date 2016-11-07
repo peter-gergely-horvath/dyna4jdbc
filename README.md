@@ -14,6 +14,8 @@ For further information, please check out the [official project home page] (http
 
 ## Sample
 
+NOTE: This is just a sample - the project's primary goal is empowering Java Reporting and ETL applications to call dynamic script langauges through the JDBC API, and NOT programmatic usage.
+
 ```java
 package sample;
 
@@ -43,7 +45,7 @@ public class HelloWorldSample {
 }
 ```
 
-NOTE: The primary goal of the project is supporting Reporting and ETL applications, and NOT providing programmatic access.
+
 
 
 ## Download
