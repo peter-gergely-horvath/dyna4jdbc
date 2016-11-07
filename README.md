@@ -12,6 +12,40 @@ This approach combines the power of dynamic languages with the rich ecosystem of
 
 For further information, please check out the [official project home page] (http://dyna4jdbc.org/) and the documentation at the [project Wiki Page](https://github.com/peter-gergely-horvath/dyna4jdbc/wiki)
 
+## Sample
+
+```java
+package sample;
+
+import java.sql.*;
+
+public class HelloWorldSample {
+
+    public static void main(String[] args) throws SQLException {
+
+        String url = "jdbc:dyna4jdbc:scriptengine:JavaScript";
+
+        try (Connection connection = DriverManager.getConnection(url)) {
+
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(" var msg = 'Hello World'; ");
+                ResultSet resultSet = statement.executeQuery(" print(msg); ");
+
+                while (resultSet.next()) {
+                    String string = resultSet.getString(1);
+
+                    System.out.println(string);
+                }
+            }
+        }
+    }
+}
+```
+
+NOTE: The primary goal of the project is supporting Reporting and ETL applications, and NOT providing programmatic access.
+
+
 ## Download
 
 Please visit the [release download section](https://github.com/peter-gergely-horvath/dyna4jdbc/releases) to download the binary version of dyna4jdbc JDBC driver. 
