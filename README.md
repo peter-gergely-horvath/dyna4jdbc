@@ -50,7 +50,7 @@ public class HelloWorldSample {
 
 ## Download
 
-Please visit the [release download section](https://github.com/peter-gergely-horvath/dyna4jdbc/releases) to download the binary version of dyna4jdbc JDBC driver. 
+Please visit [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22dyna4jdbc%22) or the the [release download section](https://github.com/peter-gergely-horvath/dyna4jdbc/releases) to download the binary version of dyna4jdbc JDBC driver. 
 
 ## Build Status
 
