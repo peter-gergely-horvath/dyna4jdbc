@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-    <name>dyna4JDBC</name>
+	<name>dyna4JDBC</name>
 
 	<groupId>com.github.peter-gergely-horvath</groupId>
 	<artifactId>dyna4jdbc</artifactId>
-	<version>1.0.0-RC1</version>
+	<version>1.0.0</version>
 
 	<licenses>
 		<license>
@@ -39,7 +39,7 @@
 			<timezone>Europe/Vienna</timezone>
 		</developer>
 	</developers>
-	
+
 	<issueManagement>
 		<system>GitHub issue tracker of dyna4jdbc project</system>
 		<url>https://github.com/peter-gergely-horvath/dyna4jdbc/issues</url>
@@ -58,12 +58,12 @@
 		<easymock.version>3.4</easymock.version>
 		<commons-lang3.version>3.4</commons-lang3.version>
 		<guava.version>19.0</guava.version>
-        <groovy.version>2.4.6</groovy.version>
-        <scala.version>2.12.0-M5</scala.version>
-        <jython-shaded.version>2.5.3</jython-shaded.version>
-        <jruby.version>9.1.2.0</jruby.version>
-        <beanshell.version>2.0b5</beanshell.version>
-        <clojure.version>1.8.0</clojure.version>
+		<groovy.version>2.4.6</groovy.version>
+		<scala.version>2.12.0-M5</scala.version>
+		<jython-shaded.version>2.5.3</jython-shaded.version>
+		<jruby.version>9.1.2.0</jruby.version>
+		<beanshell.version>2.0b5</beanshell.version>
+		<clojure.version>1.8.0</clojure.version>
 
 		<!-- Used to generate build information -->
 		<product-name>${project.name}</product-name>
@@ -113,14 +113,14 @@
 			<version>${easymock.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>${commons-lang3.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -131,8 +131,8 @@
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-            <version>${groovy.version}</version>
-            <scope>test</scope>
+			<version>${groovy.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -156,39 +156,39 @@
 			<scope>test</scope>
 		</dependency>
 
-        <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
-            <version>${jruby.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.jruby</groupId>
+			<artifactId>jruby-complete</artifactId>
+			<version>${jruby.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.beanshell</groupId>
-            <artifactId>bsh</artifactId>
-            <version>${beanshell.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.beanshell</groupId>
+			<artifactId>bsh</artifactId>
+			<version>${beanshell.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.renjin</groupId>
-            <artifactId>renjin-script-engine</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.renjin</groupId>
+			<artifactId>renjin-script-engine</artifactId>
+			<version>RELEASE</version>
+			<scope>compile</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>clojure</artifactId>
 			<version>${clojure.version}</version>
-            <scope>test</scope>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.clojars.ato</groupId>
 			<artifactId>clojure-jsr223</artifactId>
 			<version>1.5.1</version>
-            <scope>test</scope>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
@@ -207,191 +207,236 @@
 		</repository>
 	</repositories>
 
-    <profiles>
+	<profiles>
 
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>!clover</name>
-                </property>
-            </activation>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>!clover</name>
+				</property>
+			</activation>
 
-            <build>
-            <plugins>
+			<build>
+				<plugins>
 
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${maven-checkstyle-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>validate</id>
-                            <phase>validate</phase>
-                            <configuration>
-                                <configLocation>configuration/checkstyle.xml</configLocation>
-                                <encoding>UTF-8</encoding>
-                                <consoleOutput>true</consoleOutput>
-                                <failsOnError>false</failsOnError>
-                            </configuration>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-pmd-plugin</artifactId>
-					<version>${maven-pmd-plugin.version}</version>
-					<executions>
-						<execution>
-							<phase>compile</phase>
-							<goals>
-								<goal>check</goal>
-								<goal>cpd-check</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-checkstyle-plugin</artifactId>
+						<version>${maven-checkstyle-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>validate</id>
+								<phase>validate</phase>
+								<configuration>
+									<configLocation>configuration/checkstyle.xml</configLocation>
+									<encoding>UTF-8</encoding>
+									<consoleOutput>true</consoleOutput>
+									<failsOnError>false</failsOnError>
+								</configuration>
+								<goals>
+									<goal>check</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-pmd-plugin</artifactId>
+						<version>${maven-pmd-plugin.version}</version>
+						<executions>
+							<execution>
+								<phase>compile</phase>
+								<goals>
+									<goal>check</goal>
+									<goal>cpd-check</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>${findbugs-maven-plugin.version}</version>
-                    <configuration>
-                        <!--
-                            Enables analysis which takes more memory but finds more bugs.
-                            If you run out of memory, changes the value of the effort element
-                            to 'Low'.
-                        -->
-                        <effort>Max</effort>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>findbugs-maven-plugin</artifactId>
+						<version>${findbugs-maven-plugin.version}</version>
+						<configuration>
+							<!-- Enables analysis which takes more memory but finds more bugs. 
+								If you run out of memory, changes the value of the effort element to 'Low'. -->
+							<effort>Max</effort>
 
-                        <!-- Location of FindBugs exclude filter file -->
-                        <excludeFilterFile>configuration/findbugs-exclude.xml</excludeFilterFile>
+							<!-- Location of FindBugs exclude filter file -->
+							<excludeFilterFile>configuration/findbugs-exclude.xml</excludeFilterFile>
 
-                        <!-- Build shall fail if problems are found -->
-                        <failOnError>true</failOnError>
+							<!-- Build shall fail if problems are found -->
+							<failOnError>true</failOnError>
 
-                        <!-- Reports all bugs (other values are medium and max) -->
-                        <threshold>Low</threshold>
+							<!-- Reports all bugs (other values are medium and max) -->
+							<threshold>Low</threshold>
 
-                        <!-- Produces XML report -->
-                        <xmlOutput>true</xmlOutput>
+							<!-- Produces XML report -->
+							<xmlOutput>true</xmlOutput>
 
-                        <!-- Configures the directory in which the XML report is created -->
-                        <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
-                    </configuration>
-                    <executions>
-                        <!--
-                            Ensures that FindBugs inspects source code when project is compiled.
-                        -->
-                        <execution>
-                            <id>analyze-compile</id>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
+							<!-- Configures the directory in which the XML report is created -->
+							<findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
+						</configuration>
+						<executions>
+							<!-- Ensures that FindBugs inspects source code when project is compiled. -->
+							<execution>
+								<id>analyze-compile</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>check</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>xml-maven-plugin</artifactId>
-                    <version>${xml-maven-plugin.version}</version>
-                    <configuration>
-                        <transformationSets>
-                            <transformationSet>
-                                <!-- Configures the source directory of XML files. -->
-                                <dir>${project.build.directory}/findbugs</dir>
-                                <includes>
-                                    <!-- only transform findbugsXml.xml to generate FindBugs HTML report -->
-									<include>findbugsXml.xml</include>
-								</includes>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>xml-maven-plugin</artifactId>
+						<version>${xml-maven-plugin.version}</version>
+						<configuration>
+							<transformationSets>
+								<transformationSet>
+									<!-- Configures the source directory of XML files. -->
+									<dir>${project.build.directory}/findbugs</dir>
+									<includes>
+										<!-- only transform findbugsXml.xml to generate FindBugs HTML report -->
+										<include>findbugsXml.xml</include>
+									</includes>
 
-                                <!-- Configures the directory in which the FindBugs report is written.-->
-                                <outputDir>${project.build.directory}/findbugs</outputDir>
+									<!-- Configures the directory in which the FindBugs report is written. -->
+									<outputDir>${project.build.directory}/findbugs</outputDir>
 
-                                <!-- Selects the used stylesheet. -->
-                                <!-- <stylesheet>fancy-hist.xsl</stylesheet>-->
-                                <!--<stylesheet>default.xsl</stylesheet>-->
-                                <!--<stylesheet>plain.xsl</stylesheet>-->
-                                <stylesheet>fancy.xsl</stylesheet>
-                                <!--<stylesheet>summary.xsl</stylesheet>-->
-                                <fileMappers>
-                                    <!-- Configures the file extension of the output files. -->
-                                    <fileMapper
-                                            implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
-                                        <targetExtension>.html</targetExtension>
-                                    </fileMapper>
-                                </fileMappers>
-                            </transformationSet>
-                        </transformationSets>
-                    </configuration>
-                    <executions>
-                        <!-- Ensures that the XSLT transformation is run when the project is compiled. -->
-                        <execution>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>transform</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.google.code.findbugs</groupId>
-                            <artifactId>findbugs</artifactId>
-                            <version>2.0.1</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-            </plugins>
-            </build>
+									<!-- Selects the used stylesheet. -->
+									<!-- <stylesheet>fancy-hist.xsl</stylesheet> -->
+									<!--<stylesheet>default.xsl</stylesheet> -->
+									<!--<stylesheet>plain.xsl</stylesheet> -->
+									<stylesheet>fancy.xsl</stylesheet>
+									<!--<stylesheet>summary.xsl</stylesheet> -->
+									<fileMappers>
+										<!-- Configures the file extension of the output files. -->
+										<fileMapper
+											implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+											<targetExtension>.html</targetExtension>
+										</fileMapper>
+									</fileMappers>
+								</transformationSet>
+							</transformationSets>
+						</configuration>
+						<executions>
+							<!-- Ensures that the XSLT transformation is run when the project 
+								is compiled. -->
+							<execution>
+								<phase>compile</phase>
+								<goals>
+									<goal>transform</goal>
+								</goals>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>com.google.code.findbugs</groupId>
+								<artifactId>findbugs</artifactId>
+								<version>2.0.1</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
 
-        </profile>
+		</profile>
 
-        <profile>
-            <id>clover</id>
-            <activation>
-                <property>
-                    <name>clover</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.atlassian.maven.plugins</groupId>
-                        <artifactId>clover-maven-plugin</artifactId>
-                        <version>${clover.version}</version>
-                        <configuration>
-                            <licenseLocation>configuration/clover/dyna4jdbc_clover.license</licenseLocation>
+		<profile>
+			<id>clover</id>
+			<activation>
+				<property>
+					<name>clover</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.atlassian.maven.plugins</groupId>
+						<artifactId>clover-maven-plugin</artifactId>
+						<version>${clover.version}</version>
+						<configuration>
+							<licenseLocation>configuration/clover/dyna4jdbc_clover.license</licenseLocation>
 							<!-- targetPercentage should gradually reach 75-80% -->
 							<targetPercentage>62.3%</targetPercentage>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>instrument</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>instrument</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 
-            <reporting>
-                <plugins>
-                    <plugin>
-                        <groupId>com.atlassian.maven.plugins</groupId>
-                        <artifactId>clover-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </reporting>
-        </profile>
-    </profiles>
+			<reporting>
+				<plugins>
+					<plugin>
+						<groupId>com.atlassian.maven.plugins</groupId>
+						<artifactId>clover-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</reporting>
+		</profile>
+
+		<profile>
+			<id>maven-repo-promotion</id>
+			<activation>
+				<property>
+					<name>maven-repo-promotion</name>
+        			<value>true</value>
+				</property>
+			</activation>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.3</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+
+			<distributionManagement>
+				<snapshotRepository>
+					<id>ossrh</id>
+					<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+
+	</profiles>
 
 
 
@@ -453,37 +498,6 @@
 				</executions>
 			</plugin>
 
-
-
-			<!--
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.3</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-				</configuration>
-			</plugin>
-			-->
-
 		</plugins>
 	</build>
 
@@ -511,11 +525,8 @@
 				<artifactId>findbugs-maven-plugin</artifactId>
 				<version>${findbugs-maven-plugin.version}</version>
 				<configuration>
-					<!--
-                        Enables analysis which takes more memory but finds more bugs.
-                        If you run out of memory, changes the value of the effort element
-                        to 'low'.
-                    -->
+					<!-- Enables analysis which takes more memory but finds more bugs. If 
+						you run out of memory, changes the value of the effort element to 'low'. -->
 					<effort>Max</effort>
 					<!-- Reports all bugs (other values are medium and max) -->
 					<threshold>Low</threshold>
@@ -535,14 +546,5 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
-	<!--
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
-	-->
 
 </project>
