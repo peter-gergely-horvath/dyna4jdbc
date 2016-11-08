@@ -10,7 +10,9 @@ This approach combines the power of dynamic languages with the rich ecosystem of
 
 ## Documentation
 
-For further information, please check out the [official project home page] (http://dyna4jdbc.org/) and the documentation at the [project Wiki Page](https://github.com/peter-gergely-horvath/dyna4jdbc/wiki)
+For further information, please check out the 
+ * [Official project home page] (http://dyna4jdbc.org/) 
+ * [Project Wiki Page](https://github.com/peter-gergely-horvath/dyna4jdbc/wiki)
 
 ## Sample
 
@@ -50,7 +52,7 @@ public class HelloWorldSample {
 
 ## Download
 
-Please visit [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22dyna4jdbc%22) or the the [release download section](https://github.com/peter-gergely-horvath/dyna4jdbc/releases) to download the binary version of dyna4jdbc JDBC driver. 
+Please visit [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.peter-gergely-horvath%22%20a%3A%22dyna4jdbc%22) or the the [release download section](https://github.com/peter-gergely-horvath/dyna4jdbc/releases) to download the binary version of dyna4jdbc JDBC driver. 
 
 ## Build Status
 
