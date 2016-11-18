@@ -6,7 +6,7 @@
 
 	<groupId>com.github.peter-gergely-horvath</groupId>
 	<artifactId>dyna4jdbc</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 
 	<licenses>
 		<license>
@@ -146,7 +146,7 @@
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-compiler</artifactId>
 			<version>${scala.version}</version>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -174,7 +174,7 @@
 			<groupId>org.renjin</groupId>
 			<artifactId>renjin-script-engine</artifactId>
 			<version>RELEASE</version>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
