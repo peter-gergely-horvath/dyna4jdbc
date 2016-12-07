@@ -28,6 +28,7 @@ import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
 import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
+import com.github.dyna4jdbc.internal.nodejs.jdbc.impl.NodeJsConnection;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
 import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DefaultScriptEngineConnection;
 
@@ -91,6 +92,10 @@ class ConnectionFactory {
 
                 case "scriptengine":
                     connectionClass = getScriptEngineConnectionClassForConfiguration(connectionType, config);
+                    break;
+
+                case "nodejs":
+                    connectionClass = NodeJsConnection.class;
                     break;
 
                 default:

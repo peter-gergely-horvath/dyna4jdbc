@@ -23,7 +23,7 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 
 import java.sql.Statement;
 
-public final class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFactory {
+public class DefaultScriptOutputHandlerFactory implements ScriptOutputHandlerFactory {
 
     private final ColumnHandlerFactory columnHandlerFactory;
     private final Configuration configuration;
@@ -34,6 +34,7 @@ public final class DefaultScriptOutputHandlerFactory implements ScriptOutputHand
 
     }
 
+    //CHECKSTYLE.OFF: DesignForExtension
     @Override
     public SingleResultSetScriptOutputHandler newSingleResultSetQueryScriptOutputHandler(
             Statement statement,
@@ -63,6 +64,7 @@ public final class DefaultScriptOutputHandlerFactory implements ScriptOutputHand
 
         return new DefaultUpdateScriptOutputHandler(this.configuration, warningSink);
     }
+    //CHECKSTYLE.ON: DesignForExtension
 
 
 }

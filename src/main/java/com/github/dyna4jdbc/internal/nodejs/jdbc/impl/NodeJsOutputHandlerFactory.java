@@ -15,37 +15,31 @@
  */
 
  
-package com.github.dyna4jdbc.internal.common.outputhandler.impl;
+package com.github.dyna4jdbc.internal.nodejs.jdbc.impl;
 
 import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
-import com.github.dyna4jdbc.internal.common.util.io.DisallowAllWritesOutputStream;
+import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
+import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-import java.io.OutputStream;
+import java.sql.Statement;
 
-/**
- * @author Peter G. Horvath
- */
-public class DefaultUpdateScriptOutputHandler implements UpdateScriptOutputHandler {
+final class NodeJsOutputHandlerFactory extends DefaultScriptOutputHandlerFactory {
 
-    private final SQLWarningSinkOutputStream stdErr;
+    private final Configuration configuration;
 
-    public DefaultUpdateScriptOutputHandler(Configuration configuration, SQLWarningSink warningSink) {
-
-        this.stdErr = new SQLWarningSinkOutputStream(configuration, warningSink);
-    }
-
-    //CHECKSTYLE.OFF: DesignForExtension
-    @Override
-    public OutputStream getOutOutputStream() {
-        return new DisallowAllWritesOutputStream("Writing to standard output from an UPDATE call is not allowed");
+    NodeJsOutputHandlerFactory(ColumnHandlerFactory columnHandlerFactory, Configuration configuration) {
+        super(columnHandlerFactory, configuration);
+        this.configuration = configuration;
     }
 
     @Override
-    public OutputStream getErrorOutputStream() {
-        return stdErr;
+    public UpdateScriptOutputHandler newUpdateScriptOutputHandler(
+            Statement statement,
+            String script,
+            SQLWarningSink warningSink) {
+
+        return new NodeJsUpdateScriptOutputHandler(this.configuration, warningSink);
     }
-    //CHECKSTYLE.ON: DesignForExtension
 }
-
