@@ -55,6 +55,8 @@ public enum JDBCError {
             SQLStateClass.ERROR_CONNECTION, "100"),
     INITSCRIPT_EXECUTION_EXCEPTION("Exception executing init script: %s (examine stack trace for details)",
             SQLStateClass.ERROR_CONNECTION, "101"),
+    REQUIRED_RESOURCE_UNAVAILABLE("A resource required to perform the operation could not be found: %s",
+            SQLStateClass.ERROR_CONNECTION, "200"),
 
 
     // Error class FEATURE_NOT_SUPPORTED

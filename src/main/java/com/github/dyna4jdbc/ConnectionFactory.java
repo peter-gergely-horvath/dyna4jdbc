@@ -59,9 +59,12 @@ class ConnectionFactory {
             throw sqlEx;
 
         } catch (Exception ex) {
+            if (ex instanceof ClassNotFoundException) {
+                throw JDBCError.REQUIRED_RESOURCE_UNAVAILABLE.raiseSQLException(ex, ex.getMessage());
+            }
+            
             String causeMessage = ExceptionUtils.getRootCauseMessage(ex);
             throw JDBCError.CONNECT_FAILED_EXCEPTION.raiseSQLException(ex, causeMessage);
-
         } catch (Throwable throwable) {
             /*
             We do not trust any external library here: some script languages
@@ -73,6 +76,10 @@ class ConnectionFactory {
             Hence, we intentionally and knowingly catch all Throwables (including
             Errors) and wrap them into an SQLException.
             */
+            if (throwable instanceof NoClassDefFoundError) {
+                throw JDBCError.REQUIRED_RESOURCE_UNAVAILABLE.raiseSQLException(throwable, throwable.getMessage());
+            }
+            
             String causeMessage = ExceptionUtils.getRootCauseMessage(throwable);
             throw JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(throwable, causeMessage);
         }
