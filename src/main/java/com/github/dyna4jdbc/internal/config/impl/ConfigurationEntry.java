@@ -150,10 +150,10 @@ enum ConfigurationEntry {
                 @Override
                 void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
                     List<String> classpathList;
-                    if (value == null || "".equals(value)) {
+                    if (value == null || "".equals(value.trim())) {
                         classpathList = Collections.emptyList();
                     } else {
-                        classpathList = Arrays.asList(value.split(";"));
+                        classpathList = Arrays.asList(value.split(","));
                     }
                     config.setClasspath(classpathList);
                 }

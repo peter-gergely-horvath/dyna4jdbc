@@ -28,6 +28,7 @@ import java.util.Properties;
 
 import static org.testng.Assert.*;
 
+import static com.github.dyna4jdbc.internal.common.util.collection.CollectionTestHelper.assertIteratorReturnsValues;
 /**
  * @author Peter G. Horvath
  */
@@ -92,7 +93,7 @@ public class DefaultConfigurationFactoryTest {
 
         Properties properties = new Properties();
 
-        String cellSeparator = ";";
+        String cellSeparator = "|";
         String skipFirstLine = "false";
         String charSet = "UTF-16";
         String preferMultipleResultSets = "true";
@@ -116,6 +117,46 @@ public class DefaultConfigurationFactoryTest {
         assertEquals(configuration.getPreferMultipleResultSets(),
                 Boolean.valueOf(preferMultipleResultSets).booleanValue());
 
+    }
+    
+    @Test
+    public void testMultipleClasspathEntriesConfiguration() throws MisconfigurationException {
+
+        StringBuilder configurationStringBuilder = new StringBuilder();
+        
+        String cellSeparator = "|";
+        String skipFirstLine = "false";
+        String charSet = "UTF-16";
+        String preferMultipleResultSets = "true";
+        
+        configurationStringBuilder
+            .append(ConfigurationEntry.CELL_SEPARATOR.getKey()).append("=").append(cellSeparator).append(";")
+            .append(ConfigurationEntry.SKIP_FIRST_RESULT_LINE.getKey()).append("=").append(skipFirstLine).append(";")
+            .append(ConfigurationEntry.CHARSET.getKey()).append("=").append(charSet).append(";")
+            .append(ConfigurationEntry.PREFER_MULTIPLE_RESULT_SETS.getKey()).append("=").append(preferMultipleResultSets).append(";")
+            .append(ConfigurationEntry.CLASSPATH.getKey()).append("=").append("foo.jar,").append("bar.jar,").append("baz.jar").append(";");
+
+        Configuration configuration = defaultConfigurationFactory.newConfigurationFromParameters(
+                configurationStringBuilder.toString(), new Properties());
+
+        assertEquals(String.valueOf(configuration.getCellSeparator()),
+                cellSeparator);
+
+        assertEquals(configuration.getSkipFirstLine(),
+                Boolean.valueOf(skipFirstLine).booleanValue());
+
+        assertEquals(configuration.getConversionCharset(),
+                charSet);
+
+        assertEquals(configuration.getPreferMultipleResultSets(),
+                Boolean.valueOf(preferMultipleResultSets).booleanValue());
+        
+        assertEquals(configuration.getPreferMultipleResultSets(),
+                Boolean.valueOf(preferMultipleResultSets).booleanValue());
+
+        assertIteratorReturnsValues(configuration.getClasspath().iterator(),
+                "foo.jar", "bar.jar", "baz.jar");
+                
     }
 
     @Test(expectedExceptions = InvalidConfigurationValueException.class)

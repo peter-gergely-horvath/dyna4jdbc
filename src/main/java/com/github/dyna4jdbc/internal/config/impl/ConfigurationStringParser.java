@@ -26,6 +26,7 @@ public final class ConfigurationStringParser {
 
     private static final ConfigurationStringParser INSTANCE = new ConfigurationStringParser();
 
+    private static final String CONFIGURATION_STRING_ENTRY_DELIMITER = ";";
 
     public static ConfigurationStringParser getInstance() {
         return INSTANCE;
@@ -39,7 +40,7 @@ public final class ConfigurationStringParser {
         Properties properties = new Properties();
 
         if (configurationString != null) {
-            StringTokenizer st = new StringTokenizer(configurationString, ";");
+            StringTokenizer st = new StringTokenizer(configurationString, CONFIGURATION_STRING_ENTRY_DELIMITER);
             while (st.hasMoreTokens()) {
                 String keyValuePair = st.nextToken();
                 String[] keyAndValue = keyValuePair.split("=", 2);
@@ -47,7 +48,7 @@ public final class ConfigurationStringParser {
                 if (keyAndValue.length == 1) {
                     throw MisconfigurationException.forMessage(
                             "Configuration string '%s' cannot be interpreted as '=' "
-                                    + "character separated key-value pairs.",
+                                    + "character separated key-value pairs. Could not parse: " + keyValuePair,
                             configurationString);
                 }
 
