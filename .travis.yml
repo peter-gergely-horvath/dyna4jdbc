@@ -4,5 +4,5 @@ jdk:
 env:
   - NODE_VERSION=6
 script: 
-  - nvm use $NODE_VERSION
+  - nvm use 6
   - mvn test
