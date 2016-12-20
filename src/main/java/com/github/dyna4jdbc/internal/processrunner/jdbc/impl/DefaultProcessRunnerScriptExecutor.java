@@ -20,22 +20,26 @@ package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import com.github.dyna4jdbc.internal.CancelException;
-import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor {
+final class DefaultProcessRunnerScriptExecutor implements ProcessScriptExecutor {
 
     private static final int DEFAULT_POLL_INTERVAL_MS = 500;
 
     private volatile ProcessRunner processRunner;
 
-    private final ExecutorService executorService;
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
     
     private DefaultIOHandlerFactory ioHandlerFactory; 
     
@@ -45,13 +49,12 @@ final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor
 
     private long expirationIntervalMs;
 
-    ProcessRunnerScriptExecutor(Configuration configuration, ExecutorService executorService) {
+    DefaultProcessRunnerScriptExecutor(Configuration configuration) {
         this.configuration = configuration;
         this.skipFirstLine = configuration.getSkipFirstLine();
         this.endOfDataPattern = configuration.getEndOfDataPattern();
         this.expirationIntervalMs = configuration.getExternalCallQuietPeriodThresholdMs();
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
-        this.executorService = executorService;
     }
 
     @Override
@@ -168,8 +171,13 @@ final class ProcessRunnerScriptExecutor implements OutputCapturingScriptExecutor
         };
     }
 
+    @Override
     public void close() {
-        abortProcessIfRunning();
+        try {
+            abortProcessIfRunning();
+        } finally {
+            executorService.shutdownNow();
+        }
     }
 
     @Override

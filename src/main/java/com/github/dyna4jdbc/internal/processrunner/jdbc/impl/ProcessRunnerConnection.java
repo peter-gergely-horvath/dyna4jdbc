@@ -22,8 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
@@ -38,36 +36,43 @@ import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
-public final class ProcessRunnerConnection extends AbstractConnection {
+public class ProcessRunnerConnection extends AbstractConnection {
 
     private final ColumnHandlerFactory columnHandlerFactory;
     private final Configuration configuration;
-    private final ProcessRunnerScriptExecutor scriptExecutor;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ProcessScriptExecutor scriptExecutor;
 
     public ProcessRunnerConnection(
             String parameters,
             Properties properties)
             throws SQLException, MisconfigurationException {
 
+        this(parameters, properties, DefaultProcessRunnerFactory.getInstance());
+
+        registerAsChild(() -> onClose());
+    }
+    
+    protected ProcessRunnerConnection(
+            String parameters,
+            Properties properties,
+            ProcessRunnerFactory processRunnerFactory)
+            throws SQLException, MisconfigurationException {
+        
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
         configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
 
         columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
-
-        this.scriptExecutor = new ProcessRunnerScriptExecutor(configuration, executorService);
+        
+        this.scriptExecutor = processRunnerFactory.newProcessScriptExecutor(configuration);
 
         registerAsChild(() -> onClose());
     }
 
     private void onClose() {
-        try {
-            scriptExecutor.close();
-        } finally {
-            executorService.shutdownNow();
-        }
+        scriptExecutor.close();
     }
 
+    //CHECKSTYLE.OFF: DesignForExtension : incorrect detection of "is not designed for extension"
     @Override
     protected DatabaseMetaData getMetaDataInternal() throws SQLException {
 
@@ -75,22 +80,23 @@ public final class ProcessRunnerConnection extends AbstractConnection {
                 System.getProperty("os.name"),
                 System.getProperty("os.version"));
     }
+    //CHECKSTYLE.ON: DesignForExtension : incorrect detection of "is not designed for extension"
 
     @Override
-    protected Statement createStatementInternal() throws SQLException {
+    protected final Statement createStatementInternal() throws SQLException {
 
         ScriptOutputHandlerFactory outputHandlerFactory =
                 new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
 
         return new OutputHandlingStatement<>(this, outputHandlerFactory, scriptExecutor);
     }
-    
+
     @Override
-    protected PreparedStatement prepareStatementInternal(String script) throws SQLException {
+    protected final PreparedStatement prepareStatementInternal(String script) throws SQLException {
 
         ScriptOutputHandlerFactory outputHandlerFactory =
                 new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
-        
+
         return new OutputHandlingPreparedStatement<>(script, this, outputHandlerFactory, scriptExecutor);
     }
 }

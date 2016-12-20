@@ -17,71 +17,70 @@
  
 package com.github.dyna4jdbc.internal.nodejs.jdbc.impl;
 
-import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingPreparedStatement;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
-import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
-import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
-import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultColumnHandlerFactory;
-import com.github.dyna4jdbc.internal.config.Configuration;
-import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
-import com.github.dyna4jdbc.internal.config.MisconfigurationException;
-import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
-
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.UUID;
 
-public final class NodeJsConnection extends AbstractConnection {
+import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
+import com.github.dyna4jdbc.internal.config.MisconfigurationException;
+import com.github.dyna4jdbc.internal.config.impl.ConfigurationEntry;
+import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
 
-    private static final String PRODUCT_NAME = "NodeJS over J2V8";
+public final class NodeJsConnection extends ProcessRunnerConnection {
 
-    private final ColumnHandlerFactory columnHandlerFactory;
-    private final Configuration configuration;
-    private final NodeJsScriptExecutor scriptExecutor;
+    private static final String END_OF_STREAM_INDICATOR = 
+            String.format("__dyna4jdbc_eos_token_%s", UUID.randomUUID().toString());
+    
+    private static final String REPL_CONFIG_SCRIPT = new StringBuilder()
+        .append("node -e \"")
+            .append("const endOfStreamIndicator = '")
+                    .append(END_OF_STREAM_INDICATOR).append("';")
+            .append("const vm = require('vm');                          ")
+            .append("require('repl').start({                            ")
+            .append("   terminal: false,                                ")
+            .append("   prompt: '',                                     ")
+            .append("   ignoreUndefined: true,                          ")
+            .append("   eval: function(cmd, ctx, fn, cb) {              ")
+            .append("           try {                                   ")
+            .append("               vm.runInContext(cmd, ctx, fn);      ")
+            .append("           } catch (err)  {                        ")
+            .append("               cb(err);                            ")
+            .append("           } finally {                             ")
+            .append("               console.log(endOfStreamIndicator);  ")
+            .append("           }                                       ")
+            .append("       }                                           ")
+            .append("   });                                             ")
+            .append("\"")
+        .toString();
+
 
     public NodeJsConnection(
             String parameters,
             Properties properties)
             throws SQLException, MisconfigurationException {
 
-        ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
-        configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
+        super(parameters, addNodeJsProperties(properties), NodeJsProcessRunnerFactory.getInstance());
 
-        columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
+        try (Statement statement = this.createStatement()) {
+            statement.executeUpdate(REPL_CONFIG_SCRIPT);
+        }
+    }
 
-        this.scriptExecutor = new NodeJsScriptExecutor(this, configuration);
+    private static Properties addNodeJsProperties(Properties properties) {
 
-        registerAsChild(scriptExecutor);
+        properties.put(ConfigurationEntry.ENF_OF_DATA_REGEX.getKey(), END_OF_STREAM_INDICATOR);
+
+        return properties;
     }
 
     @Override
     protected DatabaseMetaData getMetaDataInternal() throws SQLException {
 
-        String version = this.scriptExecutor.getVersion();
-
-        return new GenericDatabaseMetaData(this, PRODUCT_NAME, version);
-    }
-
-    @Override
-    protected Statement createStatementInternal() throws SQLException {
-
-        ScriptOutputHandlerFactory outputHandlerFactory =
-                new NodeJsOutputHandlerFactory(this.columnHandlerFactory, this.configuration);
-
-        return new OutputHandlingStatement<>(this, outputHandlerFactory, scriptExecutor);
-    }
-
-    @Override
-    protected PreparedStatement prepareStatementInternal(String script) throws SQLException {
-
-        ScriptOutputHandlerFactory outputHandlerFactory =
-                new NodeJsOutputHandlerFactory(this.columnHandlerFactory, this.configuration);
-
-        return new OutputHandlingPreparedStatement<>(script, this, outputHandlerFactory, scriptExecutor);
+        return new GenericDatabaseMetaData(this,
+                System.getProperty("os.name"),
+                System.getProperty("os.version"));
     }
 
 }

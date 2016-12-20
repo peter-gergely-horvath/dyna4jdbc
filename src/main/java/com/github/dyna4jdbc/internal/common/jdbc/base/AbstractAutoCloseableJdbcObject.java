@@ -192,7 +192,8 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
         synchronized (this.children) {
             LinkedList<Throwable> caughtThrowables = new LinkedList<>();
 
-            for (AutoCloseable closeableObject : this.children) { // we have the monitor: synchronized (this.children)!
+            // we have the monitor: synchronized (this.children)!
+            for (AutoCloseable closeableObject : new HashSet<>(this.children)) {
 
                 try {
                     closeableObject.close();

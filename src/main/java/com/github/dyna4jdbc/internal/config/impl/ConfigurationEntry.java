@@ -29,7 +29,7 @@ import java.util.regex.PatternSyntaxException;
 import com.github.dyna4jdbc.internal.config.InvalidConfigurationValueException;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
-enum ConfigurationEntry {
+public enum ConfigurationEntry {
 
     INIT_SCRIPT("initScript", "", 
             "Path of an initialization script, which will be executed "
