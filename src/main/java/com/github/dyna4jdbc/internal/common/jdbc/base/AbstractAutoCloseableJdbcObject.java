@@ -98,7 +98,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      *
      * <p>
      * <b>NOTE:</b> no guarantee is made whether underlying resources
-     * have already been freed. The value returned simply indicate
+     * have already been freed. The value returned simply indicates
      * whether {@link #close()} method has been called or not, but
      * does not state whether its execution is finished (the call
      * has returned already or not). A thread might well see an
@@ -136,15 +136,20 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
      * @throws SQLException in case closing {@code this} object or any of the the child object fails
      */
     public final void close() throws SQLException {
+        
+        /* The close operation is de-duplicated: even if requested multiple times, 
+         * it will actually be executed only one time!
+         */
         final boolean closedFlagWasSetDuringThisMethodCall = closed.compareAndSet(false, true);
         if (closedFlagWasSetDuringThisMethodCall) {
 
-            Throwable parentCloseThrowable = null;
+            // close children first, since they might require this.parent to be around... 
+            LinkedList<Throwable> caughtThrowables = closeChildObjects();
 
-            if (parent != null) {
-
+            // Notice for threading correctness: this.parent is FINAL
+            if (this.parent != null) {
                 try {
-                    parent.unregisterChild(this);
+                    this.parent.unregisterChild(this);
                 } catch (Throwable thowable) {
                     /* Normally, any Throwable caught here should be a
                      * SQLException, however, we catch all Throwables
@@ -152,28 +157,41 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
                      * if a RuntimeException or Error is thrown, we still
                      * catch and pass it to method #closeChildObjects(Throwable)
                      */
-                    parentCloseThrowable = thowable;
+                    caughtThrowables.add(thowable);
                 }
             }
 
-            closeChildObjects(parentCloseThrowable);
+            switch (caughtThrowables.size()) {
+                case 0:
+                    return; // no Throwable caught: normal completion
+
+                case 1:
+                    // one Throwable caught during close: propagate it as the root cause
+                    throw JDBCError.CLOSE_FAILED.raiseSQLException(caughtThrowables.getFirst(),
+                            this, "Closing of dependent object caused exception");
+
+                default:
+                    // closure caused multiple Throwables to be thrown: propagate them as suppressed
+                    throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(caughtThrowables,
+                            this, "Closing of dependent objects caused exceptions; see supressed");
+
+            }
         }
     }
 
     /**
      * Closes all child objects, even if some of them throw {@code Throwable} when
-     * the close method is called on them. Any {@code Throwable}s thrown by the
-     * child objects are later re-thrown, once closing of every child is completed.
+     * the close method is called on them. Any {@code Throwable}s thrown during closing
+     * the child objects are collected into the {@code LinkedList} returned by this method
      *
-     * @param parentCloseException exception thrown from parent closure (might be {@code null})
-     *
-     * @throws SQLException if one or more child objects throw {@code Throwable} on close method call
+     * @return a {@code LinkedList} of {@code Throwable}s thrown by children
+     *          (if any), or an <b>empty</b> {@code LinkedList}, but <b>never {@code null}</b>
      */
-    private void closeChildObjects(Throwable parentCloseException) throws SQLException {
-        
+    private LinkedList<Throwable> closeChildObjects() throws SQLException {
+
         synchronized (this.children) {
             LinkedList<Throwable> caughtThrowables = new LinkedList<>();
-            
+
             for (AutoCloseable closeableObject : this.children) { // we have the monitor: synchronized (this.children)!
 
                 try {
@@ -192,26 +210,8 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
             // closing also includes discarding references
             children.clear(); // we have the monitor: synchronized (this.children)!
 
-            if (parentCloseException != null) {
-                caughtThrowables.add(parentCloseException);
-            }
+            return caughtThrowables;
 
-            switch (caughtThrowables.size()) {
-                case 0:
-                    return; // no Throwable caught: normal completion
-
-                case 1:
-                    // closure of a single child has failed: propagate it as the root cause
-                    throw JDBCError.CLOSE_FAILED.raiseSQLException(caughtThrowables.getFirst(),
-                            this, "Closing of dependent object caused exception");
-
-                default:
-                    // closure of multiple children has failed: propagate them as suppressed
-                    throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(caughtThrowables,
-                            this, "Closing of dependent objects caused exceptions; see supressed");
-
-            }
-            
         } // end of synchronized (this.children) block
     }
 
