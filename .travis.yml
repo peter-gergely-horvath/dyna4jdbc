@@ -1,4 +1,8 @@
 language: java
-script: mvn test
 jdk:
   - oraclejdk8
+env:
+  - NODE_VERSION=6
+script: 
+  - nvm use $NODE_VERSION
+  - mvn test
