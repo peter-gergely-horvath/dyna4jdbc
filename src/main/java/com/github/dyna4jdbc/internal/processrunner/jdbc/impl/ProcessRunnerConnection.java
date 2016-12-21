@@ -40,14 +40,14 @@ public class ProcessRunnerConnection extends AbstractConnection {
 
     private final ColumnHandlerFactory columnHandlerFactory;
     private final Configuration configuration;
-    private final ProcessScriptExecutor scriptExecutor;
+    private final ExternalProcessScriptExecutor scriptExecutor;
 
     public ProcessRunnerConnection(
             String parameters,
             Properties properties)
             throws SQLException, MisconfigurationException {
 
-        this(parameters, properties, DefaultProcessRunnerFactory.getInstance());
+        this(parameters, properties, DefaultExternalProcessScriptExecutorFactory.getInstance());
 
         registerAsChild(() -> onClose());
     }
@@ -55,7 +55,7 @@ public class ProcessRunnerConnection extends AbstractConnection {
     protected ProcessRunnerConnection(
             String parameters,
             Properties properties,
-            ProcessRunnerFactory processRunnerFactory)
+            ExternalProcessScriptExecutorFactory processRunnerFactory)
             throws SQLException, MisconfigurationException {
         
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
@@ -63,7 +63,7 @@ public class ProcessRunnerConnection extends AbstractConnection {
 
         columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
         
-        this.scriptExecutor = processRunnerFactory.newProcessScriptExecutor(configuration);
+        this.scriptExecutor = processRunnerFactory.newExternalProcessScriptExecutor(configuration);
 
         registerAsChild(() -> onClose());
     }

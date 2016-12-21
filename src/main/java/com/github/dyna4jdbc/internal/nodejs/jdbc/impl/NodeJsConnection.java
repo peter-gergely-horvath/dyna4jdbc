@@ -61,7 +61,7 @@ public final class NodeJsConnection extends ProcessRunnerConnection {
             Properties properties)
             throws SQLException, MisconfigurationException {
 
-        super(parameters, addNodeJsProperties(properties), NodeJsProcessRunnerFactory.getInstance());
+        super(parameters, addNodeJsProperties(properties), NodeJsProcessScriptExecutorFactory.getInstance());
 
         try (Statement statement = this.createStatement()) {
             statement.executeUpdate(REPL_CONFIG_SCRIPT);

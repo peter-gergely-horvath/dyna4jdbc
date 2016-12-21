@@ -33,7 +33,7 @@ import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-final class DefaultProcessRunnerScriptExecutor implements ProcessScriptExecutor {
+public class DefaultExternalProcessScriptExecutor implements ExternalProcessScriptExecutor {
 
     private static final int DEFAULT_POLL_INTERVAL_MS = 500;
 
@@ -49,7 +49,7 @@ final class DefaultProcessRunnerScriptExecutor implements ProcessScriptExecutor 
 
     private long expirationIntervalMs;
 
-    DefaultProcessRunnerScriptExecutor(Configuration configuration) {
+    public DefaultExternalProcessScriptExecutor(Configuration configuration) {
         this.configuration = configuration;
         this.skipFirstLine = configuration.getSkipFirstLine();
         this.endOfDataPattern = configuration.getEndOfDataPattern();
@@ -57,6 +57,7 @@ final class DefaultProcessRunnerScriptExecutor implements ProcessScriptExecutor 
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
     }
 
+    //CHECKSTYLE.OFF: DesignForExtension : incorrect detection of "is not designed for extension"
     @Override
     public void executeScriptUsingStreams(
             String script,
@@ -68,7 +69,7 @@ final class DefaultProcessRunnerScriptExecutor implements ProcessScriptExecutor 
             PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true))  {
 
             if (this.processRunner != null && !this.processRunner.isProcessRunning()) {
-                this.processRunner = null;
+                onProcessNotRunningBeforeDispatch(script);
             }
 
             if (this.processRunner == null) {
@@ -99,7 +100,11 @@ final class DefaultProcessRunnerScriptExecutor implements ProcessScriptExecutor 
         }
     }
 
-
+    protected void onProcessNotRunningBeforeDispatch(String script) throws ScriptExecutionException {
+        // allows the process to be re-initialize
+        this.processRunner = null;
+    }
+    //CHECKSTYLE.ON
 
     private Callable<Void> stdOutWatcher(final PrintWriter outputPrintWriter, final ProcessRunner currentProcess) {
         return () -> {
@@ -172,7 +177,7 @@ final class DefaultProcessRunnerScriptExecutor implements ProcessScriptExecutor 
     }
 
     @Override
-    public void close() {
+    public final void close() {
         try {
             abortProcessIfRunning();
         } finally {
@@ -181,7 +186,7 @@ final class DefaultProcessRunnerScriptExecutor implements ProcessScriptExecutor 
     }
 
     @Override
-    public void cancel() throws CancelException {
+    public final void cancel() throws CancelException {
         abortProcessIfRunning();
     }
 
