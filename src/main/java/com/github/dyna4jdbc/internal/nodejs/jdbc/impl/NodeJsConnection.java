@@ -19,7 +19,6 @@ package com.github.dyna4jdbc.internal.nodejs.jdbc.impl;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -33,39 +32,14 @@ public final class NodeJsConnection extends ProcessRunnerConnection {
     private static final String END_OF_STREAM_INDICATOR = 
             String.format("__dyna4jdbc_eos_token_%s", UUID.randomUUID().toString());
     
-    private static final String REPL_CONFIG_SCRIPT = new StringBuilder()
-        .append("node -e \"")
-            .append("const endOfStreamIndicator = '")
-                    .append(END_OF_STREAM_INDICATOR).append("';")
-            .append("const vm = require('vm');                          ")
-            .append("require('repl').start({                            ")
-            .append("   terminal: false,                                ")
-            .append("   prompt: '',                                     ")
-            .append("   ignoreUndefined: true,                          ")
-            .append("   eval: function(cmd, ctx, fn, cb) {              ")
-            .append("           try {                                   ")
-            .append("               vm.runInContext(cmd, ctx, fn);      ")
-            .append("           } catch (err)  {                        ")
-            .append("               cb(err);                            ")
-            .append("           } finally {                             ")
-            .append("               console.log(endOfStreamIndicator);  ")
-            .append("           }                                       ")
-            .append("       }                                           ")
-            .append("   });                                             ")
-            .append("\"")
-        .toString();
-
-
     public NodeJsConnection(
             String parameters,
             Properties properties)
             throws SQLException, MisconfigurationException {
 
-        super(parameters, addNodeJsProperties(properties), NodeJsProcessScriptExecutorFactory.getInstance());
-
-        try (Statement statement = this.createStatement()) {
-            statement.executeUpdate(REPL_CONFIG_SCRIPT);
-        }
+        super(parameters, 
+                addNodeJsProperties(properties),
+                NodeJsProcessScriptExecutorFactory.getInstance(END_OF_STREAM_INDICATOR));
     }
 
     private static Properties addNodeJsProperties(Properties properties) {

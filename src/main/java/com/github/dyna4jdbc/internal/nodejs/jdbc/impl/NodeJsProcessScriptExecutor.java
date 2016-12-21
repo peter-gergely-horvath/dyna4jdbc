@@ -1,19 +1,26 @@
 package com.github.dyna4jdbc.internal.nodejs.jdbc.impl;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Map;
 
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
-import com.github.dyna4jdbc.internal.common.util.io.DisallowAllWritesOutputStream;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.DefaultExternalProcessScriptExecutor;
 
 
 final class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
 
-    private static final OutputStream VARIABLE_SET_OUTPUT_STREAM = new DisallowAllWritesOutputStream(
-            "Writing to standard output while a variable is being set is unexpected");
+    private static final OutputStream VARIABLE_SET_OUTPUT_STREAM = new OutputStream() {
+
+        @Override
+        public void write(int b) throws IOException {
+            System.err.write(b);
+        }
+    };
+            /*new DisallowAllWritesOutputStream(
+            "Writing to standard output while a variable is being set is unexpected");*/
 
     NodeJsProcessScriptExecutor(Configuration configuration) {
         super(configuration);
