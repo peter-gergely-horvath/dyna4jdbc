@@ -8,8 +8,6 @@ import java.util.Map;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.DefaultExternalProcessScriptExecutor;
-import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessExecutionException;
-import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessManager;
 
 
 class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
@@ -66,14 +64,8 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
     @Override
     protected void onProcessNotRunningBeforeDispatch(String script) throws ScriptExecutionException {
         throw new ScriptExecutionException(
-                "The Node.js process exited unexpetedly! Cannot execute script: " + script);
+                "Node.js process exited unexpetedly! Cannot execute script: " + script);
 
-    }
-
-    @Override
-    protected ProcessManager createProcessManager(String script, Map<String, Object> variables)
-            throws ProcessExecutionException {
-        return ProcessManager.start(script, variables, getConfiguration(), getExecutorService());
     }
 
 }

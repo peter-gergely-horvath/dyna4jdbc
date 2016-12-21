@@ -20,6 +20,7 @@ public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalPro
 
     private final String replStartCommand;
 
+    // TODO: cleanup
     private NodeJsProcessScriptExecutorFactory(String eosToken) {
         this.replStartCommand = "const endOfStreamToken = '" + eosToken + "'; " + "const vm = require('vm'); "
                 + "require('repl').start({ " + "terminal: false, " + "prompt: '', " + "ignoreUndefined: true, "
@@ -67,6 +68,7 @@ public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalPro
             nodeJsProcessScriptExecutor.executeScriptUsingStreams(replStartCommand, null, byteArrayOutputStream,
                     byteArrayOutputStream);
 
+            // TODO: implement handling of unexpected output showing up here
             String caputedOutput = byteArrayOutputStream.toString(configuration.getConversionCharset());
 
             System.err.println("NodeJsProcessScriptExecutorFactory - captured output: " + caputedOutput);

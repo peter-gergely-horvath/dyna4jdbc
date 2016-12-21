@@ -64,7 +64,6 @@
 		<jruby.version>9.1.2.0</jruby.version>
 		<beanshell.version>2.0b5</beanshell.version>
 		<clojure.version>1.8.0</clojure.version>
-		<j2v8.version>4.6.0</j2v8.version>
 
 		<!-- Used to generate build information -->
 		<product-name>${project.name}</product-name>
@@ -435,55 +434,6 @@
 					<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 				</snapshotRepository>
 			</distributionManagement>
-		</profile>
-
-		<profile>
-			<id>windows</id>
-			<activation>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.eclipsesource.j2v8</groupId>
-					<artifactId>j2v8_win32_x86_64</artifactId>
-					<version>${j2v8.version}</version>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>unix</id>
-			<activation>
-				<os>
-					<family>unix</family>
-				</os>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.eclipsesource.j2v8</groupId>
-					<artifactId>j2v8_linux_x86_64</artifactId>
-					<version>${j2v8.version}</version>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>mac</id>
-			<activation>
-				<os>
-					<family>mac</family>
-				</os>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.eclipsesource.j2v8</groupId>
-					<artifactId>j2v8_macosx_x86_64</artifactId>
-					<version>${j2v8.version}</version>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>
 		</profile>
 	</profiles>
 
