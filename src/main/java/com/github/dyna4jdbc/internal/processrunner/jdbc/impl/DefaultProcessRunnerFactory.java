@@ -15,6 +15,6 @@ public class DefaultProcessRunnerFactory implements ProcessRunnerFactory {
     public ProcessScriptExecutor newProcessScriptExecutor(Configuration configuration) {
         return new DefaultProcessRunnerScriptExecutor(configuration);
     }
-    //CHECKSTYLE.ON: DesignForExtension : incorrect detection of "is not designed for extension"
+    //CHECKSTYLE.ON: DesignForExtension
 
 }
