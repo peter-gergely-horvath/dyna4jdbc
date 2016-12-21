@@ -30,9 +30,9 @@ import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
-final class ProcessRunner {
+public final class ProcessManager {
 
-    private static final Logger LOGGER = Logger.getLogger(ProcessRunner.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ProcessManager.class.getName());
 
     private static final int DEFAULT_TIMEOUT_MILLI_SECONDS = 10_000;
 
@@ -50,17 +50,31 @@ final class ProcessRunner {
     private boolean standardOutReachedEnd = false;
     private boolean standardErrorReachedEnd = false;
 
-
-    static ProcessRunner start(
+    
+    public static ProcessManager start(
             String command, 
             Map<String, Object> variables, Configuration configuration,
-            ExecutorService executorService) 
-                    throws ProcessExecutionException {
+            ExecutorService executorService) throws ProcessExecutionException {
 
         try {
             Process process = startProcessInternal(command, variables);
 
-            ProcessRunner processRunner = new ProcessRunner(process, configuration, executorService);
+            return start(process, command, variables, configuration, executorService);
+
+        } catch (IOException e) {
+            throw new ProcessExecutionException(e);
+        }
+    }
+
+    public static ProcessManager start(
+            Process process,
+            String command,
+            Map<String, Object> variables, Configuration configuration,
+            ExecutorService executorService)
+                    throws ProcessExecutionException {
+
+        try {
+            ProcessManager processRunner = new ProcessManager(process, configuration, executorService);
 
             final int partiesToWait = 3;
             /*
@@ -101,7 +115,7 @@ final class ProcessRunner {
             Thread.currentThread().interrupt();
             throw new ProcessExecutionException("Interrupted", e);
 
-        } catch (BrokenBarrierException | TimeoutException | IOException e) {
+        } catch (BrokenBarrierException | TimeoutException e) {
             throw new ProcessExecutionException(e);
         }
     }
@@ -129,7 +143,7 @@ final class ProcessRunner {
         return Runtime.getRuntime().exec(command, variableParameters);
     }
 
-    private ProcessRunner(
+    private ProcessManager(
             Process process,
             Configuration configuration,
             ExecutorService executorService)

@@ -37,7 +37,7 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
 
     private static final int DEFAULT_POLL_INTERVAL_MS = 500;
 
-    private volatile ProcessRunner processRunner;
+    private volatile ProcessManager processRunner;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     
@@ -73,15 +73,15 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
             }
 
             if (this.processRunner == null) {
-                this.processRunner = ProcessRunner.start(script, variables, configuration, executorService);
+                this.processRunner = createProcessManager(script, variables);
             } else {
                 this.processRunner.writeToStandardInput(script);
             }
 
-            Future<Void> standardOutFuture = executorService.submit(
+            Future<Void> standardOutFuture = getExecutorService().submit(
                     stdOutWatcher(outputPrintWriter, processRunner));
 
-            Future<Void> standardErrorFuture = executorService.submit(
+            Future<Void> standardErrorFuture = getExecutorService().submit(
                     stdErrWatcher(errorPrintWriter, processRunner));
 
             standardOutFuture.get();
@@ -100,13 +100,18 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
         }
     }
 
+    protected ProcessManager createProcessManager(String script, Map<String, Object> variables)
+            throws ProcessExecutionException {
+        return ProcessManager.start(script, variables, getConfiguration(), getExecutorService());
+    }
+
     protected void onProcessNotRunningBeforeDispatch(String script) throws ScriptExecutionException {
         // allows the process to be re-initialize
         this.processRunner = null;
     }
     //CHECKSTYLE.ON
 
-    private Callable<Void> stdOutWatcher(final PrintWriter outputPrintWriter, final ProcessRunner currentProcess) {
+    private Callable<Void> stdOutWatcher(final PrintWriter outputPrintWriter, final ProcessManager currentProcess) {
         return () -> {
 
             long expirationTime = System.currentTimeMillis() + expirationIntervalMs;
@@ -149,7 +154,7 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
         };
     }
 
-    private Callable<Void> stdErrWatcher(final PrintWriter errorPrintWriter, final ProcessRunner currentProcess) {
+    private Callable<Void> stdErrWatcher(final PrintWriter errorPrintWriter, final ProcessManager currentProcess) {
         return () -> {
 
             long expirationTime = System.currentTimeMillis() + expirationIntervalMs;
@@ -181,7 +186,7 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
         try {
             abortProcessIfRunning();
         } finally {
-            executorService.shutdownNow();
+            getExecutorService().shutdownNow();
         }
     }
 
@@ -191,12 +196,20 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
     }
 
     private void abortProcessIfRunning() {
-        ProcessRunner currentProcess = processRunner;
+        ProcessManager currentProcess = processRunner;
         if (currentProcess != null
                 && currentProcess.isProcessRunning()) {
             currentProcess.terminateProcess();
             processRunner = null;
         }
+    }
+
+    protected Configuration getConfiguration() {
+        return configuration;
+    }
+
+    protected ExecutorService getExecutorService() {
+        return executorService;
     }
 
 }
