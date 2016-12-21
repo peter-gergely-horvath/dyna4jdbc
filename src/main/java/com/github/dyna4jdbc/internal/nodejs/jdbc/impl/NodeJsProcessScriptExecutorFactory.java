@@ -14,30 +14,20 @@ public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalPro
         return new NodeJsProcessScriptExecutorFactory(eosToken);
     }
 
-    private String replConfigScript;
+    private String replStartCommand;
     
     private NodeJsProcessScriptExecutorFactory(String eosToken) {
-        this.replConfigScript = new StringBuilder()
-            .append("node -e \"")
-                .append("const endOfStreamIndicator = '")
-                        .append(eosToken).append("';")
-                .append("const vm = require('vm');                          ")
-                .append("require('repl').start({                            ")
-                .append("   terminal: false,                                ")
-                .append("   prompt: '',                                     ")
-                .append("   ignoreUndefined: true,                          ")
-                .append("   eval: function(cmd, ctx, fn, cb) {              ")
-                .append("           try {                                   ")
-                .append("               vm.runInContext(cmd, ctx, fn);      ")
-                .append("           } catch (err)  {                        ")
-                .append("               cb(err);                            ")
-                .append("           } finally {                             ")
-                .append("               console.log(endOfStreamIndicator);  ")
-                .append("           }                                       ")
-                .append("       }                                           ")
-                .append("   });                                             ")
-                .append("\"")
-            .toString();
+        this.replStartCommand = "node -e \"const endOfStreamToken = '<EOS_TOKEN>'; "
+                + "const vm = require('vm'); "
+                + "require('repl').start({ "
+                    + "terminal: false, "
+                    + "prompt: '', "
+                    + "ignoreUndefined: true, "
+                    + "eval: function(cmd, ctx, fn, cb) { "
+                        + "try { vm.runInContext(cmd, ctx, fn); } "
+                        + "catch (err) { cb(err); } "
+                        + "finally { console.log(endOfStreamToken); } "
+                + "} });\"     ".replace("<EOS_TOKEN>", eosToken);
     }
     
     
@@ -46,7 +36,7 @@ public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalPro
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             NodeJsProcessScriptExecutor nodeJsProcessScriptExecutor = new NodeJsProcessScriptExecutor(configuration);
 
-            nodeJsProcessScriptExecutor.executeScriptUsingStreams(replConfigScript,
+            nodeJsProcessScriptExecutor.executeScriptUsingStreams(replStartCommand,
                     null, byteArrayOutputStream, byteArrayOutputStream);
 
             String caputedOutput = byteArrayOutputStream.toString(configuration.getConversionCharset());
