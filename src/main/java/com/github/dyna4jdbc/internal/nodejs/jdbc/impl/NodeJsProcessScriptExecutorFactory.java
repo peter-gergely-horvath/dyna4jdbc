@@ -43,10 +43,12 @@ public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalPro
         IOHandlerFactory ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
 
         LinkedList<SQLWarning> warningList = new LinkedList<>();
-        
-        OutputStream outputWarningSinkOutputStream = ioHandlerFactory.newWarningSinkOutputStream(new SQLWarningCollectorSink(warningList));
-        OutputStream errorWarningSinkOutputStream = ioHandlerFactory.newWarningSinkOutputStream(new SQLWarningCollectorSink(warningList));
-        
+
+        OutputStream outputWarningSinkOutputStream =
+                ioHandlerFactory.newWarningSinkOutputStream(new SQLWarningCollectorSink(warningList));
+        OutputStream errorWarningSinkOutputStream =
+                ioHandlerFactory.newWarningSinkOutputStream(new SQLWarningCollectorSink(warningList));
+
         try {
             NodeJsProcessScriptExecutor nodeJsProcessScriptExecutor =
                     new NodeJsProcessScriptExecutor(configuration, replInitScript);
@@ -82,14 +84,14 @@ public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalPro
 
     }
 
-    private static class SQLWarningCollectorSink implements SQLWarningSink {
+    private static final class SQLWarningCollectorSink implements SQLWarningSink {
 
         private final List<SQLWarning> list;
-        
+
         private SQLWarningCollectorSink(List<SQLWarning> list) {
             this.list = list;
         }
-        
+
         @Override
         public void onSQLWarning(SQLWarning warning) {
             list.add(warning);
