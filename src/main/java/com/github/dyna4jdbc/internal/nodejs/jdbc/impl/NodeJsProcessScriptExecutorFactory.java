@@ -1,16 +1,19 @@
 package com.github.dyna4jdbc.internal.nodejs.jdbc.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
+import java.io.OutputStream;
+import java.sql.SQLWarning;
+import java.util.LinkedList;
+import java.util.List;
 
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
+import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
+import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.DefaultExternalProcessScriptExecutorFactory;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ExternalProcessScriptExecutor;
-import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessExecutionException;
-import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessManager;
+
 
 public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalProcessScriptExecutorFactory {
 
@@ -18,66 +21,79 @@ public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalPro
         return new NodeJsProcessScriptExecutorFactory(eosToken);
     }
 
-    private final String replStartCommand;
+    private final String replInitScript;
 
-    // TODO: cleanup
     private NodeJsProcessScriptExecutorFactory(String eosToken) {
-        this.replStartCommand = "const endOfStreamToken = '" + eosToken + "'; " + "const vm = require('vm'); "
-                + "require('repl').start({ " + "terminal: false, " + "prompt: '', " + "ignoreUndefined: true, "
-                + "eval: function(cmd, ctx, fn, cb) { " + "try { vm.runInContext(cmd, ctx, fn); } "
-                + "catch (err) { cb(err); } " + "finally { console.log(endOfStreamToken); } " + "} });";
+        this.replInitScript = ""
+                + "const endOfStreamToken = '" + eosToken + "'; " 
+                + "const vm = require('vm'); "
+                + "require('repl').start({ " 
+                + "terminal: false, " + "prompt: '', " 
+                + "ignoreUndefined: true, "
+                + "eval: function(cmd, ctx, fn, cb) { " 
+                + "try { vm.runInContext(cmd, ctx, fn); } "
+                + "catch (err) { cb(err); } "
+                + "finally { console.log(endOfStreamToken); } "
+                + "} });";
     }
 
     @Override
     public ExternalProcessScriptExecutor newExternalProcessScriptExecutor(Configuration configuration) {
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            NodeJsProcessScriptExecutor nodeJsProcessScriptExecutor = new NodeJsProcessScriptExecutor(configuration) {
 
-                @Override
-                protected ProcessManager createProcessManager(String script, Map<String, Object> variables)
-                        throws ProcessExecutionException {
+        IOHandlerFactory ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
 
-                    try {
-                        ProcessBuilder processBuilder = new ProcessBuilder();
-                        processBuilder.command(Arrays.asList("node", "-e", replStartCommand));
+        LinkedList<SQLWarning> warningList = new LinkedList<>();
+        
+        OutputStream outputWarningSinkOutputStream = ioHandlerFactory.newWarningSinkOutputStream(new SQLWarningCollectorSink(warningList));
+        OutputStream errorWarningSinkOutputStream = ioHandlerFactory.newWarningSinkOutputStream(new SQLWarningCollectorSink(warningList));
+        
+        try {
+            NodeJsProcessScriptExecutor nodeJsProcessScriptExecutor =
+                    new NodeJsProcessScriptExecutor(configuration, replInitScript);
 
-                        if (variables != null) {
-                            
-                            Map<String, String> environment = processBuilder.environment();
-                            
-                            variables.entrySet().stream().forEach(entry -> {
-                                String key = entry.getKey();
-                                Object value = entry.getValue();
-                                
-                                String valueString = String.valueOf(value);
-                                
-                                environment.put(key, valueString);
-                            });
-                        }
+            nodeJsProcessScriptExecutor.executeScriptUsingStreams("1+1", null,
+                    outputWarningSinkOutputStream, errorWarningSinkOutputStream);
 
-                        Process process = processBuilder.start();
-                        return ProcessManager.start(
-                                process, script, variables, getConfiguration(), getExecutorService());
+            switch (warningList.size()) {
+                case 0:
+                    // NO warnings: OK
+                    break;
 
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            };
+                case 1:
+                    // ONE warning - use it as root cause
+                    JDBCError.CONNECT_FAILED_EXCEPTION.raiseUncheckedException(
+                            warningList.get(0),
+                            "Node.js process wrote to output while starting the REPL: "
+                            + "this is considered to be a fatal error.");
+                    break;
 
-            nodeJsProcessScriptExecutor.executeScriptUsingStreams(replStartCommand, null, byteArrayOutputStream,
-                    byteArrayOutputStream);
-
-            // TODO: implement handling of unexpected output showing up here
-            String caputedOutput = byteArrayOutputStream.toString(configuration.getConversionCharset());
-
-            System.err.println("NodeJsProcessScriptExecutorFactory - captured output: " + caputedOutput);
+                default:
+                    // MULTIPLE warnings - use them as suppressed
+                    JDBCError.CONNECT_FAILED_EXCEPTION.raiseUncheckedExceptionWithSuppressed(warningList,
+                            "Node.js process wrote to output while starting the REPL: "
+                            + "this is considered to be a fatal error");
+            }
 
             return nodeJsProcessScriptExecutor;
-        } catch (IOException | ScriptExecutionException e) {
+
+        } catch (ScriptExecutionException e) {
             throw new RuntimeException("Exception initializing NodeJsProcessScriptExecutor", e);
         }
 
+    }
+
+    private static class SQLWarningCollectorSink implements SQLWarningSink {
+
+        private final List<SQLWarning> list;
+        
+        private SQLWarningCollectorSink(List<SQLWarning> list) {
+            this.list = list;
+        }
+        
+        @Override
+        public void onSQLWarning(SQLWarning warning) {
+            list.add(warning);
+        }
     }
 
 }

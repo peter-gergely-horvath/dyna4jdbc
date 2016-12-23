@@ -23,6 +23,7 @@ import com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSe
 import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
+import com.github.dyna4jdbc.internal.common.util.io.SQLWarningSinkOutputStream;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 import java.io.OutputStream;

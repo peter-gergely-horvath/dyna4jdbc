@@ -17,6 +17,8 @@
  
 package com.github.dyna4jdbc.internal.common.outputhandler;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
@@ -32,4 +34,8 @@ public interface IOHandlerFactory {
     OutputStreamWriter newOutputStreamWriter(OutputStream stdOutputStream);
 
     PrintStream newPrintStream(OutputStream outputStream);
+
+    BufferedReader newBufferedReader(InputStream inputStream);
+
+    OutputStream newWarningSinkOutputStream(SQLWarningSink sqlWarningSink);
 }

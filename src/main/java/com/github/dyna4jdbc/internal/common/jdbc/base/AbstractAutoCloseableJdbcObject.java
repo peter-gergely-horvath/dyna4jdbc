@@ -172,7 +172,7 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
 
                 default:
                     // closure caused multiple Throwables to be thrown: propagate them as suppressed
-                    throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSupressed(caughtThrowables,
+                    throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSuppressed(caughtThrowables,
                             this, "Closing of dependent objects caused exceptions; see supressed");
 
             }

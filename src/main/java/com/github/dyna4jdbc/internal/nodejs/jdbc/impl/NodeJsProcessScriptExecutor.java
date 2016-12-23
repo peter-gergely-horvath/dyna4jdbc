@@ -2,12 +2,15 @@ package com.github.dyna4jdbc.internal.nodejs.jdbc.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.DefaultExternalProcessScriptExecutor;
+import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessExecutionException;
+import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessManager;
 
 
 class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
@@ -21,9 +24,12 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
     };
             /*new DisallowAllWritesOutputStream(
             "Writing to standard output while a variable is being set is unexpected");*/
+    private String replInitScript;
 
-    NodeJsProcessScriptExecutor(Configuration configuration) {
+    
+    NodeJsProcessScriptExecutor(Configuration configuration, String replInitScript) {
         super(configuration);
+        this.replInitScript = replInitScript;
     }
 
     @Override
@@ -60,12 +66,43 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
         super.executeScriptUsingStreams(script.replace("\n",  " ").replace("\r",  " "),
                 variables, stdOutOutputStream, errorOutputStream);
     }
-    
+
     @Override
     protected void onProcessNotRunningBeforeDispatch(String script) throws ScriptExecutionException {
         throw new ScriptExecutionException(
                 "Node.js process exited unexpetedly! Cannot execute script: " + script);
 
+    }
+
+    @Override
+    protected ProcessManager createProcessManager(String script, Map<String, Object> variables)
+            throws ProcessExecutionException {
+
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            processBuilder.command(Arrays.asList("node", "-e", replInitScript));
+
+            if (variables != null) {
+
+                Map<String, String> environment = processBuilder.environment();
+
+                variables.entrySet().stream().forEach(entry -> {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+
+                    String valueString = String.valueOf(value);
+
+                    environment.put(key, valueString);
+                });
+            }
+
+            Process process = processBuilder.start();
+            return ProcessManager.start(
+                    process, script, variables, getConfiguration(), getExecutorService());
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

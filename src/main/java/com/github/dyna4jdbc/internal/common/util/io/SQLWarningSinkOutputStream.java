@@ -15,7 +15,7 @@
  */
 
  
-package com.github.dyna4jdbc.internal.common.outputhandler.impl;
+package com.github.dyna4jdbc.internal.common.util.io;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
@@ -28,7 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLWarning;
 
 
-class SQLWarningSinkOutputStream extends OutputStream {
+public class SQLWarningSinkOutputStream extends OutputStream {
 
     private static final int LF = 0xD;
     private static final int CR = 0xA;
@@ -40,7 +40,7 @@ class SQLWarningSinkOutputStream extends OutputStream {
     private final SQLWarningSink sqlWarningSink;
     private final String charsetName;
 
-    SQLWarningSinkOutputStream(Configuration configuration, SQLWarningSink warningSink) {
+    public SQLWarningSinkOutputStream(Configuration configuration, SQLWarningSink warningSink) {
         this.charsetName = configuration.getConversionCharset();
         this.sqlWarningSink = warningSink;
     }

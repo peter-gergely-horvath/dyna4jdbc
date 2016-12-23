@@ -19,11 +19,14 @@ package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
+import com.github.dyna4jdbc.internal.common.util.io.SQLWarningSinkOutputStream;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -31,14 +34,14 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public final class DefaultIOHandlerFactory implements IOHandlerFactory {
 
-    private final String characterSetName;
+    private final Configuration configuration;
 
     private static final AtomicReference<DefaultIOHandlerFactory> INSTANCE = new AtomicReference<>();
 
-    private DefaultIOHandlerFactory(String nameOfCharacterSet) {
-        validateCharacterSetName(nameOfCharacterSet);
+    private DefaultIOHandlerFactory(Configuration configuration) {
+        validateCharacterSetName(configuration.getConversionCharset());
 
-        this.characterSetName = nameOfCharacterSet;
+        this.configuration = configuration;
     }
 
     private static void validateCharacterSetName(String characterSetName) {
@@ -57,25 +60,28 @@ public final class DefaultIOHandlerFactory implements IOHandlerFactory {
     public static DefaultIOHandlerFactory getInstance(Configuration configuration) {
 
         DefaultIOHandlerFactory current = INSTANCE.get();
-        String requestedCharacterSetName = configuration.getConversionCharset();
-        if (current == null
-                || !requestedCharacterSetName.equals(current.characterSetName)) {
+        if (current == null 
+                || !current.configuration.equals(configuration)) {
 
-            current = new DefaultIOHandlerFactory(requestedCharacterSetName);
+            current = new DefaultIOHandlerFactory(configuration);
             INSTANCE.set(current);
         }
 
         return current;
     }
 
-
     @Override
-    public PrintWriter newPrintWriter(OutputStream out, boolean autoFlush) {
-        return new PrintWriter(newOutputStreamWriter(out), autoFlush);
+    public PrintWriter newPrintWriter(OutputStream outputStream, boolean autoFlush) {
+        Objects.requireNonNull(outputStream, "argument outputStream cannot be null");
+        
+        return new PrintWriter(newOutputStreamWriter(outputStream), autoFlush);
     }
 
     @Override
     public OutputStreamWriter newOutputStreamWriter(OutputStream outputStream) {
+        Objects.requireNonNull(outputStream, "argument outputStream cannot be null");
+
+        String characterSetName = configuration.getConversionCharset();
         try {
             return new OutputStreamWriter(outputStream, characterSetName);
         } catch (UnsupportedEncodingException e) {
@@ -87,6 +93,9 @@ public final class DefaultIOHandlerFactory implements IOHandlerFactory {
 
     @Override
     public PrintStream newPrintStream(OutputStream outputStream) {
+        Objects.requireNonNull(outputStream, "argument outputStream cannot be null");
+        
+        String characterSetName = configuration.getConversionCharset();
         try {
             return new PrintStream(outputStream, true, characterSetName);
         } catch (UnsupportedEncodingException e) {
@@ -95,8 +104,12 @@ public final class DefaultIOHandlerFactory implements IOHandlerFactory {
                     "Unsupported characterSetName: " + characterSetName);
         }
     }
-    
+
+    @Override
     public BufferedReader newBufferedReader(InputStream inputStream) {
+        Objects.requireNonNull(inputStream, "argument inputStream cannot be null");
+
+        String characterSetName = configuration.getConversionCharset();
         try {
             return new BufferedReader(new InputStreamReader(inputStream, characterSetName));
         } catch (UnsupportedEncodingException e) {
@@ -104,5 +117,12 @@ public final class DefaultIOHandlerFactory implements IOHandlerFactory {
             throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(e,
                     "Unsupported characterSetName: " + characterSetName);
         }
+    }
+
+    @Override
+    public OutputStream newWarningSinkOutputStream(SQLWarningSink sqlWarningSink) {
+        Objects.requireNonNull(sqlWarningSink, "argument sqlWarningSink cannot be null");
+
+        return new SQLWarningSinkOutputStream(this.configuration, sqlWarningSink);
     }
 }
