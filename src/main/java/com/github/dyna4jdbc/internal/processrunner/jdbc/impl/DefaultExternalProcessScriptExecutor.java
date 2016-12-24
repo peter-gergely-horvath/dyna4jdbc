@@ -210,11 +210,17 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
 
                 if (outputCaptured == null) {
 
-                    if (currentProcess.isStandardErrorReachedEnd()) {
+                    if (currentProcess.isStandardErrorReachedEnd()
+                            || currentProcess.isStandardOutReachedEnd()) {
                         break;
                     }
 
                 } else {
+                    
+                    if (endOfDataPattern != null
+                            && endOfDataPattern.matcher(outputCaptured).matches()) {
+                        break;
+                    }
 
                     expirationTime = System.currentTimeMillis() + expirationIntervalMs;
                     errorPrintWriter.println(outputCaptured);

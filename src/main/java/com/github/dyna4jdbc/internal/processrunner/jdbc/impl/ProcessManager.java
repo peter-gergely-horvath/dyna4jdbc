@@ -29,6 +29,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
@@ -49,7 +50,7 @@ final class ProcessManager {
     private final BlockingQueue<String> standardOutputStreamContentQueue;
     private final BlockingQueue<String> errorStreamContentQueue;
 
-    private final String endOfStreamIndicator = UUID.randomUUID().toString();
+    private final String endOfStreamIndicator;
 
     private boolean standardOutReachedEnd = false;
     private boolean standardErrorReachedEnd = false;
@@ -62,7 +63,7 @@ final class ProcessManager {
                     throws ProcessExecutionException {
 
         try {
-            ProcessManager processRunner = new ProcessManager(process, configuration, executorService);
+            ProcessManager processManager = new ProcessManager(process, configuration, executorService);
 
             final int partiesToWait = 3;
             /*
@@ -77,27 +78,27 @@ final class ProcessManager {
 
 
             BufferedReader stdOut = ioHandlerFactory.newBufferedReader(
-                    processRunner.processReference.getInputStream());
+                    processManager.processReference.getInputStream());
 
             BufferedReader stdErr = ioHandlerFactory.newBufferedReader(
-                    processRunner.processReference.getErrorStream());
+                    processManager.processReference.getErrorStream());
 
             Runnable stdOutReader = new BufferedReaderToBlockingQueueRunnable(
                     "StdOut reader", stdOut,
-                    processRunner.standardOutputStreamContentQueue, cyclicBarrier,
-                    processRunner.endOfStreamIndicator);
+                    processManager.standardOutputStreamContentQueue, cyclicBarrier,
+                    processManager.endOfStreamIndicator);
 
             Runnable stdErrReader = new BufferedReaderToBlockingQueueRunnable(
                     "StdErr reader", stdErr,
-                    processRunner.errorStreamContentQueue, cyclicBarrier,
-                    processRunner.endOfStreamIndicator);
+                    processManager.errorStreamContentQueue, cyclicBarrier,
+                    processManager.endOfStreamIndicator);
 
-            processRunner.executorService.execute(stdOutReader);
-            processRunner.executorService.execute(stdErrReader);
+            processManager.executorService.execute(stdOutReader);
+            processManager.executorService.execute(stdErrReader);
 
             cyclicBarrier.await(DEFAULT_TIMEOUT_MILLI_SECONDS, TimeUnit.MILLISECONDS);
 
-            return processRunner;
+            return processManager;
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -114,6 +115,14 @@ final class ProcessManager {
             ExecutorService executorService)
                     throws ProcessExecutionException {
 
+        
+            Pattern endOfDataPattern = configuration.getEndOfDataPattern();
+            if (endOfDataPattern != null) {
+                this.endOfStreamIndicator = endOfDataPattern.toString();
+            } else {
+                this.endOfStreamIndicator = UUID.randomUUID().toString();
+            }
+           
             this.processReference = process;
 
             IOHandlerFactory ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
