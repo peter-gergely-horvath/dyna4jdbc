@@ -17,8 +17,11 @@
  
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -37,24 +40,23 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
 
     private static final int DEFAULT_POLL_INTERVAL_MS = 500;
 
-    private volatile ProcessManager processRunner;
+    private volatile ProcessManager processManager;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
-    
-    private DefaultIOHandlerFactory ioHandlerFactory; 
+    private final DefaultIOHandlerFactory ioHandlerFactory; 
+    private final ProcessManagerFactory processManagerFactory;
     
     private final boolean skipFirstLine;
-    private final Configuration configuration;
     private final Pattern endOfDataPattern;
 
     private long expirationIntervalMs;
 
     public DefaultExternalProcessScriptExecutor(Configuration configuration) {
-        this.configuration = configuration;
         this.skipFirstLine = configuration.getSkipFirstLine();
         this.endOfDataPattern = configuration.getEndOfDataPattern();
         this.expirationIntervalMs = configuration.getExternalCallQuietPeriodThresholdMs();
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
+        this.processManagerFactory = ProcessManagerFactory.getInstance(configuration, executorService);
     }
 
     //CHECKSTYLE.OFF: DesignForExtension : incorrect detection of "is not designed for extension"
@@ -68,29 +70,32 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
         try (PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true);
             PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true))  {
 
-            if (this.processRunner != null && !this.processRunner.isProcessRunning()) {
+            if (this.processManager != null && !this.processManager.isProcessRunning()) {
                 onProcessNotRunningBeforeDispatch(script);
             }
 
-            if (this.processRunner == null) {
-                this.processRunner = createProcessManager(script, variables);
+            if (this.processManager == null) {
+                Process newProcess = createProcess(script, variables);
+                
+                this.processManager = processManagerFactory.newProcessManager(newProcess);
             } else {
-                this.processRunner.writeToStandardInput(script);
+                this.processManager.writeToStandardInput(script);
             }
 
-            Future<Void> standardOutFuture = getExecutorService().submit(
-                    stdOutWatcher(outputPrintWriter, processRunner));
+            Future<Void> standardOutFuture = executorService.submit(
+                    new StdOutWatcher(outputPrintWriter, processManager));
 
-            Future<Void> standardErrorFuture = getExecutorService().submit(
-                    stdErrWatcher(errorPrintWriter, processRunner));
+            Future<Void> standardErrorFuture = executorService.submit(
+                    new StdErrorWatcher(errorPrintWriter, processManager));
 
             standardOutFuture.get();
             standardErrorFuture.get();
 
+        } catch (IOException e) {
+            throw new ScriptExecutionException(e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ScriptExecutionException("Interrupted", e);
-
         } catch (ExecutionException e) {
             Throwable actualThrowable = e.getCause();
             throw new ScriptExecutionException(actualThrowable);
@@ -100,20 +105,49 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
         }
     }
 
-    protected ProcessManager createProcessManager(String script, Map<String, Object> variables)
-            throws ProcessExecutionException {
-        return ProcessManager.start(script, variables, getConfiguration(), getExecutorService());
+    protected Process createProcess(String script, Map<String, Object> variables) throws IOException {
+
+        String[] variableParameters;
+
+        if (variables == null) {
+            variableParameters = null;
+        } else {
+            List<String> variableDeclarations = new LinkedList<>();
+            for (Map.Entry<String, Object> variable : variables.entrySet()) {
+
+                String key = variable.getKey();
+                String valueString = String.valueOf(variable.getValue());
+
+                String variableSetting = String.format("%s=%s", key, valueString);
+                variableDeclarations.add(variableSetting);
+            }
+
+            variableParameters =
+                    variableDeclarations.toArray(new String[variableDeclarations.size()]);
+        }
+
+        return Runtime.getRuntime().exec(script, variableParameters);
     }
 
     protected void onProcessNotRunningBeforeDispatch(String script) throws ScriptExecutionException {
         // allows the process to be re-initialize
-        this.processRunner = null;
+        this.processManager = null;
     }
     //CHECKSTYLE.ON
 
-    private Callable<Void> stdOutWatcher(final PrintWriter outputPrintWriter, final ProcessManager currentProcess) {
-        return () -> {
 
+    private final class StdOutWatcher implements Callable<Void> {
+
+        private final PrintWriter outputPrintWriter;
+        private final ProcessManager currentProcess;
+
+        private StdOutWatcher(PrintWriter outputPrintWriter, ProcessManager currentProcess) {
+            this.outputPrintWriter = outputPrintWriter;
+            this.currentProcess = currentProcess;
+        }
+
+        @Override
+        public Void call() throws Exception {
             long expirationTime = System.currentTimeMillis() + expirationIntervalMs;
 
             boolean firstLine = true;
@@ -151,12 +185,22 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
             }
 
             return null;
-        };
+        }
+
     }
 
-    private Callable<Void> stdErrWatcher(final PrintWriter errorPrintWriter, final ProcessManager currentProcess) {
-        return () -> {
+    private final class StdErrorWatcher implements Callable<Void> {
 
+        private final PrintWriter errorPrintWriter;
+        private final ProcessManager currentProcess;
+
+        private StdErrorWatcher(PrintWriter errorPrintWriter, ProcessManager currentProcess) {
+            this.errorPrintWriter = errorPrintWriter;
+            this.currentProcess = currentProcess;
+        }
+
+        @Override
+        public Void call() throws Exception {
             long expirationTime = System.currentTimeMillis() + expirationIntervalMs;
 
             while (System.currentTimeMillis() < expirationTime) {
@@ -178,7 +222,8 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
             }
 
             return null;
-        };
+        }
+
     }
 
     @Override
@@ -186,7 +231,7 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
         try {
             abortProcessIfRunning();
         } finally {
-            getExecutorService().shutdownNow();
+            executorService.shutdownNow();
         }
     }
 
@@ -196,20 +241,12 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
     }
 
     private void abortProcessIfRunning() {
-        ProcessManager currentProcess = processRunner;
-        if (currentProcess != null
-                && currentProcess.isProcessRunning()) {
-            currentProcess.terminateProcess();
-            processRunner = null;
+        ProcessManager currentProcessManager = processManager;
+        if (currentProcessManager != null
+                && currentProcessManager.isProcessRunning()) {
+            currentProcessManager.terminateProcess();
+            processManager = null;
         }
-    }
-
-    protected Configuration getConfiguration() {
-        return configuration;
-    }
-
-    protected ExecutorService getExecutorService() {
-        return executorService;
     }
 
 }

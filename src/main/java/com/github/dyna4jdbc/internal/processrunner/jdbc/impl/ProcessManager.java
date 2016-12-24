@@ -17,20 +17,24 @@
  
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
-import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
-import com.github.dyna4jdbc.internal.config.Configuration;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
-public final class ProcessManager {
+import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
+import com.github.dyna4jdbc.internal.config.Configuration;
+
+final class ProcessManager {
 
     private static final Logger LOGGER = Logger.getLogger(ProcessManager.class.getName());
 
@@ -51,25 +55,9 @@ public final class ProcessManager {
     private boolean standardErrorReachedEnd = false;
 
     
-    public static ProcessManager start(
-            String command, 
-            Map<String, Object> variables, Configuration configuration,
-            ExecutorService executorService) throws ProcessExecutionException {
-
-        try {
-            Process process = startProcessInternal(command, variables);
-
-            return start(process, command, variables, configuration, executorService);
-
-        } catch (IOException e) {
-            throw new ProcessExecutionException(e);
-        }
-    }
-
-    public static ProcessManager start(
+    static ProcessManager newInstance(
             Process process,
-            String command,
-            Map<String, Object> variables, Configuration configuration,
+            Configuration configuration,
             ExecutorService executorService)
                     throws ProcessExecutionException {
 
@@ -95,12 +83,12 @@ public final class ProcessManager {
                     processRunner.processReference.getErrorStream());
 
             Runnable stdOutReader = new BufferedReaderToBlockingQueueRunnable(
-                    String.format("StdOut reader of '%s'", command), stdOut,
+                    "StdOut reader", stdOut,
                     processRunner.standardOutputStreamContentQueue, cyclicBarrier,
                     processRunner.endOfStreamIndicator);
 
             Runnable stdErrReader = new BufferedReaderToBlockingQueueRunnable(
-                    String.format("StdErr reader of '%s'", command), stdErr,
+                    "StdErr reader", stdErr,
                     processRunner.errorStreamContentQueue, cyclicBarrier,
                     processRunner.endOfStreamIndicator);
 
@@ -120,29 +108,6 @@ public final class ProcessManager {
         }
     }
 
-    private static Process startProcessInternal(String command,
-            Map<String, Object> variables) throws IOException {
-
-        if (variables == null) {
-            return Runtime.getRuntime().exec(command);
-        }
-
-        List<String> variableDeclarations = new LinkedList<>();
-        for (Map.Entry<String, Object> variable : variables.entrySet()) {
-
-            String key = variable.getKey();
-            String valueString = String.valueOf(variable.getValue());
-
-            String variableSetting = String.format("%s=%s", key, valueString);
-            variableDeclarations.add(variableSetting);
-        }
-
-        String[] variableParameters =
-                variableDeclarations.toArray(new String[variableDeclarations.size()]);
-
-        return Runtime.getRuntime().exec(command, variableParameters);
-    }
-
     private ProcessManager(
             Process process,
             Configuration configuration,
@@ -151,7 +116,7 @@ public final class ProcessManager {
 
             this.processReference = process;
 
-            DefaultIOHandlerFactory ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
+            IOHandlerFactory ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
 
             processInputWriter = ioHandlerFactory.newPrintWriter(process.getOutputStream(), true);
 

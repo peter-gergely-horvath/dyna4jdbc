@@ -9,8 +9,6 @@ import java.util.Map;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.DefaultExternalProcessScriptExecutor;
-import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessExecutionException;
-import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessManager;
 
 
 class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
@@ -22,8 +20,11 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
             System.err.write(b);
         }
     };
-            /*new DisallowAllWritesOutputStream(
+    // TODO: replace with the following:
+    /*new DisallowAllWritesOutputStream(
             "Writing to standard output while a variable is being set is unexpected");*/
+    
+    
     private String replInitScript;
 
     
@@ -56,8 +57,8 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
                 } else {
                     statement = String.format("%s='%s';", key, value);
                 }
-                
-                super.executeScriptUsingStreams(statement, Collections.emptyMap(), 
+
+                super.executeScriptUsingStreams(statement, Collections.emptyMap(),
                         VARIABLE_SET_OUTPUT_STREAM, VARIABLE_SET_OUTPUT_STREAM);
             }
 
@@ -74,35 +75,28 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
 
     }
 
+
     @Override
-    protected ProcessManager createProcessManager(String script, Map<String, Object> variables)
-            throws ProcessExecutionException {
+    protected Process createProcess(String script, Map<String, Object> variables) throws IOException {
 
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command(Arrays.asList("node", "-e", replInitScript));
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.command(Arrays.asList("node", "-e", replInitScript));
 
-            if (variables != null) {
+        if (variables != null) {
 
-                Map<String, String> environment = processBuilder.environment();
+            Map<String, String> environment = processBuilder.environment();
 
-                variables.entrySet().stream().forEach(entry -> {
-                    String key = entry.getKey();
-                    Object value = entry.getValue();
+            variables.entrySet().stream().forEach(entry -> {
+                String key = entry.getKey();
+                Object value = entry.getValue();
 
-                    String valueString = String.valueOf(value);
+                String valueString = String.valueOf(value);
 
-                    environment.put(key, valueString);
-                });
-            }
-
-            Process process = processBuilder.start();
-            return ProcessManager.start(
-                    process, script, variables, getConfiguration(), getExecutorService());
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+                environment.put(key, valueString);
+            });
         }
+
+        return processBuilder.start();
     }
 
 }
