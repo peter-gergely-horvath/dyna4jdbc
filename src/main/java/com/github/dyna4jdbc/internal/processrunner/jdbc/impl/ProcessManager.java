@@ -122,7 +122,7 @@ final class ProcessManager {
             } else {
                 this.endOfStreamIndicator = UUID.randomUUID().toString();
             }
-           
+
             this.processReference = process;
 
             IOHandlerFactory ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);

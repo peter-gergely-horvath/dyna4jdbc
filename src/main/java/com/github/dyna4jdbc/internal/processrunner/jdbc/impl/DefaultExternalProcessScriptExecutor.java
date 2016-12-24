@@ -216,7 +216,7 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
                     }
 
                 } else {
-                    
+
                     if (endOfDataPattern != null
                             && endOfDataPattern.matcher(outputCaptured).matches()) {
                         break;
