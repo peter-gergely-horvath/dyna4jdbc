@@ -65,10 +65,10 @@ public class ProcessRunnerConnection extends AbstractConnection {
         
         this.scriptExecutor = processRunnerFactory.newExternalProcessScriptExecutor(configuration);
 
-        registerAsChild(() -> onClose());
     }
 
-    private void onClose() {
+    @Override
+    protected final void onClose() {
         scriptExecutor.close();
     }
 

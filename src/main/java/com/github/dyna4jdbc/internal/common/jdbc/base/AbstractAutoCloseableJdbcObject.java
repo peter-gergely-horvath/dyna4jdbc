@@ -26,10 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.github.dyna4jdbc.internal.JDBCError;
 
 /**
- * {@code AbstractAutoCloseableJdbcObject} is a base class
- * for any JDBC API implementation class, which supports
- * the {@code close()} method defined by
- * {@code java.lang.AutoCloseable}.
+ * {@code AbstractAutoCloseableJdbcObject} is a base class for any JDBC API implementation class, 
+ * which supports the {@code close()} method defined by {@code java.lang.AutoCloseable}.
  * <p>
  * This class provides support for
  * <ul>
@@ -143,19 +141,27 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
         final boolean closedFlagWasSetDuringThisMethodCall = closed.compareAndSet(false, true);
         if (closedFlagWasSetDuringThisMethodCall) {
 
-            // close children first, since they might require this.parent to be around... 
+            // close children first, since they might require this and this.parent to be around...
             LinkedList<Throwable> caughtThrowables = closeChildObjects();
+
+            try {
+                onClose(); // executed AFTER the children have been closed!
+            } catch (Throwable thowable) {
+                /* Normally, any Throwable caught here should be a SQLException, however, we catch all
+                 * Throwables so as to handle offending implementations properly: if a RuntimeException
+                 * or Error is thrown, we still catch and pass it to method #closeChildObjects(Throwable)
+                 */
+                caughtThrowables.add(thowable);
+            }
 
             // Notice for threading correctness: this.parent is FINAL
             if (this.parent != null) {
                 try {
                     this.parent.unregisterChild(this);
                 } catch (Throwable thowable) {
-                    /* Normally, any Throwable caught here should be a
-                     * SQLException, however, we catch all Throwables
-                     * so as to handle offending implementations properly:
-                     * if a RuntimeException or Error is thrown, we still
-                     * catch and pass it to method #closeChildObjects(Throwable)
+                    /* Normally, any Throwable caught here should be a SQLException, however, we catch all
+                     * Throwables so as to handle offending implementations properly: if a RuntimeException
+                     * or Error is thrown, we still catch and pass it to method #closeChildObjects(Throwable)
                      */
                     caughtThrowables.add(thowable);
                 }
@@ -174,9 +180,20 @@ public class AbstractAutoCloseableJdbcObject extends AbstractWrapper implements 
                     // closure caused multiple Throwables to be thrown: propagate them as suppressed
                     throw JDBCError.CLOSE_FAILED.raiseSQLExceptionWithSuppressed(caughtThrowables,
                             this, "Closing of dependent objects caused exceptions; see supressed");
-
             }
         }
+    }
+
+    /**
+     * A template method executed <b>AFTER</b> all the child objects have been closed, but
+     * <b>BEFORE</b> this object is un-registered from its parent.
+     * NOTE that this method is always invoked, even if the child object(s) throw(s) any
+     * {@code Throwable}.
+     *
+     * @throws SQLException in case the operation fails
+     */
+    protected void onClose() throws SQLException {
+        // template method for sub-classes to override
     }
 
     /**
