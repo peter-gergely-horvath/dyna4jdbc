@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import com.github.dyna4jdbc.internal.DriverInfo;
 import com.github.dyna4jdbc.internal.config.impl.DriverPropertyInfoFactory;
 
-
 public final class DynaDriver implements java.sql.Driver {
 
     private static final Logger LOGGER = Logger.getLogger(DynaDriver.class.getName());
@@ -59,16 +58,19 @@ public final class DynaDriver implements java.sql.Driver {
     public Connection connect(String url, Properties info) throws SQLException {
 
         if (!acceptsURL(url)) {
-            /* From the JavaDoc of java.sql.Driver.connect(String, Properties): 
+            /*
+             * From the JavaDoc of java.sql.Driver.connect(String, Properties):
              * 
-             * The driver should return "null" if it realizes it is the wrong 
+             * The driver should return "null" if it realizes it is the wrong
              * kind of driver to connect to the given URL.
              */
             return null;
         }
 
-        /* strip JDBC URL prefix from connection string and
-         * delegate the remaining section to the connection factory */
+        /*
+         * strip JDBC URL prefix from connection string and delegate the
+         * remaining section to the connection factory
+         */
         String factoryConfiguration = url.substring(JDBC_URL_PREFIX.length());
 
         return connectionFactory.newConnection(factoryConfiguration, info);
