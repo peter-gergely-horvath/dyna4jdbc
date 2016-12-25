@@ -63,6 +63,22 @@ public class JRubyScriptEngineTest extends AbstractScriptEngineIntegrationTest {
 
     @Test
     @Override
+    public void testStatementMaxRowsHandlingNoHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("puts \"A:\tB:\"\n")
+                .append("puts \"First A\tFirst B\"\n")
+                .append("puts \"Second A\tSecond B\"\n")
+                .append("puts \"Third A\tThird B\"\n")
+                .append("puts \"Fourth A\tFourth B\"\n")
+                .append("puts \"Fifth A\tFifth B\"\n")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyNoHeaders(script);
+    }
+    
+    @Test
+    @Override
     public void testPreparedStatementBindsVariable() throws Exception {
 
         String script = "puts\"Message::\"\n puts $parameter1";

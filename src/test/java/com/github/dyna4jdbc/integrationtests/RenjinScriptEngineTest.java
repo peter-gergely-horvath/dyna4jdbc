@@ -63,6 +63,22 @@ public class RenjinScriptEngineTest extends AbstractScriptEngineIntegrationTest 
 
     @Test
     @Override
+    public void testStatementMaxRowsHandlingNoHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("cat (\"A:\tB:\n\")\n")
+                .append("cat (\"First A\tFirst B\n\")\n")
+                .append("cat (\"Second A\tSecond B\n\")\n")
+                .append("cat (\"Third A\tThird B\n\")\n")
+                .append("cat (\"Fourth A\tFourth B\n\")\n")
+                .append("cat (\"Fifth A\tFifth B\n\")\n")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyNoHeaders(script);
+    }
+    
+    @Test
+    @Override
     public void testPreparedStatementBindsVariable() throws Exception {
 
         String script = "cat(\"Message::\n\") \n cat(parameter1) ";

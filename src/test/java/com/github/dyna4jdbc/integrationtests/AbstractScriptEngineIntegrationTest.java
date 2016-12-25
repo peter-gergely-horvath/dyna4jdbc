@@ -168,6 +168,8 @@ public abstract class AbstractScriptEngineIntegrationTest {
             }
         }
     }
+    
+    public abstract void testStatementMaxRowsHandlingNoHeaders() throws Exception;
 
     public abstract void testPreparedStatementBindsVariable() throws Exception;
 }

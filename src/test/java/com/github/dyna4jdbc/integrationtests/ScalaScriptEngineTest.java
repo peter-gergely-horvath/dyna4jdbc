@@ -60,6 +60,22 @@ public class ScalaScriptEngineTest extends AbstractScriptEngineIntegrationTest {
 
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
+    
+    @Test
+    @Override
+    public void testStatementMaxRowsHandlingNoHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("println (\"A:\tB:\")\n")
+                .append("println (\"First A\tFirst B\")\n")
+                .append("println (\"Second A\tSecond B\")\n")
+                .append("println (\"Third A\tThird B\")\n")
+                .append("println (\"Fourth A\tFourth B\")\n")
+                .append("println (\"Fifth A\tFifth B\")\n")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyNoHeaders(script);
+    }
 
     @Test
     @Override

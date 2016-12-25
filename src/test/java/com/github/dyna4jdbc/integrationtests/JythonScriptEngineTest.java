@@ -64,6 +64,22 @@ public class JythonScriptEngineTest extends AbstractScriptEngineIntegrationTest 
 
     @Test
     @Override
+    public void testStatementMaxRowsHandlingNoHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("print \"A:\tB:\"\n")
+                .append("print \"First A\tFirst B\"\n")
+                .append("print \"Second A\tSecond B\"\n")
+                .append("print \"Third A\tThird B\"\n")
+                .append("print \"Fourth A\tFourth B\"\n")
+                .append("print \"Fifth A\tFifth B\"\n")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyNoHeaders(script);
+    }
+    
+    @Test
+    @Override
     public void testPreparedStatementBindsVariable() throws Exception {
 
         String script = "print \"Message::\" \nprint parameter1";

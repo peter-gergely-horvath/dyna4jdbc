@@ -61,6 +61,22 @@ public class BeanShellScriptEngineTest extends AbstractScriptEngineIntegrationTe
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
+    
+    @Test
+    public void testStatementMaxRowsHandlingNoHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("print(\"A:\tB:\");\n ")
+                .append("print(\"First A\tFirst B\");\n ")
+                .append("print(\"Second A\tSecond B\");")
+                .append("print(\"Third A\tThird B\");")
+                .append("print(\"Fourth A\tFourth B\");")
+                .append("print(\"Fifth A\tFifth B\");")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyNoHeaders(script);
+    }
+    
     @Test
     @Override
     public void testPreparedStatementBindsVariable() throws Exception {
