@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 
-public class GroovyScriptEngineTest extends AbstractScriptEngineIntegrationTest {
+public class GroovyScriptEngineTest extends IntegrationTestBase {
 
     protected GroovyScriptEngineTest() {
         super("jdbc:dyna4jdbc:scriptengine:Groovy");
@@ -46,6 +46,7 @@ public class GroovyScriptEngineTest extends AbstractScriptEngineIntegrationTest 
     }
 
     @Test
+    @Override
     public void testHeadersNotSpecified() throws Exception {
 
         String script = "println('A:\tB:'); println('First A\tFirst B'); println('Second A\tSecond B');";
@@ -54,6 +55,7 @@ public class GroovyScriptEngineTest extends AbstractScriptEngineIntegrationTest 
     }
 
     @Test
+    @Override
     public void testHeadersSpecified() throws Exception {
 
         String script = "println('A::\tB::'); println('First A\tFirst B'); println('Second A\tSecond B');";
@@ -61,6 +63,22 @@ public class GroovyScriptEngineTest extends AbstractScriptEngineIntegrationTest 
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
+    @Test
+    @Override
+    public void testStatementMaxRowsHandlingWithHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("println(\"A::\tB::\")\n")
+                .append("println(\"First A\tFirst B\")\n")
+                .append("println(\"Second A\tSecond B\")\n")
+                .append("println(\"Third A\tThird B\")\n")
+                .append("println(\"Fourth A\tFourth B\")\n")
+                .append("println(\"Fifth A\tFifth B\")\n")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyWithHeaders(script);
+    }
+    
     @Test
     @Override
     public void testStatementMaxRowsHandlingNoHeaders() throws Exception {

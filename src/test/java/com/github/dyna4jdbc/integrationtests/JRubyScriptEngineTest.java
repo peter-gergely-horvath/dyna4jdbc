@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 
-public class JRubyScriptEngineTest extends AbstractScriptEngineIntegrationTest {
+public class JRubyScriptEngineTest extends IntegrationTestBase {
 
     protected JRubyScriptEngineTest() {
         super("jdbc:dyna4jdbc:scriptengine:jruby");
@@ -46,6 +46,7 @@ public class JRubyScriptEngineTest extends AbstractScriptEngineIntegrationTest {
     }
 
     @Test
+    @Override
     public void testHeadersNotSpecified() throws Exception {
 
         String script = "puts\"A:\tB:\"\n puts \"First A\tFirst B\"\n puts \"Second A\tSecond B\" ";
@@ -54,6 +55,7 @@ public class JRubyScriptEngineTest extends AbstractScriptEngineIntegrationTest {
     }
 
     @Test
+    @Override
     public void testHeadersSpecified() throws Exception {
 
         String script = "puts\"A::\tB::\"\n puts \"First A\tFirst B\"\n puts \"Second A\tSecond B\" ";
@@ -61,6 +63,22 @@ public class JRubyScriptEngineTest extends AbstractScriptEngineIntegrationTest {
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
+    @Test
+    @Override
+    public void testStatementMaxRowsHandlingWithHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("puts \"A::\tB::\"\n")
+                .append("puts \"First A\tFirst B\"\n")
+                .append("puts \"Second A\tSecond B\"\n")
+                .append("puts \"Third A\tThird B\"\n")
+                .append("puts \"Fourth A\tFourth B\"\n")
+                .append("puts \"Fifth A\tFifth B\"\n")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyWithHeaders(script);
+    }
+    
     @Test
     @Override
     public void testStatementMaxRowsHandlingNoHeaders() throws Exception {

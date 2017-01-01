@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 
-public class ScalaScriptEngineTest extends AbstractScriptEngineIntegrationTest {
+public class ScalaScriptEngineTest extends IntegrationTestBase {
 
     protected ScalaScriptEngineTest() {
         super("jdbc:dyna4jdbc:scriptengine:scala");
@@ -46,6 +46,7 @@ public class ScalaScriptEngineTest extends AbstractScriptEngineIntegrationTest {
     }
 
     @Test
+    @Override
     public void testHeadersNotSpecified() throws Exception {
 
         String script = "println(\"A:\tB:\") \n println(\"First A\tFirst B\") \n println(\"Second A\tSecond B\");";
@@ -54,11 +55,28 @@ public class ScalaScriptEngineTest extends AbstractScriptEngineIntegrationTest {
     }
 
     @Test
+    @Override
     public void testHeadersSpecified() throws Exception {
 
         String script = "println(\"A::\tB::\") \n println(\"First A\tFirst B\") \n print(\"Second A\tSecond B\")";
 
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
+    }
+    
+    @Test
+    @Override
+    public void testStatementMaxRowsHandlingWithHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("println (\"A::\tB::\")\n")
+                .append("println (\"First A\tFirst B\")\n")
+                .append("println (\"Second A\tSecond B\")\n")
+                .append("println (\"Third A\tThird B\")\n")
+                .append("println (\"Fourth A\tFourth B\")\n")
+                .append("println (\"Fifth A\tFifth B\")\n")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyWithHeaders(script);
     }
     
     @Test

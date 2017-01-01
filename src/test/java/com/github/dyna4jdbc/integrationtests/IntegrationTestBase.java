@@ -28,12 +28,12 @@ import static org.testng.Assert.*;
 /**
  * @author Peter G. Horvath, Balazs Toeroek
  */
-public abstract class AbstractScriptEngineIntegrationTest {
+public abstract class IntegrationTestBase {
 
     protected static final String PREPARED_STATEMENT_PARAMETER = "Hello World";
     protected final String jdbcUrl;
 
-    protected AbstractScriptEngineIntegrationTest(String jdbcUrl) {
+    protected IntegrationTestBase(String jdbcUrl) {
         this.jdbcUrl = jdbcUrl;
     }
 
@@ -169,7 +169,15 @@ public abstract class AbstractScriptEngineIntegrationTest {
         }
     }
     
+    public abstract void testHeadersNotSpecified() throws Exception;
+
+    public abstract void testHeadersSpecified() throws Exception;
+    
+    public abstract void testStatementMaxRowsHandlingWithHeaders() throws Exception;
+    
     public abstract void testStatementMaxRowsHandlingNoHeaders() throws Exception;
 
     public abstract void testPreparedStatementBindsVariable() throws Exception;
+
+    
 }

@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 import java.sql.SQLException;
 
 
-public class JythonScriptEngineTest extends AbstractScriptEngineIntegrationTest {
+public class JythonScriptEngineTest extends IntegrationTestBase {
 
     protected JythonScriptEngineTest() {
         super("jdbc:dyna4jdbc:scriptengine:jython");
@@ -47,6 +47,7 @@ public class JythonScriptEngineTest extends AbstractScriptEngineIntegrationTest 
     }
 
     @Test
+    @Override
     public void testHeadersNotSpecified() throws Exception {
 
         String script = "print \"A:\tB:\" \nprint \"First A\tFirst B\" \nprint \"Second A\tSecond B\"";
@@ -55,6 +56,7 @@ public class JythonScriptEngineTest extends AbstractScriptEngineIntegrationTest 
     }
 
     @Test
+    @Override
     public void testHeadersSpecified() throws Exception {
 
         String script = "print \"A::\tB::\" \nprint \"First A\tFirst B\" \nprint \"Second A\tSecond B\"";
@@ -62,6 +64,22 @@ public class JythonScriptEngineTest extends AbstractScriptEngineIntegrationTest 
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
+    @Test
+    @Override
+    public void testStatementMaxRowsHandlingWithHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("print \"A::\tB::\"\n")
+                .append("print \"First A\tFirst B\"\n")
+                .append("print \"Second A\tSecond B\"\n")
+                .append("print \"Third A\tThird B\"\n")
+                .append("print \"Fourth A\tFourth B\"\n")
+                .append("print \"Fifth A\tFifth B\"\n")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyWithHeaders(script);
+    }
+    
     @Test
     @Override
     public void testStatementMaxRowsHandlingNoHeaders() throws Exception {

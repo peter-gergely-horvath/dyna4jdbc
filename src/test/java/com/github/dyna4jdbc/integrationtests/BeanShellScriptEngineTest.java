@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 
-public class BeanShellScriptEngineTest extends AbstractScriptEngineIntegrationTest {
+public class BeanShellScriptEngineTest extends IntegrationTestBase {
 
     protected BeanShellScriptEngineTest() {
         super("jdbc:dyna4jdbc:scriptengine:beanshell");
@@ -46,6 +46,7 @@ public class BeanShellScriptEngineTest extends AbstractScriptEngineIntegrationTe
     }
 
     @Test
+    @Override
     public void testHeadersNotSpecified() throws Exception {
 
         String script = "print(\"A:\tB:\");\n print(\"First A\tFirst B\");\n print(\"Second A\tSecond B\");\n";
@@ -54,6 +55,7 @@ public class BeanShellScriptEngineTest extends AbstractScriptEngineIntegrationTe
     }
 
     @Test
+    @Override
     public void testHeadersSpecified() throws Exception {
 
         String script = "print(\"A::\tB::\");\n print(\"First A\tFirst B\");\n print(\"Second A\tSecond B\");";
@@ -61,8 +63,24 @@ public class BeanShellScriptEngineTest extends AbstractScriptEngineIntegrationTe
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
+    @Test
+    @Override
+    public void testStatementMaxRowsHandlingWithHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("print(\"A::\tB::\");\n ")
+                .append("print(\"First A\tFirst B\");\n ")
+                .append("print(\"Second A\tSecond B\");")
+                .append("print(\"Third A\tThird B\");")
+                .append("print(\"Fourth A\tFourth B\");")
+                .append("print(\"Fifth A\tFifth B\");")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyWithHeaders(script);
+    }
     
     @Test
+    @Override
     public void testStatementMaxRowsHandlingNoHeaders() throws Exception {
 
         String script = new StringBuilder()

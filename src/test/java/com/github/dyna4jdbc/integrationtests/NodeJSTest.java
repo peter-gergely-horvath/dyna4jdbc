@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 
-public class NodeJSTest extends AbstractScriptEngineIntegrationTest {
+public class NodeJSTest extends IntegrationTestBase {
 
     protected NodeJSTest() {
         super("jdbc:dyna4jdbc:nodejs");
@@ -50,6 +50,7 @@ public class NodeJSTest extends AbstractScriptEngineIntegrationTest {
     }
 
     @Test
+    @Override
     public void testHeadersNotSpecified() throws Exception {
 
         String script = "console.log(\"A:\tB:\");\n console.log(\"First A\tFirst B\");\n console.log(\"Second A\tSecond B\");\n";
@@ -58,6 +59,7 @@ public class NodeJSTest extends AbstractScriptEngineIntegrationTest {
     }
 
     @Test
+    @Override
     public void testHeadersSpecified() throws Exception {
 
         String script = "console.log(\"A::\tB::\");\n console.log(\"First A\tFirst B\");\n console.log(\"Second A\tSecond B\");";
@@ -66,6 +68,7 @@ public class NodeJSTest extends AbstractScriptEngineIntegrationTest {
     }
 
     @Test
+    @Override
     public void testStatementMaxRowsHandlingWithHeaders() throws Exception {
 
         String script = new StringBuilder()
@@ -81,6 +84,7 @@ public class NodeJSTest extends AbstractScriptEngineIntegrationTest {
     }
 
     @Test
+    @Override
     public void testStatementMaxRowsHandlingNoHeaders() throws Exception {
 
         String script = new StringBuilder()

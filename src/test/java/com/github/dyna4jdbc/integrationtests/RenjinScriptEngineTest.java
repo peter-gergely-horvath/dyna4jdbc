@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 
-public class RenjinScriptEngineTest extends AbstractScriptEngineIntegrationTest {
+public class RenjinScriptEngineTest extends IntegrationTestBase {
 
     protected RenjinScriptEngineTest() {
         super("jdbc:dyna4jdbc:scriptengine:Renjin");
@@ -46,6 +46,7 @@ public class RenjinScriptEngineTest extends AbstractScriptEngineIntegrationTest 
     }
 
     @Test
+    @Override
     public void testHeadersNotSpecified() throws Exception {
 
         String script = "cat(\"A:\tB:\n\")\n cat(\"First A\tFirst B\n\")\n cat(\"Second A\tSecond B\")";
@@ -54,6 +55,7 @@ public class RenjinScriptEngineTest extends AbstractScriptEngineIntegrationTest 
     }
 
     @Test
+    @Override
     public void testHeadersSpecified() throws Exception {
 
         String script = "cat(\"A::\tB::\n\")\n cat(\"First A\tFirst B\n\")\n cat(\"Second A\tSecond B\")";
@@ -61,6 +63,22 @@ public class RenjinScriptEngineTest extends AbstractScriptEngineIntegrationTest 
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
 
+    @Test
+    @Override
+    public void testStatementMaxRowsHandlingWithHeaders() throws Exception {
+
+        String script = new StringBuilder()
+                .append("cat (\"A::\tB::\n\")\n")
+                .append("cat (\"First A\tFirst B\n\")\n")
+                .append("cat (\"Second A\tSecond B\n\")\n")
+                .append("cat (\"Third A\tThird B\n\")\n")
+                .append("cat (\"Fourth A\tFourth B\n\")\n")
+                .append("cat (\"Fifth A\tFifth B\n\")\n")
+                .toString();
+
+        assertYieldsFirstTwoRowsOnlyWithHeaders(script);
+    }
+    
     @Test
     @Override
     public void testStatementMaxRowsHandlingNoHeaders() throws Exception {

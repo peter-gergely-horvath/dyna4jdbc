@@ -21,7 +21,7 @@ import java.sql.SQLException;
 
 import org.testng.annotations.Test;
 
-public class JavaScriptScriptEngineTest extends AbstractScriptEngineIntegrationTest {
+public class JavaScriptScriptEngineTest extends IntegrationTestBase {
 
     protected JavaScriptScriptEngineTest() {
         super("jdbc:dyna4jdbc:scriptengine:JavaScript");
@@ -46,6 +46,7 @@ public class JavaScriptScriptEngineTest extends AbstractScriptEngineIntegrationT
     }
 
     @Test
+    @Override
     public void testHeadersNotSpecified() throws Exception {
 
         String script = "print(\"A:\tB:\");\n print(\"First A\tFirst B\");\n print(\"Second A\tSecond B\");\n";
@@ -54,6 +55,7 @@ public class JavaScriptScriptEngineTest extends AbstractScriptEngineIntegrationT
     }
 
     @Test
+    @Override
     public void testHeadersSpecified() throws Exception {
 
         String script = "print(\"A::\tB::\");\n print(\"First A\tFirst B\");\n print(\"Second A\tSecond B\");";
@@ -77,6 +79,7 @@ public class JavaScriptScriptEngineTest extends AbstractScriptEngineIntegrationT
     }
 
     @Test
+    @Override
     public void testStatementMaxRowsHandlingNoHeaders() throws Exception {
 
         String script = new StringBuilder()
