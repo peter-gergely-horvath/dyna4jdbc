@@ -29,11 +29,9 @@ class NodeJsDatabaseMetaData extends AbstractDatabaseMetaData<Connection> {
 
     private static final String PRINT_NODE_JS_VERSION = "console.log(process.version);";
     
-    
     private final AtomicReference<String> versionStringRef = new AtomicReference<String>(null);
-    
-    
-    public NodeJsDatabaseMetaData(Connection connection) {
+
+    NodeJsDatabaseMetaData(Connection connection) {
         super(connection);
     }
 
@@ -48,14 +46,14 @@ class NodeJsDatabaseMetaData extends AbstractDatabaseMetaData<Connection> {
         String versionString = versionStringRef.get();
         if (versionString == null) {
             try (Statement statement = getConnection().createStatement()) {
-                try(ResultSet resultSet = statement.executeQuery(PRINT_NODE_JS_VERSION)) {
+                try (ResultSet resultSet = statement.executeQuery(PRINT_NODE_JS_VERSION)) {
                     if (resultSet.next()) {
                         versionString = resultSet.getString(1);
                     }
                 }
             }    
         }
-        
+
         versionStringRef.set(versionString);
         return versionStringRef.get();
     }
