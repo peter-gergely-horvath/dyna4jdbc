@@ -17,8 +17,10 @@
  
 package com.github.dyna4jdbc.internal.common.typeconverter.impl;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadata;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnMetadataFactory;
@@ -66,18 +68,9 @@ final class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
 
     private static String buildMatchPattern() {
 
-        StringBuilder sqlTypeNamesSeparatedByPipeForRegex = new StringBuilder();
-        boolean isFirst = true;
-        for (SQLDataType sqlDataType : SQLDataType.values()) {
-            String sqlTypeName = sqlDataType.name;
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                sqlTypeNamesSeparatedByPipeForRegex.append("|");
-            }
-
-            sqlTypeNamesSeparatedByPipeForRegex.append(sqlTypeName);
-        }
+        String sqlTypeNamesSeparatedByPipeForRegex = Arrays.stream(SQLDataType.values())
+            .map(dataType -> dataType.name)
+            .collect(Collectors.joining("|"));
 
         return String.format("^[^:]+:((?:%s)[^:]*)?:[^:]*$", sqlTypeNamesSeparatedByPipeForRegex);
     }
