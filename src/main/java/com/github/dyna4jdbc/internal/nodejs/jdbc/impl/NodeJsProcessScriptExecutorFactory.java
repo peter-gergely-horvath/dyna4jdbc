@@ -33,7 +33,7 @@ public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalPro
                 + "eval: function(cmd, ctx, fn, cb) { " 
                 + "try { vm.runInContext(cmd, ctx, fn); } "
                 + "catch (err) { cb(err); } "
-                + "finally { console.log(endOfStreamToken); } "
+                + "finally { console.log(endOfStreamToken); console.error(endOfStreamToken); } "
                 + "} });";
     }
 

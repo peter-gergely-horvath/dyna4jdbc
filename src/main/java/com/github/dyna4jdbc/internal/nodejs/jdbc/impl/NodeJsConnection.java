@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.UUID;
 
-import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.ConfigurationEntry;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
@@ -52,9 +51,7 @@ public final class NodeJsConnection extends ProcessRunnerConnection {
     @Override
     protected DatabaseMetaData getMetaDataInternal() throws SQLException {
 
-        return new GenericDatabaseMetaData(this,
-                System.getProperty("os.name"),
-                System.getProperty("os.version"));
+        return new NodeJsDatabaseMetaData(this);
     }
 
 }

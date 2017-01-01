@@ -36,6 +36,7 @@ public final class DynaDriver implements java.sql.Driver {
     static {
         try {
             DriverManager.registerDriver(new DynaDriver());
+            LOGGER.log(Level.FINEST, "Driver loaded and registered");
         } catch (SQLException ex) {
             String errorMessage = "Could not register to DriverManager: " + DynaDriver.class.getName();
             LOGGER.log(Level.SEVERE, errorMessage, ex);
