@@ -34,13 +34,14 @@ public class HelloWorldSample {
             try (Statement statement = connection.createStatement()) {
 
                 statement.executeUpdate(" var msg = 'Hello World'; ");
-                ResultSet resultSet = statement.executeQuery(" print(msg); ");
+                try (ResultSet resultSet = statement.executeQuery(" print(msg); ")) {
+                    while (resultSet.next()) {
+                        String string = resultSet.getString(1);
 
-                while (resultSet.next()) {
-                    String string = resultSet.getString(1);
-
-                    System.out.println(string);
+                        System.out.println(string);
+                    }
                 }
+
             }
         }
     }
