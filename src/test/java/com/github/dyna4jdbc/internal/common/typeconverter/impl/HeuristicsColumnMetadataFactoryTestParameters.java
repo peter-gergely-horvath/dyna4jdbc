@@ -79,19 +79,19 @@ enum HeuristicsColumnMetadataFactoryTestParameters {
 
     TIMESTAMP("Timestamp",
             timestampColumnMetadata(TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NOT_NULLABLE),
-            "2016, 2017-06-01 19:16:19.123", "2016, 2017-06-01 19:16:19"),
+            "2016-06-01 19:16:19.123", "2016-06-01 19:16:19"),
 
     TIMESTAMP_AND_NULLS("Timestamp",
             timestampColumnMetadata(TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
-            "2016, 2017-06-01 19:16:19.123", "<null>", "2016, 2017-06-01 19:16:19", "<null>"),
+            "2016-06-01 19:16:19.123", "<null>", "2016-06-01 19:16:19", "<null>"),
 
     TIMESTAMP_AND_INTEGERS_AND_NULLS("Timestamp, integers and nulls",
             varcharColumnMetadata(23, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
-            "<null>", "2016, 2017-06-01 19:16:19.123", "2016, 2017-06-01 19:16:19", "13", "<null>", "42" ),
+            "<null>", "2016-06-01 19:16:19.123", "2016-06-01 19:16:19", "13", "<null>", "42" ),
 
     TIMESTAMP_AND_DOUBLES_AND_NULLS("Timestamp, doubles and nulls",
             varcharColumnMetadata(23, TEST_COLUMN_INDEX, ColumnMetadata.Nullability.NULLABLE),
-            "<null>", "2016, 2017-06-01 19:16:19.123", "2016, 2017-06-01 19:16:19", "1.234", "<null>", "123456789.0" );;
+            "<null>", "2016-06-01 19:16:19.123", "2016-06-01 19:16:19", "1.234", "<null>", "123456789.0" );
 
 
 
