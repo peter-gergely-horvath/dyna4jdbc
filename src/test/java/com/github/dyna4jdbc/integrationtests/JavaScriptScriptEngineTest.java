@@ -28,6 +28,7 @@ public class JavaScriptScriptEngineTest extends IntegrationTestBase {
     }
 
     @Test
+    @Override
     public void testWritingFromUpdateThrowsSQLException() {
 
         String script = "print(\"Hello World\")";
@@ -36,6 +37,7 @@ public class JavaScriptScriptEngineTest extends IntegrationTestBase {
     }
 
     @Test
+    @Override
     public void testVariableDeclaredInStatementVisibleFromAnotherStatement() throws SQLException {
 
         String variableDeclarationScript = "var msg = \"Hello World\"; ";

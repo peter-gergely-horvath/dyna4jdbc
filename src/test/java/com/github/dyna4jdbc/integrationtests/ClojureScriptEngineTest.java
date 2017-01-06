@@ -28,6 +28,7 @@ public class ClojureScriptEngineTest extends IntegrationTestBase {
     }
 
     @Test
+    @Override
     public void testWritingFromUpdateThrowsSQLException() {
 
         String script = "(println \"Hello world.\")";
@@ -36,6 +37,7 @@ public class ClojureScriptEngineTest extends IntegrationTestBase {
     }
 
     @Test
+    @Override
     public void testVariableDeclaredInStatementVisibleFromAnotherStatement() throws SQLException {
 
         String variableDeclarationScript = "(def msg \"Hello World\")";

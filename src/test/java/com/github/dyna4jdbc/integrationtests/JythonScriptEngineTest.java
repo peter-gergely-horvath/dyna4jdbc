@@ -29,6 +29,7 @@ public class JythonScriptEngineTest extends IntegrationTestBase {
     }
 
     @Test
+    @Override
     public void testWritingFromUpdateThrowsSQLException() {
 
         String script = "print \"Hello World\" ";
@@ -37,6 +38,7 @@ public class JythonScriptEngineTest extends IntegrationTestBase {
     }
 
     @Test
+    @Override
     public void testVariableDeclaredInStatementVisibleFromAnotherStatement() throws SQLException {
 
         String variableDeclarationScript = "msg = \"Hello World\"; ";

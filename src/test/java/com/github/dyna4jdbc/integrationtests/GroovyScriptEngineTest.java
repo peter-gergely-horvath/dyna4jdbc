@@ -28,6 +28,7 @@ public class GroovyScriptEngineTest extends IntegrationTestBase {
     }
 
     @Test
+    @Override
     public void testWritingFromUpdateThrowsSQLException() {
 
         String script = "println('Hello World') ";
@@ -36,6 +37,7 @@ public class GroovyScriptEngineTest extends IntegrationTestBase {
     }
 
     @Test
+    @Override
     public void testVariableDeclaredInStatementVisibleFromAnotherStatement() throws SQLException {
 
         String variableDeclarationScript = "msg = 'Hello World' ";

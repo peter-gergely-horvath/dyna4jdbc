@@ -52,8 +52,9 @@ public final class DefaultClassLoaderFactory implements ClassLoaderFactory {
         }
 
         public ClassLoader run() {
-            LOGGER.finer("PrivilegedAction.run() dispatched successfully");
-            
+            LOGGER.log(Level.FINER,
+                    "Creating ClassLoader inside PrivilegedAction");
+
             return new URLClassLoader(urls);
         }
     }
@@ -61,11 +62,8 @@ public final class DefaultClassLoaderFactory implements ClassLoaderFactory {
     @Override
     public ClassLoader newClassLoaderFromClasspath(List<String> classpath) throws MisconfigurationException {
 
-        if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.finer(String.format(
-                    "Preparing to construct class loader from %s URLs",
-                    classpath.size()));
-        }
+        LOGGER.log(Level.FINER, 
+                "Preparing to construct class loader from {0} URL(s)", Integer.toString(classpath.size()));
 
         ArrayList<URL> urlList = new ArrayList<>(classpath.size());
 
@@ -76,23 +74,24 @@ public final class DefaultClassLoaderFactory implements ClassLoaderFactory {
 
                 urlList.add(url);
 
-                if (LOGGER.isLoggable(Level.FINER)) {
-                    LOGGER.finer("\tAdded classpath URL: " + classpathEntry);
-                }
+                LOGGER.log(Level.FINER,
+                        "Added classpath URL: {0}", classpathEntry);
 
             } catch (MalformedURLException e) {
-                throw MisconfigurationException.forMessage("Failed to convert classpath entry to URL: '%s'",
+                throw MisconfigurationException.forMessage("Conversion of classpath entry to URL failed: '%s'",
                         classpathEntry);
             }
         }
         URL[] urlArray = urlList.toArray(new URL[0]);
 
-        LOGGER.finer("Invoking PrivilegedAction to create the class loader ...");
+        LOGGER.log(Level.FINER,
+                "Invoking PrivilegedAction to create the class loader ...");
 
         ClassLoader classLoader = AccessController.doPrivileged(
                 new CreateURLClassLoaderPrivilegedAction(urlArray));
 
-        LOGGER.finer("PrivilegedAction was successfully invoked: ClassLoader instantiated!");
+        LOGGER.log(Level.FINER,
+                "PrivilegedAction was successfully invoked: ClassLoader instantiated!");
 
         return classLoader;
     }

@@ -28,6 +28,7 @@ public class JRubyScriptEngineTest extends IntegrationTestBase {
     }
 
     @Test
+    @Override
     public void testWritingFromUpdateThrowsSQLException() {
 
         String script = "puts \"Hello World\" ";
@@ -36,6 +37,7 @@ public class JRubyScriptEngineTest extends IntegrationTestBase {
     }
 
     @Test
+    @Override
     public void testVariableDeclaredInStatementVisibleFromAnotherStatement() throws SQLException {
 
         String variableDeclarationScript = "$msg = \"Hello World\" ";

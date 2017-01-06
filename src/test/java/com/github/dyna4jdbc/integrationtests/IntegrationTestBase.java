@@ -169,6 +169,10 @@ public abstract class IntegrationTestBase {
         }
     }
     
+    public abstract void testWritingFromUpdateThrowsSQLException() throws Exception;
+    
+    public abstract void testVariableDeclaredInStatementVisibleFromAnotherStatement() throws Exception;
+    
     public abstract void testHeadersNotSpecified() throws Exception;
 
     public abstract void testHeadersSpecified() throws Exception;
