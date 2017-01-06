@@ -77,6 +77,8 @@ public enum JDBCError {
     // Error class EXTERNAL_ROUTINE_INVOCATION_EXCEPTION
     NON_STANDARD_COMPLIANT_SCRIPTENGINE("Non standard compliant ScriptEngine implementation: %s",
             SQLStateClass.EXTERNAL_ROUTINE_INVOCATION_EXCEPTION, "001"),
+    NODE_JS_INTEGRATION_ERROR("Node.js integration error: %s",
+            SQLStateClass.EXTERNAL_ROUTINE_INVOCATION_EXCEPTION, "002"),
 
     // Error class SYNTAX_OR_ACCESS_RULE_ERROR
     USING_STDOUT_FROM_UPDATE("Using standard output from an update call is not permitted",
