@@ -1,5 +1,5 @@
 
-def copyRightLine = "Copyright (c) 2016 Peter G. Horvath, All Rights Reserved."
+def copyRightLine = "Copyright (c) 2016, 2017 Peter G. Horvath, All Rights Reserved."
 
 def copyrightHeader = """/*
  * ${copyRightLine}
