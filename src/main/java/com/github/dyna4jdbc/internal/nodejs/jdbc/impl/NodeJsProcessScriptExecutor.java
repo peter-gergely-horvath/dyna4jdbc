@@ -16,6 +16,8 @@ import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.DefaultExternalProc
 
 class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
 
+    private static final String NODE_PROCESS_NAME = "node";
+
     private final String replInitScript;
     private final Configuration configuration;
 
@@ -95,24 +97,30 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
     @Override
     protected Process createProcess(String script, Map<String, Object> variables) throws IOException {
 
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command(Arrays.asList("node", "-e", replInitScript));
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            processBuilder.command(Arrays.asList(NODE_PROCESS_NAME, "-e", replInitScript));
 
-        if (variables != null) {
+            if (variables != null) {
 
-            Map<String, String> environment = processBuilder.environment();
+                Map<String, String> environment = processBuilder.environment();
 
-            variables.entrySet().stream().forEach(entry -> {
-                String key = entry.getKey();
-                Object value = entry.getValue();
+                variables.entrySet().stream().forEach(entry -> {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
 
-                String valueString = String.valueOf(value);
+                    String valueString = String.valueOf(value);
 
-                environment.put(key, valueString);
-            });
+                    environment.put(key, valueString);
+                });
+            }
+
+            return processBuilder.start();
+        } catch (IOException ioEx) {
+            throw JDBCError.NODE_JS_INTEGRATION_ERROR.raiseUncheckedException(ioEx,
+                    "Failed to launch Node.js process '" + NODE_PROCESS_NAME + "': "
+                            + ioEx.getMessage());
         }
-
-        return processBuilder.start();
     }
 
 }

@@ -45,7 +45,7 @@ public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalPro
             InitScriptInvoker initScriptInvoker =
                     new InitScriptInvoker(configuration, nodeJsProcessScriptExecutor);
 
-            initScriptInvoker.invokeScript("1+1");
+            initScriptInvoker.invokeScript("1+1"); // basic sanity check of Node.js availability
 
             return nodeJsProcessScriptExecutor;
 
