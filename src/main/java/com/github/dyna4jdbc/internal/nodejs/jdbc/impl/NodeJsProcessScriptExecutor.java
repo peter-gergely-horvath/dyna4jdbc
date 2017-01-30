@@ -63,7 +63,7 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
                 this.invokeScript(variableSetScript);
 
             } catch (ScriptExecutionException ex) {
-                JDBCError.NODE_JS_INTEGRATION_ERROR.raiseUncheckedException(
+                throw JDBCError.NODE_JS_INTEGRATION_ERROR.raiseUncheckedException(
                         String.format("Failed to set variable '%s' to '%s'",
                                 variableName, stringRepresentation));
             }
@@ -71,7 +71,7 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
 
         @Override
         protected void onSingleWarning(String script, SQLWarning warning) {
-            JDBCError.NODE_JS_INTEGRATION_ERROR.raiseUncheckedException(
+            throw JDBCError.NODE_JS_INTEGRATION_ERROR.raiseUncheckedException(
                     warning,
                     "stdERR write while invoking dyna4JDBC auto-generated JavaScript intended to set a variable. "
                     + "Script is: " + script);
@@ -79,7 +79,7 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
 
         @Override
         protected void onMultipleWarnings(String script, LinkedList<SQLWarning> warningList) {
-            JDBCError.CONNECT_FAILED_EXCEPTION.raiseUncheckedExceptionWithSuppressed(warningList,
+            throw JDBCError.CONNECT_FAILED_EXCEPTION.raiseUncheckedExceptionWithSuppressed(warningList,
                     "stdERR write while invoking dyna4JDBC auto-generated JavaScript intended to set a variable. "
                     + "Script is: " + script);
         }
@@ -89,7 +89,7 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
     @Override
     protected void onProcessNotRunningBeforeDispatch(String script) throws ScriptExecutionException {
         throw new ScriptExecutionException(
-                "Node.js process exited unexpetedly! Cannot execute script: " + script);
+                "Node.js process exited unexpectedly! Cannot execute script: " + script);
 
     }
 
@@ -105,7 +105,7 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
 
                 Map<String, String> environment = processBuilder.environment();
 
-                variables.entrySet().stream().forEach(entry -> {
+                variables.entrySet().forEach(entry -> {
                     String key = entry.getKey();
                     Object value = entry.getValue();
 
@@ -118,8 +118,8 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
             return processBuilder.start();
         } catch (IOException ioEx) {
             throw JDBCError.NODE_JS_INTEGRATION_ERROR.raiseUncheckedException(ioEx,
-                    "Failed to launch Node.js process '" + NODE_PROCESS_NAME + "': "
-                            + ioEx.getMessage());
+                    String.format("Failed to launch Node.js process \"%s\": %s",
+                            NODE_PROCESS_NAME, ioEx.getMessage()));
         }
     }
 

@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Properties;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.RuntimeDyna4JdbcException;
 import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
 import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
@@ -58,13 +59,16 @@ class ConnectionFactory {
             // their message will be detailed enough for the user to understand.
             throw sqlEx;
 
+        } catch (RuntimeDyna4JdbcException ex) {
+            throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
+
+        } catch (ClassNotFoundException | NoClassDefFoundError ex) {
+            throw JDBCError.REQUIRED_RESOURCE_UNAVAILABLE.raiseSQLException(ex, ex.getMessage());
+
         } catch (Exception ex) {
-            if (ex instanceof ClassNotFoundException) {
-                throw JDBCError.REQUIRED_RESOURCE_UNAVAILABLE.raiseSQLException(ex, ex.getMessage());
-            }
-            
             String causeMessage = ExceptionUtils.getRootCauseMessage(ex);
             throw JDBCError.CONNECT_FAILED_EXCEPTION.raiseSQLException(ex, causeMessage);
+
         } catch (Throwable throwable) {
             /*
             We do not trust any external library here: some script languages
@@ -76,10 +80,6 @@ class ConnectionFactory {
             Hence, we intentionally and knowingly catch all Throwables (including
             Errors) and wrap them into an SQLException.
             */
-            if (throwable instanceof NoClassDefFoundError) {
-                throw JDBCError.REQUIRED_RESOURCE_UNAVAILABLE.raiseSQLException(throwable, throwable.getMessage());
-            }
-            
             String causeMessage = ExceptionUtils.getRootCauseMessage(throwable);
             throw JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(throwable, causeMessage);
         }
@@ -121,8 +121,12 @@ class ConnectionFactory {
                 throw (RuntimeException) cause;
             } else if (cause instanceof Error) {
                 throw (Error) cause;
-            } else {
+            } else if (cause instanceof Exception) {
                 throw (Exception) cause;
+            } else {
+                // cause is null? This should not happen: we expect
+                // that root cause will always be non-null
+                throw new IllegalStateException(ite);
             }
         }
     }
