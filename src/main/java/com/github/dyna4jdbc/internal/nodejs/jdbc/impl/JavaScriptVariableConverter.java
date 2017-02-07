@@ -17,11 +17,7 @@
  
 package com.github.dyna4jdbc.internal.nodejs.jdbc.impl;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 final class JavaScriptVariableConverter {
@@ -33,42 +29,46 @@ final class JavaScriptVariableConverter {
     static String convertToString(Object value) {
         if (value == null) {
             return "null";
-        } else if (value instanceof java.lang.String || value instanceof java.lang.Character) {
-            return String.format("'%s'", ((String) value).replace("[^\\]'", "\\'"));
-        } else if (value instanceof Integer || value instanceof java.lang.Boolean
-                || value instanceof java.lang.Byte || value instanceof java.lang.Short
-                || value instanceof java.lang.Integer || value instanceof java.lang.Long
-                || value instanceof java.lang.Float || value instanceof java.lang.Double) {
+        } else if (value instanceof String || value instanceof CharSequence) {
+            return String.format("'%s'", value.toString().replaceAll("(?<!\\\\)[']", "\\\\'"));
+        } else if (value instanceof Character) {
+            return String.format("'%s'", ((Character) value));
+        } else if (value instanceof Boolean
+                || value instanceof Integer || value instanceof Long
+                || value instanceof Byte || value instanceof Short
+                || value instanceof Float || value instanceof Double) {
            return value.toString();
         } else if (value instanceof Date) {
             long time = ((Date) value).getTime();
             return String.format("new Date(%s)", time);
         } else if (value instanceof Collection) {
-            List<String> transformed = ((Collection<?>) value).stream()
-                .map(JavaScriptVariableConverter::convertToString)
-                .collect(Collectors.toList());
-            return String.format("[ %s ]", String.join(", ", transformed));
+            Collection<Object> collection = (Collection<Object>) value;
+            return convertToString(collection);
         } else if (value.getClass().isArray()) {
-            List<String> transformed = Arrays.asList((Object[]) value).stream()
-                    .map(JavaScriptVariableConverter::convertToString)
-                    .collect(Collectors.toList());
-            return String.format("[ %s ]", String.join(", ", transformed));
+            List<Object> list = Arrays.asList((Object[]) value);
+            return convertToString(list);
         } else if (value instanceof Map) {
-            @SuppressWarnings("unchecked")
-            Map<Object, Object> map = (Map<Object, Object>) value;
-    
-            List<String> mapEntriesAsString = map.entrySet().stream()
-                .map(entry -> {
-                            String key = convertToString(entry.getKey());
-                            String valueString = convertToString(entry.getValue());
-    
-                            return String.format("%s = %s;", key, valueString);
-                })
-                .collect(Collectors.toList());
-            return String.format("{ %s }", String.join(", ", mapEntriesAsString));
+            return convertToString((Map<Object, Object>) value);
         } else {
             return convertToString(value.toString());
         }
+    }
+
+    private static String convertToString(Collection<Object> objectStream) {
+        return String.format("[ %s ]", objectStream.stream()
+                .map(JavaScriptVariableConverter::convertToString)
+                .collect(Collectors.joining(", ")));
+    }
+
+    private static String convertToString(Map<Object, Object> map) {
+        return String.format("{ %s }", map.entrySet().stream()
+                .map(entry -> {
+                    String key = convertToString(entry.getKey());
+                    String valueString = convertToString(entry.getValue());
+
+                    return String.format("%s : %s", key, valueString);
+                })
+                .collect(Collectors.joining(", ")));
     }
 
 }
