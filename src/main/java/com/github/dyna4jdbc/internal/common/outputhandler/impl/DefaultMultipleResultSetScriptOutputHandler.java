@@ -17,7 +17,7 @@
  
 package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
-import com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet;
+import com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableAdapterResultSet;
 import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.common.outputhandler.MultipleResultSetScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
@@ -64,7 +64,7 @@ final class DefaultMultipleResultSetScriptOutputHandler implements MultipleResul
     public List<ResultSet> getResultSets() {
 
         return stdOut.getDataTableList().stream()
-                .map(dataTable -> new DataTableHolderResultSet(statement, dataTable, columnHandlerFactory))
+                .map(dataTable -> new DataTableAdapterResultSet(statement, dataTable, columnHandlerFactory))
                 .collect(Collectors.toList());
     }
 

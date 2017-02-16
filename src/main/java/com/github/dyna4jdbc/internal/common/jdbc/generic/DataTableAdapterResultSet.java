@@ -27,21 +27,19 @@ import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
 import java.sql.*;
 import java.util.*;
 
-public final class DataTableHolderResultSet extends DataRowListResultSet<List<String>> {
+public final class DataTableAdapterResultSet extends DataRowListResultSet<List<String>> {
 
-    private final DataTable dataTable;
+    private final int columnCount;
 
-    public DataTableHolderResultSet(
+    public DataTableAdapterResultSet(
             Statement statement, DataTable dataTable, ColumnHandlerFactory columnHandlerFactory) {
 
         super(dataTable.getRows(), statement, initColumnHandlers(dataTable, columnHandlerFactory));
-        this.dataTable = dataTable;
+        columnCount = dataTable.getColumnCount();
 
         if (checkFirstRowIsSkipped(getColumnHandlers())) {
             super.skipNextRowIfPresent();
         }
-
-        registerAsChild(dataTable);
     }
 
     private static List<ColumnHandler> initColumnHandlers(DataTable dataTable,
@@ -107,7 +105,7 @@ public final class DataTableHolderResultSet extends DataRowListResultSet<List<St
 
         List<String> currentRow = getCurrentRow();
 
-        if (!(javaIndex >= 0 && javaIndex < dataTable.getColumnCount())) {
+        if (!(javaIndex >= 0 && javaIndex < columnCount)) {
             throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException(
                     "Invalid index: " + sqlColumnIndex);
         }

@@ -19,7 +19,7 @@ package com.github.dyna4jdbc.internal.common.outputhandler.impl;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableHolderResultSet;
+import com.github.dyna4jdbc.internal.common.jdbc.generic.DataTableAdapterResultSet;
 import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
@@ -80,7 +80,7 @@ final class DefaultSingleResultSetScriptOutputHandler implements SingleResultSet
                         "Expected one ResultSet, script generated multiple: " + dataTableList.size());
         }
 
-        return new DataTableHolderResultSet(statement, singleDataTable, columnHandlerFactory);
+        return new DataTableAdapterResultSet(statement, singleDataTable, columnHandlerFactory);
     }
 
     @Override
