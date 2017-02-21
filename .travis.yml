@@ -2,7 +2,7 @@ language: java
 jdk:
   - oraclejdk8
 script: 
-  - nvm install v4.6.0
-  - nvm use v4.6.0
+  - nvm install v7.4.0
+  - nvm use v7.4.0
   - node --version
   - mvn test
