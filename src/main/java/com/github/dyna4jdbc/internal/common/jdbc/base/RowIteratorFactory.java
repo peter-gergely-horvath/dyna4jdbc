@@ -25,6 +25,7 @@ import java.util.List;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.ResultSetScriptOutputHandlerConstants;
 import com.github.dyna4jdbc.internal.common.util.collection.BoundedIterator;
+import com.github.dyna4jdbc.internal.common.util.collection.RemoveRetrievedElementIterator;
 
 final class RowIteratorFactory {
     
@@ -49,10 +50,13 @@ final class RowIteratorFactory {
                 maxRows = ResultSetScriptOutputHandlerConstants.MAX_ROWS_NO_BOUNDS;
             }
 
+            Iterator<T> actualRowIterator =
+                    new RemoveRetrievedElementIterator<T>(dataRows.iterator());
+
             if (maxRows != ResultSetScriptOutputHandlerConstants.MAX_ROWS_NO_BOUNDS) {
-                return new BoundedIterator<>(dataRows.iterator(), maxRows);
+                return new BoundedIterator<>(actualRowIterator, maxRows);
             } else {
-                return dataRows.iterator();
+                return actualRowIterator;
             }
 
         } catch (SQLException e) {
