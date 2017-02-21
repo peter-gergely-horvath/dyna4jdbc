@@ -168,6 +168,25 @@ public abstract class IntegrationTestBase {
             }
         }
     }
+
+    protected void assertDataBaseMetadataReturns(
+            String expectedProductName, String expectedVersion) throws SQLException {
+
+        try (Connection connection = DriverManager.getConnection(jdbcUrl)) {
+
+            DatabaseMetaData metaData = connection.getMetaData();
+
+            assertNotNull(metaData);
+
+            String databaseProductName = metaData.getDatabaseProductName();
+            assertEquals(databaseProductName, expectedProductName);
+
+
+            String databaseVersion = metaData.getDatabaseProductVersion();
+            assertEquals(databaseVersion, expectedVersion);
+
+        }
+    }
     
     public abstract void testWritingFromUpdateThrowsSQLException() throws Exception;
     

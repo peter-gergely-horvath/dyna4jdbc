@@ -19,7 +19,9 @@ package com.github.dyna4jdbc.integrationtests;
 
 import org.testng.annotations.Test;
 
-import java.sql.SQLException;
+import java.sql.*;
+
+import static org.testng.Assert.assertEquals;
 
 public class NodeJSTest extends IntegrationTestBase {
 
@@ -110,6 +112,12 @@ public class NodeJSTest extends IntegrationTestBase {
         String script = "console.log(\"Message::\");\n console.log(parameter1)";
 
         assertPreparedStatementQueryReturnsParameter(script);
+    }
+
+    @Test
+    public void testDatabaseMetaDataProductInformation() throws Exception {
+
+        assertDataBaseMetadataReturns("Node.js", "7.4.0");
     }
 
 }

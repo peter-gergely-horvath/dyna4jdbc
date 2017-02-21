@@ -48,7 +48,11 @@ class NodeJsDatabaseMetaData extends AbstractDatabaseMetaData<Connection> {
             try (Statement statement = getConnection().createStatement()) {
                 try (ResultSet resultSet = statement.executeQuery(PRINT_NODE_JS_VERSION)) {
                     if (resultSet.next()) {
-                        versionString = resultSet.getString(1);
+                        String resultSetString = resultSet.getString(1);
+                        /* Remove non-numeric/dot characters from output
+                         * e.g. "v7.4.0" --> "7.4.0"
+                         */
+                        versionString = resultSetString.replaceAll("[^\\d\\.]", "");
                     }
                 }
             }    
