@@ -19,7 +19,10 @@ package com.github.dyna4jdbc.integrationtests;
 
 import org.testng.annotations.Test;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class GroovyScriptEngineTest extends IntegrationTestBase {
 

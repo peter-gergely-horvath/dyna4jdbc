@@ -54,7 +54,7 @@ public class DriverTest {
     @Test
     public void testDriverLoadAndConnectionAcquisition() throws SQLException {
 
-        try (Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:JavaScript");) {
+        try (Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:JavaScript")) {
 
             assertNotNull(connection);
         }
@@ -156,7 +156,7 @@ public class DriverTest {
 
         ConnectionFactory mockConnectionFactory = new ConnectionFactory() {
             @Override
-            Connection newConnection(String factoryConfiguration, Properties info) throws SQLException {
+            Connection newConnection(String factoryConfiguration, Properties properties) throws SQLException {
 
                 assertEquals(factoryConfiguration, "foo:bar/baz");
 

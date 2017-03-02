@@ -17,8 +17,6 @@
  
 package com.github.dyna4jdbc;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Locale;
@@ -31,7 +29,7 @@ import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.nodejs.jdbc.impl.NodeJsConnection;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnection;
-import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DefaultScriptEngineConnection;
+import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScriptEngineConnection;
 
 class ConnectionFactory {
 
@@ -41,14 +39,14 @@ class ConnectionFactory {
         return INSTANCE;
     }
 
-    Connection newConnection(String factoryConfiguration, Properties info) throws SQLException {
+    Connection newConnection(String factoryConfiguration, Properties properties) throws SQLException {
         try {
             String[] bridgeNameAndConfig = factoryConfiguration.split(":", 2);
 
-            String bridgeName = bridgeNameAndConfig[0].toLowerCase(Locale.ENGLISH);
+            String connectionType = bridgeNameAndConfig[0].toLowerCase(Locale.ENGLISH);
             String config = ArrayUtils.tryGetByIndex(bridgeNameAndConfig, 1);
 
-            return newConnection(bridgeName, config, info);
+            return newConnection(connectionType, config, properties);
 
         } catch (MisconfigurationException ex) {
             String causeMessage = ExceptionUtils.getRootCauseMessage(ex);
@@ -86,62 +84,24 @@ class ConnectionFactory {
     }
 
 
-    protected Connection newConnection(String connectionType, String config, Properties info) throws Exception {
+    protected Connection newConnection(String connectionType, String config, Properties properties) throws Exception {
 
-        try {
-
-            Class<? extends Connection> connectionClass;
-
-            switch (connectionType) {
-                case "experimental-process-runner":
-                    connectionClass = ProcessRunnerConnection.class;
-                    break;
-
-                case "scriptengine":
-                    connectionClass = getScriptEngineConnectionClassForConfiguration(connectionType, config);
-                    break;
-
-                case "nodejs":
-                    connectionClass = NodeJsConnection.class;
-                    break;
-
-                default:
-                    throw MisconfigurationException.forMessage("No such connection type: '%s'", connectionType);
-            }
-
-            Constructor<? extends Connection> connectionConstructor =
-                    connectionClass.getConstructor(String.class, Properties.class);
-
-            return connectionConstructor.newInstance(config, info);
+        switch (connectionType) {
+            case "experimental-process-runner":
+                return new ProcessRunnerConnection(config, properties);
 
 
-        } catch (InvocationTargetException ite) {
-            Throwable cause = ite.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            } else if (cause instanceof Error) {
-                throw (Error) cause;
-            } else if (cause instanceof Exception) {
-                throw (Exception) cause;
-            } else {
-                // cause is null? This should not happen: we expect
-                // that root cause will always be non-null
-                throw new IllegalStateException(ite);
-            }
+            case "scriptengine":
+                return new ScriptEngineConnection(config, properties);
+
+
+            case "nodejs":
+                return new NodeJsConnection(config, properties);
+
+
+            default:
+                throw MisconfigurationException.forMessage("No such connection type: '%s'", connectionType);
         }
-    }
-
-    private Class<? extends Connection> getScriptEngineConnectionClassForConfiguration(
-            String connectionType, String config) throws MisconfigurationException {
-
-        Class<? extends Connection> connectionClass;
-        if (config == null || config.matches("\\s+:")) {
-            throw MisconfigurationException.forMessage(
-                    "ScriptEngine name must be specified", connectionType);
-        }
-
-        connectionClass = DefaultScriptEngineConnection.class;
-        return connectionClass;
     }
 
 }

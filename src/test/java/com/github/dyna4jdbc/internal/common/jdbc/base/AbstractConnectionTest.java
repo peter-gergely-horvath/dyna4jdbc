@@ -36,13 +36,13 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 
+import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.ScriptEngineConnection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
-import com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.DefaultScriptEngineConnection;
 
 public class AbstractConnectionTest {
 
@@ -52,8 +52,8 @@ public class AbstractConnectionTest {
     @BeforeMethod
     public void beforeMethod() throws SQLException, MisconfigurationException {
 
-        // we use JavaScript DefaultScriptEngineConnection to test AbstractConnection
-        class TestingAbstractConnection extends DefaultScriptEngineConnection {
+        // we use JavaScript ScriptEngineConnection to test AbstractConnection
+        class TestingAbstractConnection extends ScriptEngineConnection {
 
             public TestingAbstractConnection(String parameters, Properties properties)
                     throws SQLException, MisconfigurationException {

@@ -38,13 +38,13 @@ public class ConnectionFactoryTest {
 
         ConnectionFactory mockConnectionFactory = new ConnectionFactory() {
             @Override
-            protected Connection newConnection(String connectionType, String config, Properties info) throws Exception {
+            protected Connection newConnection(String connectionType, String config, Properties properties) throws Exception {
 
                 assertEquals(connectionType, "foo");
 
                 assertEquals(config, "bar:baz");
 
-                assertEquals(info, connectionProperties);
+                assertEquals(properties, properties);
 
 
                 return null;
@@ -61,13 +61,13 @@ public class ConnectionFactoryTest {
 
         ConnectionFactory mockConnectionFactory = new ConnectionFactory() {
             @Override
-            protected Connection newConnection(String connectionType, String config, Properties info) throws Exception {
+            protected Connection newConnection(String connectionType, String config, Properties properties) throws Exception {
 
                 assertEquals(connectionType, "foo");
 
                 assertEquals(config, null);
 
-                assertEquals(info, connectionProperties);
+                assertEquals(properties, properties);
 
 
                 return null;
@@ -84,13 +84,13 @@ public class ConnectionFactoryTest {
 
         ConnectionFactory mockConnectionFactory = new ConnectionFactory() {
             @Override
-            protected Connection newConnection(String connectionType, String config, Properties info) throws Exception {
+            protected Connection newConnection(String connectionType, String config, Properties properties) throws Exception {
 
                 assertEquals(connectionType, "foo");
 
                 assertEquals(config, "");
 
-                assertEquals(info, connectionProperties);
+                assertEquals(properties, properties);
 
 
                 return null;
@@ -107,13 +107,13 @@ public class ConnectionFactoryTest {
 
         ConnectionFactory mockConnectionFactory = new ConnectionFactory() {
             @Override
-            protected Connection newConnection(String connectionType, String config, Properties info) throws Exception {
+            protected Connection newConnection(String connectionType, String config, Properties properties) throws Exception {
 
                 assertEquals(connectionType, "foobar");
 
                 assertEquals(config, "");
 
-                assertEquals(info, connectionProperties);
+                assertEquals(properties, properties);
 
                 return null;
             }

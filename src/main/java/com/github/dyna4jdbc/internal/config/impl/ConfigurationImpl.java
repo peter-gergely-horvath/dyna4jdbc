@@ -137,7 +137,7 @@ class ConfigurationImpl implements Configuration {
         this.classpath = new ArrayList<>(classpath);
     }
 
-    public void setinitScriptPath(String initScript) {
+    public void setInitScriptPath(String initScript) {
         this.initScriptPath = initScript;
     }
 

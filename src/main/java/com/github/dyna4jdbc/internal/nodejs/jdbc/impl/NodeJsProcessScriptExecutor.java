@@ -34,6 +34,7 @@ import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.DefaultExternalProc
 class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
 
     private static final String NODE_PROCESS_NAME = "node";
+    private static final String NODE_COMMAND_LINE_ARGUMENT = "-e";
 
     private final String replInitScript;
     private final Configuration configuration;
@@ -96,7 +97,7 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
 
         @Override
         protected void onMultipleWarnings(String script, LinkedList<SQLWarning> warningList) {
-            throw JDBCError.CONNECT_FAILED_EXCEPTION.raiseUncheckedExceptionWithSuppressed(warningList,
+            throw JDBCError.NODE_JS_INTEGRATION_ERROR.raiseUncheckedExceptionWithSuppressed(warningList,
                     "stdERR write while invoking dyna4JDBC auto-generated JavaScript intended to set a variable. "
                     + "Script is: " + script);
         }
@@ -116,7 +117,7 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
 
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command(Arrays.asList(NODE_PROCESS_NAME, "-e", replInitScript));
+            processBuilder.command(Arrays.asList(NODE_PROCESS_NAME, NODE_COMMAND_LINE_ARGUMENT, replInitScript));
 
             if (variables != null) {
 

@@ -38,7 +38,7 @@ public enum ConfigurationEntry {
         void setConfiguration(ConfigurationImpl config, String value) throws MisconfigurationException {
             if (value != null && value.trim().length() != 0) {
                 
-                config.setinitScriptPath(value);
+                config.setInitScriptPath(value);
             }
         }
     },
