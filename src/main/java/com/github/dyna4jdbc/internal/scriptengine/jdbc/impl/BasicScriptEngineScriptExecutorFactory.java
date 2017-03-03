@@ -30,18 +30,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-final class DefaultScriptEngineScriptExecutorFactory implements ScriptEngineScriptExecutorFactory {
+final class BasicScriptEngineScriptExecutorFactory implements ScriptEngineScriptExecutorFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(DefaultScriptEngineScriptExecutorFactory.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(BasicScriptEngineScriptExecutorFactory.class.getName());
 
     private final Configuration configuration;
 
-    private DefaultScriptEngineScriptExecutorFactory(Configuration configuration) {
+    private BasicScriptEngineScriptExecutorFactory(Configuration configuration) {
         this.configuration = configuration;
     }
 
-    static DefaultScriptEngineScriptExecutorFactory getInstance(Configuration configuration) {
-        return new DefaultScriptEngineScriptExecutorFactory(configuration);
+    static BasicScriptEngineScriptExecutorFactory getInstance(Configuration configuration) {
+        return new BasicScriptEngineScriptExecutorFactory(configuration);
     }
 
     @Override
@@ -52,7 +52,7 @@ final class DefaultScriptEngineScriptExecutorFactory implements ScriptEngineScri
 
         ScriptEngine engine = loadEngineByName(scriptEngineName, this.configuration, classloaderFactory);
 
-        return new DefaultScriptEngineScriptExecutor(scriptEngineName, engine, configuration);
+        return new BasicScriptEngineScriptExecutor(scriptEngineName, engine, configuration);
     }
 
     private static ScriptEngine loadEngineByName(

@@ -31,8 +31,9 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
-class DefaultScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
+class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
 
     private final Object lockObject = new Object();
 
@@ -43,7 +44,7 @@ class DefaultScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
 
     private AtomicReference<AbortableOutputStream.AbortHandler> streamAbortHandlerRef = new AtomicReference<>();
 
-    DefaultScriptEngineScriptExecutor(String systemName, ScriptEngine engine, Configuration configuration) {
+    BasicScriptEngineScriptExecutor(String systemName, ScriptEngine engine, Configuration configuration) {
         this.systemName = systemName;
         this.engine = engine;
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
@@ -112,6 +113,22 @@ class DefaultScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
                 streamAbortHandlerRef.set(null);
             }
         } // end of synchronized (lockObject) block
+    }
+
+    @Override
+    public void setVariables(Map<String, Object> variables) {
+        Bindings bindings = getBindings(engine.getContext());
+
+        applyVariablesToEngineScope(variables, bindings);
+    }
+
+    @Override
+    public Map<String, Object> getVariables() {
+        Bindings bindings = getBindings(engine.getContext());
+
+        return bindings.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private Bindings getBindings(ScriptContext engineContext) {

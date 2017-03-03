@@ -74,7 +74,7 @@ public class ScriptEngineConnection extends AbstractConnection {
         this.columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
 
         ScriptEngineScriptExecutorFactory scriptExecutorFactory =
-                DefaultScriptEngineScriptExecutorFactory.getInstance(configuration);
+                RebindableScriptEngineScriptExecutorFactory.getInstance(configuration);
 
         this.scriptExecutor = scriptExecutorFactory.newScriptEngineScriptExecutor(engineName);
 

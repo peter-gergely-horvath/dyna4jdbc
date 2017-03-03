@@ -6,16 +6,16 @@ import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
 import java.sql.SQLException;
 
-final class DelegatingScriptEngineScriptExecutorFactory implements ScriptEngineScriptExecutorFactory {
+final class RebindableScriptEngineScriptExecutorFactory implements ScriptEngineScriptExecutorFactory {
 
     private final Configuration configuration;
 
-    private DelegatingScriptEngineScriptExecutorFactory(Configuration configuration) {
+    private RebindableScriptEngineScriptExecutorFactory(Configuration configuration) {
         this.configuration = configuration;
     }
 
-    static DelegatingScriptEngineScriptExecutorFactory getInstance(Configuration configuration) {
-        return new DelegatingScriptEngineScriptExecutorFactory(configuration);
+    static RebindableScriptEngineScriptExecutorFactory getInstance(Configuration configuration) {
+        return new RebindableScriptEngineScriptExecutorFactory(configuration);
     }
 
 
@@ -23,11 +23,11 @@ final class DelegatingScriptEngineScriptExecutorFactory implements ScriptEngineS
     public ScriptEngineScriptExecutor newScriptEngineScriptExecutor(String scriptEngineName)
             throws SQLException, MisconfigurationException {
 
-        DefaultScriptEngineScriptExecutorFactory scriptExecutorFactory =
-                DefaultScriptEngineScriptExecutorFactory.getInstance(configuration);
+        BasicScriptEngineScriptExecutorFactory scriptExecutorFactory =
+                BasicScriptEngineScriptExecutorFactory.getInstance(configuration);
 
         ScriptEngineScriptExecutor delegate = scriptExecutorFactory.newScriptEngineScriptExecutor(scriptEngineName);
 
-        return new DelegatingScriptEngineScriptExecutor(delegate, configuration);
+        return new RebindableScriptEngineScriptExecutor(delegate, configuration);
     }
 }
