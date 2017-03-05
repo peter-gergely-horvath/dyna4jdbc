@@ -4,6 +4,8 @@ package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
+import com.github.dyna4jdbc.internal.common.util.io.CloseSuppressingOutputStream;
+import com.github.dyna4jdbc.internal.common.util.io.DelegatingAutoCloseable;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
@@ -19,7 +21,7 @@ import java.util.regex.Pattern;
 final class RebindableScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
 
     private static final Pattern INTERPRETER_COMMAND_PATTERN =
-            Pattern.compile("(.*)(?:\\n|\\r)*(?:\\s*)(?<!jdbc:)dyna4jdbc:(.*)(?:\\n|\\r)?(.*)",
+            Pattern.compile("(.*)(?:\\n|\\r)*(?:\\s*)(?<!jdbc:)dyna4jdbc:(.*)(?:\\n|\\r)*(.*)",
                     Pattern.CASE_INSENSITIVE & Pattern.MULTILINE & Pattern.DOTALL);
 
     private static final int BEFORE_INTERPRETER_COMMAND_GROUP = 1;
@@ -74,38 +76,67 @@ final class RebindableScriptEngineScriptExecutor implements ScriptEngineScriptEx
             OutputStream stdOutOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
-        if (!INTERPRETER_COMMAND_PATTERN.matcher(script).matches()) {
+            if (!INTERPRETER_COMMAND_PATTERN.matcher(script).matches()) {
 
             executeWithDelegate(script, variables, stdOutOutputStream, errorOutputStream);
 
         } else {
+                /*
+                TODO: Refactor / simplify this:
 
-            Matcher matcher = INTERPRETER_COMMAND_PATTERN.matcher(script);
-            while (matcher.find()) {
-                String beforeCommand = matcher.group(BEFORE_INTERPRETER_COMMAND_GROUP);
-                String interpreterCommandString = matcher.group(INTERPRETER_COMMAND_GROUP);
-                String afterCommand = matcher.group(AFTER_INTERPRETER_COMMAND_GROUP);
+                Implementing the re-binding of the ScriptEngine is somewhat complex here, as
+                OutputCapturingScriptExecutor.executeScriptUsingStreams CLOSES the streams passed
+                to it.
 
-                InterpreterCommand interpreterCommand = Arrays.stream(InterpreterCommand.values())
-                        .filter(it -> it.canHandle(interpreterCommandString))
-                        .findFirst()
-                        .orElseThrow(() ->
-                                new ScriptExecutionException(
-                                        "Cannot process as interpreter command: " + interpreterCommandString));
+                The work-around we introduce here is passing a close-suppressing OutputStream proxy
+                to the actual calls (both to the current ScriptExecutor and the new one as well).
+                We ensure that the underlying streams are closed by creating autoCloseableStdOut and
+                autoCloseableStdErr placeholder variables, while will be handled automatic resource management
+                and hence ensure that the wrapped streams are closed at the end of work.
+                */
+                try (AutoCloseable autoCloseableStdOut = new DelegatingAutoCloseable(stdOutOutputStream);
+                     AutoCloseable autoCloseableStdErr = new DelegatingAutoCloseable(errorOutputStream)) {
 
-
-                if (beforeCommand != null && !"".equals(beforeCommand.trim())) {
-
-                    executeWithDelegate(beforeCommand, variables, stdOutOutputStream, errorOutputStream);
+                    executeWithCloseSuppressingOutputStreams(script, variables,
+                            new CloseSuppressingOutputStream(stdOutOutputStream),
+                            new CloseSuppressingOutputStream(errorOutputStream));
+                } catch (Exception autoCloseException) {
+                    throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+                            autoCloseException, "I/O error closing steam");
                 }
+            }
+    }
 
-                String parameters = interpreterCommandString.trim().substring(interpreterCommand.commandName.length());
-                interpreterCommand.parseParametersAndExecute(parameters, this);
+    private void executeWithCloseSuppressingOutputStreams(String script, Map<String, Object> variables,
+                                                          OutputStream stdOutOutputStream,
+                                                          OutputStream errorOutputStream)
+            throws ScriptExecutionException {
 
-                if (afterCommand != null && !"".equals(afterCommand.trim())) {
+        Matcher matcher = INTERPRETER_COMMAND_PATTERN.matcher(script);
+        while (matcher.find()) {
+            String beforeCommand = matcher.group(BEFORE_INTERPRETER_COMMAND_GROUP);
+            String interpreterCommandString = matcher.group(INTERPRETER_COMMAND_GROUP);
+            String afterCommand = matcher.group(AFTER_INTERPRETER_COMMAND_GROUP);
 
-                    executeWithDelegate(afterCommand, variables, stdOutOutputStream, errorOutputStream);
-                }
+            InterpreterCommand interpreterCommand = Arrays.stream(InterpreterCommand.values())
+                    .filter(it -> it.canHandle(interpreterCommandString))
+                    .findFirst()
+                    .orElseThrow(() ->
+                            new ScriptExecutionException(
+                                    "Cannot process as interpreter command: " + interpreterCommandString));
+
+
+            if (beforeCommand != null && !"".equals(beforeCommand.trim())) {
+
+                executeWithDelegate(beforeCommand, variables, stdOutOutputStream, errorOutputStream);
+            }
+
+            String parameters = interpreterCommandString.trim().substring(interpreterCommand.commandName.length());
+            interpreterCommand.parseParametersAndExecute(parameters, this);
+
+            if (afterCommand != null && !"".equals(afterCommand.trim())) {
+
+                executeWithDelegate(afterCommand, variables, stdOutOutputStream, errorOutputStream);
             }
         }
     }

@@ -11,4 +11,10 @@
         <Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
         <!-- We explicitly want to convert null to null byte array in the converters -->
     </Match>
+    <Match>
+        <Class name="com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.RebindableScriptEngineScriptExecutor" />
+        <Method name="executeScriptUsingStreams" />
+        <Bug pattern="REC_CATCH_EXCEPTION" />
+        <!-- Exception is thrown from the ARM block close -->
+    </Match>
 </FindBugsFilter>
