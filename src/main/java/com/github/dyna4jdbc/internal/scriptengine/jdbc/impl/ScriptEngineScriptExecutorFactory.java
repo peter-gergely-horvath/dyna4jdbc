@@ -24,6 +24,9 @@ import java.sql.SQLException;
 
 interface ScriptEngineScriptExecutorFactory {
 
-    ScriptEngineScriptExecutor newScriptEngineScriptExecutor(String scriptEngineName)
+    ScriptEngineScriptExecutor newInterpreterEnhancedScriptEngineScriptExecutor(String scriptEngineName)
+            throws SQLException, MisconfigurationException;
+
+    ScriptEngineScriptExecutor newBasicScriptEngineScriptExecutor(String scriptEngineName)
             throws SQLException, MisconfigurationException;
 }

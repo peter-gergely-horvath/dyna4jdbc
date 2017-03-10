@@ -33,20 +33,31 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
+final class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
 
     private final Object lockObject = new Object();
 
     private final String systemName;
-    private final ScriptEngine engine;
+
+    private final ScriptEngine scriptEngine;
 
     private final IOHandlerFactory ioHandlerFactory;
 
     private AtomicReference<AbortableOutputStream.AbortHandler> streamAbortHandlerRef = new AtomicReference<>();
 
-    BasicScriptEngineScriptExecutor(String systemName, ScriptEngine engine, Configuration configuration) {
+    BasicScriptEngineScriptExecutor(String systemName, ScriptEngine scriptEngine, Configuration configuration) {
+        if (systemName == null || "".equals(systemName.trim())) {
+            throw new NullPointerException("argument systemName cannot be null");
+        }
+        if (scriptEngine == null) {
+            throw new NullPointerException("argument scriptEngine cannot be null");
+        }
+        if (configuration == null) {
+            throw new NullPointerException("argument configuration cannot be null");
+        }
+
         this.systemName = systemName;
-        this.engine = engine;
+        this.scriptEngine = scriptEngine;
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
     }
 
@@ -78,13 +89,13 @@ class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
              * with each other: remember that ScriptEngines store state and hence are NOT thread-safe.
              * By synchronizing here, we basically implement a mutual exclusion policy for the ScriptEngine.
              */
-            ScriptContext engineContext = engine.getContext();
+            ScriptContext engineContext = scriptEngine.getContext();
             if (engineContext == null) {
                 throw JDBCError.NON_STANDARD_COMPLIANT_SCRIPTENGINE.raiseUncheckedException(
                         "javax.script.ScriptEngine.getContext() returned null");
             }
 
-            Bindings bindings = getBindings(engineContext);
+            Bindings bindings = getBindings(scriptEngine);
 
             Writer originalWriter = engineContext.getWriter();
             Writer originalErrorWriter = engineContext.getErrorWriter();
@@ -97,7 +108,7 @@ class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
 
                 applyVariablesToEngineScope(variables, bindings);
 
-                engine.eval(script);
+                scriptEngine.eval(script);
 
 
             } catch (ScriptException e) {
@@ -117,21 +128,22 @@ class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
 
     @Override
     public void setVariables(Map<String, Object> variables) {
-        Bindings bindings = getBindings(engine.getContext());
+        Bindings bindings = getBindings(scriptEngine);
 
         applyVariablesToEngineScope(variables, bindings);
     }
 
     @Override
     public Map<String, Object> getVariables() {
-        Bindings bindings = getBindings(engine.getContext());
+        Bindings bindings = getBindings(scriptEngine);
 
         return bindings.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private Bindings getBindings(ScriptContext engineContext) {
+    private static Bindings getBindings(ScriptEngine engine) {
+        ScriptContext engineContext = engine.getContext();
         Bindings bindings = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
         if (bindings == null) {
             // Work-around for Renjin ScriptEngine issue
@@ -192,7 +204,7 @@ class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
 
     @Override
     public String getHumanFriendlyName() {
-        ScriptEngineFactory factory = this.engine.getFactory();
+        ScriptEngineFactory factory = this.scriptEngine.getFactory();
 
         // graceful handling of cases, where the ScriptEngine returns null
         if (factory != null) {
@@ -207,7 +219,7 @@ class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
 
     @Override
     public String getVersion() {
-        ScriptEngineFactory factory = this.engine.getFactory();
+        ScriptEngineFactory factory = this.scriptEngine.getFactory();
 
         // graceful handling of cases, where the ScriptEngine returns null
         if (factory != null) {
@@ -220,7 +232,7 @@ class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
     @Override
     public String toString() {
         return String.format("%s (%s, wrapping: %s)",
-                super.toString(), systemName, engine);
+                super.toString(), systemName, scriptEngine);
 
     }
 }

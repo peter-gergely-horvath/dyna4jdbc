@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-final class RebindableScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
+final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
 
     private static final Pattern INTERPRETER_COMMAND_PATTERN =
             Pattern.compile("(.*)(?:\\n|\\r)*(?:\\s*)(?<!jdbc:)dyna4jdbc:(.*)(?:\\n|\\r)*(.*)",
@@ -49,12 +49,12 @@ final class RebindableScriptEngineScriptExecutor implements ScriptEngineScriptEx
 
     private final ConcurrentHashMap<String, ScriptEngineScriptExecutor> scriptExecutorMap = new ConcurrentHashMap<>();
 
-    private final BasicScriptEngineScriptExecutorFactory scriptEngineScriptExecutorFactory;
+    private final ScriptEngineScriptExecutorFactory scriptEngineScriptExecutorFactory;
 
-    RebindableScriptEngineScriptExecutor(ScriptEngineScriptExecutor delegate, Configuration configuration) {
+    InterpreterEnhancedScriptEngineScriptExecutor(ScriptEngineScriptExecutor delegate, Configuration configuration) {
 
         this.delegateRef.set(delegate);
-        this.scriptEngineScriptExecutorFactory = BasicScriptEngineScriptExecutorFactory.getInstance(configuration);
+        this.scriptEngineScriptExecutorFactory = DefaultScriptEngineScriptExecutorFactory.getInstance(configuration);
     }
 
     @Override
@@ -174,7 +174,7 @@ final class RebindableScriptEngineScriptExecutor implements ScriptEngineScriptEx
         SET_SCRIPTENGINE("set-ScriptEngine") {
             @Override
             protected void parseParametersAndExecute(
-                    String parameters, RebindableScriptEngineScriptExecutor context)
+                    String parameters, InterpreterEnhancedScriptEngineScriptExecutor context)
                     throws ScriptExecutionException {
 
                 String scriptEngineName = parameters.trim();
@@ -201,7 +201,7 @@ final class RebindableScriptEngineScriptExecutor implements ScriptEngineScriptEx
         }
 
         protected abstract void parseParametersAndExecute(
-                String parameters, RebindableScriptEngineScriptExecutor context)
+                String parameters, InterpreterEnhancedScriptEngineScriptExecutor context)
                 throws ScriptExecutionException;
     }
 
@@ -217,7 +217,8 @@ final class RebindableScriptEngineScriptExecutor implements ScriptEngineScriptEx
 
                 scriptEngineName -> {
                     try {
-                        return this.scriptEngineScriptExecutorFactory.newScriptEngineScriptExecutor(scriptEngineName);
+                        return this.scriptEngineScriptExecutorFactory.
+                                newBasicScriptEngineScriptExecutor(scriptEngineName);
                     } catch (SQLException | MisconfigurationException ex) {
                         throw JDBCError.LOADING_SCRIPTENGINE_FAILED.raiseUncheckedException(ex, scriptEngineName);
                     }

@@ -17,6 +17,7 @@
  
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
+
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.util.classpath.ClassLoaderFactory;
 import com.github.dyna4jdbc.internal.common.util.classpath.DefaultClassLoaderFactory;
@@ -30,22 +31,32 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-final class BasicScriptEngineScriptExecutorFactory implements ScriptEngineScriptExecutorFactory {
+final class DefaultScriptEngineScriptExecutorFactory implements ScriptEngineScriptExecutorFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(BasicScriptEngineScriptExecutorFactory.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DefaultScriptEngineScriptExecutorFactory.class.getName());
 
     private final Configuration configuration;
 
-    private BasicScriptEngineScriptExecutorFactory(Configuration configuration) {
+    private DefaultScriptEngineScriptExecutorFactory(Configuration configuration) {
         this.configuration = configuration;
     }
 
-    static BasicScriptEngineScriptExecutorFactory getInstance(Configuration configuration) {
-        return new BasicScriptEngineScriptExecutorFactory(configuration);
+    static DefaultScriptEngineScriptExecutorFactory getInstance(Configuration configuration) {
+        return new DefaultScriptEngineScriptExecutorFactory(configuration);
+    }
+
+
+    @Override
+    public ScriptEngineScriptExecutor newInterpreterEnhancedScriptEngineScriptExecutor(String scriptEngineName)
+            throws SQLException, MisconfigurationException {
+
+        ScriptEngineScriptExecutor delegate = newBasicScriptEngineScriptExecutor(scriptEngineName);
+
+        return new InterpreterEnhancedScriptEngineScriptExecutor(delegate, configuration);
     }
 
     @Override
-    public ScriptEngineScriptExecutor newScriptEngineScriptExecutor(String scriptEngineName)
+    public ScriptEngineScriptExecutor newBasicScriptEngineScriptExecutor(String scriptEngineName)
             throws SQLException, MisconfigurationException {
 
         ClassLoaderFactory classloaderFactory = DefaultClassLoaderFactory.getInstance();

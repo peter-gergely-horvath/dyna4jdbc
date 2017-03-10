@@ -12,7 +12,7 @@
         <!-- We explicitly want to convert null to null byte array in the converters -->
     </Match>
     <Match>
-        <Class name="com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.RebindableScriptEngineScriptExecutor" />
+        <Class name="com.github.dyna4jdbc.internal.scriptengine.jdbc.impl.InterpreterEnhancedScriptEngineScriptExecutor" />
         <Method name="executeScriptUsingStreams" />
         <Bug pattern="REC_CATCH_EXCEPTION" />
         <!-- Exception is thrown from the ARM block close -->
