@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -46,15 +47,12 @@ final class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecuto
     private AtomicReference<AbortableOutputStream.AbortHandler> streamAbortHandlerRef = new AtomicReference<>();
 
     BasicScriptEngineScriptExecutor(String systemName, ScriptEngine scriptEngine, Configuration configuration) {
-        if (systemName == null || "".equals(systemName.trim())) {
-            throw new NullPointerException("argument systemName cannot be null");
+        Objects.requireNonNull(scriptEngine, "argument systemName cannot be null");
+        if ("".equals(systemName.trim())) {
+            throw new IllegalArgumentException("argument systemName cannot be empty/whitespace-only");
         }
-        if (scriptEngine == null) {
-            throw new NullPointerException("argument scriptEngine cannot be null");
-        }
-        if (configuration == null) {
-            throw new NullPointerException("argument configuration cannot be null");
-        }
+        Objects.requireNonNull(scriptEngine, "argument scriptEngine cannot be null");
+        Objects.requireNonNull(configuration, "argument configuration cannot be null");
 
         this.systemName = systemName;
         this.scriptEngine = scriptEngine;
