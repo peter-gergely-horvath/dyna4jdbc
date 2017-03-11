@@ -87,7 +87,7 @@ class ConnectionFactory {
     protected Connection newConnection(String connectionType, String config, Properties properties) throws Exception {
 
         switch (connectionType) {
-            case "experimental-process-runner":
+            case "process-runner":
                 return new ProcessRunnerConnection(config, properties);
 
 
