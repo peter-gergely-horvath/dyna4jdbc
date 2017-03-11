@@ -34,6 +34,7 @@ import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultColumnHand
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
+import com.github.dyna4jdbc.internal.config.impl.ConfigurationEntry;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
 public class ProcessRunnerConnection extends AbstractConnection {
@@ -47,9 +48,27 @@ public class ProcessRunnerConnection extends AbstractConnection {
             Properties properties)
             throws SQLException, MisconfigurationException {
 
-        this(parameters, properties, DefaultExternalProcessScriptExecutorFactory.getInstance());
+        this(parameters, checkProperties(parameters, properties),
+                DefaultExternalProcessScriptExecutorFactory.getInstance());
 
         registerAsChild(() -> onClose());
+    }
+
+    private static Properties checkProperties(String config, Properties properties) throws MisconfigurationException {
+
+        DefaultConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
+        Configuration configuration = configurationFactory.newConfigurationFromParameters(config, properties);
+
+        if (configuration.getEndOfDataPattern() == null
+                && configuration.getExternalCallQuietPeriodThresholdMs() == 0) {
+                throw MisconfigurationException.forMessage(
+                    "External process connection requires either '%s' or '%s' to be specified.",
+                            ConfigurationEntry.ENF_OF_DATA_REGEX.getKey(),
+                            ConfigurationEntry.EXTERNAL_COMMAND_NO_OUTPUT_EXPIRATION_INTERVAL_MS.getKey());
+        }
+
+        return properties;
+
     }
     
     protected ProcessRunnerConnection(

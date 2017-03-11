@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.sql.SQLException;
 
+import com.github.dyna4jdbc.internal.config.impl.ConfigurationEntry;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -83,7 +84,9 @@ public class ProcessRunnerTest {
     @Test
     public void testContent() throws SQLException {
 
-        String resultSetString = executeScriptForResultSetString("jdbc:dyna4jdbc:experimental-process-runner", commandToExecute);
+        String url = String.format("jdbc:dyna4jdbc:process-runner:%s=3000",
+                ConfigurationEntry.EXTERNAL_COMMAND_NO_OUTPUT_EXPIRATION_INTERVAL_MS.getKey());
+        String resultSetString = executeScriptForResultSetString(url, commandToExecute);
 
         assertNotNull(resultSetString);
 
