@@ -22,10 +22,10 @@ import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.util.io.CloseSuppressingOutputStream;
-import com.github.dyna4jdbc.internal.common.util.io.DelegatingAutoCloseable;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -93,47 +93,54 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
             OutputStream stdOutOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
-            if (!INTERPRETER_COMMAND_PATTERN.matcher(script).matches()) {
+        if (!INTERPRETER_COMMAND_PATTERN.matcher(script).matches()) {
 
-            executeWithDelegate(script, variables, stdOutOutputStream, errorOutputStream);
+            // no interpreter command found in input script: simply delegate to current ScriptEngineScriptExecutor
+
+            delegateExecuteScriptUsingStreams(script, variables, stdOutOutputStream, errorOutputStream);
 
         } else {
                 /*
-                TODO: Refactor / simplify this:
-
                 Implementing the re-binding of the ScriptEngine is somewhat complex here, as
-                OutputCapturingScriptExecutor.executeScriptUsingStreams CLOSES the streams passed
-                to it.
+                OutputCapturingScriptExecutor.executeScriptUsingStreams CLOSES the streams passed to it.
+                Since we might execute this method multiple times (before and after an interpreter command),
+                a possible second invocation of executeScriptUsingStreams would find the OutputStream in closed
+                state.
 
-                The work-around we introduce here is passing a close-suppressing OutputStream proxy
-                to the actual calls (both to the current ScriptExecutor and the new one as well).
-                We ensure that the underlying streams are closed by creating autoCloseableStdOut and
-                autoCloseableStdErr placeholder variables, while will be handled automatic resource management
-                and hence ensure that the wrapped streams are closed at the end of work.
+                To avoid this issue, we pass a close-suppressing OutputStream proxy to the actual execute calls,
+                (both to the current ScriptExecutor and the new one as well) and close the actual OutputStream
+                after the calls, in the finally blocks implemented here.
                 */
-                try (AutoCloseable autoCloseableStdOut = new DelegatingAutoCloseable(stdOutOutputStream);
-                     AutoCloseable autoCloseableStdErr = new DelegatingAutoCloseable(errorOutputStream)) {
+                try {
+                    try {
+                        try {
+                            executeScriptsAndInterpreterCommand(script, variables,
+                                    new CloseSuppressingOutputStream(stdOutOutputStream),
+                                    new CloseSuppressingOutputStream(errorOutputStream));
+                        } finally {
+                            stdOutOutputStream.close();
+                        }
+                    } finally {
+                        errorOutputStream.close();
 
-                    executeWithCloseSuppressingOutputStreams(script, variables,
-                            new CloseSuppressingOutputStream(stdOutOutputStream),
-                            new CloseSuppressingOutputStream(errorOutputStream));
-                } catch (Exception autoCloseException) {
+                    }
+                } catch (IOException ieEx) {
                     throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
-                            autoCloseException, "I/O error closing steam");
+                            ieEx, "I/O error closing steam");
                 }
             }
     }
 
-    private void executeWithCloseSuppressingOutputStreams(String script, Map<String, Object> variables,
-                                                          OutputStream stdOutOutputStream,
-                                                          OutputStream errorOutputStream)
+    private void executeScriptsAndInterpreterCommand(String script, Map<String, Object> variables,
+                                                     CloseSuppressingOutputStream csStdOutOutputStream,
+                                                     CloseSuppressingOutputStream csErrorOutputStream)
             throws ScriptExecutionException {
 
         Matcher matcher = INTERPRETER_COMMAND_PATTERN.matcher(script);
         while (matcher.find()) {
-            String beforeCommand = matcher.group(BEFORE_INTERPRETER_COMMAND_GROUP);
+            String beforeInterpreterCommand = matcher.group(BEFORE_INTERPRETER_COMMAND_GROUP);
             String interpreterCommandString = matcher.group(INTERPRETER_COMMAND_GROUP);
-            String afterCommand = matcher.group(AFTER_INTERPRETER_COMMAND_GROUP);
+            String afterInterpreterCommand = matcher.group(AFTER_INTERPRETER_COMMAND_GROUP);
 
             InterpreterCommand interpreterCommand = Arrays.stream(InterpreterCommand.values())
                     .filter(it -> it.canHandle(interpreterCommandString))
@@ -143,22 +150,30 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
                                     "Cannot process as interpreter command: " + interpreterCommandString));
 
 
-            if (beforeCommand != null && !"".equals(beforeCommand.trim())) {
-
-                executeWithDelegate(beforeCommand, variables, stdOutOutputStream, errorOutputStream);
+            if (beforeInterpreterCommand != null && !"".equals(beforeInterpreterCommand.trim())) {
+                /*
+                    perform executeScriptUsingStreams on the delegate: the attempt to close the OutputStream
+                    will be suppressed by the wrapper CloseSuppressingOutputStream
+                */
+                delegateExecuteScriptUsingStreams(
+                        beforeInterpreterCommand, variables, csStdOutOutputStream, csErrorOutputStream);
             }
 
             String parameters = interpreterCommandString.trim().substring(interpreterCommand.commandName.length());
             interpreterCommand.parseParametersAndExecute(parameters, this);
 
-            if (afterCommand != null && !"".equals(afterCommand.trim())) {
-
-                executeWithDelegate(afterCommand, variables, stdOutOutputStream, errorOutputStream);
+            if (afterInterpreterCommand != null && !"".equals(afterInterpreterCommand.trim())) {
+                /*
+                    perform executeScriptUsingStreams on the delegate: the attempt to close the OutputStream
+                    will be suppressed by the wrapper CloseSuppressingOutputStream
+                */
+                delegateExecuteScriptUsingStreams(
+                        afterInterpreterCommand, variables, csStdOutOutputStream, csErrorOutputStream);
             }
         }
     }
 
-    private void executeWithDelegate(
+    private void delegateExecuteScriptUsingStreams(
             String script,
             Map<String, Object> variables,
             OutputStream stdOutOutputStream,
