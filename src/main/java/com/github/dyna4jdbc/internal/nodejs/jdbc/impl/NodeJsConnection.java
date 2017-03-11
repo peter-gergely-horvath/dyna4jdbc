@@ -28,7 +28,7 @@ import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ProcessRunnerConnec
 
 public final class NodeJsConnection extends ProcessRunnerConnection {
 
-    private static final String END_OF_STREAM_INDICATOR = 
+    private static final String END_OF_STREAM_INDICATOR =
             String.format("__dyna4jdbc_eos_token_%s", UUID.randomUUID().toString());
     
     public NodeJsConnection(
@@ -37,11 +37,18 @@ public final class NodeJsConnection extends ProcessRunnerConnection {
             throws SQLException, MisconfigurationException {
 
         super(parameters, 
-                addNodeJsProperties(properties),
+                configureNodeJsProperties(properties),
                 NodeJsProcessScriptExecutorFactory.getInstance(END_OF_STREAM_INDICATOR));
     }
 
-    private static Properties addNodeJsProperties(Properties properties) {
+    private static Properties configureNodeJsProperties(Properties properties) throws MisconfigurationException {
+
+        String userDefinedEndOfDataPattern = properties.getProperty(ConfigurationEntry.ENF_OF_DATA_REGEX.getKey());
+        if (userDefinedEndOfDataPattern != null && !"".equals(userDefinedEndOfDataPattern.trim())) {
+            throw MisconfigurationException.forMessage(
+                    "Node.js connection does not allow custom '%s' to be specified: %s",
+                            ConfigurationEntry.ENF_OF_DATA_REGEX.getKey(), userDefinedEndOfDataPattern);
+        }
 
         properties.put(ConfigurationEntry.ENF_OF_DATA_REGEX.getKey(), END_OF_STREAM_INDICATOR);
 
