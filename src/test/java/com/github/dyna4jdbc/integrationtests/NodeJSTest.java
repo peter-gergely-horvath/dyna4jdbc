@@ -17,11 +17,15 @@
  
 package com.github.dyna4jdbc.integrationtests;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
-
-import static org.testng.Assert.assertEquals;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class NodeJSTest extends IntegrationTestBase {
 
@@ -117,7 +121,31 @@ public class NodeJSTest extends IntegrationTestBase {
     @Test
     public void testDatabaseMetaDataProductInformation() throws Exception {
 
-        assertDataBaseMetadataReturns("Node.js", "7.4.0");
+        Process process = new ProcessBuilder()
+            .command("node", "--version")
+            .redirectErrorStream(true)
+            .start();
+        
+        String expectedVersionReported;
+        
+        try (BufferedReader processOutputReader = new BufferedReader(new InputStreamReader(
+                process.getInputStream(), StandardCharsets.UTF_8))) {
+            
+            List<String> outputLines = processOutputReader.lines().collect(Collectors.toList());
+            
+            Assert.assertEquals(outputLines.size(), 1);
+            
+            String singleLine = outputLines.get(0);
+            
+            /* Remove non-numeric/dot characters from output
+             * e.g. "v7.4.0" --> "7.4.0"
+             */
+            expectedVersionReported = singleLine.replaceAll("[^\\d\\.]", "");
+        }
+
+        process.waitFor();
+        
+        assertDataBaseMetadataReturns("Node.js", expectedVersionReported);
     }
 
 }

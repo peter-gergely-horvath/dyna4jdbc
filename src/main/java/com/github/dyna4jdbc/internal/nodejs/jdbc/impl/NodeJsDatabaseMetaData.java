@@ -27,6 +27,7 @@ import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractDatabaseMetaData;
 
 class NodeJsDatabaseMetaData extends AbstractDatabaseMetaData<Connection> {
 
+    private static final String NODE_JS_PRODUCT_NAME = "Node.js";
     private static final String PRINT_NODE_JS_VERSION = "console.log(process.version);";
     
     private final AtomicReference<String> versionStringRef = new AtomicReference<String>(null);
@@ -37,7 +38,7 @@ class NodeJsDatabaseMetaData extends AbstractDatabaseMetaData<Connection> {
 
     @Override
     public String getDatabaseProductName() throws SQLException {
-        return "Node.js";
+        return NODE_JS_PRODUCT_NAME;
     }
 
     @Override
@@ -52,7 +53,9 @@ class NodeJsDatabaseMetaData extends AbstractDatabaseMetaData<Connection> {
                         /* Remove non-numeric/dot characters from output
                          * e.g. "v7.4.0" --> "7.4.0"
                          */
-                        versionString = resultSetString.replaceAll("[^\\d\\.]", "");
+                        if (resultSetString != null) {
+                            versionString = resultSetString.replaceAll("[^\\d\\.]", "");
+                        }
                     }
                 }
             }    
