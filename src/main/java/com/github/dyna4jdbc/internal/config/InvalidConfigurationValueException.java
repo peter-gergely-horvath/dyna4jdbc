@@ -17,14 +17,33 @@
  
 package com.github.dyna4jdbc.internal.config;
 
+/**
+ * Thrown to indicate that a method has been passed an illegal or
+ * inappropriate configuration value.
+ */
 public class InvalidConfigurationValueException extends MisconfigurationException {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructs an <code>InvalidConfigurationValueException</code> with the
+     * specified detail message.
+     *
+     * @param   message   the detail message.
+     */
     public InvalidConfigurationValueException(String message) {
         super(message);
     }
 
+    /**
+     * Constructs an <code>InvalidConfigurationValueException</code> with the String formatted with
+     * arguments as detail message.
+     *
+     * @param format the string to format to generate the detail message string
+     * @param args argument to be used when formatting the detail message string
+     *
+     * @return a <code>InvalidConfigurationValueException</code> with detail message built from the parameters
+     */
     public static InvalidConfigurationValueException forMessage(String format, Object... args) {
         return new InvalidConfigurationValueException(String.format(format, args));
     }

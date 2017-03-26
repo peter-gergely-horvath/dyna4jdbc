@@ -17,14 +17,33 @@
  
 package com.github.dyna4jdbc.internal.config;
 
+/**
+ * Thrown to indicate that a method has been passed an illegal or
+ * inappropriate configuration.
+ */
 public class MisconfigurationException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructs an <code>MisconfigurationException</code> with the
+     * specified detail message.
+     *
+     * @param   message   the detail message.
+     */
     public MisconfigurationException(String message) {
         super(message);
     }
 
+    /**
+     * Constructs an <code>MisconfigurationException</code> with the String formatted with
+     * arguments as detail message.
+     *
+     * @param format the string to format to generate the detail message string
+     * @param args argument to be used when formatting the detail message string
+     *
+     * @return a <code>MisconfigurationException</code> with detail message built from the parameters
+     */
     public static MisconfigurationException forMessage(String format, Object... args) {
         return new MisconfigurationException(String.format(format, args));
     }

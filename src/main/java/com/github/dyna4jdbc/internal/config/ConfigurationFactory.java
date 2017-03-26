@@ -19,7 +19,23 @@ package com.github.dyna4jdbc.internal.config;
 
 import java.util.Properties;
 
+/**
+ * A Factory, which can construct a {@link Configuration} from a configuration string
+ * (a postfix applied to the JDBC URL), and {@code Properties} passed to the driver
+ *
+ * @see com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory
+ */
 public interface ConfigurationFactory {
 
+    /**
+     * Constructs a {@link Configuration} from the arguments
+     *
+     * @param config the configuration string added as a postfix to the JDBC URL
+     * @param props the {@code Properties} as passed to the driver
+     *
+     * @return a {@link Configuration} constructed from the arguments
+     *
+     * @throws MisconfigurationException if any of the arguments contain invalid configuration settings
+     */
     Configuration newConfigurationFromParameters(String config, Properties props) throws MisconfigurationException;
 }
