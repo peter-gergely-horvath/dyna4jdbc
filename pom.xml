@@ -364,7 +364,7 @@
 						<configuration>
 							<licenseLocation>configuration/clover/dyna4jdbc_clover.license</licenseLocation>
 							<!-- targetPercentage should gradually reach 75-80% -->
-							<targetPercentage>62.3%</targetPercentage>
+							<targetPercentage>63.1%</targetPercentage>
 						</configuration>
 						<executions>
 							<execution>

@@ -171,5 +171,14 @@ public class JavaScriptVariableConverterTest {
         assertEquals(stringRepresentation, "{ 'foo' : 12.34, 'and' : 56, 'bar' : 789 }");
     }
 
+    @Test
+    public void testGenericObject() {
+
+        Object object = new Object();
+
+        String stringRepresentation = convertToString(object);
+        assertEquals(stringRepresentation, String.format("'%s'", object.toString()));
+    }
+
 
 }

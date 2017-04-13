@@ -130,7 +130,7 @@ public class AbstractReadOnlyResultSetTest {
                     if(clazz.isPrimitive()
                             && defaultValue == null) {
                         throw new IllegalStateException(
-                                "Default value cannot be null / unmapped for primite type: " + clazz);
+                                "Default value cannot be null / unmapped for primitive type: " + clazz);
                     }
 
                     return defaultValue;
