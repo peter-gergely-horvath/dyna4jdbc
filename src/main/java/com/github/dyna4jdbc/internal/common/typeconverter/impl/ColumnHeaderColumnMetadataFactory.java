@@ -41,6 +41,8 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
     private static final int MATCHER_GROUP_SCALE_PART = 2;
     private static final int MATCHER_GROUP_PRECISION_PART = 3;
 
+    private static final int HEADER_GROUP_COUNT = 3;
+
     private static final ColumnHeaderColumnMetadataFactory INSTANCE = new ColumnHeaderColumnMetadataFactory();
 
 
@@ -64,7 +66,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
         }
 
         String firstValue = iterator.next();
-        String[] configStringArray = firstValue.split(":", 3);
+        String[] configStringArray = firstValue.split(":", HEADER_GROUP_COUNT);
 
         String header = ArrayUtils.tryGetByIndex(configStringArray, 0);
         String sqlTypeConfig = ArrayUtils.tryGetByIndex(configStringArray, 1);
