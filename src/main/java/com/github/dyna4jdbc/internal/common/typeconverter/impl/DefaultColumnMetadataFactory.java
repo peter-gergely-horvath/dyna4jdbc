@@ -72,7 +72,7 @@ final class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
             .map(dataType -> dataType.name)
             .collect(Collectors.joining("|"));
 
-        return String.format("^[^:]+:((?:%s)[^:]*)?:[^:]*$", sqlTypeNamesSeparatedByPipeForRegex);
+        return String.format("^[^:]+:((?:%s)[^:]*)?:.*$", sqlTypeNamesSeparatedByPipeForRegex);
     }
 
 

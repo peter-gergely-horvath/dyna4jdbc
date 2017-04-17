@@ -59,6 +59,24 @@ final class TypeConverterRegistry {
         
     }
 
+    private abstract static class NullNumberHandlerTypeConverter<T> implements TypeConverter<T> {
+
+        @Override
+        public final T convert(String input) throws TypeConversionException {
+            if (input != null) {
+                return convertNotNullValue(input);
+            } else {
+                return null;
+            }
+        }
+
+        protected final T convertNotNullValue(String notNullValue) throws TypeConversionException {
+            return convertNotNullNumberValue(notNullValue.trim());
+        }
+
+        protected abstract T convertNotNullNumberValue(String notNullValue) throws TypeConversionException;
+    }
+
     static final TypeConverter<String> STRING = new TypeConverter<String>() {
 
         @Override
@@ -85,10 +103,10 @@ final class TypeConverterRegistry {
         }
     };
 
-    static final TypeConverter<Byte> BYTE = new NullHandlerTypeConverter<Byte>() {
+    static final TypeConverter<Byte> BYTE = new NullNumberHandlerTypeConverter<Byte>() {
 
         @Override
-        public Byte convertNotNullValue(String input) throws TypeConversionException {
+        public Byte convertNotNullNumberValue(String input) throws TypeConversionException {
             try {
                 if (input == null) {
                     return null;
@@ -102,10 +120,10 @@ final class TypeConverterRegistry {
         }
     };
 
-    static final TypeConverter<Short> SHORT = new NullHandlerTypeConverter<Short>() {
+    static final TypeConverter<Short> SHORT = new NullNumberHandlerTypeConverter<Short>() {
 
         @Override
-        public Short convertNotNullValue(String input) throws TypeConversionException {
+        public Short convertNotNullNumberValue(String input) throws TypeConversionException {
             try {
                 return Short.decode(input);
 
@@ -116,10 +134,10 @@ final class TypeConverterRegistry {
 
     };
 
-    static final TypeConverter<Integer> INTEGER = new NullHandlerTypeConverter<Integer>() {
+    static final TypeConverter<Integer> INTEGER = new NullNumberHandlerTypeConverter<Integer>() {
 
         @Override
-        public Integer convertNotNullValue(String input) throws TypeConversionException {
+        public Integer convertNotNullNumberValue(String input) throws TypeConversionException {
             try {
                 return Integer.decode(input);
 
@@ -128,10 +146,10 @@ final class TypeConverterRegistry {
             }
         }
     };
-    static final TypeConverter<Long> LONG = new NullHandlerTypeConverter<Long>() {
+    static final TypeConverter<Long> LONG = new NullNumberHandlerTypeConverter<Long>() {
 
         @Override
-        public Long convertNotNullValue(String input) throws TypeConversionException {
+        public Long convertNotNullNumberValue(String input) throws TypeConversionException {
             try {
                 return Long.decode(input);
 
@@ -141,10 +159,10 @@ final class TypeConverterRegistry {
         }
     };
 
-    static final TypeConverter<Float> FLOAT = new NullHandlerTypeConverter<Float>() {
+    static final TypeConverter<Float> FLOAT = new NullNumberHandlerTypeConverter<Float>() {
 
         @Override
-        public Float convertNotNullValue(String input) throws TypeConversionException {
+        public Float convertNotNullNumberValue(String input) throws TypeConversionException {
             try {
                 return Float.valueOf(input);
 
@@ -154,10 +172,10 @@ final class TypeConverterRegistry {
         }
     };
 
-    static final TypeConverter<Double> DOUBLE = new NullHandlerTypeConverter<Double>() {
+    static final TypeConverter<Double> DOUBLE = new NullNumberHandlerTypeConverter<Double>() {
 
         @Override
-        public Double convertNotNullValue(String input) throws TypeConversionException {
+        public Double convertNotNullNumberValue(String input) throws TypeConversionException {
             try {
                 return Double.valueOf(input);
 
@@ -167,10 +185,10 @@ final class TypeConverterRegistry {
         }
     };
 
-    static final TypeConverter<BigDecimal> BIGDECIMAL = new NullHandlerTypeConverter<BigDecimal>() {
+    static final TypeConverter<BigDecimal> BIGDECIMAL = new NullNumberHandlerTypeConverter<BigDecimal>() {
 
         @Override
-        public BigDecimal convertNotNullValue(String input) throws TypeConversionException {
+        public BigDecimal convertNotNullNumberValue(String input) throws TypeConversionException {
             try {
                 return new BigDecimal(input);
 
@@ -181,10 +199,10 @@ final class TypeConverterRegistry {
 
     };
 
-    static final TypeConverter<BigInteger> BIGINTEGER = new NullHandlerTypeConverter<BigInteger>() {
+    static final TypeConverter<BigInteger> BIGINTEGER = new NullNumberHandlerTypeConverter<BigInteger>() {
 
         @Override
-        public BigInteger convertNotNullValue(String input) throws TypeConversionException {
+        public BigInteger convertNotNullNumberValue(String input) throws TypeConversionException {
             try {
                 return new BigInteger(input);
 

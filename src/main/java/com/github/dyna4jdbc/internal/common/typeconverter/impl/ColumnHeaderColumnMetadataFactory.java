@@ -64,7 +64,7 @@ final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFa
         }
 
         String firstValue = iterator.next();
-        String[] configStringArray = firstValue.split(":");
+        String[] configStringArray = firstValue.split(":", 3);
 
         String header = ArrayUtils.tryGetByIndex(configStringArray, 0);
         String sqlTypeConfig = ArrayUtils.tryGetByIndex(configStringArray, 1);

@@ -36,10 +36,18 @@ class TimestampFormatStringColumnHandler extends DefaultColumnHandler {
         super(columnMetadata);
 
         try {
+            if (formatString == null || formatString.trim().equals("")) {
+                throw new IllegalArgumentException("formatString is REQUIRED. It cannot be empty / whitespace only");
+            }
+
             this.formatString = formatString;
             this.formatter = new SimpleDateFormat(formatString);
             this.formatter.setLenient(false);
         } catch (IllegalArgumentException e) {
+            /*
+             NOTE: IllegalArgumentException can be both thrown from our
+             formatString checking logic AND SimpleDateFormat as well!
+             */
             throw JDBCError.FORMAT_STRING_INVALID.raiseUncheckedException(
                     e, formatString, e.getMessage());
         }
@@ -56,6 +64,7 @@ class TimestampFormatStringColumnHandler extends DefaultColumnHandler {
         }
     }
 
+    @Override
     public Timestamp covertToTimestamp(String rawCellValue) throws TypeConversionException {
 
         try {
@@ -65,6 +74,20 @@ class TimestampFormatStringColumnHandler extends DefaultColumnHandler {
         } catch (ParseException e) {
             throw new TypeConversionException("Could not parse '" + rawCellValue
                             + "' according to format string '" + formatString + "'", e);
+
+        }
+    }
+
+    @Override
+    public java.sql.Date covertToDate(String rawCellValue) throws TypeConversionException {
+
+        try {
+            Date parsedDate = formatter.parse(rawCellValue);
+            return new java.sql.Date(parsedDate.getTime());
+
+        } catch (ParseException e) {
+            throw new TypeConversionException("Could not parse '" + rawCellValue
+                    + "' according to format string '" + formatString + "'", e);
 
         }
     }
