@@ -227,6 +227,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
 
     @Override
     public final DatabaseMetaData getMetaData() throws SQLException {
+        checkNotClosed();
         /*
         To make retrieval of DatabaseMetaDatas created from within
         this Connection consistent with createStatement and prepareStatement,
@@ -555,7 +556,7 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
     public final String getSchema() throws SQLException {
         checkNotClosed();
         // "the current schema name or null if there is none"
-         return null;
+        return null;
     }
 
     @Override
@@ -575,6 +576,10 @@ public abstract class AbstractConnection extends AbstractAutoCloseableJdbcObject
 
     @Override
     public final void abort(Executor executor) throws SQLException {
+        if (executor == null) {
+            throw JDBCError.JDBC_API_USAGE_CALLER_ERROR.raiseSQLException("argument executor cannot be null");
+        }
+
         if (!isClosed()) {
             try {
                 executor.execute(new CloseConnectionForAbortRunnable());

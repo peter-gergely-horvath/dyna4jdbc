@@ -148,8 +148,7 @@ public class NodeJSTest extends IntegrationTestBase {
         }
     }
 
-    @Test
-    @Ignore
+    @Test(enabled = false)
     public void testPreparedStatementBindsNull() throws Exception {
 
         String script = "console.log(parameter1)";

@@ -25,7 +25,7 @@ import java.sql.*;
 public abstract class AbstractDatabaseMetaData<T extends Connection>
         extends AbstractWrapper implements DatabaseMetaData {
 
-    /* This driver was developer against Java SE 8.
+    /* This driver was developed against Java SE 8.
      * According to the documentation below from Oracle,
      * the version of JDBC in Java 8 SE is 4.2: hence we 
      * report JDBC version 4.2 in this driver.
