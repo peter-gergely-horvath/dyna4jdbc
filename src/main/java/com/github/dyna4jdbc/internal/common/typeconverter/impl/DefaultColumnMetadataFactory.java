@@ -34,12 +34,12 @@ final class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
 
 
     private final EmptyColumnMetadataFactory emptyColumnMetadataFactory;
-    private final HeuristicsColumnMetadataFactory heuristicsColumnMetadataFactory;
+    private final AutoDetectingColumnMetadataFactory autoDetectingColumnMetadataFactory;
     private final ColumnHeaderColumnMetadataFactory columnHeaderColumnMetadataFactory;
 
     DefaultColumnMetadataFactory(Configuration configuration) {
         emptyColumnMetadataFactory = EmptyColumnMetadataFactory.getInstance(configuration);
-        heuristicsColumnMetadataFactory = HeuristicsColumnMetadataFactory.getInstance(configuration);
+        autoDetectingColumnMetadataFactory = AutoDetectingColumnMetadataFactory.getInstance(configuration);
         columnHeaderColumnMetadataFactory = ColumnHeaderColumnMetadataFactory.getInstance(configuration);
 
     }
@@ -61,7 +61,7 @@ final class DefaultColumnMetadataFactory implements ColumnMetadataFactory {
         if (headerSeemsToContainParseInstructions) {
             return columnHeaderColumnMetadataFactory.getColumnMetadata(columnIndex, columnValues);
         } else {
-            return heuristicsColumnMetadataFactory.getColumnMetadata(columnIndex, columnValues);
+            return autoDetectingColumnMetadataFactory.getColumnMetadata(columnIndex, columnValues);
         }
 
     }

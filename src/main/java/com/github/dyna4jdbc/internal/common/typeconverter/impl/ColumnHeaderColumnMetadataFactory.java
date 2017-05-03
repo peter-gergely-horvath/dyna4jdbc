@@ -32,7 +32,7 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.ConfigurationStringParser;
 
-final class ColumnHeaderColumnMetadataFactory extends HeuristicsColumnMetadataFactory {
+final class ColumnHeaderColumnMetadataFactory extends AutoDetectingColumnMetadataFactory {
 
     private static final Pattern SQL_TYPE_PATTERN =
             Pattern.compile("\\s*(\\w+)(?:\\s*[(]\\s*(\\d+)\\s*[,]?\\s*(\\d)?\\s*[)])?\\s*");
