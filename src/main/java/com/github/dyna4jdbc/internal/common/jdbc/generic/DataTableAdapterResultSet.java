@@ -40,6 +40,8 @@ public final class DataTableAdapterResultSet extends DataRowListResultSet<List<S
         if (checkFirstRowIsSkipped(getColumnHandlers())) {
             super.skipNextRowIfPresent();
         }
+
+        registerAsChild(dataTable);
     }
 
     private static List<ColumnHandler> initColumnHandlers(DataTable dataTable,
