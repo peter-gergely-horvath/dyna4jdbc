@@ -64,7 +64,7 @@ public final class DataTableAdapterResultSet extends DataRowListResultSet<List<S
 
     private static boolean checkFirstRowIsSkipped(List<ColumnHandler> columnHandlers) {
 
-        Boolean shouldTakeFirstRowValue = null;
+        Boolean shouldConsumeFirstRow = null;
 
         final int typeHandlerNumber = columnHandlers.size();
         for (int i = 0; i < typeHandlerNumber; i++) {
@@ -74,10 +74,10 @@ public final class DataTableAdapterResultSet extends DataRowListResultSet<List<S
             final boolean thisTypeHandlerTakesFirstRowValue =
                     columnHandler.getColumnMetadata().isConsumesFirstRow();
 
-            if (shouldTakeFirstRowValue == null) {
-                shouldTakeFirstRowValue = thisTypeHandlerTakesFirstRowValue;
+            if (shouldConsumeFirstRow == null) {
+                shouldConsumeFirstRow = thisTypeHandlerTakesFirstRowValue;
             } else {
-                if (shouldTakeFirstRowValue != thisTypeHandlerTakesFirstRowValue) {
+                if (shouldConsumeFirstRow != thisTypeHandlerTakesFirstRowValue) {
 
                     final int sqlIndexOfColumn = i + 1;
 
@@ -92,11 +92,11 @@ public final class DataTableAdapterResultSet extends DataRowListResultSet<List<S
             }
         }
 
-        if (shouldTakeFirstRowValue == null) {
-            shouldTakeFirstRowValue = false;
+        if (shouldConsumeFirstRow == null) {
+            shouldConsumeFirstRow = false;
         }
 
-        return shouldTakeFirstRowValue;
+        return shouldConsumeFirstRow;
     }
 
     protected String getRawCellValueBySqlColumnIndex(int sqlColumnIndex) throws SQLException {
