@@ -93,6 +93,11 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
         }
     }
 
+    protected void onProcessNotRunningBeforeDispatch(String script) throws ScriptExecutionException {
+        // allows the process to be re-initialize
+        this.processManager = null;
+    }
+
     protected Process createProcess(String script, Map<String, Object> variables) throws IOException {
 
         String[] variableParameters;
@@ -115,11 +120,6 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
         }
 
         return Runtime.getRuntime().exec(script, variableParameters);
-    }
-
-    protected void onProcessNotRunningBeforeDispatch(String script) throws ScriptExecutionException {
-        // allows the process to be re-initialize
-        this.processManager = null;
     }
     //CHECKSTYLE.ON
 
