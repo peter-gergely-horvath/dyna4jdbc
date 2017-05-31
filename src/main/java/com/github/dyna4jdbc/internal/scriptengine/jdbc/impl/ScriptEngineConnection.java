@@ -18,38 +18,27 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.ScriptExecutionException;
-import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
+import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
+import com.github.dyna4jdbc.internal.common.jdbc.base.ScriptConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingPreparedStatement;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
-import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
-import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultColumnHandlerFactory;
 import com.github.dyna4jdbc.internal.common.util.collection.ArrayUtils;
-import com.github.dyna4jdbc.internal.common.util.io.DisallowAllWritesOutputStream;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.config.ConfigurationFactory;
 import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 
-public class ScriptEngineConnection extends AbstractConnection {
+public class ScriptEngineConnection extends ScriptConnection {
 
-    private final ColumnHandlerFactory columnHandlerFactory;
     private final Configuration configuration;
-
+    private final ColumnHandlerFactory columnHandlerFactory;
     private final ScriptEngineScriptExecutor scriptExecutor;
-    
+
     public ScriptEngineConnection(String parameters, Properties properties)
             throws SQLException, MisconfigurationException {
 
@@ -69,7 +58,9 @@ public class ScriptEngineConnection extends AbstractConnection {
         }
 
         ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
-        this.configuration = configurationFactory.newConfigurationFromParameters(configurationString, properties);
+        this.configuration =
+                configurationFactory.newConfigurationFromParameters(configurationString, properties);
+
 
         this.columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
 
@@ -78,62 +69,36 @@ public class ScriptEngineConnection extends AbstractConnection {
 
         this.scriptExecutor = scriptExecutorFactory.newInterpreterEnhancedScriptEngineScriptExecutor(engineName);
 
-        String initScriptPath = this.configuration.getInitScriptPath();
+        String initScriptPath = configuration.getInitScriptPath();
         if (initScriptPath != null) {
             executeInitScript(initScriptPath);
         }
     }
 
-    private void executeInitScript(String initScriptPath) throws SQLException, MisconfigurationException {
-        File initScript = new File(initScriptPath);
-        if (!initScript.exists()) {
-            throw MisconfigurationException.forMessage("InitScript not found: %s", initScriptPath);
-        }
-
-        try {
-            byte[] bytesRead = Files.readAllBytes(initScript.toPath());
-            String initScriptText = new String(bytesRead, this.configuration.getConversionCharset());
-
-            this.scriptExecutor.executeScriptUsingStreams(
-                    initScriptText,
-                    null,
-                    new DisallowAllWritesOutputStream("An init script cannot generate output"),
-                    new DisallowAllWritesOutputStream("An init script cannot generate output"));
-
-
-        } catch (IOException e) {
-            throw JDBCError.INITSCRIPT_READ_IO_ERROR.raiseSQLException(initScriptPath);
-        } catch (ScriptExecutionException e) {
-            throw JDBCError.INITSCRIPT_EXECUTION_EXCEPTION.raiseSQLException(e, initScriptPath);
-        }
-    }
-
-
     @Override
     protected final DatabaseMetaData getMetaDataInternal() throws SQLException {
 
-        String name = this.scriptExecutor.getHumanFriendlyName();
-        String version = this.scriptExecutor.getVersion();
+        String name = scriptExecutor.getHumanFriendlyName();
+        String version = scriptExecutor.getVersion();
 
         return new GenericDatabaseMetaData(this, name, version);
     }
 
+
+
     @Override
-    protected final Statement createStatementInternal() throws SQLException {
-
-        ScriptOutputHandlerFactory outputHandlerFactory =
-                new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
-
-        return new OutputHandlingStatement<>(this, outputHandlerFactory, this.scriptExecutor);
+    protected final ColumnHandlerFactory getColumnHandlerFactory() {
+        return columnHandlerFactory;
     }
 
     @Override
-    protected final PreparedStatement prepareStatementInternal(String script) throws SQLException {
+    protected final Configuration getConfiguration() {
+        return configuration;
+    }
 
-        ScriptOutputHandlerFactory outputHandlerFactory =
-                new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
-
-        return new OutputHandlingPreparedStatement<>(script, this, outputHandlerFactory, this.scriptExecutor);
+    @Override
+    protected final OutputCapturingScriptExecutor getScriptExecutor() {
+        return scriptExecutor;
     }
 }
 

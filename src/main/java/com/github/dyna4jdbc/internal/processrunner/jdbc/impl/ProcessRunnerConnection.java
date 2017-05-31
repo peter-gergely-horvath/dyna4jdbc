@@ -17,18 +17,9 @@
  
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
-
-import com.github.dyna4jdbc.internal.common.jdbc.base.AbstractConnection;
+import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
+import com.github.dyna4jdbc.internal.common.jdbc.base.ScriptConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingPreparedStatement;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
-import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
-import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.impl.DefaultColumnHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
@@ -37,10 +28,15 @@ import com.github.dyna4jdbc.internal.config.MisconfigurationException;
 import com.github.dyna4jdbc.internal.config.impl.ConfigurationEntry;
 import com.github.dyna4jdbc.internal.config.impl.DefaultConfigurationFactory;
 
-public class ProcessRunnerConnection extends AbstractConnection {
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.Properties;
 
-    private final ColumnHandlerFactory columnHandlerFactory;
+
+public class ProcessRunnerConnection extends ScriptConnection {
+
     private final Configuration configuration;
+    private final ColumnHandlerFactory columnHandlerFactory;
     private final ExternalProcessScriptExecutor scriptExecutor;
 
     public ProcessRunnerConnection(
@@ -50,8 +46,25 @@ public class ProcessRunnerConnection extends AbstractConnection {
 
         this(parameters, checkProperties(parameters, properties),
                 DefaultExternalProcessScriptExecutorFactory.getInstance());
+    }
 
-        registerAsChild(() -> onClose());
+    protected ProcessRunnerConnection(
+            String parameters,
+            Properties properties,
+            ExternalProcessScriptExecutorFactory processRunnerFactory)
+            throws SQLException, MisconfigurationException {
+        
+        ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
+        this.configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
+
+        this.columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(this.configuration);
+
+        this.scriptExecutor = processRunnerFactory.newExternalProcessScriptExecutor(this.configuration);
+
+        String initScriptPath = this.configuration.getInitScriptPath();
+        if (initScriptPath != null) {
+            executeInitScript(initScriptPath);
+        }
     }
 
     private static Properties checkProperties(String config, Properties properties) throws MisconfigurationException {
@@ -61,28 +74,13 @@ public class ProcessRunnerConnection extends AbstractConnection {
 
         if (configuration.getEndOfDataPattern() == null
                 && configuration.getExternalCallQuietPeriodThresholdMs() == 0) {
-                throw MisconfigurationException.forMessage(
+            throw MisconfigurationException.forMessage(
                     "External process connection requires either '%s' or '%s' to be specified.",
-                            ConfigurationEntry.ENF_OF_DATA_REGEX.getKey(),
-                            ConfigurationEntry.EXTERNAL_COMMAND_NO_OUTPUT_EXPIRATION_INTERVAL_MS.getKey());
+                    ConfigurationEntry.ENF_OF_DATA_REGEX.getKey(),
+                    ConfigurationEntry.EXTERNAL_COMMAND_NO_OUTPUT_EXPIRATION_INTERVAL_MS.getKey());
         }
 
         return properties;
-
-    }
-    
-    protected ProcessRunnerConnection(
-            String parameters,
-            Properties properties,
-            ExternalProcessScriptExecutorFactory processRunnerFactory)
-            throws SQLException, MisconfigurationException {
-        
-        ConfigurationFactory configurationFactory = DefaultConfigurationFactory.getInstance();
-        configuration = configurationFactory.newConfigurationFromParameters(parameters, properties);
-
-        columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(configuration);
-        
-        this.scriptExecutor = processRunnerFactory.newExternalProcessScriptExecutor(configuration);
 
     }
 
@@ -101,21 +99,20 @@ public class ProcessRunnerConnection extends AbstractConnection {
     }
     //CHECKSTYLE.ON: DesignForExtension : incorrect detection of "is not designed for extension"
 
+
+
     @Override
-    protected final Statement createStatementInternal() throws SQLException {
-
-        ScriptOutputHandlerFactory outputHandlerFactory =
-                new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
-
-        return new OutputHandlingStatement<>(this, outputHandlerFactory, scriptExecutor);
+    protected final ColumnHandlerFactory getColumnHandlerFactory() {
+        return columnHandlerFactory;
     }
 
     @Override
-    protected final PreparedStatement prepareStatementInternal(String script) throws SQLException {
+    protected final Configuration getConfiguration() {
+        return configuration;
+    }
 
-        ScriptOutputHandlerFactory outputHandlerFactory =
-                new DefaultScriptOutputHandlerFactory(columnHandlerFactory, configuration);
-
-        return new OutputHandlingPreparedStatement<>(script, this, outputHandlerFactory, scriptExecutor);
+    @Override
+    protected final OutputCapturingScriptExecutor getScriptExecutor() {
+        return scriptExecutor;
     }
 }
