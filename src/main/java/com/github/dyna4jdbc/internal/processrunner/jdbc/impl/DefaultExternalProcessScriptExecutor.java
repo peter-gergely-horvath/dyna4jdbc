@@ -23,13 +23,10 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
@@ -38,23 +35,14 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 
 public class DefaultExternalProcessScriptExecutor implements ExternalProcessScriptExecutor {
 
-    private static final int DEFAULT_POLL_INTERVAL_MS = 500;
-
     private volatile ProcessManager processManager;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final DefaultIOHandlerFactory ioHandlerFactory; 
     private final ProcessManagerFactory processManagerFactory;
     
-    private final boolean skipFirstLine;
-    private final Pattern endOfDataPattern;
-
-    private long expirationIntervalMs;
 
     public DefaultExternalProcessScriptExecutor(Configuration configuration) {
-        this.skipFirstLine = configuration.getSkipFirstLine();
-        this.endOfDataPattern = configuration.getEndOfDataPattern();
-        this.expirationIntervalMs = configuration.getExternalCallQuietPeriodThresholdMs();
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
         this.processManagerFactory = ProcessManagerFactory.getInstance(configuration, executorService);
     }
@@ -82,11 +70,11 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
                 this.processManager.writeToStandardInput(script);
             }
 
-            Future<Void> standardOutFuture = executorService.submit(
-                    new StdOutWatcher(outputPrintWriter, processManager));
+            Future<Void> standardOutFuture = processManager.submitReadTaskForStdOut(
+                    line -> outputPrintWriter.println(line));
 
-            Future<Void> standardErrorFuture = executorService.submit(
-                    new StdErrorWatcher(errorPrintWriter, processManager));
+            Future<Void> standardErrorFuture = processManager.submitReadTaskForStdErr(
+                    line -> errorPrintWriter.println(line));
 
             standardOutFuture.get();
             standardErrorFuture.get();
@@ -135,102 +123,6 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
     }
     //CHECKSTYLE.ON
 
-
-    private final class StdOutWatcher implements Callable<Void> {
-
-        private final PrintWriter outputPrintWriter;
-        private final ProcessManager currentProcess;
-
-        private StdOutWatcher(PrintWriter outputPrintWriter, ProcessManager currentProcess) {
-            this.outputPrintWriter = outputPrintWriter;
-            this.currentProcess = currentProcess;
-        }
-
-        @Override
-        public Void call() throws Exception {
-            long expirationTime = System.currentTimeMillis() + expirationIntervalMs;
-
-            boolean firstLine = true;
-
-            while (System.currentTimeMillis() < expirationTime) {
-
-                String outputCaptured = currentProcess.pollStandardOutput(
-                        DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
-
-                if (outputCaptured == null) {
-
-                    if (currentProcess.isStandardOutReachedEnd()) {
-                        break;
-                    }
-
-                } else {
-
-                    expirationTime = System.currentTimeMillis() + expirationIntervalMs;
-
-                    if (endOfDataPattern != null
-                            && endOfDataPattern.matcher(outputCaptured).matches()) {
-                        break;
-                    }
-
-                    if (firstLine) {
-                        firstLine = false;
-
-                        if (skipFirstLine) {
-                            continue;
-                        }
-                    }
-
-                    outputPrintWriter.println(outputCaptured);
-                }
-            }
-
-            return null;
-        }
-
-    }
-
-    private final class StdErrorWatcher implements Callable<Void> {
-
-        private final PrintWriter errorPrintWriter;
-        private final ProcessManager currentProcess;
-
-        private StdErrorWatcher(PrintWriter errorPrintWriter, ProcessManager currentProcess) {
-            this.errorPrintWriter = errorPrintWriter;
-            this.currentProcess = currentProcess;
-        }
-
-        @Override
-        public Void call() throws Exception {
-            long expirationTime = System.currentTimeMillis() + expirationIntervalMs;
-
-            while (System.currentTimeMillis() < expirationTime) {
-
-                String outputCaptured = currentProcess.pollStandardError(
-                        DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
-
-                if (outputCaptured == null) {
-
-                    if (currentProcess.isStandardErrorReachedEnd()
-                            || currentProcess.isStandardOutReachedEnd()) {
-                        break;
-                    }
-
-                } else {
-
-                    if (endOfDataPattern != null
-                            && endOfDataPattern.matcher(outputCaptured).matches()) {
-                        break;
-                    }
-
-                    expirationTime = System.currentTimeMillis() + expirationIntervalMs;
-                    errorPrintWriter.println(outputCaptured);
-                }
-            }
-
-            return null;
-        }
-
-    }
 
     @Override
     public final void close() {

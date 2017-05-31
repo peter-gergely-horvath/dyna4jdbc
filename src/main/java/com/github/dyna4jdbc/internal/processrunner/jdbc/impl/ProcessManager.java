@@ -23,8 +23,10 @@ import java.io.PrintWriter;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -36,6 +38,12 @@ import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerF
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 final class ProcessManager {
+
+    interface ReadListener {
+        void onLineRead(String line);
+    }
+
+    private static final int DEFAULT_POLL_INTERVAL_MS = 500;
 
     private static final Logger LOGGER = Logger.getLogger(ProcessManager.class.getName());
 
@@ -51,6 +59,8 @@ final class ProcessManager {
     private final BlockingQueue<String> errorStreamContentQueue;
 
     private final String endOfStreamIndicator;
+
+    private final Configuration configuration;
 
     private boolean standardOutReachedEnd = false;
     private boolean standardErrorReachedEnd = false;
@@ -115,7 +125,9 @@ final class ProcessManager {
             ExecutorService executorService)
                     throws ProcessExecutionException {
 
-        
+
+            this.configuration = configuration;
+
             Pattern endOfDataPattern = configuration.getEndOfDataPattern();
             if (endOfDataPattern != null) {
                 this.endOfStreamIndicator = endOfDataPattern.toString();
@@ -142,6 +154,16 @@ final class ProcessManager {
         }
     }
 
+    Future<Void> submitReadTaskForStdErr(ReadListener onStdErr) {
+        return executorService.submit(
+                new StdErrorWatcher(configuration, onStdErr));
+    }
+
+    Future<Void> submitReadTaskForStdOut(ReadListener onStdOut) {
+        return executorService.submit(
+                new StdOutWatcher(configuration, onStdOut));
+    }
+
     boolean isProcessRunning() {
         return processReference.isAlive();
     }
@@ -152,11 +174,11 @@ final class ProcessManager {
         processReference.destroyForcibly();
     }
 
-    boolean isStandardOutReachedEnd() {
+    private boolean isStandardOutReachedEnd() {
         return standardOutReachedEnd;
     }
 
-    String pollStandardOutput(long timeout, TimeUnit unit) throws IOException {
+    private String pollStandardOutput(long timeout, TimeUnit unit) throws IOException {
 
         try {
             String result = standardOutputStreamContentQueue.poll(timeout, unit);
@@ -174,11 +196,11 @@ final class ProcessManager {
         }
     }
 
-    boolean isStandardErrorReachedEnd() {
+    private boolean isStandardErrorReachedEnd() {
         return standardErrorReachedEnd;
     }
 
-    String pollStandardError(long timeout, TimeUnit unit) throws IOException {
+    private String pollStandardError(long timeout, TimeUnit unit) throws IOException {
 
         try {
             String result = errorStreamContentQueue.poll(timeout, unit);
@@ -276,4 +298,107 @@ final class ProcessManager {
 
     }
 
+    private final class StdErrorWatcher implements Callable<Void> {
+
+        private final Pattern endOfDataPattern;
+        private final ReadListener listener;
+        private final long expirationIntervalMs;
+
+        StdErrorWatcher(Configuration configuration, ReadListener listener) {
+            this.expirationIntervalMs = configuration.getExternalCallQuietPeriodThresholdMs();
+            this.endOfDataPattern = configuration.getEndOfDataPattern();
+            this.listener = listener;
+
+        }
+
+        @Override
+        public Void call() throws Exception {
+            long expirationTime = System.currentTimeMillis() + expirationIntervalMs;
+
+            while (System.currentTimeMillis() < expirationTime) {
+
+                String outputCaptured = ProcessManager.this.pollStandardError(
+                        DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
+
+                if (outputCaptured == null) {
+
+                    if (ProcessManager.this.isStandardErrorReachedEnd()
+                            || ProcessManager.this.isStandardOutReachedEnd()) {
+                        break;
+                    }
+
+                } else {
+
+                    if (endOfDataPattern != null
+                            && endOfDataPattern.matcher(outputCaptured).matches()) {
+                        break;
+                    }
+
+                    expirationTime = System.currentTimeMillis() + expirationIntervalMs;
+                    listener.onLineRead(outputCaptured);
+                }
+            }
+
+            return null;
+        }
+
+    }
+
+    private final class StdOutWatcher implements Callable<Void> {
+
+        private final boolean skipFirstLine;
+        private final Pattern endOfDataPattern;
+        private final ReadListener listener;
+        private final long expirationIntervalMs;
+
+        StdOutWatcher(Configuration configuration, ReadListener listener) {
+            this.expirationIntervalMs = configuration.getExternalCallQuietPeriodThresholdMs();
+            this.skipFirstLine = configuration.getSkipFirstLine();
+            this.endOfDataPattern = configuration.getEndOfDataPattern();
+            this.listener = listener;
+
+        }
+
+        @Override
+        public Void call() throws Exception {
+            long expirationTime = System.currentTimeMillis() + expirationIntervalMs;
+
+            boolean firstLine = true;
+
+            while (System.currentTimeMillis() < expirationTime) {
+
+                String outputCaptured = ProcessManager.this.pollStandardOutput(
+                        DEFAULT_POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
+
+                if (outputCaptured == null) {
+
+                    if (ProcessManager.this.isStandardOutReachedEnd()) {
+                        break;
+                    }
+
+                } else {
+
+                    expirationTime = System.currentTimeMillis() + expirationIntervalMs;
+
+                    if (endOfDataPattern != null
+                            && endOfDataPattern.matcher(outputCaptured).matches()) {
+                        break;
+                    }
+
+                    if (firstLine) {
+                        firstLine = false;
+
+                        if (skipFirstLine) {
+                            continue;
+                        }
+                    }
+
+                    listener.onLineRead(outputCaptured);
+                }
+            }
+
+            return null;
+        }
+
+    }
 }
