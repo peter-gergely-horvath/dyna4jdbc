@@ -149,12 +149,12 @@ public enum JDBCError {
     }
 
     public SQLException raiseSQLExceptionWithSuppressed(
-            Iterable<? extends Throwable> supressedThrowables,
+            Iterable<? extends Throwable> suppressedThrowables,
             Object... params) throws SQLException {
         String errorMessage = buildErrorMessage(params);
         SQLException sqlException = new SQLException(errorMessage, getSqlStateAsString());
-        for (Throwable supressed : supressedThrowables) {
-            sqlException.addSuppressed(supressed);
+        for (Throwable suppressed : suppressedThrowables) {
+            sqlException.addSuppressed(suppressed);
         }
         throw sqlException;
     }
@@ -176,12 +176,12 @@ public enum JDBCError {
     }
 
     public RuntimeDyna4JdbcException raiseUncheckedExceptionWithSuppressed(
-            Iterable<? extends Throwable> supressedThrowables,
+            Iterable<? extends Throwable> suppressedThrowables,
             Object... params) throws RuntimeDyna4JdbcException {
         String errorMessage = buildErrorMessage(params);
         RuntimeDyna4JdbcException exception = new RuntimeDyna4JdbcException(errorMessage, getSqlStateAsString());
-        for (Throwable supressed : supressedThrowables) {
-            exception.addSuppressed(supressed);
+        for (Throwable suppressed : suppressedThrowables) {
+            exception.addSuppressed(suppressed);
         }
         throw exception;
     }
@@ -194,7 +194,7 @@ public enum JDBCError {
             /*
              * we should have a sensible handling for the unlikely
              * case when the error message cannot be constructed
-             * due to a bug in the arguments passed to from the
+             * due to a bug in the arguments passed from the
              * error handler routine
              */
             return String.format(
