@@ -11,7 +11,7 @@ This approach combines the power of dynamic languages with the rich ecosystem of
 ## Documentation
 
 For further information, please check out the 
- * [Official project home page] (http://dyna4jdbc.org/) 
+ * [Official project home page](http://dyna4jdbc.org/) 
  * [Project Wiki Page](https://github.com/peter-gergely-horvath/dyna4jdbc/wiki)
 
 ## Sample
