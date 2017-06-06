@@ -44,7 +44,7 @@ public final class DefaultConfigurationFactory implements ConfigurationFactory {
         if (props != null) {
             for (Object propKey : props.keySet()) {
                 if (!(propKey instanceof java.lang.String)) {
-                    Class<? extends Object> keyClass = propKey.getClass();
+                    Class<?> keyClass = propKey.getClass();
                     throw MisconfigurationException.forMessage(
                             "properties should only contain String keys, but was: " + keyClass);
                 } else {

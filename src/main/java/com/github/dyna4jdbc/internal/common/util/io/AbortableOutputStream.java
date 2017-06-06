@@ -75,9 +75,6 @@ public final class AbortableOutputStream extends OutputStream {
     }
 
     private void checkNotAborted() {
-        if (abortHandler == null) {
-            throw new AbortedError("abortHandler == null");
-        }
         if (abortHandler.aborted) {
             throw new AbortedError(this + ": OutputStream is aborted");
         }

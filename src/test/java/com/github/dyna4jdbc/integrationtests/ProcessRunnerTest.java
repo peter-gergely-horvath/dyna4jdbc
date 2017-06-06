@@ -19,7 +19,6 @@ package com.github.dyna4jdbc.integrationtests;
 
 import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.executeScriptForResultSetString;
 import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.newLineSeparated;
-import static org.testng.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,13 +52,12 @@ public class ProcessRunnerTest {
     
             
     
-    private File tempFile;
     private String commandToExecute;
 
     @BeforeMethod
     public void beforeMethod() throws IOException {
 
-        tempFile = File.createTempFile("processIntegrationTest", "tmp");
+        File tempFile = File.createTempFile("processIntegrationTest", "tmp");
         tempFile.deleteOnExit();
 
         String fileSeparator = System.getProperty("file.separator");

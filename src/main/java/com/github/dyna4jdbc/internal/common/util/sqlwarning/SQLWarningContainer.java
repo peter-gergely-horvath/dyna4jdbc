@@ -31,7 +31,7 @@ public final class SQLWarningContainer {
     public void addSQLWarning(SQLWarning newSQLWarning) {
 
         if (newSQLWarning == null) {
-            JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("newSQLWarning is null");
+            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException("newSQLWarning is null");
         }
         
         if (currentSQLWarning == null) {

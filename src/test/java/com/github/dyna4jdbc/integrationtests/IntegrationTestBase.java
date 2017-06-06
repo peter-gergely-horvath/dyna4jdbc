@@ -116,7 +116,7 @@ public abstract class IntegrationTestBase {
         String resultSetString;
         try(Connection connection = DriverManager.getConnection(jdbcUrl)) {
 
-            try (Statement statement = connection.createStatement();) {
+            try (Statement statement = connection.createStatement()) {
 
                 statement.setMaxRows(2);
 
@@ -139,7 +139,7 @@ public abstract class IntegrationTestBase {
         String resultSetString;
         try(Connection connection = DriverManager.getConnection(jdbcUrl)) {
 
-            try (Statement statement = connection.createStatement();) {
+            try (Statement statement = connection.createStatement()) {
 
                 statement.setMaxRows(2);
 

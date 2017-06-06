@@ -41,7 +41,7 @@ public class IntegrationTestUtils {
 
     static String executeScriptForResultSetString(String script, Connection connection) throws SQLException {
 
-        try (Statement statement = connection.createStatement();) {
+        try (Statement statement = connection.createStatement()) {
 
             return executeScriptForResultSetString(script, statement);
         }

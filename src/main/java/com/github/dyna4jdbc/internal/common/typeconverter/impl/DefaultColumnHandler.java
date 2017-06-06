@@ -102,7 +102,16 @@ class DefaultColumnHandler implements ColumnHandler {
             }
 
             BigDecimal bigDecimal = covertToBigDecimal(rawCellValue);
-            bigDecimal = bigDecimal.setScale(scale);
+            /*
+            Note to the rounding mode: ROUND_HALF_UP - representing "common" rounding
+            one learns in primary school - is our best guess here regarding
+            what the caller expects to happen.
+
+            This will
+                - truncate the number if the discarded fraction < 0.5
+                - increment the digit prior the discarded fraction, if discarded fraction >= 0.5
+             */
+            bigDecimal = bigDecimal.setScale(scale, BigDecimal.ROUND_HALF_UP);
 
             return bigDecimal;
         } catch (ArithmeticException nfe) {

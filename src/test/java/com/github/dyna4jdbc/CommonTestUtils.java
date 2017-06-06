@@ -33,7 +33,7 @@ public class CommonTestUtils {
     @FunctionalInterface
     public interface VoidCallable {
         void call() throws Exception;
-    };
+    }
 
     public static void assertThrowsSQLExceptionWithFunctionNotSupportedMessage(VoidCallable callable) {
         assertThrowsSQLExceptionAndMessageContains(JDBCError.JDBC_FEATURE_NOT_SUPPORTED.name(),

@@ -32,7 +32,7 @@ import com.github.dyna4jdbc.internal.sqlstate.Category;
 
 public class JDBCErrorTest {
 
-    private static final int NO_DATA_CODE = 02;
+    private static final int NO_DATA_CODE = 2;
 
     @Test
     public void testNoCodeIsNull() throws SQLException {

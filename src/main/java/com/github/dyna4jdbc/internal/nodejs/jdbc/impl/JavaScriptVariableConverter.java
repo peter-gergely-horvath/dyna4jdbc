@@ -42,25 +42,25 @@ final class JavaScriptVariableConverter {
             long time = ((Date) value).getTime();
             return String.format("new Date(%s)", time);
         } else if (value instanceof Collection) {
-            Collection<Object> collection = (Collection<Object>) value;
+            Collection<?> collection = (Collection<?>) value;
             return convertToString(collection);
         } else if (value.getClass().isArray()) {
-            List<Object> list = Arrays.asList((Object[]) value);
+            List<?> list = Arrays.asList((Object[]) value);
             return convertToString(list);
         } else if (value instanceof Map) {
-            return convertToString((Map<Object, Object>) value);
+            return convertToString((Map<?, ?>) value);
         } else {
             return convertToString(value.toString());
         }
     }
 
-    private static String convertToString(Collection<Object> objectStream) {
+    private static String convertToString(Collection<?> objectStream) {
         return String.format("[ %s ]", objectStream.stream()
                 .map(JavaScriptVariableConverter::convertToString)
                 .collect(Collectors.joining(", ")));
     }
 
-    private static String convertToString(Map<Object, Object> map) {
+    private static String convertToString(Map<?, ?> map) {
         return String.format("{ %s }", map.entrySet().stream()
                 .map(entry -> {
                     String key = convertToString(entry.getKey());

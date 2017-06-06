@@ -85,7 +85,7 @@ public class SQLWarningSinkOutputStream extends OutputStream {
         SQLWarning sqlwarning = new SQLWarning(value);
 
         sqlWarningSink.onSQLWarning(sqlwarning);
-    };
+    }
 
 
     public final void close() throws IOException {
