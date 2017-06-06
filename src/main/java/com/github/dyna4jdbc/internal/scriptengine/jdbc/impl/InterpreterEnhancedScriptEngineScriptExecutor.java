@@ -88,7 +88,7 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
     }
 
     @Override
-    public void executeScriptUsingStreams(
+    public void executeScript(
             String script, Map<String, Object> variables,
             OutputStream stdOutOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
@@ -102,9 +102,9 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
         } else {
                 /*
                 Implementing the re-binding of the ScriptEngine is somewhat complex here, as
-                OutputCapturingScriptExecutor.executeScriptUsingStreams CLOSES the streams passed to it.
+                ScriptExecutor.executeScript CLOSES the streams passed to it.
                 Since we might execute this method multiple times (before and after an interpreter command),
-                a possible second invocation of executeScriptUsingStreams would find the OutputStream in closed
+                a possible second invocation of executeScript would find the OutputStream in closed
                 state.
 
                 To avoid this issue, we pass a close-suppressing OutputStream proxy to the actual execute calls,
@@ -152,7 +152,7 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
 
             if (beforeInterpreterCommand != null && !"".equals(beforeInterpreterCommand.trim())) {
                 /*
-                    perform executeScriptUsingStreams on the delegate: the attempt to close the OutputStream
+                    perform executeScript on the delegate: the attempt to close the OutputStream
                     will be suppressed by the wrapper CloseSuppressingOutputStream
                 */
                 delegateExecuteScriptUsingStreams(
@@ -164,7 +164,7 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
 
             if (afterInterpreterCommand != null && !"".equals(afterInterpreterCommand.trim())) {
                 /*
-                    perform executeScriptUsingStreams on the delegate: the attempt to close the OutputStream
+                    perform executeScript on the delegate: the attempt to close the OutputStream
                     will be suppressed by the wrapper CloseSuppressingOutputStream
                 */
                 delegateExecuteScriptUsingStreams(
@@ -179,7 +179,7 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
             OutputStream stdOutOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
-        getDelegate().executeScriptUsingStreams(
+        getDelegate().executeScript(
                 script, variables, stdOutOutputStream, errorOutputStream);
     }
 

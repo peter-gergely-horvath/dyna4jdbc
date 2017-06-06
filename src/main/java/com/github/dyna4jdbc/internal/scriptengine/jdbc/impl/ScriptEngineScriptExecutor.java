@@ -18,11 +18,11 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
 
-import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
+import com.github.dyna4jdbc.internal.ScriptExecutor;
 
 import java.util.Map;
 
-interface ScriptEngineScriptExecutor extends OutputCapturingScriptExecutor {
+interface ScriptEngineScriptExecutor extends ScriptExecutor {
 
     void setVariables(Map<String, Object> variables);
 

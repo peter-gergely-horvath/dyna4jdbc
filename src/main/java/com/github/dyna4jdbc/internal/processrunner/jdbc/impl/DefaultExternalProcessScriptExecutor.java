@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- 
+
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
 import java.io.IOException;
@@ -38,9 +38,9 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
     private volatile ProcessManager processManager;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
-    private final DefaultIOHandlerFactory ioHandlerFactory; 
+    private final DefaultIOHandlerFactory ioHandlerFactory;
     private final ProcessManagerFactory processManagerFactory;
-    
+
 
     public DefaultExternalProcessScriptExecutor(Configuration configuration) {
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
@@ -49,14 +49,14 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
 
     //CHECKSTYLE.OFF: DesignForExtension : incorrect detection of "is not designed for extension"
     @Override
-    public void executeScriptUsingStreams(
+    public void executeScript(
             String script,
             Map<String, Object> variables,
             OutputStream stdOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {
 
         try (PrintWriter outputPrintWriter = ioHandlerFactory.newPrintWriter(stdOutputStream, true);
-            PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true))  {
+             PrintWriter errorPrintWriter = ioHandlerFactory.newPrintWriter(errorOutputStream, true)) {
 
             if (this.processManager != null && !this.processManager.isProcessRunning()) {
                 onProcessNotRunningBeforeDispatch(script);
@@ -64,7 +64,7 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
 
             if (this.processManager == null) {
                 Process newProcess = createProcess(script, variables);
-                
+
                 this.processManager = processManagerFactory.newProcessManager(newProcess);
             } else {
                 this.processManager.writeToStandardInput(script);

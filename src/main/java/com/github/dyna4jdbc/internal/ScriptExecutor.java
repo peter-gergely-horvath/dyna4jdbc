@@ -20,9 +20,9 @@ package com.github.dyna4jdbc.internal;
 import java.io.OutputStream;
 import java.util.Map;
 
-public interface OutputCapturingScriptExecutor {
+public interface ScriptExecutor {
 
-    void executeScriptUsingStreams(
+    void executeScript(
             String script,
             Map<String, Object> variables,
             OutputStream stdOutOutputStream,

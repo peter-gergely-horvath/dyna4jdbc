@@ -135,7 +135,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, testObject);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -157,7 +157,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setNull(1, Types.VARCHAR);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -179,7 +179,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setString(1, "FOOBAR");
 
                 ResultSet resultSet = statement.executeQuery();
@@ -203,7 +203,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, expectedValue);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -227,7 +227,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, expectedValue);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -251,7 +251,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, expectedValue);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -275,7 +275,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, expectedValue);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -299,7 +299,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, expectedValue);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -323,7 +323,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, expectedValue);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -347,7 +347,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, expectedValue);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -371,7 +371,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, expectedValue);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -395,7 +395,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, expectedValue);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -428,7 +428,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, expectedValue);
 
                 ResultSet resultSet = statement.executeQuery();
@@ -457,7 +457,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, headers);
                 statement.setObject(2, data);
 
@@ -489,7 +489,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, headers);
                 statement.setObject(2, data);
 
@@ -528,7 +528,7 @@ public class NodeJSTest extends IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setObject(1, headerToData);
 
                 ResultSet resultSet = statement.executeQuery();

@@ -156,7 +156,7 @@ public abstract class IntegrationTestBase {
 
             try (PreparedStatement statement = connection.prepareStatement(script)) {
                 // value will be bound to the name "parameter1"
-                // see OutputHandlingPreparedStatement.setParameter()
+                // see ScriptPreparedStatement.setParameter()
                 statement.setString(1, PREPARED_STATEMENT_PARAMETER);
 
                 ResultSet resultSet = statement.executeQuery();

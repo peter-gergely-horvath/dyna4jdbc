@@ -17,9 +17,9 @@
  
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
-import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
+import com.github.dyna4jdbc.internal.ScriptExecutor;
 
-public interface ExternalProcessScriptExecutor extends OutputCapturingScriptExecutor {
+public interface ExternalProcessScriptExecutor extends ScriptExecutor {
 
     void close();
 }

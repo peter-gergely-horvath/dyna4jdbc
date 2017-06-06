@@ -27,7 +27,7 @@ import java.util.List;
 import com.github.dyna4jdbc.internal.AbortedError;
 import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
+import com.github.dyna4jdbc.internal.ScriptExecutor;
 import com.github.dyna4jdbc.internal.OutputDisabledError;
 import com.github.dyna4jdbc.internal.RuntimeDyna4JdbcException;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
@@ -40,10 +40,10 @@ import com.github.dyna4jdbc.internal.common.outputhandler.SingleResultSetScriptO
 import com.github.dyna4jdbc.internal.common.outputhandler.UpdateScriptOutputHandler;
 import com.github.dyna4jdbc.internal.common.util.exception.ExceptionUtils;
 
-public class OutputHandlingStatement<T extends java.sql.Connection> extends AbstractStatement<T> {
+public class ScriptStatement<T extends java.sql.Connection> extends AbstractStatement<T> {
 
     private final ScriptOutputHandlerFactory scriptOutputHandlerFactory;
-    private final OutputCapturingScriptExecutor outputCapturingScriptExecutor;
+    private final ScriptExecutor scriptExecutor;
     
     private final SQLWarningSink warningSink = new SQLWarningSink() {
         @Override
@@ -52,19 +52,19 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         }
     };
     
-    public OutputHandlingStatement(
+    public ScriptStatement(
             T connection,
             ScriptOutputHandlerFactory scriptOutputHandlerFactory,
-            OutputCapturingScriptExecutor outputCapturingScriptExecutor) {
+            ScriptExecutor scriptExecutor) {
 
         super(connection);
         
         this.scriptOutputHandlerFactory = scriptOutputHandlerFactory;
-        this.outputCapturingScriptExecutor = outputCapturingScriptExecutor;
+        this.scriptExecutor = scriptExecutor;
     }
 
-    protected final OutputCapturingScriptExecutor getOutputCapturingScriptExecutor() {
-        return outputCapturingScriptExecutor;
+    protected final ScriptExecutor getScriptExecutor() {
+        return scriptExecutor;
     }
 
     public final ResultSet executeQuery(String script) throws SQLException {
@@ -210,14 +210,14 @@ public class OutputHandlingStatement<T extends java.sql.Connection> extends Abst
         OutputStream outOutputStream = scriptOutputHandler.getOutOutputStream();
         OutputStream errorOutputStream = scriptOutputHandler.getErrorOutputStream();
 
-        outputCapturingScriptExecutor.executeScriptUsingStreams(script, null, outOutputStream, errorOutputStream);
+        scriptExecutor.executeScript(script, null, outOutputStream, errorOutputStream);
     }
     //CHECKSTYLE.ON: DesignForExtension
 
     @Override
     public final void cancel() throws SQLException {
         try {
-            outputCapturingScriptExecutor.cancel();
+            scriptExecutor.cancel();
 
         } catch (CancelException ce) {
 

@@ -60,7 +60,7 @@ final class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecuto
     }
 
     @Override
-    public void executeScriptUsingStreams(
+    public void executeScript(
             String script, Map<String, Object> variables,
             OutputStream stdOutOutputStream,
             OutputStream errorOutputStream) throws ScriptExecutionException {

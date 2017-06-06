@@ -19,10 +19,10 @@ package com.github.dyna4jdbc.internal.common.jdbc.base;
 
 
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
+import com.github.dyna4jdbc.internal.ScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingPreparedStatement;
-import com.github.dyna4jdbc.internal.common.jdbc.generic.OutputHandlingStatement;
+import com.github.dyna4jdbc.internal.common.jdbc.generic.ScriptPreparedStatement;
+import com.github.dyna4jdbc.internal.common.jdbc.generic.ScriptStatement;
 import com.github.dyna4jdbc.internal.common.outputhandler.ScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultScriptOutputHandlerFactory;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
@@ -49,7 +49,7 @@ public abstract class ScriptConnection extends AbstractConnection {
             byte[] bytesRead = Files.readAllBytes(initScript.toPath());
             String initScriptText = new String(bytesRead, this.getConfiguration().getConversionCharset());
 
-            getScriptExecutor().executeScriptUsingStreams(
+            getScriptExecutor().executeScript(
                     initScriptText,
                     null,
                     new DisallowAllWritesOutputStream("An init script cannot generate output"),
@@ -69,7 +69,7 @@ public abstract class ScriptConnection extends AbstractConnection {
         ScriptOutputHandlerFactory outputHandlerFactory =
                 new DefaultScriptOutputHandlerFactory(getColumnHandlerFactory(), getConfiguration());
 
-        return new OutputHandlingStatement<>(
+        return new ScriptStatement<>(
                 this, outputHandlerFactory, getScriptExecutor());
     }
 
@@ -79,7 +79,7 @@ public abstract class ScriptConnection extends AbstractConnection {
         ScriptOutputHandlerFactory outputHandlerFactory =
                 new DefaultScriptOutputHandlerFactory(getColumnHandlerFactory(), getConfiguration());
 
-        return new OutputHandlingPreparedStatement<>(
+        return new ScriptPreparedStatement<>(
                 script, this, outputHandlerFactory, getScriptExecutor());
     }
 
@@ -88,6 +88,6 @@ public abstract class ScriptConnection extends AbstractConnection {
 
     protected abstract Configuration getConfiguration();
 
-    protected abstract OutputCapturingScriptExecutor getScriptExecutor();
+    protected abstract ScriptExecutor getScriptExecutor();
 
 }

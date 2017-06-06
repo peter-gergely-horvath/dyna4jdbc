@@ -17,7 +17,7 @@
  
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
-import com.github.dyna4jdbc.internal.OutputCapturingScriptExecutor;
+import com.github.dyna4jdbc.internal.ScriptExecutor;
 import com.github.dyna4jdbc.internal.common.jdbc.base.ScriptConnection;
 import com.github.dyna4jdbc.internal.common.jdbc.generic.GenericDatabaseMetaData;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
@@ -112,7 +112,7 @@ public class ProcessRunnerConnection extends ScriptConnection {
     }
 
     @Override
-    protected final OutputCapturingScriptExecutor getScriptExecutor() {
+    protected final ScriptExecutor getScriptExecutor() {
         return scriptExecutor;
     }
 }
