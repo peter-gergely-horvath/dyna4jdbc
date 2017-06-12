@@ -52,6 +52,8 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
 
     @Override
     public final int getRow() throws SQLException {
+        checkNotClosed();
+
         return javaIndex + SQL_INDEX_OFFSET;
     }
 
@@ -129,6 +131,7 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
 
     @Override
     public final void refreshRow() throws SQLException {
+        checkNotClosed();
         // We implement result set type TYPE_FORWARD_ONLY
         // where the support of this method is optional
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("Updating ResultSet data");
@@ -136,64 +139,88 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
 
     @Override
     public final boolean isBeforeFirst() throws SQLException {
+        checkNotClosed();
+
         return resultSetState.isInState(GuardedResultSetState.State.BEFORE_FIRST);
     }
 
     @Override
     public final boolean isAfterLast() throws SQLException {
+        checkNotClosed();
+
         return resultSetState.isInState(GuardedResultSetState.State.AFTER_LAST);
     }
 
     @Override
     public final boolean isFirst() throws SQLException {
+        checkNotClosed();
+
         return getRow() == SQL_INDEX_FIRST_ROW;
     }
 
     @Override
     public final boolean isLast() throws SQLException {
+        checkNotClosed();
+
         return resultSetState.isInState(GuardedResultSetState.State.ITERATING_OVER_RESULTS) && !rowIterator.hasNext();
     }
 
     @Override
     public final void beforeFirst() throws SQLException {
+        checkNotClosed();
+
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#beforeFirst()");
     }
 
     @Override
     public final void afterLast() throws SQLException {
+        checkNotClosed();
+
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#afterLast()");
     }
 
     @Override
     public final boolean first() throws SQLException {
+        checkNotClosed();
+
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#first()");
     }
 
     @Override
     public final boolean last() throws SQLException {
+        checkNotClosed();
+
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException("java.sql.ResultSet#last()");
     }
 
     @Override
     public final boolean absolute(int row) throws SQLException {
+        checkNotClosed();
+
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                 "Moving cursor by absolute(int)");
     }
 
     @Override
     public final boolean relative(int rows) throws SQLException {
+        checkNotClosed();
+
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                 "Moving cursor by relative(int)");
     }
 
     @Override
     public final boolean previous() throws SQLException {
+        checkNotClosed();
+
         throw JDBCError.JDBC_FEATURE_NOT_SUPPORTED.raiseSQLException(
                 "Moving cursor by previous()");
     }
 
     @Override
     public final void setFetchDirection(int direction) throws SQLException {
+        checkNotClosed();
+
         if (direction != ResultSet.FETCH_FORWARD
                 && direction != ResultSet.FETCH_REVERSE
                 && direction != ResultSet.FETCH_UNKNOWN) {
@@ -210,11 +237,15 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
 
     @Override
     public final int getFetchDirection() throws SQLException {
+        checkNotClosed();
+
         return ResultSet.FETCH_FORWARD;
     }
 
     @Override
     public final int getType() throws SQLException {
+        checkNotClosed();
+
         return ResultSet.TYPE_FORWARD_ONLY;
     }
 
