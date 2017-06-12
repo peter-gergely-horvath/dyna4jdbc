@@ -27,11 +27,11 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
         super("jdbc:dyna4jdbc:scriptengine:JavaScript");
     }
 
-    @Test(enabled = false)
+    @Test
     @Override
     public void testWritingFromUpdateThrowsSQLException() {
 
-        String script = "dyna4jdbc:set ScriptEngine Groovy\n"
+        String script = "dyna4jdbc:set ScriptEngine Groovy \n"
                 + "println \"Hello World\" ";   // NOTE: this is Groovy syntax, it would not work with JavaScript
 
         assertWritingFromUpdateThrowsSQLException(script);
