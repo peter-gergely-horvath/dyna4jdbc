@@ -25,14 +25,18 @@ import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerF
 import com.github.dyna4jdbc.internal.common.util.io.AbortableOutputStream;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
-import javax.script.*;
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 final class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
 
@@ -135,9 +139,13 @@ final class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecuto
     public Map<String, Object> getVariables() {
         Bindings bindings = getBindings(scriptEngine);
 
-        return bindings.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey, Map.Entry::getValue));
+        HashMap<String, Object> returnedVariableMap = new HashMap<>();
+
+        for (Map.Entry<String, Object> entry : bindings.entrySet()) {
+            returnedVariableMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return returnedVariableMap;
     }
 
     private static Bindings getBindings(ScriptEngine engine) {

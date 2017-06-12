@@ -19,7 +19,14 @@ package com.github.dyna4jdbc.integrationtests;
 
 import org.testng.annotations.Test;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
+
+import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.executeScriptForResultSetString;
+import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.newLineSeparated;
+import static org.testng.Assert.assertEquals;
 
 public class InterpreterScriptEngineTest extends IntegrationTestBase {
 
@@ -117,5 +124,51 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
 
         assertPreparedStatementQueryReturnsParameter(script);
     }
+
+    @Test
+    public void testVariableDeclaredIsCarriedOverToMultipleLanguages() throws Exception {
+
+        try(Connection connection = DriverManager.getConnection(jdbcUrl)) {
+
+            try (Statement statement = connection.createStatement()) {
+                statement.executeUpdate("var msg = \"Hello World\"");
+            }
+
+            assertInterpreterCommandAndScriptYields("clojure", connection,
+                    "(println \"Message::\") (println msg)");
+
+
+            assertInterpreterCommandAndScriptYields("Groovy", connection,
+                    "println \"Message::\";\n println msg ");
+
+            assertInterpreterCommandAndScriptYields("scala", connection,
+                    "println(\"Message::\");\n println(msg)");
+
+            assertInterpreterCommandAndScriptYields("python", connection,
+                    "print \"Message::\" \nprint msg ");
+
+            assertInterpreterCommandAndScriptYields("jruby", connection,
+                    "puts \"Message::\" \n puts $msg ");
+        }
+
+    }
+
+    private void assertInterpreterCommandAndScriptYields(
+            String scriptEngineName, Connection connection, String printScript) throws SQLException {
+
+        final String expectedOutput = newLineSeparated(
+                "RESULT SET #1 ",
+                "    Message | ",
+                "------------|-",
+                "Hello World | ");
+
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("dyna4jdbc:set ScriptEngine " + scriptEngineName);
+        }
+
+        String resultSetString = executeScriptForResultSetString(printScript, connection);
+        assertEquals(resultSetString, expectedOutput);
+    }
+
 
 }

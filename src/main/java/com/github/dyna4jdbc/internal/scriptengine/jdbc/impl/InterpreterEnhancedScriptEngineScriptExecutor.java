@@ -39,8 +39,6 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
 
     private static final Pattern INTERPRETER_COMMAND_PATTERN =
             Pattern.compile("(.*)"              // CAPTURING GROUP 1: content before the interpreter command
-                            + "(?:\\n|\\r)*"    // optional newline
-                            + "(?:\\s*)"        // optional whitespace(s)
                             + "(?<!jdbc:)"      // NOT a "jdbc:" prefix
                             + "dyna4jdbc:"      // the pattern "dyna4jdbc:"
                             + "([^\\n\\r]+)"    // CAPTURING GROUP 2: the interpreter command
