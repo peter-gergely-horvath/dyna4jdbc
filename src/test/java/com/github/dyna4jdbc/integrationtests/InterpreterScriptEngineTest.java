@@ -50,12 +50,13 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
 
     }
 
-    @Test(enabled = false)
+    @Test
     @Override
     public void testHeadersNotSpecified() throws Exception {
 
         String script = "dyna4jdbc:set ScriptEngine Groovy\n" +
-                "print(\"A:\tB:\");\n print(\"First A\tFirst B\");\n print(\"Second A\tSecond B\");\n";
+                // NOTE: this is Groovy syntax, it would not work with JavaScript
+                "println \"A:\tB:\";\n println \"First A\tFirst B\";\n println \"Second A\tSecond B\";\n";
 
         assertHeadersNotSpecifiedCausesNumbersToBeUsed(script);
     }
@@ -64,7 +65,9 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
     @Override
     public void testHeadersSpecified() throws Exception {
 
-        String script = "print(\"A::\tB::\");\n print(\"First A\tFirst B\");\n print(\"Second A\tSecond B\");";
+        String script = "dyna4jdbc:set ScriptEngine Groovy \n" +
+                // NOTE: this is Groovy syntax, it would not work with JavaScript
+                "println \"A::\tB::\";\n println \"First A\tFirst B\";\n println \"Second A\tSecond B\";";
 
         assertIfHeadersAreSpecifiedThenHeadersAreUsed(script);
     }
@@ -76,9 +79,10 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
                 .append("print(\"A::\tB::\");\n ")
                 .append("print(\"First A\tFirst B\");\n ")
                 .append("print(\"Second A\tSecond B\");")
-                .append("print(\"Third A\tThird B\");")
-                .append("print(\"Fourth A\tFourth B\");")
-                .append("print(\"Fifth A\tFifth B\");")
+                .append("dyna4jdbc:set ScriptEngine Groovy\n")
+                .append("println \"Third A\tThird B\";")
+                .append("println \"Fourth A\tFourth B\";")
+                .append("println \"Fifth A\tFifth B\";")
                 .toString();
 
         assertYieldsFirstTwoRowsOnlyWithHeaders(script);
@@ -90,11 +94,12 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
 
         String script = new StringBuilder()
                 .append("print(\"A:\tB:\");\n ")
-                .append("print(\"First A\tFirst B\");\n ")
-                .append("print(\"Second A\tSecond B\");")
-                .append("print(\"Third A\tThird B\");")
-                .append("print(\"Fourth A\tFourth B\");")
-                .append("print(\"Fifth A\tFifth B\");")
+                .append("dyna4jdbc:set ScriptEngine Groovy\n")
+                .append("println \"First A\tFirst B\" ;\n ")
+                .append("println \"Second A\tSecond B\";")
+                .append("println \"Third A\tThird B\";")
+                .append("println \"Fourth A\tFourth B\";")
+                .append("println \"Fifth A\tFifth B\";")
                 .toString();
 
         assertYieldsFirstTwoRowsOnlyNoHeaders(script);
@@ -106,7 +111,9 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
     @Override
     public void testPreparedStatementBindsVariable() throws Exception {
 
-        String script = "print(\"Message::\");\n print(parameter1)";
+        String script = "print(\"Message::\");\n " +
+                "dyna4jdbc:set ScriptEngine Groovy\n" +
+                "println parameter1";
 
         assertPreparedStatementQueryReturnsParameter(script);
     }

@@ -43,10 +43,9 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
                             + "(?:\\s*)"        // optional whitespace(s)
                             + "(?<!jdbc:)"      // NOT a "jdbc:" prefix
                             + "dyna4jdbc:"      // the pattern "dyna4jdbc:"
-                            + "(.*)"            // CAPTURING GROUP 2: the interpreter command
-                            + "(?:\\n|\\r)*"    // optional newline
+                            + "([^\\n\\r]+)"    // CAPTURING GROUP 2: the interpreter command
                             + "(.*)",           // CAPTURING GROUP 3: content after the interpreter command
-                    Pattern.CASE_INSENSITIVE & Pattern.MULTILINE & Pattern.DOTALL);
+                    Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     private static final int BEFORE_INTERPRETER_COMMAND_GROUP = 1;
     private static final int INTERPRETER_COMMAND_GROUP = 2;
