@@ -37,7 +37,7 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
         assertWritingFromUpdateThrowsSQLException(script);
     }
 
-    @Test(enabled = false)
+    @Test
     @Override
     public void testVariableDeclaredInStatementVisibleFromAnotherStatement() throws SQLException {
 
