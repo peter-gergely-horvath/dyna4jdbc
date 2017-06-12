@@ -38,7 +38,14 @@ import java.util.regex.Pattern;
 final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
 
     private static final Pattern INTERPRETER_COMMAND_PATTERN =
-            Pattern.compile("(.*)(?:\\n|\\r)*(?:\\s*)(?<!jdbc:)dyna4jdbc:(.*)(?:\\n|\\r)*(.*)",
+            Pattern.compile("(.*)"              // CAPTURING GROUP 1: content before the interpreter command
+                            + "(?:\\n|\\r)*"    // optional newline
+                            + "(?:\\s*)"        // optional whitespace(s)
+                            + "(?<!jdbc:)"      // NOT a "jdbc:" prefix
+                            + "dyna4jdbc:"      // the pattern "dyna4jdbc:"
+                            + "(.*)"            // CAPTURING GROUP 2: the interpreter command
+                            + "(?:\\n|\\r)*"    // optional newline
+                            + "(.*)",           // CAPTURING GROUP 3: content after the interpreter command
                     Pattern.CASE_INSENSITIVE & Pattern.MULTILINE & Pattern.DOTALL);
 
     private static final int BEFORE_INTERPRETER_COMMAND_GROUP = 1;
@@ -186,7 +193,7 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
 
 
     private enum InterpreterCommand {
-        SET_SCRIPTENGINE("set-ScriptEngine") {
+        SET_SCRIPTENGINE("set ScriptEngine") {
             @Override
             protected void parseParametersAndExecute(
                     String parameters, InterpreterEnhancedScriptEngineScriptExecutor context)
