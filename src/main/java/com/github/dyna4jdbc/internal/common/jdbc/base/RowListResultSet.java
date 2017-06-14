@@ -30,7 +30,7 @@ import com.github.dyna4jdbc.internal.common.util.collection.BoundedIterator;
 /**
  * @author Peter G. Horvath
  */
-public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> {
+public abstract class RowListResultSet<T> extends ColumnHandlerResultSet<T> {
 
     private static final int SQL_INDEX_OFFSET = 1;
     private static final int SQL_INDEX_FIRST_ROW = 1;
@@ -43,7 +43,7 @@ public abstract class DataRowListResultSet<T> extends ColumnHandlerResultSet<T> 
 
     private final Iterator<T> rowIterator;
 
-    public DataRowListResultSet(
+    public RowListResultSet(
             List<T> dataRows, Statement statement, List<ColumnHandler> columnHandlers)  {
         super(statement, columnHandlers);
 

@@ -20,14 +20,14 @@ package com.github.dyna4jdbc.internal.common.jdbc.generic;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.datamodel.DataColumn;
 import com.github.dyna4jdbc.internal.common.datamodel.DataTable;
-import com.github.dyna4jdbc.internal.common.jdbc.base.DataRowListResultSet;
+import com.github.dyna4jdbc.internal.common.jdbc.base.RowListResultSet;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandler;
 import com.github.dyna4jdbc.internal.common.typeconverter.ColumnHandlerFactory;
 
 import java.sql.*;
 import java.util.*;
 
-public final class DataTableAdapterResultSet extends DataRowListResultSet<List<String>> {
+public final class DataTableAdapterResultSet extends RowListResultSet<List<String>> {
 
     private final int columnCount;
 
@@ -73,13 +73,13 @@ public final class DataTableAdapterResultSet extends DataRowListResultSet<List<S
 
             ColumnHandler columnHandler = columnHandlers.get(i);
 
-            final boolean thisTypeHandlerTakesFirstRowValue =
+            final boolean thisTypeHandlerConsumesFirstRowValue =
                     columnHandler.getColumnMetadata().isConsumesFirstRow();
 
             if (shouldConsumeFirstRow == null) {
-                shouldConsumeFirstRow = thisTypeHandlerTakesFirstRowValue;
+                shouldConsumeFirstRow = thisTypeHandlerConsumesFirstRowValue;
             } else {
-                if (shouldConsumeFirstRow != thisTypeHandlerTakesFirstRowValue) {
+                if (shouldConsumeFirstRow != thisTypeHandlerConsumesFirstRowValue) {
 
                     final int sqlIndexOfColumn = i + 1;
 
