@@ -146,9 +146,6 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
 
             assertInterpreterCommandAndScriptYields("python", connection,
                     "print \"Message::\" \nprint msg ");
-
-            assertInterpreterCommandAndScriptYields("jruby", connection,
-                    "puts \"Message::\" \n puts $msg ");
         }
 
     }
