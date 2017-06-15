@@ -80,16 +80,16 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
             standardErrorFuture.get();
 
         } catch (IOException e) {
-            throw new ScriptExecutionException(e);
+            throw new ScriptExecutionException(e, script);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ScriptExecutionException("Interrupted", e);
+            throw new ScriptExecutionException("Interrupted", e, script);
         } catch (ExecutionException e) {
             Throwable actualThrowable = e.getCause();
-            throw new ScriptExecutionException(actualThrowable);
+            throw new ScriptExecutionException(actualThrowable, script);
 
         } catch (ProcessExecutionException e) {
-            throw new ScriptExecutionException(e);
+            throw new ScriptExecutionException(e, script);
         }
     }
 

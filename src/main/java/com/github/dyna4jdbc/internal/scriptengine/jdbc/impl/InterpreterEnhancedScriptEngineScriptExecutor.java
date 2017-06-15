@@ -151,7 +151,7 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
                     .findFirst()
                     .orElseThrow(() ->
                             new ScriptExecutionException(
-                                    "Cannot process as interpreter command: " + interpreterCommandString));
+                                    "Cannot process as interpreter command", interpreterCommandString));
 
 
             if (beforeInterpreterCommand != null && !"".equals(beforeInterpreterCommand.trim())) {
@@ -199,7 +199,7 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
                 String scriptEngineName = parameters.trim();
                 if ("".equals(scriptEngineName.trim())) {
                     throw new ScriptExecutionException(
-                            this.commandName + ": Missing mandatory parameter: ScriptEngineName");
+                            this.commandName + ": Missing mandatory parameter: ScriptEngineName", this.commandName);
                 }
 
 

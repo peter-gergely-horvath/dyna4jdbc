@@ -20,17 +20,25 @@ package com.github.dyna4jdbc.internal;
 public class ScriptExecutionException extends Exception {
 
     private static final long serialVersionUID = 1L;
+    private final String failedScript;
 
-    public ScriptExecutionException(String message) {
+    public ScriptExecutionException(String message, String failedScript) {
         super(message);
+        this.failedScript = failedScript;
     }
     
-    public ScriptExecutionException(Throwable cause) {
+    public ScriptExecutionException(Throwable cause, String failedScript) {
         super(cause);
+        this.failedScript = failedScript;
     }
 
-    public ScriptExecutionException(String message, Throwable cause) {
+    public ScriptExecutionException(String message, Throwable cause, String failedScript) {
         super(message, cause);
+        this.failedScript = failedScript;
+    }
+
+    public final String getFailedScript() {
+        return failedScript;
     }
 }
 

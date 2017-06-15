@@ -114,7 +114,7 @@ final class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecuto
 
 
             } catch (ScriptException e) {
-                throw new ScriptExecutionException(e);
+                throw new ScriptExecutionException(e, script);
 
             } finally {
 

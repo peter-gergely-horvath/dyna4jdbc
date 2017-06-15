@@ -108,7 +108,7 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
     @Override
     protected void onProcessNotRunningBeforeDispatch(String script) throws ScriptExecutionException {
         throw new ScriptExecutionException(
-                "Node.js process exited unexpectedly! Cannot execute script: " + script);
+                "Node.js process exited unexpectedly: Cannot execute script!", script);
 
     }
 

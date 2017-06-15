@@ -81,7 +81,7 @@ public class ScriptStatement<T extends java.sql.Connection> extends AbstractStat
                         rootCause, rootCause.getMessage());
             } else {
                 String message = rootCause.getMessage();
-                throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
+                throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message, se.getFailedScript());
             }
 
         } catch (SQLException sqle) {
@@ -129,7 +129,7 @@ public class ScriptStatement<T extends java.sql.Connection> extends AbstractStat
                         rootCause, rootCause.getMessage());
             } else {
                 String message = rootCause.getMessage();
-                throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
+                throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message, se.getFailedScript());
             }
         } catch (RuntimeDyna4JdbcException ex) {
             throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
@@ -171,7 +171,7 @@ public class ScriptStatement<T extends java.sql.Connection> extends AbstractStat
                         rootCause, rootCause.getMessage());
             } else {
                 String message = rootCause.getMessage();
-                throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message);
+                throw JDBCError.SCRIPT_EXECUTION_EXCEPTION.raiseSQLException(se, message, se.getFailedScript());
             }
 
         } catch (RuntimeDyna4JdbcException ex) {
