@@ -17,6 +17,26 @@
  
 package com.github.dyna4jdbc.internal;
 
+/**
+ * <p>
+ * Thrown to indicate that the operation failed and
+ * a {@code SQLException} is to be thrown to the
+ * JDBC API caller.</p>
+ *
+ * <p>
+ * This class should be used in cases, where
+ * the method signature does not allow a
+ * {@code SQLException} to be thrown: higher
+ * layers of the code must catch this exception
+ * and wrap it into {@code SQLException}, with
+ * the message and SQLState taken from this
+ * exception.
+ * </p>
+ *
+ * @see RuntimeDyna4JdbcException#getMessage()
+ * @see RuntimeDyna4JdbcException#getSqlState()
+ *
+ */
 public class RuntimeDyna4JdbcException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

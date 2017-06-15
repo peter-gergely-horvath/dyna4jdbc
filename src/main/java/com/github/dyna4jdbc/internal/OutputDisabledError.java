@@ -17,6 +17,19 @@
  
 package com.github.dyna4jdbc.internal;
 
+/**
+ * <p>
+ * Thrown when a user script attempts to write to an
+ * {@code OutputStream} is not supposed to write to.</p>
+ *
+ * <p>
+ * This class extends {@code Error} so that a JVM script,
+ * that catches {@code Exception}s, will NOT also catch it:
+ * a failed write attempt will result in the abortion of
+ * the user script and this {@code Error} being propagated
+ * back to our code, where it is dealt with appropriately.
+ * </p>
+ */
 public class OutputDisabledError extends Error {
 
     private static final long serialVersionUID = 1L;

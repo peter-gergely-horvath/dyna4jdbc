@@ -17,18 +17,18 @@
  
 package com.github.dyna4jdbc.internal.nodejs.jdbc.impl;
 
+import com.github.dyna4jdbc.internal.JDBCError;
+import com.github.dyna4jdbc.internal.ScriptExecutionException;
+import com.github.dyna4jdbc.internal.ScriptExecutor;
+import com.github.dyna4jdbc.internal.config.Configuration;
+import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.DefaultExternalProcessScriptExecutor;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLWarning;
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-
-import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.ScriptExecutor;
-import com.github.dyna4jdbc.internal.ScriptExecutionException;
-import com.github.dyna4jdbc.internal.config.Configuration;
-import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.DefaultExternalProcessScriptExecutor;
 
 
 class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
@@ -97,7 +97,7 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
         }
 
         @Override
-        protected void onMultipleWarnings(String script, LinkedList<SQLWarning> warningList) {
+        protected void onMultipleWarnings(String script, List<SQLWarning> warningList) {
             throw JDBCError.NODE_JS_INTEGRATION_ERROR.raiseUncheckedExceptionWithSuppressed(warningList,
                     "stdERR write while invoking dyna4JDBC auto-generated JavaScript intended to set a variable. "
                     + "Script is: " + script);

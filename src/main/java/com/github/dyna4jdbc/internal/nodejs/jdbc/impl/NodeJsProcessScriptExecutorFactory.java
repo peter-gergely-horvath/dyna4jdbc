@@ -17,15 +17,15 @@
  
 package com.github.dyna4jdbc.internal.nodejs.jdbc.impl;
 
-import java.sql.SQLWarning;
-import java.util.LinkedList;
-
 import com.github.dyna4jdbc.internal.JDBCError;
-import com.github.dyna4jdbc.internal.ScriptExecutor;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
+import com.github.dyna4jdbc.internal.ScriptExecutor;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.DefaultExternalProcessScriptExecutorFactory;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.ExternalProcessScriptExecutor;
+
+import java.sql.SQLWarning;
+import java.util.List;
 
 
 public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalProcessScriptExecutorFactory {
@@ -87,7 +87,7 @@ public final class NodeJsProcessScriptExecutorFactory extends DefaultExternalPro
         }
 
         @Override
-        protected void onMultipleWarnings(String script, LinkedList<SQLWarning> warningList) {
+        protected void onMultipleWarnings(String script, List<SQLWarning> warningList) {
             JDBCError.CONNECT_FAILED_EXCEPTION.raiseUncheckedExceptionWithSuppressed(warningList,
                     "Node.js process wrote to output while starting the REPL: "
                     + "this is considered to be a fatal error");

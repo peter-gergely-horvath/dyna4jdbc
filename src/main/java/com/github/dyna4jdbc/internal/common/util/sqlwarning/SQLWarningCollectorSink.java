@@ -18,7 +18,9 @@
 package com.github.dyna4jdbc.internal.common.util.sqlwarning;
 
 import java.sql.SQLWarning;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 
@@ -31,7 +33,7 @@ public final class SQLWarningCollectorSink implements SQLWarningSink {
         list.add(warning);
     }
 
-    public LinkedList<SQLWarning> getWarnings() {
-        return list; // defensive copy?
+    public List<SQLWarning> getWarnings() {
+        return Collections.unmodifiableList(list);
     }
 }
