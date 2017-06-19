@@ -17,16 +17,7 @@
  
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
+interface InterpreterCommandHandler {
 
-import com.github.dyna4jdbc.internal.config.MisconfigurationException;
-
-import java.sql.SQLException;
-
-interface ScriptEngineScriptExecutorFactory {
-
-    ScriptEngineScriptExecutor newScriptEngineScriptExecutorWithInterpreterSupport(String scriptEngineName)
-            throws SQLException, MisconfigurationException;
-
-    ScriptEngineScriptExecutor newBasicScriptEngineScriptExecutor(String scriptEngineName)
-            throws SQLException, MisconfigurationException;
+    void setScriptEngine(String newScripEngineName);
 }

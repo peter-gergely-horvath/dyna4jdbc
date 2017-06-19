@@ -18,7 +18,6 @@
 package com.github.dyna4jdbc.internal.scriptengine.jdbc.impl;
 
 
-import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.common.util.io.CloseSuppressingOutputStream;
@@ -31,12 +30,13 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngineScriptExecutor {
+final class InterpreterCommandHandlerScriptEngineScriptExecutor extends DelegatingScriptExecutor
+        implements InterpreterCommandHandler {
 
+    // we use a simple regular expression to fish out our one-liner tiny "interpreter commands" from the the input
     private static final Pattern INTERPRETER_COMMAND_PATTERN =
             Pattern.compile("(.*)"              // CAPTURING GROUP 1: content before the interpreter command
                             + "(?<!jdbc:)"      // NOT a "jdbc:" prefix
@@ -49,46 +49,16 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
     private static final int INTERPRETER_COMMAND_GROUP = 2;
     private static final int AFTER_INTERPRETER_COMMAND_GROUP = 3;
 
-    private final AtomicReference<ScriptEngineScriptExecutor> delegateRef = new AtomicReference<>();
-
     private final ConcurrentHashMap<String, ScriptEngineScriptExecutor> scriptExecutorMap = new ConcurrentHashMap<>();
 
     private final ScriptEngineScriptExecutorFactory scriptEngineScriptExecutorFactory;
 
-    InterpreterEnhancedScriptEngineScriptExecutor(ScriptEngineScriptExecutor delegate, Configuration configuration) {
+    InterpreterCommandHandlerScriptEngineScriptExecutor(
+            ScriptEngineScriptExecutor delegate,
+            Configuration configuration) {
 
-        this.delegateRef.set(delegate);
+        super(delegate);
         this.scriptEngineScriptExecutorFactory = DefaultScriptEngineScriptExecutorFactory.getInstance(configuration);
-    }
-
-    @Override
-    public void cancel() throws CancelException {
-        getDelegate().cancel();
-    }
-
-    @Override
-    public void setVariables(Map<String, Object> variables) {
-        getDelegate().setVariables(variables);
-    }
-
-    @Override
-    public Map<String, Object> getVariables() {
-        return getDelegate().getVariables();
-    }
-
-    @Override
-    public String getSystemName() {
-        return getDelegate().getSystemName();
-    }
-
-    @Override
-    public String getHumanFriendlyName() {
-        return getDelegate().getHumanFriendlyName();
-    }
-
-    @Override
-    public String getVersion() {
-        return getDelegate().getVersion();
     }
 
     @Override
@@ -151,7 +121,8 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
                     .findFirst()
                     .orElseThrow(() ->
                             new ScriptExecutionException(
-                                    "Cannot process as interpreter command", interpreterCommandString));
+                                    "No such interpreter command: " + interpreterCommandString,
+                                    interpreterCommandString));
 
 
             if (beforeInterpreterCommand != null && !"".equals(beforeInterpreterCommand.trim())) {
@@ -188,43 +159,8 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
     }
 
 
-
-    private enum InterpreterCommand {
-        SET_SCRIPTENGINE("set ScriptEngine") {
-            @Override
-            protected void parseParametersAndExecute(
-                    String parameters, InterpreterEnhancedScriptEngineScriptExecutor context)
-                    throws ScriptExecutionException {
-
-                String scriptEngineName = parameters.trim();
-                if ("".equals(scriptEngineName.trim())) {
-                    throw new ScriptExecutionException(
-                            this.commandName + ": Missing mandatory parameter: ScriptEngineName", this.commandName);
-                }
-
-
-                context.rebindDelegate(scriptEngineName);
-            }
-        };
-
-        //CHECKSTYLE.OFF: VisibilityModifier: should be visible to enum fields
-        protected final String commandName;
-        //CHECKSTYLE.ON: VisibilityModifier
-
-        InterpreterCommand(String commandName) {
-            this.commandName = commandName;
-        }
-
-        protected boolean canHandle(String commandLine) {
-            return commandLine != null && commandLine.trim().startsWith(commandName);
-        }
-
-        protected abstract void parseParametersAndExecute(
-                String parameters, InterpreterEnhancedScriptEngineScriptExecutor context)
-                throws ScriptExecutionException;
-    }
-
-    private void rebindDelegate(String newScriptExecutorSystemName) {
+    @Override
+    public void setScriptEngine(String newScripEngineName) {
 
         ScriptEngineScriptExecutor previousScriptExecutor = getDelegate();
 
@@ -232,7 +168,7 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
 
         scriptExecutorMap.put(systemName, previousScriptExecutor);
 
-        ScriptEngineScriptExecutor newScriptExecutor = scriptExecutorMap.computeIfAbsent(newScriptExecutorSystemName,
+        ScriptEngineScriptExecutor newScriptExecutor = scriptExecutorMap.computeIfAbsent(newScripEngineName,
 
                 scriptEngineName -> {
                     try {
@@ -245,18 +181,10 @@ final class InterpreterEnhancedScriptEngineScriptExecutor implements ScriptEngin
 
         newScriptExecutor.setVariables(previousScriptExecutor.getVariables());
 
-        if (!delegateRef.compareAndSet(previousScriptExecutor, newScriptExecutor)) {
+        if (!compareAndSetDelegate(previousScriptExecutor, newScriptExecutor)) {
             throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
                     String.format("failed to compareAndSet(%s, %s)", previousScriptExecutor, newScriptExecutor));
         }
     }
 
-    private ScriptEngineScriptExecutor getDelegate() {
-        ScriptEngineScriptExecutor theDelegate = delegateRef.get();
-        if (theDelegate == null) {
-            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE
-                    .raiseUncheckedException("theDelegate is null");
-        }
-        return theDelegate;
-    }
 }

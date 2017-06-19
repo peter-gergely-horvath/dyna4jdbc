@@ -38,7 +38,7 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
     @Override
     public void testWritingFromUpdateThrowsSQLException() {
 
-        String script = "dyna4jdbc:set ScriptEngine Groovy \n"
+        String script = "dyna4jdbc:setScriptEngine Groovy \n"
                 + "println \"Hello World\" ";   // NOTE: this is Groovy syntax, it would not work with JavaScript
 
         assertWritingFromUpdateThrowsSQLException(script);
@@ -48,7 +48,7 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
     @Override
     public void testVariableDeclaredInStatementVisibleFromAnotherStatement() throws SQLException {
 
-        String variableDeclarationScript = "var msg = \"Hello World\"; dyna4jdbc:set ScriptEngine Groovy";
+        String variableDeclarationScript = "var msg = \"Hello World\"; dyna4jdbc:setScriptEngine Groovy ";
 
         // NOTE: this is Groovy syntax, it would not work with JavaScript
         String printVariableScript = "println \"Message::\";\n println msg ";
@@ -61,7 +61,7 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
     @Override
     public void testHeadersNotSpecified() throws Exception {
 
-        String script = "dyna4jdbc:set ScriptEngine Groovy\n" +
+        String script = "dyna4jdbc:setScriptEngine Groovy\n" +
                 // NOTE: this is Groovy syntax, it would not work with JavaScript
                 "println \"A:\tB:\";\n println \"First A\tFirst B\";\n println \"Second A\tSecond B\";\n";
 
@@ -72,7 +72,7 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
     @Override
     public void testHeadersSpecified() throws Exception {
 
-        String script = "dyna4jdbc:set ScriptEngine Groovy \n" +
+        String script = "dyna4jdbc:setScriptEngine Groovy \n" +
                 // NOTE: this is Groovy syntax, it would not work with JavaScript
                 "println \"A::\tB::\";\n println \"First A\tFirst B\";\n println \"Second A\tSecond B\";";
 
@@ -86,7 +86,7 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
                 .append("print(\"A::\tB::\");\n ")
                 .append("print(\"First A\tFirst B\");\n ")
                 .append("print(\"Second A\tSecond B\");")
-                .append("dyna4jdbc:set ScriptEngine Groovy\n")
+                .append("dyna4jdbc:setScriptEngine Groovy\n")
                 .append("println \"Third A\tThird B\";")
                 .append("println \"Fourth A\tFourth B\";")
                 .append("println \"Fifth A\tFifth B\";")
@@ -101,7 +101,7 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
 
         String script = new StringBuilder()
                 .append("print(\"A:\tB:\");\n ")
-                .append("dyna4jdbc:set ScriptEngine Groovy\n")
+                .append("dyna4jdbc:setScriptEngine Groovy\n ")
                 .append("println \"First A\tFirst B\" ;\n ")
                 .append("println \"Second A\tSecond B\";")
                 .append("println \"Third A\tThird B\";")
@@ -119,7 +119,7 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
     public void testPreparedStatementBindsVariable() throws Exception {
 
         String script = "print(\"Message::\");\n " +
-                "dyna4jdbc:set ScriptEngine Groovy\n" +
+                "dyna4jdbc:setScriptEngine Groovy\n" +
                 "println parameter1";
 
         assertPreparedStatementQueryReturnsParameter(script);
@@ -160,7 +160,7 @@ public class InterpreterScriptEngineTest extends IntegrationTestBase {
                 "Hello World | ");
 
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("dyna4jdbc:set ScriptEngine " + scriptEngineName);
+            statement.executeUpdate("dyna4jdbc:setScriptEngine " + scriptEngineName);
         }
 
         String resultSetString = executeScriptForResultSetString(printScript, connection);

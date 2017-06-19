@@ -31,7 +31,7 @@ public enum JDBCError {
 
     // Error class DYNAMIC_SQL_ERROR
     SCRIPT_EXECUTION_EXCEPTION("Execution of script raised exception: %s%n"
-            + "--- BEGIN OF FAILED SCRIPT ---%n%s%n--- END OF FAILED SCRIPT ---",
+            + "--- BEGIN OF FAILED SCRIPT ---%n%s%n---- END OF FAILED SCRIPT ----",
             SQLStateClass.DYNAMIC_SQL_ERROR, "001"),
     LOADING_SCRIPTENGINE_FAILED("Could not load ScriptEngine '%s'",
             SQLStateClass.DYNAMIC_SQL_ERROR, "002"),

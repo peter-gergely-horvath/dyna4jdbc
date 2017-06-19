@@ -67,7 +67,7 @@ public class ScriptEngineConnection extends ScriptConnection {
         ScriptEngineScriptExecutorFactory scriptExecutorFactory =
                 DefaultScriptEngineScriptExecutorFactory.getInstance(configuration);
 
-        this.scriptExecutor = scriptExecutorFactory.newInterpreterEnhancedScriptEngineScriptExecutor(engineName);
+        this.scriptExecutor = scriptExecutorFactory.newScriptEngineScriptExecutorWithInterpreterSupport(engineName);
 
         String initScriptPath = configuration.getInitScriptPath();
         if (initScriptPath != null) {

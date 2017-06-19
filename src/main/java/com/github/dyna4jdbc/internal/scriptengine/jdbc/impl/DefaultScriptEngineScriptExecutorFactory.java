@@ -47,12 +47,12 @@ final class DefaultScriptEngineScriptExecutorFactory implements ScriptEngineScri
 
 
     @Override
-    public ScriptEngineScriptExecutor newInterpreterEnhancedScriptEngineScriptExecutor(String scriptEngineName)
+    public ScriptEngineScriptExecutor newScriptEngineScriptExecutorWithInterpreterSupport(String scriptEngineName)
             throws SQLException, MisconfigurationException {
 
         ScriptEngineScriptExecutor delegate = newBasicScriptEngineScriptExecutor(scriptEngineName);
 
-        return new InterpreterEnhancedScriptEngineScriptExecutor(delegate, configuration);
+        return new InterpreterCommandHandlerScriptEngineScriptExecutor(delegate, configuration);
     }
 
     @Override
