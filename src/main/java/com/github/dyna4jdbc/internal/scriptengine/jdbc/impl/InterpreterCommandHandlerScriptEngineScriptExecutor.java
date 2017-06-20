@@ -53,6 +53,8 @@ final class InterpreterCommandHandlerScriptEngineScriptExecutor extends Delegati
 
     private final ScriptEngineScriptExecutorFactory scriptEngineScriptExecutorFactory;
 
+    private final Object lockObject = new Object();
+
     InterpreterCommandHandlerScriptEngineScriptExecutor(
             ScriptEngineScriptExecutor delegate,
             Configuration configuration) {
@@ -162,29 +164,35 @@ final class InterpreterCommandHandlerScriptEngineScriptExecutor extends Delegati
     @Override
     public void setScriptEngine(String newScripEngineName) {
 
-        ScriptEngineScriptExecutor previousScriptExecutor = getDelegate();
+        synchronized (lockObject) {
+            ScriptEngineScriptExecutor previousScriptExecutor = getDelegate();
 
-        String systemName = previousScriptExecutor.getSystemName();
+            String systemName = previousScriptExecutor.getSystemName();
 
-        scriptExecutorMap.put(systemName, previousScriptExecutor);
+            scriptExecutorMap.put(systemName, previousScriptExecutor);
 
-        ScriptEngineScriptExecutor newScriptExecutor = scriptExecutorMap.computeIfAbsent(newScripEngineName,
+            ScriptEngineScriptExecutor newScriptExecutor = scriptExecutorMap.computeIfAbsent(newScripEngineName,
 
-                scriptEngineName -> {
-                    try {
-                        return this.scriptEngineScriptExecutorFactory.
-                                newBasicScriptEngineScriptExecutor(scriptEngineName);
-                    } catch (SQLException | MisconfigurationException ex) {
-                        throw JDBCError.LOADING_SCRIPTENGINE_FAILED.raiseUncheckedException(ex, scriptEngineName);
-                    }
-                });
+                    scriptEngineName -> {
+                        try {
+                            return this.scriptEngineScriptExecutorFactory.
+                                    newBasicScriptEngineScriptExecutor(scriptEngineName);
 
-        newScriptExecutor.setVariables(previousScriptExecutor.getVariables());
+                        } catch (SQLException | MisconfigurationException ex) {
+                            throw JDBCError.LOADING_SCRIPTENGINE_FAILED.raiseUncheckedException(ex, scriptEngineName);
+                        }
+                    });
 
-        if (!compareAndSetDelegate(previousScriptExecutor, newScriptExecutor)) {
-            throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
-                    String.format("failed to compareAndSet(%s, %s)", previousScriptExecutor, newScriptExecutor));
+            newScriptExecutor.setVariables(previousScriptExecutor.getVariables());
+
+            if (!compareAndSetDelegate(previousScriptExecutor, newScriptExecutor)) {
+                // should not happen: this is the only place, that changes the ScriptExecutor
+                // and the retrieval using getDelegate() is in the same synchronized block
+                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(
+                        String.format("failed to compareAndSet(%s, %s)", previousScriptExecutor, newScriptExecutor));
+            }
         }
+
     }
 
 }
