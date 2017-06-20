@@ -6,7 +6,7 @@
 
 	<groupId>com.github.peter-gergely-horvath</groupId>
 	<artifactId>dyna4jdbc</artifactId>
-	<version>2.8.0-SNAPSHOT</version>
+	<version>3.0.0</version>
 
 	<licenses>
 		<license>
@@ -86,15 +86,15 @@
 
 	<url>https://github.com/peter-gergely-horvath/dyna4jdbc</url>
 	<description>
-		DYNA4JDBC is a JDBC driver implementation that allows running dynamic JVM language
-		(Scala, JavaScript, Groovy, Jython, BeanShell, R (Renjin), JRuby etc.) scripts or
-        external console-oriented programs (written in shell, PERL, C/C++, etc.) via the
-        JDBC API.
+		dyna4JDBC is a JDBC driver, that allows running alternative JVM language
+		scripts (Groovy, JavaScript, Scala, Jython, Clojure, BeanShell, R (Renjin),
+		JRuby etc.) or external console-oriented programs via the JDBC API.
 
-		The console output of the scripts/external programs is captured, parsed and
-        presented to the caller application as a standard JDBC ResultSet, allowing it
-        to be processed further for various purposes like analysis with other tools or
-        building complex reports using any JDBC-enabled business intelligence application.
+		Mainly targeted at allowing JDBC-enabled business intelligence applications to
+		run various scripts instead of SQL easily, dyna4JDBC captures and parses the
+		output of scripts/external programs and presents that as a standard JDBC
+		Result Set, allowing the output to be processed further for various purposes
+		like building complex reports quickly and analysis with other tools.
 	</description>
 	<inceptionYear>2016</inceptionYear>
 
