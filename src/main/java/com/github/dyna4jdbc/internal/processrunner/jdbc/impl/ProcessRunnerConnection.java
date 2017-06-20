@@ -80,6 +80,12 @@ public class ProcessRunnerConnection extends ScriptConnection {
                     ConfigurationEntry.EXTERNAL_COMMAND_NO_OUTPUT_EXPIRATION_INTERVAL_MS.getKey());
         }
 
+        if (!configuration.getClasspath().isEmpty()) {
+            throw MisconfigurationException.forMessage(
+                    "External process connection cannot handle configuration '%s'",
+                    ConfigurationEntry.CLASSPATH.getKey());
+        }
+
         return properties;
 
     }
