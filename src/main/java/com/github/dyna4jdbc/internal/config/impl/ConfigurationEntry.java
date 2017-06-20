@@ -179,8 +179,9 @@ public enum ConfigurationEntry {
             }
         }
     },
-    EXTERNAL_COMMAND_NO_OUTPUT_EXPIRATION_INTERVAL_MS("externalCallQuietPeriodMeansFinishedThreshold_ms", "3000",
-            "If an external program does not print anything more, it is considered as finish after this timespan (ms). "
+    EXTERNAL_COMMAND_NO_OUTPUT_EXPIRATION_INTERVAL_MS("endOfDataTimeoutMs", "3000",
+            "A timeout in milliseconds, after which, if an external program does not print anything more, "
+                    + "its execution is considered to be finished, even if the process continues to run. "
                     + "Default is 3000") {
         @Override
         void setConfiguration(ConfigurationImpl config, String value)
