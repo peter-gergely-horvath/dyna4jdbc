@@ -30,21 +30,25 @@ import java.util.concurrent.Future;
 
 import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
+import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 public class DefaultExternalProcessScriptExecutor implements ExternalProcessScriptExecutor {
+
 
     private volatile ProcessManager processManager;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final DefaultIOHandlerFactory ioHandlerFactory;
     private final ProcessManagerFactory processManagerFactory;
+    private final SQLWarningSink warningSink;
 
 
-    public DefaultExternalProcessScriptExecutor(Configuration configuration) {
+    public DefaultExternalProcessScriptExecutor(Configuration configuration, SQLWarningSink warningSink) {
         this.ioHandlerFactory = DefaultIOHandlerFactory.getInstance(configuration);
         this.processManagerFactory = ProcessManagerFactory.getInstance(configuration, executorService);
+        this.warningSink = warningSink;
     }
 
     //CHECKSTYLE.OFF: DesignForExtension : incorrect detection of "is not designed for extension"
@@ -65,7 +69,7 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
             if (this.processManager == null) {
                 Process newProcess = createProcess(script, variables);
 
-                this.processManager = processManagerFactory.newProcessManager(newProcess);
+                this.processManager = processManagerFactory.newProcessManager(newProcess, warningSink);
             } else {
                 this.processManager.writeToStandardInput(script);
             }

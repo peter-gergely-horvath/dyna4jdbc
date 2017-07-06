@@ -19,6 +19,7 @@ package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
 import java.util.concurrent.ExecutorService;
 
+import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 final class ProcessManagerFactory {
@@ -37,8 +38,8 @@ final class ProcessManagerFactory {
     }
     
 
-    ProcessManager newProcessManager(Process process) throws ProcessExecutionException {
-        return ProcessManager.newInstance(process, configuration, executorService);
+    ProcessManager newProcessManager(Process process, SQLWarningSink warningSink) throws ProcessExecutionException {
+        return ProcessManager.newInstance(process, configuration, executorService, warningSink);
     }
 
 }

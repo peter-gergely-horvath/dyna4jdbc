@@ -17,6 +17,7 @@
  
 package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 
+import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
 public class DefaultExternalProcessScriptExecutorFactory implements ExternalProcessScriptExecutorFactory {
@@ -30,8 +31,9 @@ public class DefaultExternalProcessScriptExecutorFactory implements ExternalProc
 
     //CHECKSTYLE.OFF: DesignForExtension : incorrect detection of "is not designed for extension"
     @Override
-    public ExternalProcessScriptExecutor newExternalProcessScriptExecutor(Configuration configuration) {
-        return new DefaultExternalProcessScriptExecutor(configuration);
+    public ExternalProcessScriptExecutor newExternalProcessScriptExecutor(
+            Configuration configuration, SQLWarningSink warningSink) {
+        return new DefaultExternalProcessScriptExecutor(configuration, warningSink);
     }
     //CHECKSTYLE.ON: DesignForExtension
 

@@ -20,6 +20,7 @@ package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLWarning;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
@@ -34,7 +35,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.common.outputhandler.IOHandlerFactory;
+import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.common.outputhandler.impl.DefaultIOHandlerFactory;
 import com.github.dyna4jdbc.internal.config.Configuration;
 
@@ -66,7 +69,11 @@ final class ProcessManager {
     private final Configuration configuration;
 
 
-    static ProcessManager newInstance(Process process, Configuration configuration, ExecutorService executorService)
+    static ProcessManager newInstance(
+            Process process,
+            Configuration configuration,
+            ExecutorService executorService,
+            SQLWarningSink warningSink)
             throws ProcessExecutionException {
 
         try {
@@ -91,11 +98,11 @@ final class ProcessManager {
 
             Runnable stdOutReader = new BufferedReaderToBlockingQueueRunnable(
                     "StdOut reader", stdOut,
-                    processManager.standardOutputStreamContentQueue, cyclicBarrier);
+                    processManager.standardOutputStreamContentQueue, cyclicBarrier, warningSink);
 
             Runnable stdErrReader = new BufferedReaderToBlockingQueueRunnable(
                     "StdErr reader", stdErr,
-                    processManager.errorStreamContentQueue, cyclicBarrier);
+                    processManager.errorStreamContentQueue, cyclicBarrier, warningSink);
 
             processManager.executorService.execute(stdOutReader);
             processManager.executorService.execute(stdErrReader);
@@ -109,7 +116,10 @@ final class ProcessManager {
             throw new ProcessExecutionException("Interrupted", e);
 
         } catch (BrokenBarrierException | TimeoutException e) {
-            throw new ProcessExecutionException(e);
+            process.destroyForcibly();
+
+            throw new ProcessExecutionException(
+                    "At least one process reader thread failed to initialize: process destroyed forcibly", e);
         }
     }
 
@@ -158,16 +168,18 @@ final class ProcessManager {
         private final BufferedReader bufferedReader;
         private final BlockingQueue<String> blockingQueue;
         private CyclicBarrier cyclicBarrier;
+        private final SQLWarningSink warningSink;
 
         private BufferedReaderToBlockingQueueRunnable(String identifier,
                                                       BufferedReader bufferedReader,
                                                       BlockingQueue<String> blockingQueue,
-                                                      CyclicBarrier cyclicBarrier) {
+                                                      CyclicBarrier cyclicBarrier, SQLWarningSink warningSink) {
 
             this.identifier = identifier;
             this.bufferedReader = bufferedReader;
             this.blockingQueue = blockingQueue;
             this.cyclicBarrier = cyclicBarrier;
+            this.warningSink = warningSink;
         }
 
         @Override
@@ -183,8 +195,25 @@ final class ProcessManager {
                     }
                     blockingQueue.put(line);
                 }
-            } catch (IOException | BrokenBarrierException | TimeoutException e) {
-                throw new RuntimeException(e);
+            } catch (IOException ioEx) {
+                LOGGER.log(Level.WARNING, ioEx, () -> "IOException in " + this.identifier);
+
+                warningSink.onSQLWarning(new SQLWarning(ioEx));
+
+            } catch (BrokenBarrierException bbe) {
+                LOGGER.log(Level.SEVERE, bbe, () -> "BrokenBarrierException in " + this.identifier);
+
+                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(bbe,
+                        "Caught BrokenBarrierException in " + this.identifier);
+
+            } catch (TimeoutException te) {
+                LOGGER.log(Level.SEVERE, te, () -> "TimeoutException in " + this.identifier);
+
+                warningSink.onSQLWarning(new SQLWarning(te));
+
+                throw JDBCError.DRIVER_BUG_UNEXPECTED_STATE.raiseUncheckedException(te,
+                        "Caught TimeoutException in " + this.identifier);
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } finally {

@@ -20,6 +20,7 @@ package com.github.dyna4jdbc.internal.nodejs.jdbc.impl;
 import com.github.dyna4jdbc.internal.JDBCError;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
 import com.github.dyna4jdbc.internal.ScriptExecutor;
+import com.github.dyna4jdbc.internal.common.outputhandler.SQLWarningSink;
 import com.github.dyna4jdbc.internal.config.Configuration;
 import com.github.dyna4jdbc.internal.processrunner.jdbc.impl.DefaultExternalProcessScriptExecutor;
 
@@ -40,8 +41,8 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
     private final Configuration configuration;
 
     
-    NodeJsProcessScriptExecutor(Configuration configuration, String replInitScript) {
-        super(configuration);
+    NodeJsProcessScriptExecutor(Configuration configuration, String replInitScript, SQLWarningSink warningSink) {
+        super(configuration, warningSink);
         this.replInitScript = replInitScript;
         this.configuration = configuration;
     }

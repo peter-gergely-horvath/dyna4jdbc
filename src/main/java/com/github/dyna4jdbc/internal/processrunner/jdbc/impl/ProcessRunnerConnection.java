@@ -59,7 +59,9 @@ public class ProcessRunnerConnection extends ScriptConnection {
 
         this.columnHandlerFactory = DefaultColumnHandlerFactory.getInstance(this.configuration);
 
-        this.scriptExecutor = processRunnerFactory.newExternalProcessScriptExecutor(this.configuration);
+        this.scriptExecutor = processRunnerFactory.newExternalProcessScriptExecutor(this.configuration,
+                warning -> addSQLWarning(warning)
+        );
 
         String initScriptPath = this.configuration.getInitScriptPath();
         if (initScriptPath != null) {
