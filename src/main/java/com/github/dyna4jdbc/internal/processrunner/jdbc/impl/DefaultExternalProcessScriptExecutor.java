@@ -20,6 +20,7 @@ package com.github.dyna4jdbc.internal.processrunner.jdbc.impl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.sql.SQLWarning;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -127,9 +128,13 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
     }
     //CHECKSTYLE.ON
 
+    protected final void addWarning(SQLWarning warning) {
+        warningSink.onSQLWarning(warning);
+    }
+
 
     @Override
-    public final void close() {
+    public void close() {
         try {
             abortProcessIfRunning();
         } finally {
