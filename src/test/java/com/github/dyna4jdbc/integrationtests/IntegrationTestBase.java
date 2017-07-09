@@ -18,8 +18,12 @@
 package com.github.dyna4jdbc.integrationtests;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import org.testng.ITestResult;
+import org.testng.annotations.AfterMethod;
 
 import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.executeScriptForResultSetString;
 import static com.github.dyna4jdbc.integrationtests.IntegrationTestUtils.newLineSeparated;
@@ -30,11 +34,19 @@ import static org.testng.Assert.*;
  */
 public abstract class IntegrationTestBase {
 
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
+
     protected static final String PREPARED_STATEMENT_PARAMETER = "Hello World";
     protected final String jdbcUrl;
 
     protected IntegrationTestBase(String jdbcUrl) {
         this.jdbcUrl = jdbcUrl;
+    }
+
+    @AfterMethod
+    public void afterMethod(ITestResult result) {
+        logger.log(Level.INFO, "Integration test finished: class: {0}, method name: {1}",
+                new Object[] { result.getTestClass(), result.getMethod().getMethodName() } );
     }
 
     protected void assertWritingFromUpdateThrowsSQLException(String script) {

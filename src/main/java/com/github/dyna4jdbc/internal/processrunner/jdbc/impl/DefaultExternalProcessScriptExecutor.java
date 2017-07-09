@@ -28,6 +28,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.github.dyna4jdbc.internal.CancelException;
 import com.github.dyna4jdbc.internal.ScriptExecutionException;
@@ -37,6 +39,7 @@ import com.github.dyna4jdbc.internal.config.Configuration;
 
 public class DefaultExternalProcessScriptExecutor implements ExternalProcessScriptExecutor {
 
+    private static final Logger LOGGER = Logger.getLogger(DefaultExternalProcessScriptExecutor.class.getName());
 
     private volatile ProcessManager processManager;
 
@@ -151,6 +154,9 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
         ProcessManager currentProcessManager = processManager;
         if (currentProcessManager != null
                 && currentProcessManager.isProcessRunning()) {
+
+            LOGGER.log(Level.FINEST, () -> "Terminating process " + this);
+
             currentProcessManager.terminateProcess();
             processManager = null;
         }

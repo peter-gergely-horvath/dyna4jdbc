@@ -121,6 +121,10 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
         private void exitNodeJsProcess() {
 
             try {
+
+                LOGGER.log(Level.FINEST, "Dispatching command {0} to {1} to shutdown the attached process",
+                        new Object[] {NODE_EXIT_COMMAND, this});
+
                 this.invokeScript(NODE_EXIT_COMMAND);
 
             } catch (ScriptExecutionException ex) {
@@ -190,6 +194,8 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
     @Override
     public final void close() {
 
+        LOGGER.log(Level.FINEST, "{0} is being closed", this);
+
         try {
             ExitNodeJsScriptInvoker exitCommandInvoker = new ExitNodeJsScriptInvoker(configuration, this);
 
@@ -198,8 +204,7 @@ class NodeJsProcessScriptExecutor extends DefaultExternalProcessScriptExecutor {
         } catch (RuntimeException ex) {
 
             LOGGER.log(Level.WARNING, ex, () ->
-                    "Exception shutting down Node.js process gracefully; will fall-back to OS kill");
-
+                    "Exception dispatching exit request to " + this + " Node.js process; will fall-back to OS kill");
 
             throw ex;
 

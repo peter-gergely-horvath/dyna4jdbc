@@ -80,6 +80,7 @@
 		<maven-pmd-plugin.version>3.6</maven-pmd-plugin.version>
 		<findbugs-maven-plugin.version>3.0.3</findbugs-maven-plugin.version>
 		<xml-maven-plugin.version>1.0</xml-maven-plugin.version>
+		<maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
 		<maven-source-plugin.version>3.0.0</maven-source-plugin.version>
 		<maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
 	</properties>
@@ -342,6 +343,20 @@
 								<version>2.0.1</version>
 							</dependency>
 						</dependencies>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${maven-surefire-plugin.version}</version>
+						<configuration>
+							<systemProperties>
+								<property>
+									<name>java.util.logging.config.file</name>
+									<value>src/test/resources/dyna4jdbc.debug.log.config.properties</value>
+								</property>
+							</systemProperties>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
