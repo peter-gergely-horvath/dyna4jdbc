@@ -18,8 +18,10 @@
 package com.github.dyna4jdbc.integrationtests;
 
 import com.github.dyna4jdbc.internal.JDBCError;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 
 import java.sql.*;
 import java.util.logging.Level;
@@ -36,16 +38,22 @@ public abstract class IntegrationTestBase {
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
-    protected static final String PREPARED_STATEMENT_PARAMETER = "Hello World";
+    private static final String PREPARED_STATEMENT_PARAMETER = "Hello World";
     protected final String jdbcUrl;
 
     protected IntegrationTestBase(String jdbcUrl) {
         this.jdbcUrl = jdbcUrl;
     }
 
+    @BeforeMethod
+    public void beforeMethod(java.lang.reflect.Method method) {
+        logger.log(Level.INFO, "Commencing Integration Test: {0}#{1}",
+                new Object[] { method.getDeclaringClass().getName(), method.getName() } );
+    }
+
     @AfterMethod
     public void afterMethod(ITestResult result) {
-        logger.log(Level.INFO, "Integration test finished: class: {0}, method name: {1}",
+        logger.log(Level.INFO, "Finished Integration Test: {0}#{1}",
                 new Object[] { result.getTestClass(), result.getMethod().getMethodName() } );
     }
 
@@ -63,7 +71,7 @@ public abstract class IntegrationTestBase {
 
             String message = sqlEx.getMessage();
             assertNotNull(message);
-            assertTrue(message.contains(JDBCError.USING_STDOUT_FROM_UPDATE.name().toString()), message);
+            assertTrue(message.contains(JDBCError.USING_STDOUT_FROM_UPDATE.name()), message);
         }
     }
 

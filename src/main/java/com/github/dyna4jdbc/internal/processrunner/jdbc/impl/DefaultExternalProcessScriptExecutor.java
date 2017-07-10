@@ -132,12 +132,17 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
     //CHECKSTYLE.ON
 
     protected final void addWarning(SQLWarning warning) {
+        LOGGER.log(Level.FINE, "Adding SQLWarning {0} to {1}", new Object[]{warning, this});
+
         warningSink.onSQLWarning(warning);
     }
 
 
     @Override
     public void close() {
+
+        LOGGER.log(Level.FINEST, "Closing {0}", this);
+
         try {
             abortProcessIfRunning();
         } finally {
@@ -147,6 +152,9 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
 
     @Override
     public final void cancel() throws CancelException {
+
+        LOGGER.log(Level.FINE, "Cancel requested on {0}", this);
+
         abortProcessIfRunning();
     }
 
@@ -155,10 +163,12 @@ public class DefaultExternalProcessScriptExecutor implements ExternalProcessScri
         if (currentProcessManager != null
                 && currentProcessManager.isProcessRunning()) {
 
-            LOGGER.log(Level.FINEST, () -> "Terminating process " + this);
+            LOGGER.log(Level.FINEST, "Terminating process in {0}", this);
 
             currentProcessManager.terminateProcess();
             processManager = null;
+        } else {
+            LOGGER.log(Level.FINEST, "Nothing to do: Process was NOT running in {0}", this);
         }
     }
 
