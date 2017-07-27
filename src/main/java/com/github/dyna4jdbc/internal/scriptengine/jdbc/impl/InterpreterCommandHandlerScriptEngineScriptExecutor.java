@@ -38,7 +38,7 @@ final class InterpreterCommandHandlerScriptEngineScriptExecutor extends Delegati
 
     // we use a simple regular expression to fish out our one-liner tiny "interpreter commands" from the the input
     private static final Pattern INTERPRETER_COMMAND_PATTERN =
-            Pattern.compile("(.*)"              // CAPTURING GROUP 1: content before the interpreter command
+            Pattern.compile("(.*)"       // CAPTURING GROUP 1: content before the interpreter command
                             + "(?<!jdbc:)"      // NOT a "jdbc:" prefix
                             + "dyna4jdbc:"      // the pattern "dyna4jdbc:"
                             + "([^\\n\\r]+)"    // CAPTURING GROUP 2: the interpreter command

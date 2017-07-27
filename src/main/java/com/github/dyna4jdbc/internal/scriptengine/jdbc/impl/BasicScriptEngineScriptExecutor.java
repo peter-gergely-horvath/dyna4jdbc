@@ -48,7 +48,7 @@ final class BasicScriptEngineScriptExecutor implements ScriptEngineScriptExecuto
 
     private final IOHandlerFactory ioHandlerFactory;
 
-    private AtomicReference<AbortableOutputStream.AbortHandler> streamAbortHandlerRef = new AtomicReference<>();
+    private final AtomicReference<AbortableOutputStream.AbortHandler> streamAbortHandlerRef = new AtomicReference<>();
 
     BasicScriptEngineScriptExecutor(String systemName, ScriptEngine scriptEngine, Configuration configuration) {
         Objects.requireNonNull(scriptEngine, "argument systemName cannot be null");
