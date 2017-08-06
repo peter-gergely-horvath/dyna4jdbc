@@ -38,9 +38,9 @@ public class ConnectionFactoryTest {
 
         ConnectionFactory mockConnectionFactory = new ConnectionFactory() {
             @Override
-            protected Connection newConnection(String connectionType, String config, Properties properties) throws Exception {
+            protected Connection newConnection(String connectionTypeName, String config, Properties properties) throws Exception {
 
-                assertEquals(connectionType, "foo");
+                assertEquals(connectionTypeName, "foo");
 
                 assertEquals(config, "bar:baz");
 
@@ -61,9 +61,9 @@ public class ConnectionFactoryTest {
 
         ConnectionFactory mockConnectionFactory = new ConnectionFactory() {
             @Override
-            protected Connection newConnection(String connectionType, String config, Properties properties) throws Exception {
+            protected Connection newConnection(String connectionTypeName, String config, Properties properties) throws Exception {
 
-                assertEquals(connectionType, "foo");
+                assertEquals(connectionTypeName, "foo");
 
                 assertEquals(config, null);
 
@@ -84,9 +84,9 @@ public class ConnectionFactoryTest {
 
         ConnectionFactory mockConnectionFactory = new ConnectionFactory() {
             @Override
-            protected Connection newConnection(String connectionType, String config, Properties properties) throws Exception {
+            protected Connection newConnection(String connectionTypeName, String config, Properties properties) throws Exception {
 
-                assertEquals(connectionType, "foo");
+                assertEquals(connectionTypeName, "foo");
 
                 assertEquals(config, "");
 
@@ -107,9 +107,9 @@ public class ConnectionFactoryTest {
 
         ConnectionFactory mockConnectionFactory = new ConnectionFactory() {
             @Override
-            protected Connection newConnection(String connectionType, String config, Properties properties) throws Exception {
+            protected Connection newConnection(String connectionTypeName, String config, Properties properties) throws Exception {
 
-                assertEquals(connectionType, "foobar");
+                assertEquals(connectionTypeName, "foobar");
 
                 assertEquals(config, "");
 

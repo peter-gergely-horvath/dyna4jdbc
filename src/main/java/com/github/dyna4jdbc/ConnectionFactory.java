@@ -83,25 +83,57 @@ class ConnectionFactory {
         }
     }
 
+    protected Connection newConnection(String connectionTypeName, String config, Properties properties)
+            throws Exception {
 
-    protected Connection newConnection(String connectionType, String config, Properties properties) throws Exception {
+        ConnectionType connectionType = ConnectionType.getByName(connectionTypeName);
 
-        switch (connectionType) {
-            case "process-runner":
-                return new ProcessRunnerConnection(config, properties);
+        return connectionType.newConnection(config, properties);
 
+    }
 
-            case "scriptengine":
+    private enum ConnectionType {
+        SCRIPTENGINE("scriptengine") {
+            @Override
+            protected Connection newConnection(String config, Properties properties)
+                    throws MisconfigurationException, SQLException {
                 return new ScriptEngineConnection(config, properties);
-
-
-            case "nodejs":
+            }
+        },
+        PROCESS_RUNNER("process-runner") {
+            @Override
+            protected Connection newConnection(String config, Properties properties)
+                    throws MisconfigurationException, SQLException {
+                return new ProcessRunnerConnection(config, properties);
+            }
+        },
+        NODE_JS("nodejs") {
+            @Override
+            protected Connection newConnection(String config, Properties properties)
+                    throws MisconfigurationException, SQLException {
                 return new NodeJsConnection(config, properties);
+            }
+        };
 
+        private final String publicName;
 
-            default:
-                throw MisconfigurationException.forMessage("No such connection type: '%s'", connectionType);
+        ConnectionType(String publicName) {
+            this.publicName = publicName;
         }
+
+        private static ConnectionType getByName(String requestedPublicName) throws MisconfigurationException {
+            for (ConnectionType ct : ConnectionType.values()) {
+                if (ct.publicName.equals(requestedPublicName)) {
+                    return ct;
+                }
+            }
+
+            throw MisconfigurationException.forMessage("No such connection type: '%s'", requestedPublicName);
+        }
+
+
+        protected abstract Connection newConnection(String config, Properties properties)
+                throws MisconfigurationException, SQLException;
     }
 
 }
