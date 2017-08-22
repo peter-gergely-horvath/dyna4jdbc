@@ -67,8 +67,7 @@ class ConnectionFactory {
             throw JDBCError.CONNECT_FAILED_EXCEPTION.raiseSQLException(ex, causeMessage);
         } catch (OutOfMemoryError er) {
             throw JDBCError.OUT_OF_MEMORY.raiseSQLException(er, "Connect failed");
-        }
-        catch (Throwable throwable) {
+        } catch (Throwable throwable) {
             /*
             We do not trust any external library here: While a GUI client application
             might be prepared to properly handle SQLExceptions, it might break if we

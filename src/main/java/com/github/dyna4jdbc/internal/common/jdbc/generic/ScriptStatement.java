@@ -95,8 +95,7 @@ public class ScriptStatement<T extends java.sql.Connection> extends AbstractStat
             throw JDBCError.REQUIRED_RESOURCE_UNAVAILABLE.raiseSQLException(ex, ex.getMessage());
         } catch (OutOfMemoryError er) {
             throw JDBCError.OUT_OF_MEMORY.raiseSQLException(er, "executeQuery failed");
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             String message = ExceptionUtils.getRootCauseMessage(t);
             throw JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
         }
@@ -148,8 +147,7 @@ public class ScriptStatement<T extends java.sql.Connection> extends AbstractStat
             throw JDBCError.REQUIRED_RESOURCE_UNAVAILABLE.raiseSQLException(ex, ex.getMessage());
         } catch (OutOfMemoryError er) {
             throw JDBCError.OUT_OF_MEMORY.raiseSQLException(er, "executeUpdate failed");
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             String message = ExceptionUtils.getRootCauseMessage(t);
             throw JDBCError.UNEXPECTED_THROWABLE.raiseSQLException(t, message);
         }
