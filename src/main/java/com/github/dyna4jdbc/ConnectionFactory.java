@@ -60,20 +60,19 @@ class ConnectionFactory {
         } catch (RuntimeDyna4JdbcException ex) {
             throw new SQLException(ex.getMessage(), ex.getSqlState(), ex);
 
-        } catch (ClassNotFoundException | NoClassDefFoundError ex) {
+        } catch (ClassNotFoundException | NoClassDefFoundError | UnsatisfiedLinkError ex) {
             throw JDBCError.REQUIRED_RESOURCE_UNAVAILABLE.raiseSQLException(ex, ex.getMessage());
-
         } catch (Exception ex) {
             String causeMessage = ExceptionUtils.getRootCauseMessage(ex);
             throw JDBCError.CONNECT_FAILED_EXCEPTION.raiseSQLException(ex, causeMessage);
-
-        } catch (Throwable throwable) {
+        } catch (OutOfMemoryError er) {
+            throw JDBCError.OUT_OF_MEMORY.raiseSQLException(er, "Connect failed");
+        }
+        catch (Throwable throwable) {
             /*
-            We do not trust any external library here: some script languages
-            might e.g. attempt to load native libraries, which can cause an
-            UnsatisfiedLinkError. While a GUI client application might be prepared
-            to properly handle SQLExceptions, it might break if we let any unexpected
-            Throwables escape the driver layer.
+            We do not trust any external library here: While a GUI client application
+            might be prepared to properly handle SQLExceptions, it might break if we
+            let any unexpected Throwables escape the driver layer.
 
             Hence, we intentionally and knowingly catch all Throwables (including
             Errors) and wrap them into an SQLException.

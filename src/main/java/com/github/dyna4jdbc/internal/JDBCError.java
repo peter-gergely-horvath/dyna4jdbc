@@ -108,6 +108,8 @@ public enum JDBCError {
             SQLStateClass.SYSTEM_ERROR, "003"),
     PARENT_CLOSE_TRIGGERED_FROM_CHILD_THREW_EXCEPTION("Closure of parent failed: %s",
             SQLStateClass.SYSTEM_ERROR, "004"),
+    OUT_OF_MEMORY("%s: Out of memory",
+            SQLStateClass.SYSTEM_ERROR, "005"),
     
     
     UNEXPECTED_THROWABLE("Processing failed; caught unexpected exception: %s",
