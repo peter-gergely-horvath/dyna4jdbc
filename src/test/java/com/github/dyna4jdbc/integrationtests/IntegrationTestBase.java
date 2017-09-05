@@ -48,13 +48,13 @@ public abstract class IntegrationTestBase {
     @BeforeMethod
     public void beforeMethod(java.lang.reflect.Method method) {
         logger.log(Level.INFO, "Commencing Integration Test: {0}#{1}",
-                new Object[] { method.getDeclaringClass().getName(), method.getName() } );
+                new Object[] { getClass().getName(), method.getName() } );
     }
 
     @AfterMethod
     public void afterMethod(ITestResult result) {
         logger.log(Level.INFO, "Finished Integration Test: {0}#{1}",
-                new Object[] { result.getTestClass(), result.getMethod().getMethodName() } );
+                new Object[] { result.getTestClass().getRealClass().getName(), result.getMethod().getMethodName() } );
     }
 
     protected void assertWritingFromUpdateThrowsSQLException(String script) {
