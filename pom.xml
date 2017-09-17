@@ -6,7 +6,7 @@
 
 	<groupId>com.github.peter-gergely-horvath</groupId>
 	<artifactId>dyna4jdbc</artifactId>
-	<version>3.1.0</version>
+	<version>3.1.1</version>
 
 	<licenses>
 		<license>
