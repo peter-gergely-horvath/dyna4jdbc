@@ -59,6 +59,26 @@ public class BasicScriptEngineTest {
             assertTrue(message.contains(JDBCError.LOADING_SCRIPTENGINE_FAILED.name().toString()), message);
         }
     }
+
+    @Test
+    public void testDuplicatedHeaderThrowsSQLException() {
+
+        try(Connection connection = DriverManager.getConnection("jdbc:dyna4jdbc:scriptengine:JavaScript")) {
+
+            try(Statement statement = connection.createStatement()) {
+
+                statement.executeQuery("print(\"FOOBAR::\tFOOBAR::\");\n print(\"FOO\tBAR\");");
+
+                fail("Should have thrown an exception");
+            }
+        } catch (SQLException sqlEx) {
+
+            String message = sqlEx.getMessage();
+            assertNotNull(message);
+            assertTrue(message.contains(JDBCError.DUPLICATED_HEADER_NAME.name().toString()), message);
+            assertTrue(message.contains("FOOBAR"), message);
+        }
+    }
 }
 
 
