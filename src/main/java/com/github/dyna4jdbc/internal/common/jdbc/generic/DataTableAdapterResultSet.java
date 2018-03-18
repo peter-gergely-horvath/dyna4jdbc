@@ -47,7 +47,8 @@ public final class DataTableAdapterResultSet extends RowListResultSet<List<Strin
     private static List<ColumnHandler> initColumnHandlers(DataTable dataTable,
                                                         ColumnHandlerFactory columnHandlerFactory) {
 
-        LinkedList<ColumnHandler> columnHandlerList = new LinkedList<>();
+        final int columnCount = dataTable.getColumnCount();
+        final List<ColumnHandler> columnHandlerList = new ArrayList<>(columnCount);
 
         int columnIndex = 0;
 
